@@ -38,6 +38,8 @@ test("visual-validate script rejects blank/white/uniform frames", () => {
   assert.match(script, /sceneDiversity/);
   assert.match(script, /poster is blank/);
   assert.match(script, /GATE@/);
+  assert.match(script, /--input-dir/);
+  assert.match(script, /--output-dir/);
 });
 
 test("remotion scenes use dedicated components without app CSS imports", () => {

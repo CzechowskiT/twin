@@ -173,23 +173,47 @@ PostHog not configured in agent env — events verified via static guards only; 
 
 ---
 
+## 12. Production frame validation (2026-07-15, post PR #480)
+
+**PR #480** merged @ `0c739b5e7e98ef3ca1c8a51a5463160b4ede14a0` · prod FE aligned · MP4 EN Content-Length **3719495** (was 2814402).
+
+| Check | Result |
+|-------|--------|
+| Prod assets downloaded | **PASS** — `reports/demo-prod-assets/` (8 files, 15.5 MB) |
+| `demo:video:visual-validate --input-dir` prod | **PASS** — 32 frames EN+PL @ 0,3,5,7,10,12,18,20,22,26,28,33,35,38,40,41s |
+| Frame audit copies | **PASS** — `reports/demo-frame-audit/prod-{en,pl}-{t}s.png` |
+| Scene diversity | **PASS** — avg diff > 0.02 |
+| Poster validation | **PASS** — EN+PL webp non-blank |
+| Gate frames (3,7,12,20,28,35,40s) | **PASS** — visible UI (Inbox, Career Compass, Hiring Cockpit, Calendar, CTA) |
+| `smoke:demo-founder-review-prod` | **PASS** — 20 screenshots, 0 FAIL criteria @ `0c739b5e` |
+| `probe:prod-public` ×2 | **220/220 PASS** |
+| `verify:production-v3:077` | **PASS** |
+| P0 demo-video-blank (LB-107) | **CLOSED** |
+
+**Root cause (closed):** Remotion rendered on light gradient with low-contrast skeleton UI — frames appeared blank (white% ~100%) while VTT captions worked. Fix: dedicated dark-theme scene components + visual validator gate.
+
+---
+
 ## 11. Stance
 
 - **Gate F:** PENDING — founder checkbox **empty**
 - **Launch:** NO-GO
-- **Demo prod:** Real video @ PR #476 — **verified PASS** on prod
+- **Demo prod:** Real video @ PR #476 + visible frames @ PR #480 — **verified PASS** on prod `0c739b5e`
+- **P0 demo-video-blank (LB-107):** **CLOSED** @ 2026-07-15
 - **Harness debt:** Closed — PR #478 harness + fix/demo-reduced-data-fallback runtime alignment
 - **Reduced-data:** **FALLBACK_VERIFIED** — poster-first, role cards without video when save-data
 
 ```
 DEMO_FOUNDER_REVIEW_DATE: 2026-07-15
-REPO_HEAD: (post fix/demo-reduced-data-fallback merge)
-PROD_FE: (post Vercel deploy)
+REPO_HEAD: 0c739b5e7e98ef3ca1c8a51a5463160b4ede14a0
+PROD_FE: 0c739b5e7e98ef3ca1c8a51a5463160b4ede14a0
 PROD_API: ae14bfb58fc0
 DB_HEAD: 077
-VISUAL_CRITERIA: 19/19_PASS
+VISUAL_CRITERIA: 18/18_PASS
 VIDEO_PROD: PASS
+PROD_FRAME_VALIDATION: 32/32_PASS
 REDUCED_DATA: FALLBACK_VERIFIED
+P0_DEMO_VIDEO_BLANK: CLOSED
 GATE_F: PENDING
 LAUNCH: NO-GO
 ```

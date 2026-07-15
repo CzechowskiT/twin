@@ -2,6 +2,8 @@
 
 > Append-only register. Each blocker must be **GREEN** or explicitly **WAIVED** with founder sign-off before public GO.
 
+**Batch update 2026-07-15T06:10Z:** LB-107 **CLOSED** — P0 demo-video-blank; PR #480 merged @ `0c739b5e`; prod MP4 EN 3719495 B (was 2814402); `demo:video:visual-validate` PASS on downloaded prod assets (32 frames EN+PL); `smoke:demo-founder-review-prod` 18/18 PASS @ prod `0c739b5e`; evidence `reports/demo-visual-validate-prod/`, `reports/demo-frame-audit/prod-*`, `reports/demo-prod-assets/`.
+
 **Batch update 2026-07-14T12:00Z:** Closed batch — LB-104 **CLOSED** (C1–C5 per-module evidence complete); LB-201/LB-005 remain BLOCKED (O7/R-019 preflight UNSET); Gate F pack refreshed; PR #473 merge confirmed @ `874b8586`.
 
 **Batch update 2026-07-14T09:30Z:** LB-106 **CLOSED** — canonical 60min stabilization soak GH run #29315813862 PASS (3731s, 13 snapshots, `identityDriftDetected=false`, `credentialsSet=true`, DB 077, `failReasons=[]`); evidence `reports/stabilization/29315813862/`; rejected drift run #29313170353; duplicate #29316738867 already completed (cancel N/A).
@@ -21,6 +23,7 @@
 | LB-003 | Wave B3 referrals not merged (#448) | P0 | Eng | **CLOSED** | PR #470 merged; Wave B/C guards 16/16 PASS @ `ad7944b8` |
 | LB-004 | Public launch stance `noGo` | P0 | Product | **OPEN** | Founder scoped launch decision §G checkboxes |
 | LB-005 | Self-service account delete (R-019) | P1→P0 at scale | Eng | **BLOCKED** | API on prod; no disposable test account in env — never founder/demo@twin.career |
+| LB-107 | Demo product film blank/white frames (demo-video-blank) | P0 | Eng | **CLOSED** | PR #480 @ `0c739b5e` — Remotion dark-theme scenes; prod visual validator PASS (32 frames EN+PL); browser smoke PASS @ 2026-07-15; evidence `reports/demo-visual-validate-prod/` |
 
 ---
 
@@ -82,7 +85,7 @@
 
 ---
 
-**Register stance:** 3 OPEN · 11 FIXED/CLOSED · 0 PARTIAL · 2 BLOCKED · 2 WAIVED/ACCEPTED · Launch **NO-GO**
+**Register stance:** 3 OPEN · 12 FIXED/CLOSED · 0 PARTIAL · 2 BLOCKED · 2 WAIVED/ACCEPTED · Launch **NO-GO**
 
 ---
 

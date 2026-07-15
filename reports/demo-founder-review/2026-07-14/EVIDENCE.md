@@ -1,8 +1,8 @@
 # Demo Founder Review Evidence — 2026-07-14
 
-**Generated:** 2026-07-14T14:00:38.633Z
+**Generated:** 2026-07-15T06:07:45.044Z
 **Prod:** https://twin-society.vercel.app/demo
-**FE SHA:** aa33afe61ae82e7ce3f6ea9565c97d86aced8b88
+**FE SHA:** 0c739b5e7e98ef3ca1c8a51a5463160b4ede14a0
 **API SHA:** ae14bfb58fc0c2db56a6fa0f417ca41c534b7960
 **Gate F:** PENDING · **Launch:** NO-GO
 
@@ -10,26 +10,26 @@
 
 | File | Locale | Viewport | State | UTC |
 |------|--------|----------|-------|-----|
-| hero-EN-1920x1080.png | EN | 1920x1080 | hero-loaded | 2026-07-14T14:00:57.112Z |
-| hero-EN-390x844.png | EN | 390x844 | hero-loaded | 2026-07-14T14:00:58.824Z |
-| hero-PL-1920x1080.png | PL | 1920x1080 | hero-loaded | 2026-07-14T14:01:01.025Z |
-| hero-PL-390x844.png | PL | 390x844 | hero-loaded | 2026-07-14T14:01:02.629Z |
-| video-milestone-0s-EN.png | EN | 1280x800 | video-t=0s | 2026-07-14T14:01:08.081Z |
-| video-milestone-5s-EN.png | EN | 1280x800 | video-t=5s | 2026-07-14T14:01:08.534Z |
-| video-milestone-10s-EN.png | EN | 1280x800 | video-t=10s | 2026-07-14T14:01:08.979Z |
-| video-milestone-18s-EN.png | EN | 1280x800 | video-t=18s | 2026-07-14T14:01:09.432Z |
-| video-milestone-22s-EN.png | EN | 1280x800 | video-t=22s | 2026-07-14T14:01:09.880Z |
-| video-milestone-26s-EN.png | EN | 1280x800 | video-t=26s | 2026-07-14T14:01:10.330Z |
-| video-milestone-33s-EN.png | EN | 1280x800 | video-t=33s | 2026-07-14T14:01:10.782Z |
-| video-milestone-38s-EN.png | EN | 1280x800 | video-t=38s | 2026-07-14T14:01:11.229Z |
-| video-complete-interactive-EN.png | EN | 1280x800 | post-skip-roles-visible | 2026-07-14T14:01:11.482Z |
-| role-candidate-flow-EN-desktop.png | EN | 1280x800 | role-candidate-selected | 2026-07-14T14:01:11.649Z |
-| role-recruiter-flow-EN-desktop.png | EN | 1280x800 | role-recruiter-selected | 2026-07-14T14:01:42.058Z |
-| role-company-flow-EN-desktop.png | EN | 1280x800 | role-company-selected | 2026-07-14T14:02:12.476Z |
-| a11y-reduced-motion-EN.png | EN | 1280x800 | reduced-motion | 2026-07-14T14:02:45.133Z |
-| a11y-reduced-data-EN.png | EN | 1280x800 | reduced-data | 2026-07-14T14:02:47.100Z |
-| a11y-keyboard-focus-EN.png | EN | 1280x800 | keyboard-tab-focus | 2026-07-14T14:02:49.310Z |
-| role-candidate-flow-PL-mobile.png | PL | 390x844 | role-candidate-mobile | 2026-07-14T14:02:51.155Z |
+| hero-EN-1920x1080.png | EN | 1920x1080 | hero-loaded | 2026-07-15T06:07:58.767Z |
+| hero-EN-390x844.png | EN | 390x844 | hero-loaded | 2026-07-15T06:08:00.337Z |
+| hero-PL-1920x1080.png | PL | 1920x1080 | hero-loaded | 2026-07-15T06:08:02.480Z |
+| hero-PL-390x844.png | PL | 390x844 | hero-loaded | 2026-07-15T06:08:04.026Z |
+| video-milestone-0s-EN.png | EN | 1280x800 | video-t=0s | 2026-07-15T06:08:09.039Z |
+| video-milestone-5s-EN.png | EN | 1280x800 | video-t=5s | 2026-07-15T06:08:09.522Z |
+| video-milestone-10s-EN.png | EN | 1280x800 | video-t=10s | 2026-07-15T06:08:09.981Z |
+| video-milestone-18s-EN.png | EN | 1280x800 | video-t=18s | 2026-07-15T06:08:10.437Z |
+| video-milestone-22s-EN.png | EN | 1280x800 | video-t=22s | 2026-07-15T06:08:10.897Z |
+| video-milestone-26s-EN.png | EN | 1280x800 | video-t=26s | 2026-07-15T06:08:11.348Z |
+| video-milestone-33s-EN.png | EN | 1280x800 | video-t=33s | 2026-07-15T06:08:11.800Z |
+| video-milestone-38s-EN.png | EN | 1280x800 | video-t=38s | 2026-07-15T06:08:12.251Z |
+| video-complete-interactive-EN.png | EN | 1280x800 | post-skip-roles-visible | 2026-07-15T06:08:12.479Z |
+| role-candidate-flow-EN-desktop.png | EN | 1280x800 | role-candidate-selected | 2026-07-15T06:08:12.630Z |
+| role-recruiter-flow-EN-desktop.png | EN | 1280x800 | role-recruiter-selected | 2026-07-15T06:08:43.026Z |
+| role-company-flow-EN-desktop.png | EN | 1280x800 | role-company-selected | 2026-07-15T06:09:13.429Z |
+| a11y-reduced-motion-EN.png | EN | 1280x800 | reduced-motion | 2026-07-15T06:09:45.752Z |
+| a11y-reduced-data-EN.png | EN | 1280x800 | reduced-data | 2026-07-15T06:09:48.009Z |
+| a11y-keyboard-focus-EN.png | EN | 1280x800 | keyboard-tab-focus | 2026-07-15T06:09:50.394Z |
+| role-candidate-flow-PL-mobile.png | PL | 390x844 | role-candidate-mobile | 2026-07-15T06:09:52.084Z |
 
 ## Visual acceptance (18 criteria)
 
