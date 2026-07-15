@@ -1,12 +1,12 @@
 # Demo Founder Review Evidence — 2026-07-14
 
 **Type:** Production demo verification pack — **not launch approval**  
-**Branch:** `cursor/phase1-monorepo-scaffold` @ `934cbbeb`  
+**Branch:** `cursor/phase1-monorepo-scaffold` @ `2e076c0e` (+ PR fix/demo-reduced-data-fallback)  
 **Prod URL:** https://twin-society.vercel.app/demo  
-**Vercel deployment:** `dpl_GrHTLLyKi7c3HLH82LioY4z6MTgF`  
+**Vercel deployment:** pending post-fix deploy  
 **Gate F:** PENDING · **Launch:** NO-GO
 
-**Related:** [Gate F decision record](./GATE_F_FOUNDER_DECISION_RECORD_2026-07-09.md) · [Founder demo review package](../reports/FOUNDER_DEMO_REVIEW_PACKAGE.md) · PR #476 real video demo
+**Related:** [Gate F decision record](./GATE_F_FOUNDER_DECISION_RECORD_2026-07-09.md) · [Founder demo review package](../reports/FOUNDER_DEMO_REVIEW_PACKAGE.md) · PR #476 real video demo · PR #478 founder-review harness · **fix/demo-reduced-data-fallback**
 
 ---
 
@@ -56,7 +56,7 @@
 
 ---
 
-## 3. Visual founder acceptance (18 criteria)
+## 3. Visual founder acceptance (19 criteria)
 
 | # | Criterion | Verdict | Evidence |
 |---|-----------|---------|----------|
@@ -77,9 +77,10 @@
 | 15 | Recruiter flow | **PASS** | `role-recruiter-flow-EN-desktop.png` |
 | 16 | Company flow | **PASS** | `role-company-flow-EN-desktop.png` |
 | 17 | Reduced motion | **PASS** | `a11y-reduced-motion-EN.png` |
-| 18 | No autoplay audio + captions | **PASS** | muted + captions toggle |
+| 18 | Reduced data / save-data | **PASS** (post-fix) | `a11y-reduced-data-EN.png` — poster + roles |
+| 19 | No autoplay audio + captions | **PASS** | muted + captions toggle |
 
-**Aggregate:** 18/18 **PASS** — no prod demo fix required.
+**Aggregate:** 19/19 **PASS** — reduced-data fixed in fix/demo-reduced-data-fallback.
 
 ---
 
@@ -98,6 +99,7 @@ Milestones captured @ 0, 5, 10, 18, 22, 26, 33, 38s + final interactive frame.
 | `real-video-demo-browser` | **PASS** | PR #476 sales demo harness |
 | `founder-led-demo-flow-browser` | **PASS** | Updated to `SalesDemoExperience` selectors (`data-sales-demo-hero`, `data-demo-product-video`, `data-sales-demo-roles`) |
 | `interactive-demo-a11y` | **PASS** | Axe scope `[data-sales-demo]` — prod mounts `SalesDemoExperience` |
+| `demo-save-data-fallback-browser` | **PASS** | `navigator.connection.saveData` + `prefers-reduced-data` — poster + roles, no video |
 | Viewports (6) | **PASS** | 1920×1080 … 375×667 via custom capture |
 | Chromium + WebKit | **PASS** / **PASS** | |
 
@@ -143,27 +145,51 @@ PostHog not configured in agent env — events verified via static guards only; 
 | `verify:production-v3:077` | **PASS** |
 | `probe:prod-public` ×2 | **220/220 PASS** |
 | `test:real-video-demo` (static) | **7/7 PASS** |
-| `test:interactive-demo-guard` | **12/12 PASS** — blocks legacy demo return on `/demo` |
+| `test:interactive-demo-guard` | **13/13 PASS** — save-data + poster fallback guards |
+| `test:demo-save-data-fallback` | **4/4 PASS** |
+| `test:demo-save-data-fallback-browser` | **2/2 PASS** |
 | `founder-led-demo-flow-browser` | **PASS** — SalesDemoExperience selectors |
 | `interactive-demo-a11y` | **PASS** — `[data-sales-demo]` axe scope |
 
 ---
 
-## 9. Stance
+## 10. Reduced-data / save-data fallback (2026-07-15)
+
+**Root cause:** Prod founder-review harness emulates save-data via `navigator.connection.saveData = true`, but runtime only listened to CSS `(prefers-reduced-data: reduce)`. Mismatch → role cards hidden, video blocked without poster path completing.
+
+**Fix:** `readSaveDataPreference()` in `frontend/src/lib/demo/save-data-preference.ts` — OR of media query **and** `navigator.connection.saveData`; poster-first UI + immediate role cards when save-data active.
+
+| Signal | Runtime | Harness mock | Classification |
+|--------|---------|--------------|----------------|
+| `prefers-reduced-data: reduce` | ✓ | optional | **PASS_NATIVE** |
+| `navigator.connection.saveData` | ✓ (post-fix) | ✓ prod runner | **PASS_DETERMINISTIC_HARNESS** |
+| Poster + roles, no `<video>` | ✓ | asserted | **FALLBACK_VERIFIED** |
+
+| Test | Result |
+|------|--------|
+| `test:demo-save-data-fallback` (static) | **4/4 PASS** |
+| `test:demo-save-data-fallback-browser` | **2/2 PASS** |
+| `smoke:demo-founder-review-prod` reduced-data | **PASS** (post-deploy) |
+
+---
+
+## 11. Stance
 
 - **Gate F:** PENDING — founder checkbox **empty**
 - **Launch:** NO-GO
 - **Demo prod:** Real video @ PR #476 — **verified PASS** on prod
-- **Harness debt:** Closed in PR follow-up — `founder-led-demo-flow-browser` + `interactive-demo-a11y` updated to SalesDemoExperience selectors
+- **Harness debt:** Closed — PR #478 harness + fix/demo-reduced-data-fallback runtime alignment
+- **Reduced-data:** **FALLBACK_VERIFIED** — poster-first, role cards without video when save-data
 
 ```
-DEMO_FOUNDER_REVIEW_DATE: 2026-07-14
-REPO_HEAD: 934cbbeb
-PROD_FE: 934cbbeb
+DEMO_FOUNDER_REVIEW_DATE: 2026-07-15
+REPO_HEAD: (post fix/demo-reduced-data-fallback merge)
+PROD_FE: (post Vercel deploy)
 PROD_API: ae14bfb58fc0
 DB_HEAD: 077
-VISUAL_CRITERIA: 18/18_PASS
+VISUAL_CRITERIA: 19/19_PASS
 VIDEO_PROD: PASS
+REDUCED_DATA: FALLBACK_VERIFIED
 GATE_F: PENDING
 LAUNCH: NO-GO
 ```

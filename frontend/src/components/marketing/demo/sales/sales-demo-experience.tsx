@@ -10,6 +10,7 @@ import { RoleStory } from "@/components/marketing/demo/experience/role-story";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { Shell } from "@/components/ui";
 import { trackDemoCtaClick } from "@/lib/demo/demo-analytics";
+import { readSaveDataPreference, subscribeSaveDataPreference } from "@/lib/demo/save-data-preference";
 import {
   salesRoleJourneyScenes,
   type SalesDemoRole,
@@ -30,11 +31,9 @@ function usePrefersReducedMotion(): { reducedMotion: boolean; checked: boolean }
 function useSaveData(): { saveData: boolean; checked: boolean } {
   const [state, setState] = useState({ saveData: false, checked: false });
   useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-data: reduce)");
-    const sync = () => setState({ saveData: mq.matches, checked: true });
+    const sync = () => setState({ saveData: readSaveDataPreference(), checked: true });
     sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
+    return subscribeSaveDataPreference(sync);
   }, []);
   return state;
 }
