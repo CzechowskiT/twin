@@ -110,6 +110,12 @@ test("8 video controls exposed on product film player", () => {
   assert.match(player, /type="video\/mp4"/);
 });
 
+test("8b play overlay stacks above video for click hit-testing", () => {
+  const css = read("src/app/globals.css");
+  assert.match(css, /\.sales-demo-film__video[\s\S]*?z-index:\s*2/);
+  assert.match(css, /\.sales-demo-film__play-overlay[\s\S]*?z-index:\s*3/);
+});
+
 test("9 demo fixtures use synthetic IDs only", () => {
   const fixtures = read("src/lib/demo/demo-fixtures.ts");
   assert.match(fixtures, /demo-candidate-001/);
