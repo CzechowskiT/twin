@@ -432,6 +432,8 @@ class Settings(BaseSettings):
 
     # Recruiter batch inbox pilot (X-Twin-Recruiter-Token + company_slug filter).
     recruiter_inbox_token: str = ""
+    # Recruiter session JWT TTL after pilot-token exchange (default 8h).
+    recruiter_jwt_expire_minutes: int = 60 * 8
 
     @property
     def cors_origin_list(self) -> list[str]:

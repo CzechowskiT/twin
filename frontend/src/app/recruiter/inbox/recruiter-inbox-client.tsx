@@ -31,6 +31,8 @@ import {
   readRecruiterInboxDemoEnv,
   readRecruiterInboxSession,
   recruiterInboxQuery,
+  recruiterProxyHeaders,
+  ensureRecruiterJwtSession,
   resolveCompanySlugFromRaw,
   writeRecruiterInboxSession,
 } from "@/lib/recruiter-inbox";
@@ -213,10 +215,17 @@ export default function RecruiterInboxClient() {
     writeRecruiterInboxSession(tkn, slug);
     setCompanyRaw(slug);
     try {
-      const q = recruiterInboxQuery(tkn, slug);
+      const session = await ensureRecruiterJwtSession(tkn, slug);
+      if (!session) {
+        setLoadError(formatInboxLoadError("", 401));
+        setRows([]);
+        setQueueLoaded(false);
+        return;
+      }
+      const q = recruiterInboxQuery("", slug);
       const res = await fetch(`/api/recruiter/inbox?${q}`, {
         cache: "no-store",
-        headers: { "X-Locale": getClientApiLocale() ?? "en" },
+        headers: recruiterProxyHeaders(session.jwt, getClientApiLocale()),
       });
       if (!res.ok) {
         const body = await res.text();
@@ -240,6 +249,11 @@ export default function RecruiterInboxClient() {
       setLoading(false);
     }
   }, [token, companySlug, t, formatInboxLoadError]);
+
+  const ensureJwt = useCallback(
+    async (tkn: string, slug: string) => ensureRecruiterJwtSession(tkn, slug),
+    [],
+  );
 
   useEffect(() => {
     if (!hydrated || autoLoadDone.current) return;
@@ -336,7 +350,12 @@ export default function RecruiterInboxClient() {
     setBusyId(`batch-${action}`);
     setLoadError(null);
     try {
-      const q = recruiterInboxQuery(tkn, slug);
+      const session = await ensureJwt(tkn, slug);
+      if (!session) {
+        setLoadError(formatInboxLoadError("", 401));
+        return;
+      }
+      const q = recruiterInboxQuery("", slug);
       const body: { action: string; application_ids: number[]; decline_note?: string } = {
         action,
         application_ids: ids,
@@ -346,7 +365,7 @@ export default function RecruiterInboxClient() {
       }
       const res = await fetch(`/api/recruiter/inbox/respond-batch?${q}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: recruiterProxyHeaders(session.jwt, getClientApiLocale()),
         body: JSON.stringify(body),
       });
       if (!res.ok) {
@@ -382,14 +401,19 @@ export default function RecruiterInboxClient() {
     setBusyId(key);
     setLoadError(null);
     try {
-      const q = recruiterInboxQuery(tkn, slug);
+      const session = await ensureJwt(tkn, slug);
+      if (!session) {
+        setLoadError(formatInboxLoadError("", 401));
+        return;
+      }
+      const q = recruiterInboxQuery("", slug);
       const body: { action: string; decline_note?: string } = { action };
       if (action === "decline" && opts?.decline_note?.trim()) {
         body.decline_note = opts.decline_note.trim();
       }
       const res = await fetch(`/api/recruiter/inbox/${applicationId}/respond?${q}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: recruiterProxyHeaders(session.jwt, getClientApiLocale()),
         body: JSON.stringify(body),
       });
       if (!res.ok) {
@@ -522,10 +546,12 @@ export default function RecruiterInboxClient() {
       const tkn = token.trim();
       const slug = companySlug;
       if (!tkn || !slug) throw new Error("missing auth");
-      const q = recruiterInboxQuery(tkn, slug);
+      const session = await ensureJwt(tkn, slug);
+      if (!session) throw new Error("missing auth");
+      const q = recruiterInboxQuery("", slug);
       const res = await fetch(`/api/recruiter/inbox/${applicationId}/schedule?${q}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", "X-Locale": getClientApiLocale() ?? "en" },
+        headers: recruiterProxyHeaders(session.jwt, getClientApiLocale()),
         body: JSON.stringify({
           slot_date: slot.slotDate,
           slot_time: slot.slotTime,
@@ -537,7 +563,7 @@ export default function RecruiterInboxClient() {
       if (!res.ok) throw new Error("save failed");
       await load();
     },
-    [token, companySlug, load],
+    [token, companySlug, load, ensureJwt],
   );
 
   function toggleReviewCard(applicationId: number) {
