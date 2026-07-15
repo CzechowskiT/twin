@@ -1,84 +1,136 @@
 import React from "react";
-import { interpolate, useCurrentFrame } from "remotion";
+import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 
+import { FlyInItem, PulseBadge, SuccessFlash } from "../components/MotionPrimitives";
 import { ProductShell } from "../components/ProductShell";
 import { FILM } from "../theme";
 
-const SLOTS = [
-  { day: "Mon", time: "—", active: false },
-  { day: "Wed", time: "14:00", active: true },
-  { day: "Thu", time: "10:30", active: true },
-  { day: "Fri", time: "—", active: false },
+const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+const CALENDARS = [
+  { label: "Candidate", color: FILM.blue, slots: [false, false, true, false, false] },
+  { label: "Recruiter", color: FILM.purple, slots: [false, true, true, false, true] },
+  { label: "Company", color: FILM.amber, slots: [false, false, true, true, false] },
 ];
 
 export function CalendarScene() {
   const frame = useCurrentFrame();
-  const confirmScale = interpolate(frame, [20, 35], [0.8, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
+  const { fps } = useVideoConfig();
+  const overlayProgress = interpolate(frame, [20, 50], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const confirmed = frame >= 120;
+  const highlightWed = frame >= 60;
 
   return (
     <ProductShell
       title="calendar"
       sidebarLabel="Calendar"
       sidebarItems={["Week", "Holds", "Confirmed", "Export ICS"]}
-      activeItem={2}
+      activeItem={confirmed ? 2 : 1}
     >
-      <div style={{ display: "flex", gap: 24, alignItems: "flex-start" }}>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 18, fontWeight: 700, color: FILM.text, marginBottom: 16 }}>
-            Calendar of acceptance
+      <div style={{ display: "flex", gap: 20 }}>
+        <div style={{ flex: 1, position: "relative" }}>
+          <div style={{ fontSize: 15, fontWeight: 700, color: FILM.text, marginBottom: 12 }}>
+            Finding common slot
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
-            {SLOTS.map((s) => (
-              <div
-                key={s.day}
-                style={{
-                  padding: 16,
-                  borderRadius: 12,
-                  textAlign: "center",
-                  background: s.active ? "#ecfdf5" : "#fff",
-                  border: `2px solid ${s.active ? FILM.accent : FILM.border}`,
-                }}
-              >
-                <div style={{ fontSize: 14, fontWeight: 700, color: FILM.text }}>{s.day}</div>
-                <div
-                  style={{
-                    fontSize: 20,
-                    fontWeight: 800,
-                    color: s.active ? FILM.accent : FILM.muted,
-                    marginTop: 8,
-                  }}
-                >
-                  {s.time}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8 }}>
+            {DAYS.map((day, di) => {
+              const isWed = di === 2;
+              const allOverlap = isWed && highlightWed;
+              return (
+                <div key={day} style={{ textAlign: "center" }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: FILM.text, marginBottom: 6 }}>{day}</div>
+                  <div
+                    style={{
+                      height: 120,
+                      borderRadius: 8,
+                      background: allOverlap ? "#ecfdf5" : "#fff",
+                      border: `2px solid ${allOverlap ? FILM.accent : FILM.border}`,
+                      position: "relative",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {CALENDARS.map((cal, ci) => {
+                      const hasSlot = cal.slots[di];
+                      const offset = ci * 28;
+                      const opacity = overlayProgress * (hasSlot ? 1 : 0.15);
+                      return (
+                        <div
+                          key={cal.label}
+                          style={{
+                            position: "absolute",
+                            left: 8,
+                            right: 8,
+                            top: 10 + offset,
+                            height: 22,
+                            borderRadius: 4,
+                            background: `${cal.color}${hasSlot ? "cc" : "33"}`,
+                            opacity,
+                            transform: `translateX(${interpolate(overlayProgress, [0, 1], [20, 0])}px)`,
+                            fontSize: 9,
+                            fontWeight: 700,
+                            color: "#fff",
+                            display: "flex",
+                            alignItems: "center",
+                            paddingLeft: 6,
+                          }}
+                        >
+                          {hasSlot ? cal.label : ""}
+                        </div>
+                      );
+                    })}
+                    {allOverlap ? (
+                      <div
+                        style={{
+                          position: "absolute",
+                          bottom: 8,
+                          left: "50%",
+                          transform: `translateX(-50%) scale(${spring({ frame: frame - 60, fps, config: { damping: 10 } })})`,
+                        }}
+                      >
+                        <PulseBadge color={FILM.accent}>Wed 14:00</PulseBadge>
+                      </div>
+                    ) : null}
+                  </div>
                 </div>
+              );
+            })}
+          </div>
+        </div>
+        <FlyInItem delay={100} fromX={60} fromY={0}>
+          <div
+            style={{
+              width: 300,
+              padding: 16,
+              borderRadius: 12,
+              background: "#fff",
+              border: `3px solid ${confirmed ? FILM.accent : FILM.border}`,
+              boxShadow: confirmed ? `0 12px 40px ${FILM.accent}44` : "0 4px 16px rgba(0,0,0,0.08)",
+              position: "relative",
+            }}
+          >
+            <div style={{ fontSize: 11, fontWeight: 700, color: confirmed ? FILM.accent : FILM.muted, textTransform: "uppercase" }}>
+              {confirmed ? "Confirmed" : "Proposed hold"}
+            </div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: FILM.text, marginTop: 8 }}>
+              Interview — NovaTech
+            </div>
+            <div style={{ fontSize: 12, color: FILM.muted, marginTop: 4 }}>Wed 14:00 · 45 min · Anna K.</div>
+            {confirmed ? (
+              <>
+                <div style={{ marginTop: 10, fontSize: 11, color: FILM.accentDark, fontWeight: 600 }}>
+                  ✓ Added to Google Calendar
+                </div>
+                <div style={{ marginTop: 6, fontSize: 11, color: FILM.blue, fontWeight: 600 }}>
+                  ✓ ICS exported · Meet link attached
+                </div>
+              </>
+            ) : (
+              <div style={{ marginTop: 10, fontSize: 11, color: FILM.amber, fontWeight: 600 }}>
+                Syncing calendars…
               </div>
-            ))}
+            )}
+            <SuccessFlash startFrame={120} />
           </div>
-        </div>
-        <div
-          style={{
-            width: 280,
-            padding: 20,
-            borderRadius: 12,
-            background: "#fff",
-            border: `3px solid ${FILM.accent}`,
-            transform: `scale(${confirmScale})`,
-            boxShadow: `0 12px 40px ${FILM.accent}44`,
-          }}
-        >
-          <div style={{ fontSize: 12, fontWeight: 700, color: FILM.accent, textTransform: "uppercase" }}>
-            Confirmed
-          </div>
-          <div style={{ fontSize: 18, fontWeight: 700, color: FILM.text, marginTop: 8 }}>
-            Interview — NovaTech
-          </div>
-          <div style={{ fontSize: 14, color: FILM.muted, marginTop: 4 }}>Wed 14:00 · 45 min</div>
-          <div style={{ marginTop: 12, fontSize: 13, color: FILM.accentDark, fontWeight: 600 }}>
-            ✓ Added to Google Calendar
-          </div>
-        </div>
+        </FlyInItem>
       </div>
     </ProductShell>
   );

@@ -30,7 +30,7 @@ test("render script outputs all 8 asset paths", () => {
   assert.match(script, /--force/);
 });
 
-test("visual-validate script rejects blank/white/uniform frames", () => {
+test("visual-validate script rejects blank/white/uniform frames and static periods", () => {
   const script = readFileSync(join(root, "scripts/demo-video-visual-validate.ts"), "utf8");
   assert.match(script, /MAX_WHITE_PCT/);
   assert.match(script, /MAX_UNIFORM_PCT/);
@@ -40,9 +40,14 @@ test("visual-validate script rejects blank/white/uniform frames", () => {
   assert.match(script, /GATE@/);
   assert.match(script, /--input-dir/);
   assert.match(script, /--output-dir/);
+  assert.match(script, /MIN_PAIR_MOTION/);
+  assert.match(script, /MOTION@/);
+  assert.match(script, /centerEntropy/);
+  assert.match(script, /MIN_CENTER_ENTROPY/);
+  assert.match(script, /SAMPLE_INTERVAL_SEC = 2/);
 });
 
-test("remotion scenes use dedicated components without app CSS imports", () => {
+test("remotion v2 scenes use dedicated components without app CSS imports", () => {
   const film = readFileSync(join(root, "remotion/src/ProductFilm.tsx"), "utf8");
   assert.match(film, /InboxChaosScene/);
   assert.match(film, /TalentMemoryScene/);
@@ -51,8 +56,14 @@ test("remotion scenes use dedicated components without app CSS imports", () => {
   assert.match(film, /CompanyCockpitScene/);
   assert.match(film, /CalendarScene/);
   assert.match(film, /BrandCtaScene/);
+  assert.match(film, /CaptionBar/);
+  assert.match(film, /CameraMotion/);
   assert.doesNotMatch(film, /@\/components/);
   assert.doesNotMatch(film, /globals\.css/);
+  assert.doesNotMatch(film, /fontSize: 48/);
+  const copy = readFileSync(join(root, "remotion/src/copy.ts"), "utf8");
+  assert.match(copy, /FILM_DURATION_SEC = 45/);
+  assert.match(copy, /caption:/);
   const theme = readFileSync(join(root, "remotion/src/theme.ts"), "utf8");
   assert.match(theme, /bgDark/);
   assert.match(theme, /font:/);

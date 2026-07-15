@@ -63,7 +63,7 @@ async function renderLocale(locale: FilmLocale): Promise<void> {
   }
 
   run(
-    `ffmpeg -y -i "${mp4Path}" -ss 3 -vframes 1 -vf "scale=1920:1080" -update 1 "${pngTemp}"`,
+    `ffmpeg -y -i "${mp4Path}" -ss 5 -vframes 1 -vf "scale=1920:1080" -update 1 "${pngTemp}"`,
   );
   await sharp(pngTemp).webp({ quality: 85 }).toFile(posterPath);
   run(`rm -f "${pngTemp}"`);

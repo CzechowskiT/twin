@@ -4,142 +4,51 @@ export type FilmSegment = {
   id: string;
   startSec: number;
   endSec: number;
-  eyebrow: string;
-  title: string;
-  subtitle: string;
+  caption: string;
 };
 
-export const FILM_DURATION_SEC = 42;
+export const FILM_DURATION_SEC = 45;
 export const FILM_FPS = 30;
 
 const EN_SEGMENTS: FilmSegment[] = [
-  {
-    id: "problem",
-    startSec: 0,
-    endSec: 5,
-    eyebrow: "The problem",
-    title: "Thousands of pings. Zero clarity.",
-    subtitle: "Inboxes flood. CV piles grow. Nobody wins.",
-  },
-  {
-    id: "context",
-    startSec: 5,
-    endSec: 10,
-    eyebrow: "TWIN",
-    title: "Signal over noise",
-    subtitle: "Ranked matches. Human decisions. Calendar-first.",
-  },
-  {
-    id: "candidate",
-    startSec: 10,
-    endSec: 18,
-    eyebrow: "Candidate",
-    title: "Matches worth your time",
-    subtitle: "Career Compass surfaces roles that fit your bar.",
-  },
-  {
-    id: "recruiter",
-    startSec: 18,
-    endSec: 26,
-    eyebrow: "Recruiter",
-    title: "Review cards, not blind piles",
-    subtitle: "Accept, decline, or reschedule — you stay in control.",
-  },
-  {
-    id: "company",
-    startSec: 26,
-    endSec: 33,
-    eyebrow: "Company",
-    title: "Talent memory that compounds",
-    subtitle: "Hiring cockpit with explainable pipeline quality.",
-  },
-  {
-    id: "calendar",
-    startSec: 33,
-    endSec: 38,
-    eyebrow: "The result",
-    title: "A calendar of acceptance",
-    subtitle: "Pre-qualified interview holds — not random spam.",
-  },
-  {
-    id: "cta",
-    startSec: 38,
-    endSec: 42,
-    eyebrow: "TWIN",
-    title: "The right talent. The right role. The right moment.",
-    subtitle: "Explore the interactive demo — sample data only.",
-  },
+  { id: "inbox", startSec: 0, endSec: 7, caption: "Inbox chaos — thousands of pings, zero clarity" },
+  { id: "organize", startSec: 7, endSec: 13, caption: "TWIN organizes — one profile, ranked signal" },
+  { id: "candidate", startSec: 13, endSec: 21, caption: "Candidate — matches worth your time" },
+  { id: "recruiter", startSec: 21, endSec: 29, caption: "Recruiter — review cards, not blind piles" },
+  { id: "company", startSec: 29, endSec: 35, caption: "Company — pipeline quality, team aligned" },
+  { id: "calendar", startSec: 35, endSec: 41, caption: "Calendar of acceptance — pre-qualified holds" },
+  { id: "finale", startSec: 41, endSec: 45, caption: "Explore the interactive demo" },
 ];
 
 const PL_SEGMENTS: FilmSegment[] = [
-  {
-    id: "problem",
-    startSec: 0,
-    endSec: 5,
-    eyebrow: "Problem",
-    title: "Tysiące pingów. Zero jasności.",
-    subtitle: "Skrzynki toną. Stosy CV rosną. Nikt nie wygrywa.",
-  },
-  {
-    id: "context",
-    startSec: 5,
-    endSec: 10,
-    eyebrow: "TWIN",
-    title: "Sygnał ponad szumem",
-    subtitle: "Ranking dopasowań. Decyzje człowieka. Kalendarz na pierwszym planie.",
-  },
-  {
-    id: "candidate",
-    startSec: 10,
-    endSec: 18,
-    eyebrow: "Kandydat",
-    title: "Dopasowania warte Twojego czasu",
-    subtitle: "Career Compass pokazuje role zgodne z Twoim progiem.",
-  },
-  {
-    id: "recruiter",
-    startSec: 18,
-    endSec: 26,
-    eyebrow: "Rekruter",
-    title: "Karty review, nie ślepe stosy",
-    subtitle: "Akceptuj, odrzuć lub przełóż — kontrola zostaje po Twojej stronie.",
-  },
-  {
-    id: "company",
-    startSec: 26,
-    endSec: 33,
-    eyebrow: "Firma",
-    title: "Pamięć talentu, która rośnie",
-    subtitle: "Kokpit hiringu z wyjaśnialną jakością pipeline.",
-  },
-  {
-    id: "calendar",
-    startSec: 33,
-    endSec: 38,
-    eyebrow: "Efekt",
-    title: "Kalendarz akceptacji",
-    subtitle: "Pre-kwalifikowane holdy rozmów — nie losowy spam.",
-  },
-  {
-    id: "cta",
-    startSec: 38,
-    endSec: 42,
-    eyebrow: "TWIN",
-    title: "Właściwy talent. Właściwa rola. Właściwy moment.",
-    subtitle: "Odkryj interaktywne demo — tylko dane próbki.",
-  },
+  { id: "inbox", startSec: 0, endSec: 7, caption: "Chaos w skrzynce — tysiące pingów, zero jasności" },
+  { id: "organize", startSec: 7, endSec: 13, caption: "TWIN porządkuje — jeden profil, sygnał z rankingu" },
+  { id: "candidate", startSec: 13, endSec: 21, caption: "Kandydat — dopasowania warte Twojego czasu" },
+  { id: "recruiter", startSec: 21, endSec: 29, caption: "Rekruter — karty review, nie ślepe stosy" },
+  { id: "company", startSec: 29, endSec: 35, caption: "Firma — jakość pipeline, zespół zsynchronizowany" },
+  { id: "calendar", startSec: 35, endSec: 41, caption: "Kalendarz akceptacji — pre-kwalifikowane holdy" },
+  { id: "finale", startSec: 41, endSec: 45, caption: "Odkryj interaktywne demo" },
 ];
 
 export function filmSegments(locale: FilmLocale): FilmSegment[] {
   return locale === "pl" ? PL_SEGMENTS : EN_SEGMENTS;
 }
 
+export function captionAtSec(locale: FilmLocale, sec: number): string {
+  const segments = filmSegments(locale);
+  for (let i = segments.length - 1; i >= 0; i--) {
+    if (sec >= segments[i]!.startSec) return segments[i]!.caption;
+  }
+  return segments[0]!.caption;
+}
+
+/** VTT supplements visuals — short captions, not describe-only narration. */
 export function vttCaptions(locale: FilmLocale): string {
   const segments = filmSegments(locale);
   const lines = ["WEBVTT", ""];
   for (const seg of segments) {
     lines.push(`${formatVttTime(seg.startSec)} --> ${formatVttTime(seg.endSec)}`);
-    lines.push(`${seg.title} — ${seg.subtitle}`);
+    lines.push(seg.caption);
     lines.push("");
   }
   return lines.join("\n");

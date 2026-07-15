@@ -1,8 +1,6 @@
 import React from "react";
 import {
   AbsoluteFill,
-  Easing,
-  interpolate,
   Sequence,
   useCurrentFrame,
   useVideoConfig,
@@ -15,7 +13,8 @@ import { CompanyCockpitScene } from "./scenes/CompanyCockpitScene";
 import { InboxChaosScene } from "./scenes/InboxChaosScene";
 import { RecruiterInboxScene } from "./scenes/RecruiterInboxScene";
 import { TalentMemoryScene } from "./scenes/TalentMemoryScene";
-import { filmSegments, type FilmLocale } from "./copy";
+import { CameraMotion, CaptionBar } from "./components/MotionPrimitives";
+import { captionAtSec, filmSegments, type FilmLocale } from "./copy";
 import { FILM } from "./theme";
 
 export type ProductFilmProps = {
@@ -23,130 +22,74 @@ export type ProductFilmProps = {
 };
 
 const SCENE_MAP: Record<string, React.FC> = {
-  problem: InboxChaosScene,
-  context: TalentMemoryScene,
+  inbox: InboxChaosScene,
+  organize: TalentMemoryScene,
   candidate: CandidateProfileScene,
   recruiter: RecruiterInboxScene,
   company: CompanyCockpitScene,
   calendar: CalendarScene,
-  // cta: rendered via BrandCtaScene with locale-specific ctaText
 };
 
-function FilmSegment({ locale, segmentIndex }: { locale: FilmLocale; segmentIndex: number }) {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+function SceneCrossfade({
+  locale,
+  segmentIndex,
+}: {
+  locale: FilmLocale;
+  segmentIndex: number;
+}) {
+  const localFrame = useCurrentFrame();
   const segments = filmSegments(locale);
   const seg = segments[segmentIndex];
   if (!seg) return null;
-
-  const durationFrames = Math.round((seg.endSec - seg.startSec) * fps);
-  const fadeIn = interpolate(frame, [0, 10], [0.85, 1], { extrapolateRight: "clamp" });
-  const fadeOut = interpolate(frame, [durationFrames - 10, durationFrames], [1, 0.85], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const opacity = Math.min(fadeIn, fadeOut);
-  const slideY = interpolate(frame, [0, 15], [20, 0], {
-    extrapolateRight: "clamp",
-    easing: Easing.out(Easing.cubic),
-  });
 
   const SceneComponent = SCENE_MAP[seg.id];
   const ctaText =
     locale === "pl" ? "Odkryj interaktywne demo →" : "Explore the interactive demo →";
 
   return (
-    <AbsoluteFill
+    <div
       style={{
-        background: `linear-gradient(145deg, ${FILM.bgDark} 0%, ${FILM.bgMid} 50%, #0c1222 100%)`,
-        fontFamily: FILM.font,
-        color: FILM.textLight,
+        position: "absolute",
+        inset: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: `radial-gradient(ellipse 70% 50% at 50% 20%, ${FILM.accent}22, transparent)`,
-        }}
-      />
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "flex-start",
-          height: "100%",
-          padding: "48px 80px 40px",
-          opacity,
-          transform: `translateY(${slideY}px)`,
-        }}
-      >
-        <p
-          style={{
-            fontSize: 14,
-            fontWeight: 700,
-            letterSpacing: "0.28em",
-            textTransform: "uppercase",
-            color: FILM.accent,
-            marginBottom: 12,
-          }}
-        >
-          {seg.eyebrow}
-        </p>
-        <h1
-          style={{
-            fontSize: 48,
-            fontWeight: 800,
-            textAlign: "center",
-            maxWidth: 900,
-            lineHeight: 1.1,
-            margin: 0,
-            color: FILM.textLight,
-          }}
-        >
-          {seg.title}
-        </h1>
-        <p
-          style={{
-            fontSize: 20,
-            color: "#94a3b8",
-            marginTop: 16,
-            textAlign: "center",
-            maxWidth: 700,
-          }}
-        >
-          {seg.subtitle}
-        </p>
-        <div style={{ marginTop: 36, flex: 1, display: "flex", alignItems: "center" }}>
-          {SceneComponent ? (
-            seg.id === "cta" ? (
-              <BrandCtaScene ctaText={ctaText} />
-            ) : (
-              <SceneComponent />
-            )
-          ) : null}
-        </div>
-      </div>
-    </AbsoluteFill>
+      {seg.id === "finale" ? (
+        <BrandCtaScene ctaText={ctaText} />
+      ) : SceneComponent ? (
+        <SceneComponent />
+      ) : null}
+    </div>
   );
 }
 
 export const ProductFilm: React.FC<ProductFilmProps> = ({ locale }) => {
+  const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
+  const sec = frame / fps;
   const segments = filmSegments(locale);
 
   return (
-    <AbsoluteFill style={{ background: FILM.bgDark }}>
-      {segments.map((seg, i) => {
-        const from = Math.round(seg.startSec * fps);
-        const duration = Math.round((seg.endSec - seg.startSec) * fps);
-        return (
-          <Sequence key={seg.id} from={from} durationInFrames={duration}>
-            <FilmSegment locale={locale} segmentIndex={i} />
-          </Sequence>
-        );
-      })}
+    <AbsoluteFill
+      style={{
+        background: `linear-gradient(160deg, ${FILM.bgDark} 0%, #0c1222 100%)`,
+        fontFamily: FILM.font,
+      }}
+    >
+      <CameraMotion intensity={1.2}>
+        {segments.map((seg, i) => {
+          const from = Math.round(seg.startSec * fps);
+          const duration = Math.round((seg.endSec - seg.startSec) * fps);
+          return (
+            <Sequence key={seg.id} from={from} durationInFrames={duration} layout="none">
+              <SceneCrossfade locale={locale} segmentIndex={i} />
+            </Sequence>
+          );
+        })}
+      </CameraMotion>
+      <CaptionBar text={captionAtSec(locale, sec)} />
     </AbsoluteFill>
   );
 };
