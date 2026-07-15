@@ -399,11 +399,17 @@ async function captureAccessibilityStates(
     }
     await seedLocale(page, "en");
     await gotoDemo(page);
+    await page.locator("[data-sales-demo-roles]").first().waitFor({ state: "visible", timeout: 15_000 }).catch(() => undefined);
     const videoCount = await page.locator("[data-demo-product-video]").count();
     const rolesVisible = await page.locator("[data-sales-demo-roles]").first().isVisible().catch(() => false);
-    results[label] = label === "reduced-motion" || label === "reduced-data"
-      ? rolesVisible && videoCount === 0 ? "PASS" : rolesVisible ? "PASS" : "FAIL"
-      : "NOT_RUN";
+    const posterVisible = await page.locator("[data-demo-poster-fallback]").first().isVisible().catch(() => false);
+    if (label === "reduced-motion") {
+      results[label] = rolesVisible && videoCount === 0 ? "PASS" : "FAIL";
+    } else if (label === "reduced-data") {
+      results[label] = rolesVisible && videoCount === 0 && posterVisible ? "PASS" : "FAIL";
+    } else {
+      results[label] = "NOT_RUN";
+    }
     const name = `a11y-${label}-EN`;
     await page.screenshot({ path: shotPath(name), fullPage: false });
     recordShot(shots, name, {

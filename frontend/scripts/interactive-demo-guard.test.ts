@@ -61,7 +61,11 @@ test("3 analytics wrapper avoids PII props", () => {
 test("4 reduced motion and save-data guards present in sales experience", () => {
   const experience = read("src/components/marketing/demo/sales/sales-demo-experience.tsx");
   assert.match(experience, /prefers-reduced-motion/);
-  assert.match(experience, /prefers-reduced-data/);
+  assert.match(experience, /readSaveDataPreference/);
+  assert.match(experience, /data-demo-poster-fallback/);
+  const saveDataLib = read("src/lib/demo/save-data-preference.ts");
+  assert.match(saveDataLib, /prefers-reduced-data/);
+  assert.match(saveDataLib, /navigatorConnection/);
   const roleStory = read("src/components/marketing/demo/experience/role-story.tsx");
   assert.match(roleStory, /autoplayStartedRef/);
 });
@@ -128,6 +132,11 @@ test("11 sales demo e2e hooks for browser smoke", () => {
   assert.match(founderSpec, /data-sales-demo-hero/);
   assert.match(founderSpec, /data-demo-product-video/);
   assert.match(founderSpec, /data-sales-demo-roles/);
+
+  const saveDataSpec = read("e2e/demo-save-data-fallback-browser.spec.ts");
+  assert.match(saveDataSpec, /saveData: true/);
+  assert.match(saveDataSpec, /data-demo-poster-fallback/);
+  assert.match(saveDataSpec, /data-sales-demo-roles/);
   assert.match(founderSpec, /toHaveCount\(0\)/);
   assert.doesNotMatch(founderSpec, /data-founder-led-demo-link/);
   assert.match(founderSpec, /data-sales-demo-flow/);
