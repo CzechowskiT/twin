@@ -6,6 +6,8 @@
 
 **Batch update 2026-07-15T06:10Z:** LB-107 **CLOSED** — P0 demo-video-blank; PR #480 merged @ `0c739b5e`; prod MP4 EN 3719495 B (was 2814402); `demo:video:visual-validate` PASS on downloaded prod assets (32 frames EN+PL); `smoke:demo-founder-review-prod` 18/18 PASS @ prod `0c739b5e`; evidence `reports/demo-visual-validate-prod/`, `reports/demo-frame-audit/prod-*`, `reports/demo-prod-assets/`.
 
+**Batch update 2026-07-15T18:30Z:** O7/LB-201 **CLOSED** — staging restore drill PASS + evidence `docs/O7_RESTORE_DRILL_EVIDENCE_2026-07-15.md`. R-019/LB-005 remains **BLOCKED** — prod Postgres alembic **050** vs API needing **077** tables (`docs/R019_DELETE_ACCOUNT_PRODUCTION_EVIDENCE_2026-07-15.md`). Gate F **PENDING**; Launch **NO-GO**.
+
 **Batch update 2026-07-14T12:00Z:** Closed batch — LB-104 **CLOSED** (C1–C5 per-module evidence complete); LB-201/LB-005 remain BLOCKED (O7/R-019 preflight UNSET); Gate F pack refreshed; PR #473 merge confirmed @ `874b8586`.
 
 **Batch update 2026-07-14T09:30Z:** LB-106 **CLOSED** — canonical 60min stabilization soak GH run #29315813862 PASS (3731s, 13 snapshots, `identityDriftDetected=false`, `credentialsSet=true`, DB 077, `failReasons=[]`); evidence `reports/stabilization/29315813862/`; rejected drift run #29313170353; duplicate #29316738867 already completed (cancel N/A).
@@ -24,7 +26,7 @@
 | LB-002 | Founder smoke credentials UNSET | P0 | Founder | **CLOSED** | `preflight:founder-smoke-env` SET; `verify:production-v3:077` loads dotenv — `credentialsSet=true` @ 2026-07-14 |
 | LB-003 | Wave B3 referrals not merged (#448) | P0 | Eng | **CLOSED** | PR #470 merged; Wave B/C guards 16/16 PASS @ `ad7944b8` |
 | LB-004 | Public launch stance `noGo` | P0 | Product | **OPEN** | Founder scoped launch decision §G checkboxes |
-| LB-005 | Self-service account delete (R-019) | P1→P0 at scale | Eng | **BLOCKED** | API on prod; no disposable test account in env — never founder/demo@twin.career |
+| LB-005 | Self-service account delete (R-019) | P1→P0 at scale | Eng | **BLOCKED** | Disposable register PASS; delete 503 schema mismatch — prod DB `050`, missing trust/privacy tables until `alembic upgrade head`; evidence `docs/R019_DELETE_ACCOUNT_PRODUCTION_EVIDENCE_2026-07-15.md` |
 | LB-107 | Demo product film blank/white frames (demo-video-blank) | P0 | Eng | **CLOSED** | v2 motion film @ `feat/demo-product-film-v2-motion` — 45s continuous UI motion; 2s entropy gate; local PASS 2026-07-15; prod pending deploy |
 
 ---
@@ -49,7 +51,7 @@
 
 | ID | Blocker | Severity | Status | Remediation |
 |----|---------|----------|--------|-------------|
-| LB-201 | O7 post-scaffold DR re-drill | P1 | **BLOCKED** | `RAILWAY_TOKEN`/`DATABASE_PUBLIC_URL` UNSET in agent env — founder staging restore per `O7_RESTORE_DRILL_RUNBOOK_2026-06-11.md` |
+| LB-201 | O7 post-scaffold DR re-drill | P1 | **CLOSED** | Staging restore exit 0 + forward-migrate to 077 on clone; `docs/O7_RESTORE_DRILL_EVIDENCE_2026-07-15.md` + drill log row 2026-07-15 |
 | LB-202 | L6 erasure self-service gap | P2 at pilot | **WAIVED** | Manual DSR runbook; re-verify before uncontrolled signup |
 | LB-203 | No centralized log drains | P2 | **ACCEPTED** | Hobby plan; Dashboard/CLI; upgrade path documented |
 
