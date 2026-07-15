@@ -59,8 +59,17 @@ async function seedLocale(context: BrowserContext, locale: string): Promise<void
 async function gotoDemo(page: Page): Promise<void> {
   await page.goto("/demo", { waitUntil: "domcontentloaded", timeout: 30_000 });
   await dismissCookieBanner(page);
-  await page.waitForLoadState("networkidle").catch(() => undefined);
   await expect(page.locator("[data-sales-demo-hero]").first()).toBeVisible({ timeout: SETTLE_MS });
+}
+
+async function waitForVideoMetadata(page: Page): Promise<void> {
+  await page.waitForFunction(
+    () => {
+      const el = document.querySelector<HTMLVideoElement>("[data-demo-product-video]");
+      return Boolean(el && Number.isFinite(el.duration) && el.duration > 0);
+    },
+    { timeout: SETTLE_MS },
+  );
 }
 
 async function screenshot(page: Page, name: string): Promise<void> {
@@ -82,6 +91,7 @@ test.describe("Real video demo browser", () => {
 
           const video = page.locator("[data-demo-product-video]").first();
           await expect(video).toBeVisible({ timeout: SETTLE_MS });
+          await waitForVideoMetadata(page);
 
           const duration = await video.evaluate((el: HTMLVideoElement) => el.duration);
           expect(duration).toBeGreaterThanOrEqual(44);
@@ -98,6 +108,32 @@ test.describe("Real video demo browser", () => {
       });
     }
   }
+
+  test("EN — play overlay click without force advances playback", async ({ browser }) => {
+    await withFreshContext(browser, async (context) => {
+      await seedLocale(context, "en");
+      const page = await context.newPage();
+      await page.setViewportSize({ width: 1280, height: 800 });
+      await gotoDemo(page);
+
+      const video = page.locator("[data-demo-product-video]").first();
+      await expect(video).toBeVisible({ timeout: SETTLE_MS });
+      await expect(page.locator("[data-demo-video-poster-underlay]").first()).toBeVisible({ timeout: SETTLE_MS });
+      await expect(page.locator("[data-demo-video-play]").first()).toBeVisible({ timeout: SETTLE_MS });
+
+      const t0 = await video.evaluate((el: HTMLVideoElement) => el.currentTime);
+      await page.locator("[data-demo-video-play]").click();
+      await page.waitForFunction(
+        (start) => {
+          const el = document.querySelector<HTMLVideoElement>("[data-demo-product-video]");
+          return Boolean(el && el.currentTime > start);
+        },
+        t0,
+        { timeout: 5_000 },
+      );
+      await expect(page.locator("[data-demo-video-poster-underlay]")).toHaveCount(0);
+    });
+  });
 
   test("EN — play pause seek skip captions", async ({ browser }) => {
     await withFreshContext(browser, async (context) => {

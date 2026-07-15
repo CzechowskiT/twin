@@ -201,7 +201,7 @@ PostHog not configured in agent env — events verified via static guards only; 
 - **Demo prod:** Real video @ PR #476 + visible frames @ PR #480 — **verified PASS** on prod `0c739b5e`
 - **P0 demo-video-blank (LB-107):** **CLOSED** @ 2026-07-15
 - **Harness debt:** Closed — PR #478 harness + fix/demo-reduced-data-fallback runtime alignment
-- **Reduced-data:** **FALLBACK_VERIFIED** — poster-first, role cards without video when save-data
+- **Interactive motion + audio (2026-07-15):** PR #483–#486 merged; prod aligned @ `9c806e5e`; duration **45.056s**; play overlay + poster-until-play verified; see **[DEMO_INTERACTIVE_MOTION_AUDIO_EVIDENCE_2026-07-15](./DEMO_INTERACTIVE_MOTION_AUDIO_EVIDENCE_2026-07-15.md)**
 
 ```
 DEMO_FOUNDER_REVIEW_DATE: 2026-07-15
