@@ -1,7 +1,7 @@
 # Public launch 9/10 scorecard — canonical
 
 > **Generated:** 2026-07-14T12:00:00Z · **Path:** A (credentials SET) · **Owner:** Eng agent closed batch  
-> **Verdict:** **NO-GO** — Gate F PENDING founder sign-off; LB-104 CLOSED; O7/R-019 BLOCKED; LB-106 stabilization soak **CLOSED**.
+> **Verdict:** **NO-GO** — Gate F PENDING founder sign-off; LB-104 CLOSED; O7 CLOSED; R-019/LB-005 CLOSED (prod 077 + delete smoke PASS); LB-106 stabilization soak **CLOSED**.
 
 **Supersedes:** scorecard @ 2026-07-14T09:30Z · PR #473 merged @ `874b8586` · LB-104 per-module evidence batch.
 
@@ -80,7 +80,7 @@
 | B6 | Authenticated persistence smoke | **PASS** | Wave B/C refresh persistence verified @ `a5f3f6ea` |
 | B7 | Multitab stability (Phase 3B) | **PASS** (historical) | Gate E attempt 19 — 20/20 @ `80d981c`; **NOT_RUN** @ current SHA `874b8586` |
 | B8 | Scoped launch routes (8/5/4) verified | **PASS** (public only) | Public routes 200; auth routes unreachable without creds |
-| B9 | R-019 delete flow E2E smoke | **BLOCKED** | LB-005 — `TWIN_PROD_TEST_JWT` UNSET; no disposable test account |
+| B9 | R-019 delete flow E2E smoke | **PASS** | LB-005 CLOSED — disposable E2E PASS after prod 050→077; evidence `docs/R019_DELETE_ACCOUNT_PRODUCTION_EVIDENCE_2026-07-15.md` |
 | B10 | Founder E2E sign-off recorded | **BLOCKED** ★ | Gate F PENDING — LB-001 |
 
 **Area B score: 7/10** (B9, B10 mandatory BLOCKED → auto NO-GO)

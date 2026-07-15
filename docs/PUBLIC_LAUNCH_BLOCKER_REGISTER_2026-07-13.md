@@ -6,7 +6,9 @@
 
 **Batch update 2026-07-15T06:10Z:** LB-107 **CLOSED** — P0 demo-video-blank; PR #480 merged @ `0c739b5e`; prod MP4 EN 3719495 B (was 2814402); `demo:video:visual-validate` PASS on downloaded prod assets (32 frames EN+PL); `smoke:demo-founder-review-prod` 18/18 PASS @ prod `0c739b5e`; evidence `reports/demo-visual-validate-prod/`, `reports/demo-frame-audit/prod-*`, `reports/demo-prod-assets/`.
 
-**Batch update 2026-07-15T18:30Z:** O7/LB-201 **CLOSED** — staging restore drill PASS + evidence `docs/O7_RESTORE_DRILL_EVIDENCE_2026-07-15.md`. R-019/LB-005 remains **BLOCKED** — prod Postgres alembic **050** vs API needing **077** tables (`docs/R019_DELETE_ACCOUNT_PRODUCTION_EVIDENCE_2026-07-15.md`). Gate F **PENDING**; Launch **NO-GO**.
+**Batch update 2026-07-15T19:05Z:** R-019/LB-005 **CLOSED** — production `alembic upgrade head` 050→077 (GH [#29442548647](https://github.com/CzechowskiT/twin/actions/runs/29442548647), workflow PR #490) + disposable delete-account E2E **PASS**; evidence `docs/R019_DELETE_ACCOUNT_PRODUCTION_EVIDENCE_2026-07-15.md`. Gate F **PENDING**; Launch **NO-GO**.
+
+**Batch update 2026-07-15T18:30Z:** O7/LB-201 **CLOSED** — staging restore drill PASS + evidence `docs/O7_RESTORE_DRILL_EVIDENCE_2026-07-15.md`. R-019/LB-005 was still **BLOCKED** until schema migrate + smoke (closed in 19:05Z batch). Gate F **PENDING**; Launch **NO-GO**.
 
 **Batch update 2026-07-14T12:00Z:** Closed batch — LB-104 **CLOSED** (C1–C5 per-module evidence complete); LB-201/LB-005 remain BLOCKED (O7/R-019 preflight UNSET); Gate F pack refreshed; PR #473 merge confirmed @ `874b8586`.
 
@@ -26,7 +28,7 @@
 | LB-002 | Founder smoke credentials UNSET | P0 | Founder | **CLOSED** | `preflight:founder-smoke-env` SET; `verify:production-v3:077` loads dotenv — `credentialsSet=true` @ 2026-07-14 |
 | LB-003 | Wave B3 referrals not merged (#448) | P0 | Eng | **CLOSED** | PR #470 merged; Wave B/C guards 16/16 PASS @ `ad7944b8` |
 | LB-004 | Public launch stance `noGo` | P0 | Product | **OPEN** | Founder scoped launch decision §G checkboxes |
-| LB-005 | Self-service account delete (R-019) | P1→P0 at scale | Eng | **BLOCKED** | Disposable register PASS; delete 503 schema mismatch — prod DB `050`, missing trust/privacy tables until `alembic upgrade head`; evidence `docs/R019_DELETE_ACCOUNT_PRODUCTION_EVIDENCE_2026-07-15.md` |
+| LB-005 | Self-service account delete (R-019) | P1→P0 at scale | Eng | **CLOSED** | Prod DB head `077`; disposable register→profile→DELETE→invalidate + negatives PASS; evidence `docs/R019_DELETE_ACCOUNT_PRODUCTION_EVIDENCE_2026-07-15.md`; workflow run #29442548647 |
 | LB-107 | Demo product film blank/white frames (demo-video-blank) | P0 | Eng | **CLOSED** | v2 motion film @ `feat/demo-product-film-v2-motion` — 45s continuous UI motion; 2s entropy gate; local PASS 2026-07-15; prod pending deploy |
 
 ---
