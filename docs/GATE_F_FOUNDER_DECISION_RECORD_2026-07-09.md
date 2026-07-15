@@ -21,7 +21,7 @@
 | **Stabilization soak** | **CLOSED** | GH #29315813862 PASS — 3731s, 13 snapshots, `identityDriftDetected=false`, `credentialsSet=true`, DB 077 (LB-106 CLOSED) |
 | **LB-104 C1–C5 smoke** | **CLOSED** | Per-module evidence `docs/FOUNDER_SMOKE_C1_C5_PER_MODULE_EVIDENCE_2026-07-14.md` — all PASS @ `a5f3f6ea` |
 | **O7 DR re-drill** | **CLOSED** | LB-201 — staging restore PASS + forward-migrate proof; [O7 evidence 2026-07-15](./O7_RESTORE_DRILL_EVIDENCE_2026-07-15.md) |
-| **R-019 delete E2E** | **BLOCKED** | LB-005 — disposable register PASS; delete 503 schema mismatch (prod alembic **050** vs head **077**); [R-019 evidence 2026-07-15](./R019_DELETE_ACCOUNT_PRODUCTION_EVIDENCE_2026-07-15.md) |
+| **R-019 delete E2E** | **PASS** | LB-005 **CLOSED** — prod alembic **077** + disposable delete smoke PASS; [R-019 evidence 2026-07-15](./R019_DELETE_ACCOUNT_PRODUCTION_EVIDENCE_2026-07-15.md); schema workflow [#29442548647](https://github.com/CzechowskiT/twin/actions/runs/29442548647) |
 | **Phase 3B @ current SHA** | **NOT_RUN** | Gate E functional PASS historical (attempt 19, 20/20 @ `80d981c`); local execution HARD BLOCKED |
 | **Public health** | **PASS** | `status=ok`, `db_ok=true`, head 077 |
 | **Recruiter prod smoke** | **PASS** | 6-route sequential behavioral @ `ae14bfb5` — 2026-07-14 |

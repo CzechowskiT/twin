@@ -51,7 +51,7 @@ All five Wave C recruiter modules (C1–C5) have **complete canonical per-module
 |------|--------|
 | Phase 3B local re-run @ current SHA | **NOT_RUN** — Gate E PASS historical (attempt 19, 20/20) |
 | O7 DR re-drill | **BLOCKED** — LB-201 (`RAILWAY_TOKEN`/`DATABASE_PUBLIC_URL` UNSET) |
-| R-019 delete E2E | **BLOCKED** — LB-005 (`TWIN_PROD_TEST_JWT` UNSET) |
+| R-019 delete E2E | **PASS** — LB-005 CLOSED @ 2026-07-15 (prod 077 + disposable delete smoke); see `docs/R019_DELETE_ACCOUNT_PRODUCTION_EVIDENCE_2026-07-15.md` |
 | Launch GO | **NO-GO** |
 | Gate F YES | **PENDING** — founder checkbox empty |
 

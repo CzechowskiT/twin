@@ -11,7 +11,7 @@
 
 Wave C closes the recruiter pilot auth gap by introducing a **canonical recruiter session JWT** (backend-authoritative HS256 with `iss`/`aud`/`role`/`tenant`/`nbf`/`exp`), a **`POST /api/v1/auth/recruiter/session`** exchange endpoint, removal of **query-string tokens** on recruiter API routes, and frontend proxy/gate updates so JWT travels only in **`Authorization: Bearer`**.
 
-O7 DR re-drill remains **BLOCKED** (no `RAILWAY_TOKEN`/`DATABASE_PUBLIC_URL` in agent env). R-019 self-service delete API is **on branch**; prod disposable-account E2E remains **BLOCKED** (`TWIN_PROD_TEST_JWT` UNSET).
+O7 DR re-drill **CLOSED** (staging restore + migrate proof). R-019/LB-005 **CLOSED** after prod 050→077 + disposable delete smoke PASS (`docs/R019_DELETE_ACCOUNT_PRODUCTION_EVIDENCE_2026-07-15.md`).
 
 ---
 
@@ -59,9 +59,9 @@ O7 DR re-drill remains **BLOCKED** (no `RAILWAY_TOKEN`/`DATABASE_PUBLIC_URL` in 
 
 | Item | Status | Evidence |
 |------|--------|----------|
-| API `POST /candidates/me/delete-account` | **FIXED (branch)** | `backend/app/api/candidates.py`, `test_candidate_account_deletion.py` 6 PASS |
-| Frontend live panel | **FIXED (branch)** | `candidate-account-delete-live-panel.tsx`, guard test |
-| Prod disposable-account E2E | **BLOCKED** | `TWIN_PROD_TEST_JWT` UNSET — never `demo@twin.career` |
+| API `POST /candidates/me/delete-account` | **SHIPPED** | `backend/app/api/candidates.py`, `test_candidate_account_deletion.py` 6 PASS |
+| Frontend live panel | **SHIPPED** | `candidate-account-delete-live-panel.tsx`, guard test |
+| Prod disposable-account E2E | **PASS** | LB-005 CLOSED — disposable smoke after prod 077; never `demo@twin.career` |
 
 ---
 

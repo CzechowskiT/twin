@@ -14,10 +14,10 @@ test("verify:o7-restore-drill passes on committed evidence", () => {
   assert.equal(r.status, 0, r.stdout + r.stderr);
 });
 
-test("verify:prod-delete-account-smoke exits blocked (2) without fake PASS", () => {
+test("verify:prod-delete-account-smoke exits 0 after R-019 PASS evidence", () => {
   const r = spawnSync("npx", ["--yes", "tsx", join(here, "verify-prod-delete-account-smoke.ts")], {
     cwd: join(here, ".."),
     encoding: "utf8",
   });
-  assert.equal(r.status, 2, r.stdout + r.stderr);
+  assert.equal(r.status, 0, r.stdout + r.stderr);
 });

@@ -79,4 +79,4 @@ python3 -m pytest tests/ -q --ignore=tests/test_nightly_auto_apply_integration.p
 
 ## Executive launch verdict
 
-**NO-GO** — Core marketing + scoped LIVE modules are production-stable (Gate E PASS; LB-106 60min soak CLOSED @ #29315813862; LB-104 C1–C5 smoke CLOSED), but Gate F is pending, LB-001/LB-004/LB-005/LB-201 remain open/blocked, and O7 DR re-drill is blocked. Controlled founder-led pilot remains supported; public uncontrolled launch is forbidden.
+**NO-GO** — Core marketing + scoped LIVE modules are production-stable (Gate E PASS; LB-106 60min soak CLOSED @ #29315813862; LB-104 C1–C5 smoke CLOSED; O7/LB-201 CLOSED; R-019/LB-005 CLOSED), but Gate F is pending and LB-001/LB-004 remain open. Controlled founder-led pilot remains supported; public uncontrolled launch is forbidden.
