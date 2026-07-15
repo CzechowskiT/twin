@@ -46,8 +46,11 @@ export function CandidateProfileScene() {
       sidebarItems={["Matches", "Profile", "Calendar", "Settings"]}
       activeItem={0}
     >
-      <div style={{ display: "flex", gap: 16 }}>
+      <div style={{ display: "flex", gap: 16, height: "100%" }}>
         <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: FILM.accentDark }}>
+            Ranked matches
+          </div>
           {ROLES.map((role, i) => {
             const slideIn = spring({ frame: frame - i * 12, fps, config: { damping: 14, stiffness: 100 } });
             const isSelected = i === 0;
@@ -64,18 +67,14 @@ export function CandidateProfileScene() {
                     boxShadow: isSelected ? `0 4px 20px ${FILM.accent}33` : "none",
                   }}
                 >
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 700, color: FILM.text }}>{role.title}</div>
                       <div style={{ fontSize: 12, color: FILM.muted }}>{role.company} · Warsaw</div>
                     </div>
-                    {isSelected ? (
-                      <div style={{ fontSize: 22, fontWeight: 800, color: FILM.accent }}>
-                        {Math.round(i === 0 ? scoreAnim : role.score)}%
-                      </div>
-                    ) : (
-                      <div style={{ fontSize: 16, fontWeight: 700, color: FILM.muted }}>{role.score}%</div>
-                    )}
+                    <div style={{ fontSize: isSelected ? 22 : 16, fontWeight: 800, color: isSelected ? FILM.accent : FILM.muted }}>
+                      {Math.round(i === 0 ? scoreAnim : role.score)}%
+                    </div>
                   </div>
                   {isSelected ? (
                     <div style={{ marginTop: 8 }}>
@@ -87,20 +86,22 @@ export function CandidateProfileScene() {
             );
           })}
         </div>
-        <div style={{ width: 340, position: "relative" }}>
+        <div style={{ width: 360, position: "relative" }}>
           <div
             style={{
               background: "#fff",
               borderRadius: 12,
               padding: 16,
               border: `2px solid ${FILM.accent}`,
+              boxShadow: `0 8px 28px ${FILM.accent}22`,
+              minHeight: 420,
             }}
           >
             <div style={{ fontSize: 12, fontWeight: 700, color: statusColor }}>{statusText}</div>
-            <div style={{ fontSize: 16, fontWeight: 700, color: FILM.text, marginTop: 6 }}>
+            <div style={{ fontSize: 17, fontWeight: 700, color: FILM.text, marginTop: 6 }}>
               Why you fit
             </div>
-            <div style={{ overflow: "hidden", height: expandHeight }}>
+            <div style={{ overflow: "hidden", height: Math.max(expandHeight, 8) }}>
               {WHY_FIT.map((reason, i) => (
                 <div
                   key={reason}
@@ -119,12 +120,30 @@ export function CandidateProfileScene() {
                 </div>
               ))}
             </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10 }}>
+              {["Python", "FastAPI", "React", "PostgreSQL"].map((s) => (
+                <span
+                  key={s}
+                  style={{
+                    padding: "4px 8px",
+                    borderRadius: 999,
+                    border: `1px solid ${FILM.accent}66`,
+                    background: `${FILM.accent}18`,
+                    color: FILM.accentDark,
+                    fontSize: 11,
+                    fontWeight: 600,
+                  }}
+                >
+                  {s}
+                </span>
+              ))}
+            </div>
             <button
               type="button"
               style={{
-                marginTop: 12,
+                marginTop: 16,
                 width: "100%",
-                padding: "10px 0",
+                padding: "12px 0",
                 borderRadius: 8,
                 background: interested ? "#ecfdf5" : FILM.accent,
                 color: interested ? FILM.accentDark : "#fff",

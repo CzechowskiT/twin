@@ -87,6 +87,55 @@ function SkeletonBar({ width = "100%" }: { width?: string }) {
   );
 }
 
+function AvatarMark({ name }: { name: string }) {
+  const initials = name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase() ?? "")
+    .join("");
+  return (
+    <span className="demo-cockpit-avatar" aria-hidden>
+      {initials || "·"}
+    </span>
+  );
+}
+
+function MetricBar({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="demo-cockpit-metric" data-demo-cockpit-metric>
+      <div className="demo-cockpit-metric__row">
+        <span>{label}</span>
+        <span>{value}%</span>
+      </div>
+      <div className="demo-cockpit-metric__track">
+        <div className="demo-cockpit-metric__fill" style={{ width: `${value}%` }} />
+      </div>
+    </div>
+  );
+}
+
+function AvailabilityWeek({ activeDays }: { activeDays: readonly boolean[] }) {
+  const { t } = useTranslation();
+  const labels = [
+    t("demoCockpit.dayMon"),
+    t("demoCockpit.dayTue"),
+    t("demoCockpit.dayWed"),
+    t("demoCockpit.dayThu"),
+    t("demoCockpit.dayFri"),
+  ];
+  return (
+    <div className="demo-cockpit-week" data-demo-cockpit-availability>
+      {labels.map((label, i) => (
+        <div key={label} className={`demo-cockpit-week__day ${activeDays[i] ? "demo-cockpit-week__day--on" : ""}`}>
+          <span className="demo-cockpit-week__dot" aria-hidden />
+          <span>{label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function TimelineTrack({
   steps,
   activeIdx,
@@ -150,7 +199,8 @@ function CandidateSurface({
 
   const left = (
     <>
-      <PanelLabel>{t("demoCockpit.candidateInbox")}</PanelLabel>
+      <PanelLabel>{t("demoCockpit.careerCompass")}</PanelLabel>
+      <p className="demo-cockpit-sublabel">{t("demoCockpit.candidateInbox")}</p>
       {phase === "loading" ? (
         <div className="space-y-2" data-demo-ui="left_skeleton">
           <SkeletonBar width="90%" />
@@ -197,8 +247,18 @@ function CandidateSurface({
         </div>
       ) : showCenterProfile ? (
         <div className="demo-cockpit-profile" data-demo-ui="center_profile_partial">
-          <p className="demo-cockpit-profile__name">{candidate.displayName}</p>
-          <p className="demo-cockpit-profile__title">{candidate.title}</p>
+          {showSkills ? (
+            <span className="demo-cockpit-pill-badge" data-demo-ui="center_new_match">
+              {t("demoCockpit.newMatchBadge")}
+            </span>
+          ) : null}
+          <div className="demo-cockpit-profile__header">
+            <AvatarMark name={candidate.displayName} />
+            <div className="min-w-0">
+              <p className="demo-cockpit-profile__name">{candidate.displayName}</p>
+              <p className="demo-cockpit-profile__title">{candidate.title}</p>
+            </div>
+          </div>
           {["rank", "highlight", "decision", "decision_loading", "success", "outcome"].includes(phase) ? (
             <p className="demo-cockpit-profile__role" data-demo-ui="center_role_title">
               {jobs[0]!.title} · {jobs[0]!.company}
@@ -206,14 +266,19 @@ function CandidateSurface({
           ) : null}
           {showSkills ? (
             <div className="demo-cockpit-skills" data-demo-ui="center_skills">
-              <p className="text-[10px] uppercase tracking-wider opacity-70">{t("demoCockpit.skills")}</p>
+              <p className="demo-cockpit-section-title">{t("demoCockpit.whyFitCandidate")}</p>
+              <ul className="demo-cockpit-checklist">
+                <li>{t("demoCockpit.whyFit1")}</li>
+                <li>{t("demoCockpit.whyFit2")}</li>
+                <li>{t("demoCockpit.whyFit3")}</li>
+              </ul>
+              <p className="demo-cockpit-section-title">{t("demoCockpit.skills")}</p>
               <div className="flex flex-wrap gap-1">
-                {DEMO_FIXTURE_BUNDLE.cvMeta &&
-                  ["Python", "FastAPI", "React", "PostgreSQL"].map((s) => (
-                    <span key={s} className="demo-cockpit-tag">
-                      {s}
-                    </span>
-                  ))}
+                {["Python", "FastAPI", "React", "PostgreSQL"].map((s) => (
+                  <span key={s} className="demo-cockpit-tag">
+                    {s}
+                  </span>
+                ))}
               </div>
               <dl className="demo-cockpit-meta-grid">
                 <div>
@@ -235,7 +300,7 @@ function CandidateSurface({
             <div className="demo-cockpit-cta-row" data-demo-ui="center_cta">
               <button
                 type="button"
-                className={`demo-cockpit-cta demo-cockpit-cta--primary ${
+                className={`demo-cockpit-cta demo-cockpit-cta--neon ${
                   decisionHover === "accept" ? "demo-cockpit-cta--hover" : ""
                 }`}
                 data-demo-flow-decision="accept"
@@ -243,7 +308,7 @@ function CandidateSurface({
                 onMouseLeave={() => onDecisionHover(null)}
                 onClick={() => onDecisionClick("accept")}
               >
-                {t("interactiveDemoPlayer.stageAccept")}
+                {t("demoCockpit.interestedCta")}
               </button>
               <button
                 type="button"
@@ -336,6 +401,7 @@ function RecruiterSurface({
   const candidate = DEMO_FIXTURE_BUNDLE.inboxCandidate;
   const card = DEMO_FIXTURE_BUNDLE.reviewCard;
   const slot = DEMO_FIXTURE_BUNDLE.calendarSlot;
+  const cv = DEMO_FIXTURE_BUNDLE.cvMeta;
   const inboxCount = phase === "loading" ? 0 : phase === "scan" ? 3 : 1;
   const showCard = ["scan", "rank", "highlight", "decision", "decision_loading", "success", "outcome"].includes(phase);
   const showScore = ["rank", "highlight", "decision", "decision_loading", "success", "outcome"].includes(phase);
@@ -346,9 +412,9 @@ function RecruiterSurface({
   const activeIdx = phaseIndex(phase);
 
   const queue = [
-    { id: "q1", name: candidate.name, score: candidate.matchScore, active: true },
-    { id: "q2", name: "Jordan M. (demo)", score: 82, active: false },
-    { id: "q3", name: "Sam P. (demo)", score: 76, active: false },
+    { id: "q1", name: candidate.name, title: candidate.title, score: candidate.matchScore, active: true },
+    { id: "q2", name: "Jordan M. (demo)", title: "Data Scientist", score: 82, active: false },
+    { id: "q3", name: "Sam P. (demo)", title: "UX Designer", score: 76, active: false },
   ];
 
   const left = (
@@ -361,6 +427,12 @@ function RecruiterSurface({
           </span>
         ) : null}
       </PanelLabel>
+      {phase !== "loading" ? (
+        <p className="demo-cockpit-sublabel demo-cockpit-sublabel--live">
+          <span className="demo-cockpit-live-dot" aria-hidden />
+          {t("demoCockpit.newMatches")}
+        </p>
+      ) : null}
       {phase === "loading" ? (
         <div className="space-y-2" data-demo-ui="left_skeleton">
           <SkeletonBar />
@@ -374,7 +446,11 @@ function RecruiterSurface({
               className={`demo-cockpit-inbox-row ${item.active ? "demo-cockpit-inbox-row--active" : ""}`}
               data-demo-ui={i === 0 && phase === "rank" ? "left_queue_active" : phase === "highlight" ? "left_card_promote" : undefined}
             >
-              <span className="truncate">{item.name}</span>
+              <AvatarMark name={item.name} />
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-medium">{item.name}</p>
+                <p className="truncate text-[10px] opacity-70">{item.title}</p>
+              </div>
               {showScore ? <span className="demo-cockpit-score-pill">{item.score}%</span> : null}
             </li>
           ))}
@@ -392,34 +468,77 @@ function RecruiterSurface({
           <SkeletonBar />
         </div>
       ) : showCard ? (
-        <div className="demo-cockpit-review-card" data-demo-ui="center_card_partial">
-          <p className="font-semibold">{candidate.name}</p>
-          <p className="text-sm opacity-80">{candidate.title}</p>
+        <div className="demo-cockpit-review-card demo-cockpit-review-card--dense" data-demo-ui="center_card_partial">
+          <div className="demo-cockpit-profile__header">
+            <AvatarMark name={candidate.name} />
+            <div className="min-w-0 flex-1">
+              <p className="font-semibold">{candidate.name}</p>
+              <p className="text-sm opacity-80">{candidate.title}</p>
+            </div>
+            {showScore ? <span className="demo-cockpit-score-pill demo-cockpit-score-pill--lg">{candidate.matchScore}%</span> : null}
+          </div>
           {["rank", "highlight", "decision", "decision_loading", "success", "outcome"].includes(phase) ? (
-            <p className="mt-2 text-sm leading-snug opacity-90" data-demo-ui="center_rationale">
-              {card.why_this_candidate}
-            </p>
+            <div className="demo-cockpit-chip-row" data-demo-ui="center_chips">
+              <span className="demo-cockpit-chip">{t("demoCockpit.experienceChip")}</span>
+              <span className="demo-cockpit-chip">{cv.location}</span>
+              <span className="demo-cockpit-chip">{t("demoCockpit.languagesChip")}</span>
+              <span className="demo-cockpit-chip">{t("demoCockpit.availableNow")}</span>
+            </div>
+          ) : null}
+          {["rank", "highlight", "decision", "decision_loading", "success", "outcome"].includes(phase) ? (
+            <div data-demo-ui="center_rationale">
+              <p className="demo-cockpit-section-title">{t("demoCockpit.whyFit")}</p>
+              <ul className="demo-cockpit-checklist">
+                <li>{t("demoCockpit.whyFit1")}</li>
+                <li>{t("demoCockpit.whyFit2")}</li>
+                <li>{t("demoCockpit.whyFit3")}</li>
+              </ul>
+              <p className="mt-2 text-sm leading-snug opacity-90">{card.why_this_candidate}</p>
+            </div>
           ) : null}
           {showTags ? (
-            <div className="mt-2 flex flex-wrap gap-1" data-demo-ui="center_tags">
-              {card.requirements_matched.slice(0, 4).map((tag) => (
-                <span key={tag} className="demo-cockpit-tag demo-cockpit-tag--accent">
-                  {tag}
-                </span>
-              ))}
+            <div data-demo-ui="center_tags">
+              <p className="demo-cockpit-section-title">{t("demoCockpit.keySkills")}</p>
+              <div className="mt-1 flex flex-wrap gap-1">
+                {card.requirements_matched.slice(0, 4).map((tag) => (
+                  <span key={tag} className="demo-cockpit-tag demo-cockpit-tag--accent">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              <p className="demo-cockpit-section-title">{t("demoCockpit.preferences")}</p>
+              <dl className="demo-cockpit-meta-grid">
+                <div>
+                  <dt>{t("demoCockpit.workMode")}</dt>
+                  <dd>{t("demoCockpit.workModeHybrid")}</dd>
+                </div>
+                <div>
+                  <dt>{t("demoCockpit.salary")}</dt>
+                  <dd>{cv.salaryPln} PLN</dd>
+                </div>
+                <div>
+                  <dt>{t("demoCockpit.teamSize")}</dt>
+                  <dd>{t("demoCockpit.teamSizeValue")}</dd>
+                </div>
+              </dl>
+              <p className="demo-cockpit-section-title">{t("demoCockpit.availWeek")}</p>
+              <AvailabilityWeek activeDays={[true, true, false, true, true]} />
             </div>
           ) : null}
           {showDecision ? (
             <div className="demo-cockpit-cta-row mt-3" data-demo-ui="center_cta">
+              <button type="button" className="demo-cockpit-cta demo-cockpit-cta--ghost" tabIndex={-1}>
+                {t("demoCockpit.sendMessage")}
+              </button>
               <button
                 type="button"
-                className={`demo-cockpit-cta demo-cockpit-cta--primary ${decisionHover === "accept" ? "demo-cockpit-cta--hover" : ""}`}
+                className={`demo-cockpit-cta demo-cockpit-cta--neon ${decisionHover === "accept" ? "demo-cockpit-cta--hover" : ""}`}
                 data-demo-flow-decision="accept"
                 onMouseEnter={() => onDecisionHover("accept")}
                 onMouseLeave={() => onDecisionHover(null)}
                 onClick={() => onDecisionClick("accept")}
               >
-                {t("interactiveDemoPlayer.stageAccept")}
+                {t("demoCockpit.inviteInterview")}
               </button>
               <button
                 type="button"
@@ -441,7 +560,7 @@ function RecruiterSurface({
           ) : null}
           {showSuccess ? (
             <div className="demo-cockpit-calendar-hold mt-3" data-demo-flow-success data-demo-ui="center_slots">
-              <p className="font-medium">{t("demoInteractive.recruiterSlotProposed")}</p>
+              <p className="font-medium">{t("demoCockpit.inviteSent")}</p>
               <p className="text-sm opacity-80">{slot.when}</p>
             </div>
           ) : null}
@@ -452,17 +571,42 @@ function RecruiterSurface({
 
   const right = (
     <>
-      <PanelLabel>{t("demoCockpit.suggestedAction")}</PanelLabel>
+      <PanelLabel>{t("demoCockpit.matchScore")}</PanelLabel>
       {showScore ? (
         <div data-demo-ui={phase === "highlight" ? "right_action" : "right_score"}>
-          <DemoMatchGauge score={candidate.matchScore} size="lg" label={t("demoCockpit.matchScore")} />
-          <p className="mt-2 text-sm" data-demo-ui="right_suggested">
-            {phase === "decision"
-              ? t("demoCockpit.proposeSlots")
-              : phase === "success"
-                ? t("demoCockpit.slotsConfirmed")
-                : t("demoCockpit.reviewRequirements")}
-          </p>
+          <div className="demo-cockpit-score-hero">
+            <DemoMatchGauge score={candidate.matchScore} size="lg" label={t("demoCockpit.matchScore")} />
+            <p className="demo-cockpit-vs-avg">{t("demoCockpit.vsAvg")}</p>
+          </div>
+          {["highlight", "decision", "decision_loading", "success", "outcome"].includes(phase) ? (
+            <div className="demo-cockpit-metrics" data-demo-ui="right_metrics">
+              <MetricBar label={t("demoCockpit.metricSkills")} value={96} />
+              <MetricBar label={t("demoCockpit.metricExperience")} value={91} />
+              <MetricBar label={t("demoCockpit.metricCulture")} value={88} />
+              <MetricBar label={t("demoCockpit.metricSalary")} value={84} />
+            </div>
+          ) : null}
+          <div className="demo-cockpit-next-step" data-demo-ui="right_suggested">
+            <p className="demo-cockpit-section-title">{t("demoCockpit.nextStep")}</p>
+            <p className="text-sm font-medium">
+              {phase === "decision"
+                ? t("demoCockpit.proposeSlots")
+                : phase === "success"
+                  ? t("demoCockpit.slotsConfirmed")
+                  : t("demoCockpit.reviewRequirements")}
+            </p>
+            {["highlight", "decision", "decision_loading", "success", "outcome"].includes(phase) ? (
+              <>
+                <p className="mt-1 text-xs opacity-70">{t("demoCockpit.proposedSlot")}</p>
+                <p className="text-sm font-semibold text-[var(--demo-cockpit-accent)]">{slot.when}</p>
+                {showDecision || showSuccess ? (
+                  <span className="demo-cockpit-cta demo-cockpit-cta--primary demo-cockpit-cta--compact mt-2">
+                    {t("demoCockpit.bookSlot")}
+                  </span>
+                ) : null}
+              </>
+            ) : null}
+          </div>
         </div>
       ) : (
         <p className="text-xs opacity-50">{t("demoCockpit.pendingReview")}</p>
