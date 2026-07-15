@@ -12,6 +12,7 @@ from slowapi.util import get_remote_address
 
 from app.config import get_settings
 from app.core.deps import get_current_user
+from app.core.recruiter_jwt import mint_recruiter_session_jwt
 from app.core.scrape_ops import (
     scrape_ops_configured,
     scrape_worker_ready,
@@ -37,6 +38,7 @@ from app.schemas.auth import (
     UserRegister,
     UserRegisteredOut,
 )
+from app.schemas.recruiter_session import RecruiterSessionExchangeIn, RecruiterSessionOut
 from app.services.apple_oauth import (
     AppleOAuthError,
     build_apple_authorize_url,
@@ -87,6 +89,7 @@ from app.services.email_verification import (
 from app.services.password_change import PasswordChangeError, change_user_password
 from app.services.password_reset import request_password_reset, reset_password_with_token
 from app.services.referral_public_token import ensure_user_referral_public_token
+from app.services.recruiter_company_auth import resolve_recruiter_access
 from app.services.signup_referrer import (
     normalize_stored_referred_by_note,
     normalize_utm_field,
@@ -628,3 +631,32 @@ async def web_oauth_callback(
         params["next"] = "/profile"
         params["oauth"] = "1"
     return RedirectResponse(_frontend_callback_url(**params), status_code=302)
+
+
+@router.post("/recruiter/session", response_model=RecruiterSessionOut)
+@limiter.limit("30/minute")
+def exchange_recruiter_session(
+    request: Request,
+    body: RecruiterSessionExchangeIn,
+    db: Session = Depends(get_db),
+) -> RecruiterSessionOut:
+    """Exchange pilot access token for a short-lived recruiter session JWT (no query-string tokens)."""
+    settings = get_settings()
+    ok, slug = resolve_recruiter_access(db, settings, body.access_token, body.company_slug)
+    if not ok or not slug:
+        if not (settings.recruiter_inbox_token or "").strip():
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="recruiter_inbox_unavailable",
+            )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="recruiter_inbox_invalid_token",
+        )
+    ttl = settings.recruiter_jwt_expire_minutes
+    jwt_token = mint_recruiter_session_jwt(slug, expires_minutes=ttl)
+    return RecruiterSessionOut(
+        access_token=jwt_token,
+        company_slug=slug,
+        expires_in_minutes=ttl,
+    )

@@ -1,5 +1,15 @@
 /** Recruiter batch inbox — session, invite URL params, and display names (no "slug" in UI). */
 
+import {
+  clearRecruiterJwtSession,
+  exchangeRecruiterPilotToken,
+  hasRecruiterJwtSession,
+  readRecruiterJwtSession,
+  recruiterCompanyQuery,
+  recruiterJwtAuthHeaders,
+  writeRecruiterJwtSession,
+} from "@/lib/recruiter-jwt";
+
 export const RECRUITER_INBOX_STORAGE_TOKEN = "twin_recruiter_inbox_token";
 export const RECRUITER_INBOX_STORAGE_COMPANY = "twin_recruiter_company_slug";
 
@@ -60,10 +70,74 @@ export function readRecruiterInboxSession(): { token: string; companySlug: strin
   }
 }
 
-/** Pilot inbox invite — token + company slug in session (no candidate JWT). */
+/** Pilot inbox invite — JWT session preferred; legacy token blob for exchange only. */
 export function hasRecruiterPilotInboxSession(): boolean {
+  if (hasRecruiterJwtSession()) return true;
   const { token, companySlug } = readRecruiterInboxSession();
   return token.length >= 8 && companySlug.length > 0;
+}
+
+/** Active recruiter session for API calls — JWT only after exchange. */
+export function readRecruiterApiSession(): { jwt: string; companySlug: string; pilotToken: string } {
+  const jwtSession = readRecruiterJwtSession();
+  if (jwtSession.jwt && hasRecruiterJwtSession()) {
+    return { jwt: jwtSession.jwt, companySlug: jwtSession.companySlug, pilotToken: "" };
+  }
+  const legacy = readRecruiterInboxSession();
+  return { jwt: "", companySlug: legacy.companySlug, pilotToken: legacy.token };
+}
+
+/** Ensure JWT session — exchanges pilot token when needed. */
+export async function ensureRecruiterJwtSession(
+  pilotToken: string,
+  companySlug: string,
+): Promise<{ jwt: string; companySlug: string } | null> {
+  const existing = readRecruiterJwtSession();
+  if (existing.jwt && hasRecruiterJwtSession() && existing.companySlug === companySlug.trim()) {
+    return { jwt: existing.jwt, companySlug: existing.companySlug };
+  }
+  const exchanged = await exchangeRecruiterPilotToken(pilotToken, companySlug);
+  if (!exchanged.ok) return null;
+  writeRecruiterInboxSession("", companySlug);
+  return { jwt: exchanged.jwt, companySlug: exchanged.companySlug };
+}
+
+/** Build fetch headers for recruiter proxy routes (JWT in Authorization only). */
+export function recruiterProxyHeaders(jwt: string, locale?: string | null): HeadersInit {
+  const headers = recruiterJwtAuthHeaders(jwt);
+  if (locale) {
+    (headers as Record<string, string>)["X-Locale"] = locale;
+  }
+  return headers;
+}
+
+/** Authenticated recruiter/company proxy fetch — JWT in Authorization header only. */
+export async function recruiterApiFetch(
+  path: string,
+  pilotToken: string,
+  companySlug: string,
+  init?: RequestInit,
+): Promise<Response | null> {
+  const session = await ensureRecruiterJwtSession(pilotToken, companySlug);
+  if (!session) return null;
+  const q = recruiterCompanyQuery(companySlug);
+  const sep = path.includes("?") ? "&" : "?";
+  return fetch(`${path}${sep}${q}`, {
+    cache: "no-store",
+    ...init,
+    headers: recruiterProxyHeaders(session.jwt, null),
+  });
+}
+
+export function clearRecruiterInboxSession(): void {
+  clearRecruiterJwtSession();
+  if (typeof window === "undefined") return;
+  try {
+    sessionStorage.removeItem(RECRUITER_INBOX_STORAGE_TOKEN);
+    sessionStorage.removeItem(RECRUITER_INBOX_STORAGE_COMPANY);
+  } catch {
+    /* ignore */
+  }
 }
 
 export function writeRecruiterInboxSession(token: string, companySlug: string): void {
@@ -111,8 +185,9 @@ export function mergeCompanyOptions(
     .sort((a, b) => a.label.localeCompare(b.label));
 }
 
-export function recruiterInboxQuery(token: string, companySlug: string): URLSearchParams {
-  return new URLSearchParams({ company_slug: companySlug.trim(), token: token.trim() });
+export function recruiterInboxQuery(_token: string, companySlug: string): URLSearchParams {
+  void _token;
+  return recruiterCompanyQuery(companySlug);
 }
 
 export function resolveCompanySlugFromRaw(raw: string, knownSlugs: Set<string>): string {

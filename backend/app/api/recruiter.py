@@ -9,9 +9,9 @@ from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.config import Settings, get_settings
+from app.core.recruiter_auth import resolve_recruiter_company_slug
 from app.database.session import get_db
 from app.limiter import limiter, recruiter_token_key
-from app.services.recruiter_company_auth import resolve_recruiter_access
 from app.schemas.recruiter_activation import RecruiterActivationOut
 from app.services.recruiter_activation_persistence import (
     record_first_decision,
@@ -88,26 +88,49 @@ router = APIRouter()
 RECRUITER_INBOX_UNAVAILABLE = "recruiter_inbox_unavailable"
 RECRUITER_INBOX_INVALID_TOKEN = "recruiter_inbox_invalid_token"
 RECRUITER_INBOX_COMPANY_REQUIRED = "recruiter_inbox_company_required"
+RECRUITER_INBOX_TENANT_MISMATCH = "recruiter_inbox_tenant_mismatch"
 
 
 def _resolved_company_slug(
     db: Session,
     settings: Settings,
-    raw_token: str | None,
-    company_slug_query: str | None,
+    *,
+    authorization: str | None = None,
+    x_twin_recruiter_token: str | None = None,
+    company_slug_query: str | None = None,
 ) -> str:
-    ok, slug = resolve_recruiter_access(db, settings, raw_token, company_slug_query)
-    if ok:
-        if not slug:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=RECRUITER_INBOX_COMPANY_REQUIRED,
-            )
+    """Authoritative recruiter tenant resolution — JWT Bearer or legacy pilot header token."""
+    header_token = (x_twin_recruiter_token or "").strip()
+    bearer = authorization
+    legacy_header: str | None = None
+    if not bearer and header_token.count(".") == 2:
+        bearer = f"Bearer {header_token}"
+    elif header_token:
+        legacy_header = header_token
+
+    ok, slug, err = resolve_recruiter_company_slug(
+        db,
+        settings,
+        authorization=bearer,
+        x_twin_recruiter_token=legacy_header,
+        company_slug_query=company_slug_query,
+    )
+    if ok and slug:
         return slug
-    if not (settings.recruiter_inbox_token or "").strip():
+    if err == "unavailable":
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=RECRUITER_INBOX_UNAVAILABLE,
+        )
+    if err == "company_required":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=RECRUITER_INBOX_COMPANY_REQUIRED,
+        )
+    if err == "tenant_mismatch":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=RECRUITER_INBOX_TENANT_MISMATCH,
         )
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -151,12 +174,18 @@ class RecruiterJobCreateIn(BaseModel):
 def recruiter_activation(
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
 ) -> dict:
     """Recruiter onboarding state — steps through first decision activation event."""
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     return serialize_activation(db, company_slug=slug)
 
 
@@ -165,13 +194,19 @@ def recruiter_inbox(
     request: Request,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
     limit: int = Query(25, ge=1, le=50),
 ) -> dict:
     """Pre-qualified applications for one employer (batch accept/decline in UI)."""
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         payload = build_recruiter_batch(
             db,
@@ -193,11 +228,17 @@ def recruiter_inbox_respond(
     body: RecruiterRespondIn,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         result = respond_recruiter_batch(
             db,
@@ -246,11 +287,17 @@ def recruiter_inbox_scorecard_get(
     application_id: int,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         return get_recruiter_scorecard(db, application_id=application_id, company_slug=slug)
     except ValueError as exc:
@@ -265,11 +312,17 @@ def recruiter_inbox_scorecard_upsert(
     body: RecruiterScorecardIn,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         return upsert_recruiter_scorecard(
             db,
@@ -287,12 +340,18 @@ def recruiter_inbox_audit_list(
     application_id: int,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
     limit: int = Query(50, ge=1, le=100),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         return list_recruiter_audit_events(
             db, application_id=application_id, company_slug=slug, limit=limit,
@@ -309,11 +368,17 @@ def recruiter_inbox_audit_log(
     body: RecruiterAuditLogIn,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     if body.action_type.strip() not in RECRUITER_CLIENT_AUDIT_ACTION_TYPES:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="audit_action_not_allowed")
     try:
@@ -334,11 +399,17 @@ def recruiter_inbox_respond_batch(
     body: RecruiterBatchRespondIn,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         result = respond_recruiter_batch_bulk(
             db,
@@ -368,8 +439,8 @@ def recruiter_candidate_search(
     request: Request,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
     limit: int = Query(50, ge=1, le=100),
     q: str | None = Query(None, max_length=200),
@@ -385,7 +456,13 @@ def recruiter_candidate_search(
     missing_data: bool | None = Query(None),
     availability: str | None = Query(None, max_length=32),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         return build_recruiter_candidate_search(
             db,
@@ -414,8 +491,8 @@ def recruiter_talent_radar(
     request: Request,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
     role_id: int | None = Query(None, ge=1),
     segment: str | None = Query(None, max_length=48),
@@ -423,7 +500,13 @@ def recruiter_talent_radar(
     signal_type: str | None = Query(None, max_length=48),
     limit: int = Query(10, ge=1, le=10),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         return build_recruiter_talent_radar(
             db,
@@ -443,14 +526,20 @@ def recruiter_talent_radar(
 def recruiter_talent_radar_decisions_list(
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
     application_id: int | None = Query(None, ge=1),
     decision_filter: str | None = Query(None, max_length=32),
     limit: int = Query(100, ge=1, le=200),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         return list_recruiter_talent_radar_decisions(
             db,
@@ -468,14 +557,20 @@ def recruiter_talent_radar_digest(
     request: Request,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
     period: str | None = Query("7d", max_length=16),
     job_id: int | None = Query(None, ge=1, alias="jobId"),
     include_dismissed_summary: bool = Query(True, alias="includeDismissedSummary"),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         return build_recruiter_talent_radar_digest(
             db,
@@ -496,11 +591,17 @@ def recruiter_talent_radar_decisions_log(
     body: RecruiterTalentRadarDecisionIn,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         return log_recruiter_talent_radar_decision(
             db,
@@ -523,11 +624,17 @@ def recruiter_inbox_schedule(
     body: RecruiterScheduleIn,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         return save_recruiter_manual_schedule(
             db,
@@ -547,12 +654,18 @@ def recruiter_inbox_schedule(
 def recruiter_analytics(
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
     days: int = Query(7, ge=1, le=30),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         return build_recruiter_analytics(db, company_slug=slug, days=days)
     except ValueError as exc:
@@ -564,13 +677,19 @@ def recruiter_pipeline_list(
     request: Request,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
     status: str | None = Query(None, max_length=32),
     limit: int = Query(50, ge=1, le=100),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         return build_recruiter_pipeline(
             db,
@@ -591,11 +710,17 @@ def recruiter_pipeline_transition(
     body: RecruiterPipelineTransitionIn,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         return transition_recruiter_pipeline(
             db,
@@ -612,12 +737,18 @@ def recruiter_pipeline_transition(
 def recruiter_jobs_list(
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
     limit: int = Query(50, ge=1, le=100),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         items = list_company_jobs(db, company_slug=slug, limit=limit)
     except ValueError as exc:
@@ -630,11 +761,17 @@ def recruiter_jobs_create(
     body: RecruiterJobCreateIn,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         return create_company_job(
             db,
@@ -664,8 +801,8 @@ def recruiter_talent_pool_list(
     request: Request,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
     limit: int = Query(50, ge=1, le=100),
     offset: int = Query(0, ge=0),
@@ -675,7 +812,13 @@ def recruiter_talent_pool_list(
     search: str | None = Query(None, max_length=80),
     detail: bool = Query(False),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         if detail or search or source_type or pipeline_status or include_archived or offset:
             listed = list_talent_pool_records(
@@ -712,11 +855,17 @@ def recruiter_talent_pool_add_candidate(
     body: TalentPoolAddIn,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         return add_talent_pool_record(
             db,
@@ -741,11 +890,17 @@ def recruiter_talent_pool_detail(
     record_id: int,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         return get_talent_pool_record(db, company_slug=slug, record_id=record_id)
     except ValueError as exc:
@@ -759,11 +914,17 @@ def recruiter_talent_pool_archive(
     record_id: int,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         return archive_talent_pool_record(db, company_slug=slug, record_id=record_id)
     except ValueError as exc:
@@ -775,14 +936,20 @@ def recruiter_trust_review_queue_list(
     request: Request,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
     limit: int = Query(50, ge=1, le=100),
     offset: int = Query(0, ge=0),
     status: str | None = Query(None, max_length=32),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         return list_trust_review_queue(
             db,
@@ -802,11 +969,17 @@ def recruiter_trust_review_queue_detail(
     item_id: int,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         return get_trust_review_item(db, company_slug=slug, item_id=item_id)
     except ValueError as exc:
@@ -821,11 +994,17 @@ def recruiter_trust_review_queue_decide(
     body: TrustReviewDecisionIn,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     actor = (x_twin_recruiter_token or token or "recruiter")[:120]
     try:
         return record_trust_review_decision(
@@ -847,11 +1026,17 @@ def recruiter_trust_review_queue_decisions(
     item_id: int,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         return list_trust_review_decisions(db, company_slug=slug, item_id=item_id)
     except ValueError as exc:
@@ -865,11 +1050,17 @@ def recruiter_talent_pool_import_preview(
     body: RecruiterTalentPoolImportPreviewIn,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         return preview_talent_pool_import(
             db,
@@ -888,11 +1079,17 @@ def recruiter_talent_pool_import_commit(
     body: RecruiterTalentPoolImportCommitIn,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         return commit_talent_pool_import(
             db,
@@ -908,11 +1105,17 @@ def recruiter_notification_preferences_get(
     request: Request,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
 ) -> RecruiterNotificationPrefsOut:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         return RecruiterNotificationPrefsOut.model_validate(get_notification_prefs(db, company_slug=slug))
     except ValueError as exc:
@@ -926,11 +1129,17 @@ def recruiter_notification_preferences_put(
     body: RecruiterNotificationPrefsPutIn,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
 ) -> RecruiterNotificationPrefsOut:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         out = put_notification_prefs(db, company_slug=slug, data=body.model_dump())
         return RecruiterNotificationPrefsOut.model_validate(out)
@@ -945,11 +1154,17 @@ def recruiter_notification_preferences_patch(
     body: RecruiterNotificationPrefsPatchIn,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
 ) -> RecruiterNotificationPrefsOut:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     data = body.model_dump(exclude_unset=True)
     if not data:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="empty_body")
@@ -966,11 +1181,17 @@ def recruiter_notification_preferences_reset(
     request: Request,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
 ) -> RecruiterNotificationPrefsOut:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         out = reset_notification_prefs(db, company_slug=slug)
         return RecruiterNotificationPrefsOut.model_validate(out)
@@ -983,12 +1204,18 @@ def recruiter_saved_views_list(
     request: Request,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
     surface: str | None = Query(None, max_length=32),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         return list_saved_views(db, company_slug=slug, surface=surface)
     except ValueError as exc:
@@ -1002,11 +1229,17 @@ def recruiter_saved_views_create(
     body: RecruiterSavedViewCreateIn,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
 ) -> RecruiterSavedViewOut:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         out = create_saved_view(db, company_slug=slug, payload=body.model_dump())
         return RecruiterSavedViewOut.model_validate(out)
@@ -1022,11 +1255,17 @@ def recruiter_saved_views_update(
     body: RecruiterSavedViewUpdateIn,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
 ) -> RecruiterSavedViewOut:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         out = update_saved_view(db, company_slug=slug, view_id=view_id, fields=body.model_dump(exclude_unset=True))
         return RecruiterSavedViewOut.model_validate(out)
@@ -1041,11 +1280,17 @@ def recruiter_saved_views_delete(
     view_id: int,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         return delete_saved_view(db, company_slug=slug, view_id=view_id)
     except ValueError as exc:
@@ -1057,14 +1302,20 @@ def recruiter_activity_timeline(
     request: Request,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
     x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
-    token: Annotated[str | None, Query()] = None,
     company_slug: str | None = Query(None, max_length=80),
     limit: int = Query(50, ge=1, le=100),
     offset: int = Query(0, ge=0),
     action_type: str | None = Query(None, max_length=64),
 ) -> dict:
-    slug = _resolved_company_slug(db, settings, x_twin_recruiter_token or token, company_slug)
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
     try:
         return list_company_activity_timeline(
             db,

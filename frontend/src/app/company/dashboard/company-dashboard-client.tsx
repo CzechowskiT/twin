@@ -25,7 +25,7 @@ import {
 import {
   mergeCompanyOptions,
   readRecruiterInboxSession,
-  recruiterInboxQuery,
+  recruiterApiFetch,
   resolveCompanySlugFromRaw,
   companySlugToLabel,
   writeRecruiterInboxSession,
@@ -85,9 +85,8 @@ export default function CompanyDashboardClient() {
     writeRecruiterInboxSession(tkn, slug);
     setLoading(true);
     try {
-      const q = recruiterInboxQuery(tkn, slug);
-      const res = await fetch(`/api/company/dashboard?${q}`, { cache: "no-store" });
-      if (!res.ok) {
+      const res = await recruiterApiFetch("/api/company/dashboard", tkn, slug);
+      if (!res?.ok) {
         setPayload(null);
         return;
       }

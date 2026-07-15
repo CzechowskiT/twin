@@ -1,6 +1,6 @@
 /** Recruiter trust review queue C2 API — list, detail, decisions. */
 
-import { recruiterInboxQuery } from "@/lib/recruiter-inbox";
+import { recruiterCompanyQuery, recruiterJwtAuthHeaders } from "@/lib/recruiter-jwt";
 
 export type TrustReviewQueueItemLive = {
   id: number;
@@ -36,25 +36,27 @@ export type TrustReviewDecision = {
 };
 
 export async function fetchRecruiterTrustReviewQueue(
-  token: string,
+  jwt: string,
   companySlug: string,
 ): Promise<TrustReviewQueuePayload | null> {
-  const q = recruiterInboxQuery(token, companySlug);
-  const res = await fetch(`/api/recruiter/trust-review-queue?${q}`);
+  const q = recruiterCompanyQuery(companySlug);
+  const res = await fetch(`/api/recruiter/trust-review-queue?${q}`, {
+    headers: recruiterJwtAuthHeaders(jwt),
+  });
   if (!res.ok) return null;
   return (await res.json()) as TrustReviewQueuePayload;
 }
 
 export async function postRecruiterTrustReviewDecision(
-  token: string,
+  jwt: string,
   companySlug: string,
   itemId: number,
   body: { decision: string; note?: string },
 ): Promise<{ decision: TrustReviewDecision; status: string } | null> {
-  const q = recruiterInboxQuery(token, companySlug);
+  const q = recruiterCompanyQuery(companySlug);
   const res = await fetch(`/api/recruiter/trust-review-queue/${itemId}/decisions?${q}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: recruiterJwtAuthHeaders(jwt, { "Content-Type": "application/json" }),
     body: JSON.stringify(body),
   });
   if (!res.ok) return null;
@@ -62,12 +64,14 @@ export async function postRecruiterTrustReviewDecision(
 }
 
 export async function fetchRecruiterTrustReviewDecisions(
-  token: string,
+  jwt: string,
   companySlug: string,
   itemId: number,
 ): Promise<TrustReviewDecision[]> {
-  const q = recruiterInboxQuery(token, companySlug);
-  const res = await fetch(`/api/recruiter/trust-review-queue/${itemId}/decisions?${q}`);
+  const q = recruiterCompanyQuery(companySlug);
+  const res = await fetch(`/api/recruiter/trust-review-queue/${itemId}/decisions?${q}`, {
+    headers: recruiterJwtAuthHeaders(jwt),
+  });
   if (!res.ok) return [];
   const data = (await res.json()) as { decisions: TrustReviewDecision[] };
   return data.decisions ?? [];

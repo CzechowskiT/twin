@@ -23,6 +23,7 @@ import {
 } from "@/lib/persona-access";
 import { LOGIN_PATH, WORKSPACE_PATH } from "@/lib/persona-auth";
 import { hasRecruiterPilotInboxSession } from "@/lib/recruiter-inbox";
+import { hasRecruiterJwtSession } from "@/lib/recruiter-jwt";
 
 const SURFACE_COPY: Record<
   "candidate" | "recruiter" | "investor" | "company",
@@ -90,7 +91,9 @@ export function PersonaWorkspaceGate({
   useEffect(() => {
     queueMicrotask(() => {
       setHasSession(hasActiveSession());
-      setHasPilotRecruiter(surface === "recruiter" && hasRecruiterPilotInboxSession());
+      setHasPilotRecruiter(
+        surface === "recruiter" && (hasRecruiterJwtSession() || hasRecruiterPilotInboxSession()),
+      );
     });
   }, [pathname, surface]);
 

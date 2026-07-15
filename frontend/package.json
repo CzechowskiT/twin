@@ -87,6 +87,7 @@
     "test:all-modules-green-wave-c3-notification-prefs-guard": "npx --yes tsx scripts/all-modules-green-wave-c3-notification-prefs-guard.test.ts",
     "test:candidate-green-modules-founder-smoke-guard": "npx --yes tsx scripts/candidate-green-modules-founder-smoke-guard.test.ts",
     "test:candidate-referrals-persistence": "npx --yes tsx scripts/candidate-referrals-persistence.test.ts",
+    "test:recruiter-jwt-gate-wave-c-guard": "npx --yes tsx scripts/recruiter-jwt-gate-wave-c-guard.test.ts",
     "test:recruiter-wave-c-founder-smoke-guard": "npx --yes tsx scripts/recruiter-wave-c-founder-smoke-guard.test.ts",
     "test:alembic-duplicate-revision-guard": "npx --yes tsx scripts/alembic-duplicate-revision-guard.test.ts",
     "test:founder-smoke-env-preflight": "npx --yes tsx scripts/founder-smoke-env-preflight.test.ts",

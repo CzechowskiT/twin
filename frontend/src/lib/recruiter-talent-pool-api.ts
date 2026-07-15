@@ -1,7 +1,7 @@
 /** Recruiter talent pool C2 API helpers — list, add, detail, archive. */
 
 import type { TalentPoolPayload, TalentPoolRecord } from "@/lib/recruiter-talent-pool";
-import { recruiterInboxQuery } from "@/lib/recruiter-inbox";
+import { recruiterCompanyQuery, recruiterJwtAuthHeaders } from "@/lib/recruiter-jwt";
 
 export type TalentPoolAddInput = {
   display_name: string;
@@ -21,27 +21,29 @@ export type TalentPoolAddResult = {
 };
 
 export async function fetchRecruiterTalentPool(
-  token: string,
+  jwt: string,
   companySlug: string,
   opts?: { search?: string; includeArchived?: boolean },
 ): Promise<TalentPoolPayload | null> {
-  const params = new URLSearchParams(recruiterInboxQuery(token, companySlug));
+  const params = recruiterCompanyQuery(companySlug);
   if (opts?.search) params.set("search", opts.search);
   if (opts?.includeArchived) params.set("include_archived", "true");
-  const res = await fetch(`/api/recruiter/talent-pool?${params.toString()}`);
+  const res = await fetch(`/api/recruiter/talent-pool?${params.toString()}`, {
+    headers: recruiterJwtAuthHeaders(jwt),
+  });
   if (!res.ok) return null;
   return (await res.json()) as TalentPoolPayload;
 }
 
 export async function addRecruiterTalentPoolCandidate(
-  token: string,
+  jwt: string,
   companySlug: string,
   body: TalentPoolAddInput,
 ): Promise<TalentPoolAddResult | null> {
-  const q = recruiterInboxQuery(token, companySlug);
+  const q = recruiterCompanyQuery(companySlug);
   const res = await fetch(`/api/recruiter/talent-pool/candidates?${q}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: recruiterJwtAuthHeaders(jwt, { "Content-Type": "application/json" }),
     body: JSON.stringify(body),
   });
   if (!res.ok) return null;
@@ -49,23 +51,28 @@ export async function addRecruiterTalentPoolCandidate(
 }
 
 export async function fetchRecruiterTalentPoolDetail(
-  token: string,
+  jwt: string,
   companySlug: string,
   recordId: number,
 ): Promise<TalentPoolRecord | null> {
-  const q = recruiterInboxQuery(token, companySlug);
-  const res = await fetch(`/api/recruiter/talent-pool/${recordId}?${q}`);
+  const q = recruiterCompanyQuery(companySlug);
+  const res = await fetch(`/api/recruiter/talent-pool/${recordId}?${q}`, {
+    headers: recruiterJwtAuthHeaders(jwt),
+  });
   if (!res.ok) return null;
   return (await res.json()) as TalentPoolRecord;
 }
 
 export async function archiveRecruiterTalentPoolRecord(
-  token: string,
+  jwt: string,
   companySlug: string,
   recordId: number,
 ): Promise<TalentPoolRecord | null> {
-  const q = recruiterInboxQuery(token, companySlug);
-  const res = await fetch(`/api/recruiter/talent-pool/${recordId}?${q}`, { method: "PATCH" });
+  const q = recruiterCompanyQuery(companySlug);
+  const res = await fetch(`/api/recruiter/talent-pool/${recordId}?${q}`, {
+    method: "PATCH",
+    headers: recruiterJwtAuthHeaders(jwt),
+  });
   if (!res.ok) return null;
   return (await res.json()) as TalentPoolRecord;
 }

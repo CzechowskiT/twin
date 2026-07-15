@@ -14,6 +14,7 @@ import {
   RECRUITER_INBOX_STORAGE_TOKEN,
   RECRUITER_DEMO_COMPANY_SLUG,
 } from "../src/lib/recruiter-inbox";
+import { RECRUITER_JWT_COMPANY_KEY, RECRUITER_JWT_STORAGE_KEY } from "../src/lib/recruiter-jwt";
 import { withFreshContext } from "./helpers/browser-lifecycle";
 import { loadLocalTestEnv } from "./helpers/load-local-test-env";
 
@@ -54,13 +55,11 @@ async function dismissCookieBanner(page: Page): Promise<void> {
   }
 }
 
-function recruiterRouteWithToken(path: string): string {
-  const sep = path.includes("?") ? "&" : "?";
-  return `${path}${sep}token=${encodeURIComponent(RECRUITER_TOKEN)}&company_slug=${encodeURIComponent(COMPANY_SLUG)}`;
-}
-
-async function seedRecruiterInboxSession(page: Page): Promise<void> {
-  await page.goto(recruiterRouteWithToken("/recruiter/inbox"), { waitUntil: "domcontentloaded" });
+async function seedRecruiterInboxSession(page: Page, context: BrowserContext): Promise<void> {
+  await injectRecruiterSession(context);
+  await page.goto(`/recruiter/inbox?company_slug=${encodeURIComponent(COMPANY_SLUG)}`, {
+    waitUntil: "domcontentloaded",
+  });
   await dismissCookieBanner(page);
   await page.waitForTimeout(2_000);
 }
@@ -87,18 +86,37 @@ async function injectCandidateToken(context: BrowserContext, token: string): Pro
   }, token);
 }
 
-async function injectRecruiterSession(context: BrowserContext): Promise<void> {
+async function exchangeRecruiterJwt(context: BrowserContext): Promise<string> {
   if (!RECRUITER_TOKEN) throw new Error("RECRUITER_TOKEN UNSET");
+  const base = process.env.PLAYWRIGHT_BASE_URL ?? "https://twin-sooty.vercel.app";
+  const res = await context.request.post(`${base}/api/v1/auth/recruiter/session`, {
+    data: { access_token: RECRUITER_TOKEN, company_slug: COMPANY_SLUG },
+  });
+  expect(res.ok(), `recruiter JWT exchange HTTP ${res.status()}`).toBeTruthy();
+  const body = (await res.json()) as { access_token?: string };
+  expect(body.access_token?.length).toBeGreaterThan(10);
+  return body.access_token!;
+}
+
+async function injectRecruiterSession(context: BrowserContext): Promise<void> {
+  const jwt = await exchangeRecruiterJwt(context);
   await context.addInitScript(
-    ({ token, slug }: { token: string; slug: string }) => {
+    ({ token, slug, jwtKey, companyKey }: { token: string; slug: string; jwtKey: string; companyKey: string }) => {
       try {
-        window.sessionStorage?.setItem("twin_recruiter_inbox_token", token);
+        window.sessionStorage?.setItem(jwtKey, token);
+        window.sessionStorage?.setItem(companyKey, slug);
+        window.sessionStorage?.setItem("twin_recruiter_inbox_token", "");
         window.sessionStorage?.setItem("twin_recruiter_company_slug", slug);
       } catch {
         /* ignore */
       }
     },
-    { token: RECRUITER_TOKEN, slug: COMPANY_SLUG },
+    {
+      token: jwt,
+      slug: COMPANY_SLUG,
+      jwtKey: RECRUITER_JWT_STORAGE_KEY,
+      companyKey: RECRUITER_JWT_COMPANY_KEY,
+    },
   );
 }
 
@@ -213,12 +231,13 @@ test.describe("Founder Wave B/C prod smoke", () => {
   for (const route of WAVE_C_ROUTES) {
     test(`Wave C ${route.id} ${route.path} loads with recruiter token`, async ({ browser }) => {
       await withFreshContext(browser, async (context) => {
-        await injectRecruiterSession(context);
         const page = await context.newPage();
-        await seedRecruiterInboxSession(page);
-        const res = await page.goto(recruiterRouteWithToken(route.path), {
-          waitUntil: "domcontentloaded",
-        });
+        await seedRecruiterInboxSession(page, context);
+        const sep = route.path.includes("?") ? "&" : "?";
+        const res = await page.goto(
+          `${route.path}${sep}company_slug=${encodeURIComponent(COMPANY_SLUG)}`,
+          { waitUntil: "domcontentloaded" },
+        );
         await dismissCookieBanner(page);
         expect(res?.status()).not.toBe(404);
         const body = await page.locator("body").innerText();
