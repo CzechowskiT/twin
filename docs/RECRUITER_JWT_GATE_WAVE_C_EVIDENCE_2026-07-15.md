@@ -88,9 +88,12 @@ O7 DR re-drill remains **BLOCKED** (no `RAILWAY_TOKEN`/`DATABASE_PUBLIC_URL` in 
 | `pytest tests/test_candidate_account_deletion.py` | 6 PASS |
 | `npm run test:recruiter-jwt-gate-wave-c-guard` | 8/8 PASS |
 | `npm run build` (frontend) | PASS |
-| CI (PR) | pending post-push |
-| Prod `verify:production-v3:077` | pending post-merge |
-| Prod `probe:prod-public` ×2 | pending post-merge |
+| CI PR #488 | **PASS** (backend-smoke, frontend-build, security-regression, Vercel) |
+| Prod merge SHA | `b98499aea615182b58d0f5099fa85665d604bfd0` |
+| Prod `verify:production-v3:077` | **PASS** |
+| Prod `probe:prod-public` ×2 | **220/220 PASS** (110+110) |
+| Prod `/auth/recruiter/session` | **PASS** (401 on invalid token — endpoint live) |
+| `/demo` regression | **PASS** (HTTP 200) |
 
 ---
 
