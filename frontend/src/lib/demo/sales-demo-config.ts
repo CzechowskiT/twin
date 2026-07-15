@@ -3,7 +3,8 @@
  */
 import { scenesForRole, totalDurationMs, type DemoRole, type DemoScene } from "@/lib/demo/demo-scene-manifest";
 
-export const PRODUCT_FILM_DURATION_SEC = 42;
+/** Canonical Remotion composition length — ffprobe ~45.056s on rendered MP4. */
+export const PRODUCT_FILM_DURATION_SEC = 45;
 
 export type SalesDemoRole = Exclude<DemoRole, "overview">;
 

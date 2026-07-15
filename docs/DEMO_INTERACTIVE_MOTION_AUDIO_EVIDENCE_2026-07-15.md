@@ -1,93 +1,115 @@
 # Demo Interactive Motion + Audio Evidence — 2026-07-15
 
-**Type:** Interactive flow rebuild + ambient audio — **not launch approval**  
-**Baseline:** PR #482 @ `7118f735` (product film v2, ALIGNED on prod)  
-**Branch:** `feat/demo-interactive-motion-audio`  
+**Type:** Interactive flow rebuild + ambient audio + duration/harness fixes — **not launch approval**  
+**Baseline:** PR #482 @ `7118f735` · PR #483 @ `d4efe3ac` (**MERGED**)  
 **Prod URL:** https://twin-society.vercel.app/demo  
-**Gate F:** PENDING · **Launch:** NO-GO · **LB-107:** CLOSED
+**Gate F:** PENDING · **Launch:** NO-GO · **LB-107:** CLOSED · **Railway:** NONE
 
-**Related:** [Demo Founder Review Evidence 2026-07-14](./DEMO_FOUNDER_REVIEW_EVIDENCE_2026-07-14.md) · PR #482 product film v2
+**Related:** [Demo Founder Review Evidence 2026-07-14](./DEMO_FOUNDER_REVIEW_EVIDENCE_2026-07-14.md)
 
 ---
 
-## 1. Scope (this batch)
+## Source of truth
 
-| Area | Change |
+| Field | Value |
+|-------|-------|
+| repo_head | `d4efe3ac` + lokalne poprawki duration/harness/e2e |
+| prod_frontend_commit | `cddcfac31a2a48a6b892734814fa1bef368da104` |
+| prod_api_commit | `ae14bfb58fc0c2db56a6fa0f417ca41c534b7960` |
+| alignment_status | **PARTIAL** — prod FE +1 commit vs lokalny HEAD; treść #483 live |
+| docs_only_drift | NO |
+
+---
+
+## PR and CI
+
+| Item | Status |
 |------|--------|
-| Interactive flows | Step-based Candidate / Recruiter / Company with UI beat every 1–2s |
-| Audio | Local MP3 + OGG in `public/demo/`, user-gesture gated |
-| Video blank frames | MP4-first source order + poster underlay until first frame |
-| Validators | `test:interactive-demo-visual-change`, `test:demo-audio-validate` |
-| Browser tests | `e2e/interactive-demo-flow-browser.spec.ts` EN/PL desktop/mobile |
+| PR #483 | **MERGED** @ `d4efe3ac` — bez re-merge |
+| CI #483 | security-regression PASS · smoke PASS · Vercel SUCCESS |
+| Duration fix | Lokalnie: `test:real-video-demo` 42→45s, ffprobe ±0.25s EN+PL |
 
 ---
 
-## 2. Black frame investigation
+## Interactive Candidate / Recruiter / Company
 
-| Check | Result | Detail |
-|-------|--------|--------|
-| Prod screenshot @ 0s | **BLANK (light)** | Poster/background — not decoded frame |
-| Prod screenshot @ 3s | **PASS** | Content visible (“Thousands of pings…”) |
-| Prod screenshot @ 10s | **BLANK (light)** | Capture during decode gap / pre-play state |
-| Local MP4 extract @ 10s | **PASS** | mean brightness 173 — content present in asset |
-| Root cause | **RENDER TIMING** | Asset OK; browser showed empty surface before decode / between segments |
-| Fix applied | **IN SCOPE** | MP4-first, poster underlay until `loadedData`, no fake PASS on blank captures |
+| Role | EN desktop | PL desktop | EN mobile | PL mobile |
+|------|------------|------------|-----------|-----------|
+| Candidate | PASS | PASS | PASS (retry) | PASS |
+| Recruiter | PASS | PASS | PASS | PASS |
+| Company | PASS | PASS | PASS | PASS |
 
----
-
-## 3. Interactive rebuild
-
-- `InteractiveRoleFlow` replaces cinematic `RoleStory` in `SalesDemoExperience`
-- 8 steps per role: loading → scan → rank → highlight → decision → processing → success → outcome
-- Decision buttons: hover / click / loading / success states with `DemoMatchGauge`
-- `prefers-reduced-motion` + `save-data`: step picker, no auto-timer, no audio
-- Outcome + CTA preserved; sample-data boundary note intact
+`test:interactive-demo-flow-browser` prod: **13/13 PASS**.
 
 ---
 
-## 4. Audio
+## Audio assets
 
-| Asset | Path | Size |
-|-------|------|------|
-| MP3 | `/demo/twin-demo-ambient.mp3` | ~235 KB |
-| OGG | `/demo/twin-demo-ambient.ogg` | ~199 KB |
-
-- Procedurally generated sine ambient (royalty-free)
-- `preload="none"`, no autoplay; toggle enabled after user gesture
-- Analytics: `demo_audio_impression`, `demo_audio_play`, `demo_audio_pause`, `demo_audio_mute`, `demo_audio_unmute`
+| Asset | Prod HEAD |
+|-------|-----------|
+| `/demo/twin-demo-ambient.mp3` | 200 |
+| `/demo/twin-demo-ambient.ogg` | 200 |
 
 ---
 
-## 5. Validators
+## Audio browser behavior
 
-| Script | Purpose |
-|--------|---------|
-| `test:interactive-demo-visual-change` | Step timing 800–2000ms, ≥4 beats/role |
-| `test:demo-audio-validate` | Asset existence, gesture policy, analytics |
-| `test:interactive-demo-guard` | Sales stack, reduced-data, e2e hooks |
-
----
-
-## 6. Prod verification (post-merge)
-
-Run after manual merge + Vercel deploy:
-
-```bash
-PLAYWRIGHT_ALLOW_PROD_SMOKE=1 PLAYWRIGHT_SKIP_WEBSERVER=1 \
-  PLAYWRIGHT_BASE_URL=https://twin-society.vercel.app \
-  npm run smoke:demo-founder-review-prod
-
-npm run verify:production-v3:077
-npm run probe:prod-public
-```
+| Check | Result |
+|-------|--------|
+| preload=none | PASS |
+| No autoplay | PASS |
+| Gesture-gated toggle | PASS |
+| Disabled under save-data | PASS |
 
 ---
 
-## 7. Final decision
+## Video blank-frame fix
 
-| Gate | Status |
+| Check | Result |
+|-------|--------|
+| MP4-first | PASS (24/24) |
+| Prod duration | **45.056s** |
+| Frame audit t=0 | **3/24 FAIL** (light surface, brak underlay w DOM) |
+| Frame audit t≥0.25s | **PASS** |
+| `demo:video:visual-validate` | PASS |
+
+---
+
+## Production verification
+
+| Check | Result |
+|-------|--------|
+| `smoke:demo-founder-review-prod` | **18/18 PASS** |
+| `verify:production-v3:077` | PASS |
+| `probe:prod-public` ×2 | **220/220 PASS** |
+
+---
+
+## Final regression
+
+| Test | Result |
 |------|--------|
-| Launch GO | **NO-GO** |
-| Gate F YES | **BLOCKED** |
-| Interactive + audio batch | **READY FOR PR** |
-| Black frames on prod MP4 | **ASSET OK** — UI timing fix shipped |
+| `test:real-video-demo` | PASS (po fix 45s) |
+| `test:interactive-demo-guard` | PASS |
+| `test:interactive-demo-visual-change` | PASS |
+| `test:demo-audio-validate` | PASS |
+| `test:real-video-demo-browser` prod | PARTIAL 8/12 (stale selector — naprawiony lokalnie) |
+
+---
+
+## Cleanup
+
+Lokalne poprawki niezacommitowane; artefakty w `reports/` — evidence only.
+
+---
+
+## Final decision
+
+| Field | Value |
+|-------|-------|
+| Launch GO | **NO** |
+| Gate F YES | **NO** |
+| #483 merged | **YES** |
+| Duration 45s | **YES** (prod 45.056s) |
+| All 32 criteria | **NO** |
+| Batch status | **PARTIAL** |

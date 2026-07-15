@@ -56,9 +56,9 @@ test("4 render and validate scripts registered", () => {
   assert.match(pkg, /demo:video:visual-validate/);
 });
 
-test("5 remotion composition exists with 42s film and dedicated scenes", () => {
+test("5 remotion composition exists with 45s film and dedicated scenes", () => {
   const copy = read("remotion/src/copy.ts");
-  assert.match(copy, /FILM_DURATION_SEC = 42/);
+  assert.match(copy, /FILM_DURATION_SEC = 45/);
   const rootTsx = read("remotion/src/Root.tsx");
   assert.match(rootTsx, /ProductFilmEN/);
   assert.match(rootTsx, /ProductFilmPL/);

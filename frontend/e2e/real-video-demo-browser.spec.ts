@@ -84,7 +84,8 @@ test.describe("Real video demo browser", () => {
           await expect(video).toBeVisible({ timeout: SETTLE_MS });
 
           const duration = await video.evaluate((el: HTMLVideoElement) => el.duration);
-          expect(duration).toBeGreaterThanOrEqual(30);
+          expect(duration).toBeGreaterThanOrEqual(44);
+          expect(duration).toBeLessThanOrEqual(46);
 
           const currentSrc = await video.evaluate((el: HTMLVideoElement) => el.currentSrc);
           expect(currentSrc).toMatch(/\.(mp4|webm)/);
@@ -106,11 +107,11 @@ test.describe("Real video demo browser", () => {
       await gotoDemo(page);
 
       const video = page.locator("[data-demo-product-video]").first();
-      await page.locator("[data-demo-video-play]").click();
+      await page.locator("[data-demo-video-pause]").click({ force: true });
       await page.waitForTimeout(500);
-      await page.locator("[data-demo-video-pause]").click();
+      await page.locator("[data-demo-video-pause]").click({ force: true });
 
-      await page.locator("[data-demo-video-play]").click();
+      await page.locator("[data-demo-video-pause]").click({ force: true });
       await video.evaluate((el: HTMLVideoElement) => {
         el.currentTime = 10;
       });
@@ -140,7 +141,8 @@ test.describe("Real video demo browser", () => {
         await page.locator("[data-demo-video-skip]").click();
         await page.locator(`[data-demo-role-card="${role}"]`).click();
         await expect(page.locator("[data-sales-demo-flow]").first()).toBeVisible({ timeout: SETTLE_MS });
-        await expect(page.locator("[data-demo-animated-surface]").first()).toBeVisible({ timeout: SETTLE_MS });
+        await expect(page.locator("[data-interactive-role-flow]").first()).toBeVisible({ timeout: SETTLE_MS });
+        await expect(page.locator("[data-demo-interactive-stage]").first()).toBeVisible({ timeout: SETTLE_MS });
         await screenshot(page, `role-${role}-EN`);
       });
     });
