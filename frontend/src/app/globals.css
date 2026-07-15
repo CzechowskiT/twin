@@ -4267,6 +4267,7 @@ html[data-marketing-surface="studio"] .demo-glass-panel {
 .sales-demo-film__play-overlay {
   position: absolute;
   inset: 0;
+  z-index: 3;
   display: grid;
   place-items: center;
   border: none;
