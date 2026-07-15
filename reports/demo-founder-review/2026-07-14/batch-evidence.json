@@ -1,8 +1,8 @@
 {
   "schemaVersion": "1",
-  "generatedUtc": "2026-07-14T14:00:38.633Z",
-  "repoHead": "aa33afe61ae82e7ce3f6ea9565c97d86aced8b88",
-  "prodFeSha": "aa33afe61ae82e7ce3f6ea9565c97d86aced8b88",
+  "generatedUtc": "2026-07-15T06:07:45.044Z",
+  "repoHead": "0c739b5e7e98ef3ca1c8a51a5463160b4ede14a0",
+  "prodFeSha": "0c739b5e7e98ef3ca1c8a51a5463160b4ede14a0",
   "prodApiSha": "ae14bfb58fc0c2db56a6fa0f417ca41c534b7960",
   "dbOk": true,
   "vercelDeploymentId": "dpl_GrHTLLyKi7c3HLH82LioY4z6MTgF",
@@ -12,7 +12,7 @@
     "NEXT_PUBLIC_POSTHOG_KEY": "UNSET",
     "NEXT_PUBLIC_POSTHOG_HOST": "UNSET",
     "POSTHOG_PERSONAL_API_KEY": "UNSET",
-    "repoHead": "aa33afe61ae82e7ce3f6ea9565c97d86aced8b88",
+    "repoHead": "0c739b5e7e98ef3ca1c8a51a5463160b4ede14a0",
     "healthStatus": "ok",
     "alignment": "ALIGNED"
   },
@@ -53,182 +53,182 @@
     {
       "file": "hero-EN-1920x1080.png",
       "prodUrl": "https://twin-society.vercel.app/demo",
-      "feSha": "aa33afe6",
+      "feSha": "0c739b5e",
       "locale": "EN",
       "viewport": "1920x1080",
       "state": "hero-loaded",
-      "capturedUtc": "2026-07-14T14:00:57.112Z"
+      "capturedUtc": "2026-07-15T06:07:58.767Z"
     },
     {
       "file": "hero-EN-390x844.png",
       "prodUrl": "https://twin-society.vercel.app/demo",
-      "feSha": "aa33afe6",
+      "feSha": "0c739b5e",
       "locale": "EN",
       "viewport": "390x844",
       "state": "hero-loaded",
-      "capturedUtc": "2026-07-14T14:00:58.824Z"
+      "capturedUtc": "2026-07-15T06:08:00.337Z"
     },
     {
       "file": "hero-PL-1920x1080.png",
       "prodUrl": "https://twin-society.vercel.app/demo",
-      "feSha": "aa33afe6",
+      "feSha": "0c739b5e",
       "locale": "PL",
       "viewport": "1920x1080",
       "state": "hero-loaded",
-      "capturedUtc": "2026-07-14T14:01:01.025Z"
+      "capturedUtc": "2026-07-15T06:08:02.480Z"
     },
     {
       "file": "hero-PL-390x844.png",
       "prodUrl": "https://twin-society.vercel.app/demo",
-      "feSha": "aa33afe6",
+      "feSha": "0c739b5e",
       "locale": "PL",
       "viewport": "390x844",
       "state": "hero-loaded",
-      "capturedUtc": "2026-07-14T14:01:02.629Z"
+      "capturedUtc": "2026-07-15T06:08:04.026Z"
     },
     {
       "file": "video-milestone-0s-EN.png",
       "prodUrl": "https://twin-society.vercel.app/demo",
-      "feSha": "aa33afe6",
+      "feSha": "0c739b5e",
       "locale": "EN",
       "viewport": "1280x800",
       "state": "video-t=0s",
-      "capturedUtc": "2026-07-14T14:01:08.081Z"
+      "capturedUtc": "2026-07-15T06:08:09.039Z"
     },
     {
       "file": "video-milestone-5s-EN.png",
       "prodUrl": "https://twin-society.vercel.app/demo",
-      "feSha": "aa33afe6",
+      "feSha": "0c739b5e",
       "locale": "EN",
       "viewport": "1280x800",
       "state": "video-t=5s",
-      "capturedUtc": "2026-07-14T14:01:08.534Z"
+      "capturedUtc": "2026-07-15T06:08:09.522Z"
     },
     {
       "file": "video-milestone-10s-EN.png",
       "prodUrl": "https://twin-society.vercel.app/demo",
-      "feSha": "aa33afe6",
+      "feSha": "0c739b5e",
       "locale": "EN",
       "viewport": "1280x800",
       "state": "video-t=10s",
-      "capturedUtc": "2026-07-14T14:01:08.979Z"
+      "capturedUtc": "2026-07-15T06:08:09.981Z"
     },
     {
       "file": "video-milestone-18s-EN.png",
       "prodUrl": "https://twin-society.vercel.app/demo",
-      "feSha": "aa33afe6",
+      "feSha": "0c739b5e",
       "locale": "EN",
       "viewport": "1280x800",
       "state": "video-t=18s",
-      "capturedUtc": "2026-07-14T14:01:09.432Z"
+      "capturedUtc": "2026-07-15T06:08:10.437Z"
     },
     {
       "file": "video-milestone-22s-EN.png",
       "prodUrl": "https://twin-society.vercel.app/demo",
-      "feSha": "aa33afe6",
+      "feSha": "0c739b5e",
       "locale": "EN",
       "viewport": "1280x800",
       "state": "video-t=22s",
-      "capturedUtc": "2026-07-14T14:01:09.880Z"
+      "capturedUtc": "2026-07-15T06:08:10.897Z"
     },
     {
       "file": "video-milestone-26s-EN.png",
       "prodUrl": "https://twin-society.vercel.app/demo",
-      "feSha": "aa33afe6",
+      "feSha": "0c739b5e",
       "locale": "EN",
       "viewport": "1280x800",
       "state": "video-t=26s",
-      "capturedUtc": "2026-07-14T14:01:10.330Z"
+      "capturedUtc": "2026-07-15T06:08:11.348Z"
     },
     {
       "file": "video-milestone-33s-EN.png",
       "prodUrl": "https://twin-society.vercel.app/demo",
-      "feSha": "aa33afe6",
+      "feSha": "0c739b5e",
       "locale": "EN",
       "viewport": "1280x800",
       "state": "video-t=33s",
-      "capturedUtc": "2026-07-14T14:01:10.782Z"
+      "capturedUtc": "2026-07-15T06:08:11.800Z"
     },
     {
       "file": "video-milestone-38s-EN.png",
       "prodUrl": "https://twin-society.vercel.app/demo",
-      "feSha": "aa33afe6",
+      "feSha": "0c739b5e",
       "locale": "EN",
       "viewport": "1280x800",
       "state": "video-t=38s",
-      "capturedUtc": "2026-07-14T14:01:11.229Z"
+      "capturedUtc": "2026-07-15T06:08:12.251Z"
     },
     {
       "file": "video-complete-interactive-EN.png",
       "prodUrl": "https://twin-society.vercel.app/demo",
-      "feSha": "aa33afe6",
+      "feSha": "0c739b5e",
       "locale": "EN",
       "viewport": "1280x800",
       "state": "post-skip-roles-visible",
-      "capturedUtc": "2026-07-14T14:01:11.482Z"
+      "capturedUtc": "2026-07-15T06:08:12.479Z"
     },
     {
       "file": "role-candidate-flow-EN-desktop.png",
       "prodUrl": "https://twin-society.vercel.app/demo",
-      "feSha": "aa33afe6",
+      "feSha": "0c739b5e",
       "locale": "EN",
       "viewport": "1280x800",
       "state": "role-candidate-selected",
-      "capturedUtc": "2026-07-14T14:01:11.649Z"
+      "capturedUtc": "2026-07-15T06:08:12.630Z"
     },
     {
       "file": "role-recruiter-flow-EN-desktop.png",
       "prodUrl": "https://twin-society.vercel.app/demo",
-      "feSha": "aa33afe6",
+      "feSha": "0c739b5e",
       "locale": "EN",
       "viewport": "1280x800",
       "state": "role-recruiter-selected",
-      "capturedUtc": "2026-07-14T14:01:42.058Z"
+      "capturedUtc": "2026-07-15T06:08:43.026Z"
     },
     {
       "file": "role-company-flow-EN-desktop.png",
       "prodUrl": "https://twin-society.vercel.app/demo",
-      "feSha": "aa33afe6",
+      "feSha": "0c739b5e",
       "locale": "EN",
       "viewport": "1280x800",
       "state": "role-company-selected",
-      "capturedUtc": "2026-07-14T14:02:12.476Z"
+      "capturedUtc": "2026-07-15T06:09:13.429Z"
     },
     {
       "file": "a11y-reduced-motion-EN.png",
       "prodUrl": "https://twin-society.vercel.app/demo",
-      "feSha": "aa33afe6",
+      "feSha": "0c739b5e",
       "locale": "EN",
       "viewport": "1280x800",
       "state": "reduced-motion",
-      "capturedUtc": "2026-07-14T14:02:45.133Z"
+      "capturedUtc": "2026-07-15T06:09:45.752Z"
     },
     {
       "file": "a11y-reduced-data-EN.png",
       "prodUrl": "https://twin-society.vercel.app/demo",
-      "feSha": "aa33afe6",
+      "feSha": "0c739b5e",
       "locale": "EN",
       "viewport": "1280x800",
       "state": "reduced-data",
-      "capturedUtc": "2026-07-14T14:02:47.100Z"
+      "capturedUtc": "2026-07-15T06:09:48.009Z"
     },
     {
       "file": "a11y-keyboard-focus-EN.png",
       "prodUrl": "https://twin-society.vercel.app/demo",
-      "feSha": "aa33afe6",
+      "feSha": "0c739b5e",
       "locale": "EN",
       "viewport": "1280x800",
       "state": "keyboard-tab-focus",
-      "capturedUtc": "2026-07-14T14:02:49.310Z"
+      "capturedUtc": "2026-07-15T06:09:50.394Z"
     },
     {
       "file": "role-candidate-flow-PL-mobile.png",
       "prodUrl": "https://twin-society.vercel.app/demo",
-      "feSha": "aa33afe6",
+      "feSha": "0c739b5e",
       "locale": "PL",
       "viewport": "390x844",
       "state": "role-candidate-mobile",
-      "capturedUtc": "2026-07-14T14:02:51.155Z"
+      "capturedUtc": "2026-07-15T06:09:52.084Z"
     }
   ],
   "criteria": [
@@ -367,15 +367,15 @@
   },
   "accessibility": {
     "reduced-motion": "PASS",
-    "reduced-data": "FAIL",
+    "reduced-data": "PASS",
     "keyboard-focus": "PASS",
     "captions-mobile-pl": "PASS"
   },
   "performance": {
-    "demoTtfbMs": 1596,
+    "demoTtfbMs": 258,
     "demoStatus": 200,
     "demoHtmlBytes": 26089,
-    "healthTtfbMs": 4415
+    "healthTtfbMs": 4447
   },
   "analyticsEvents": {
     "demo_video_impression": "CODE_ONLY",

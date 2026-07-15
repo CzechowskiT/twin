@@ -11,10 +11,16 @@ import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const demoDir = join(root, "public/demo");
-const auditDir = join(root, "reports/demo-visual-validate");
 
-const SAMPLE_TIMES_SEC = [0, 3, 5, 10, 18, 22, 26, 33, 38, 41];
+function argValue(flag: string): string | undefined {
+  const idx = process.argv.indexOf(flag);
+  return idx >= 0 ? process.argv[idx + 1] : undefined;
+}
+
+const inputDir = argValue("--input-dir") ?? join(root, "public/demo");
+const auditDir = argValue("--output-dir") ?? join(root, "reports/demo-visual-validate");
+
+const SAMPLE_TIMES_SEC = [0, 3, 5, 7, 10, 12, 18, 20, 22, 26, 28, 33, 35, 38, 40, 41];
 const GATE_TIMES_SEC = [3, 7, 12, 20, 28, 35, 40];
 
 const MAX_WHITE_PCT = 70;
@@ -134,8 +140,8 @@ function frameDiff(a: FrameMetrics, b: FrameMetrics): number {
 }
 
 async function validateLocale(locale: "en" | "pl"): Promise<LocaleResult> {
-  const videoPath = join(demoDir, `twin-product-film-${locale}.mp4`);
-  const posterPath = join(demoDir, `twin-product-film-poster-${locale}.webp`);
+  const videoPath = join(inputDir, `twin-product-film-${locale}.mp4`);
+  const posterPath = join(inputDir, `twin-product-film-poster-${locale}.webp`);
   const issues: string[] = [];
   const frames: FrameMetrics[] = [];
 
@@ -206,6 +212,8 @@ function printTable(results: LocaleResult[]): void {
 
 async function main(): Promise<void> {
   mkdirSync(auditDir, { recursive: true });
+  console.log(`input-dir: ${inputDir}`);
+  console.log(`output-dir: ${auditDir}`);
   const results: LocaleResult[] = [];
 
   for (const locale of ["en", "pl"] as const) {
