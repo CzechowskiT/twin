@@ -29,7 +29,7 @@ const SCENE_MAP: Record<string, React.FC> = {
   recruiter: RecruiterInboxScene,
   company: CompanyCockpitScene,
   calendar: CalendarScene,
-  cta: BrandCtaScene,
+  // cta: rendered via BrandCtaScene with locale-specific ctaText
 };
 
 function FilmSegment({ locale, segmentIndex }: { locale: FilmLocale; segmentIndex: number }) {
