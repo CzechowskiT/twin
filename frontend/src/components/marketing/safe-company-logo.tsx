@@ -16,7 +16,7 @@ type SafeCompanyLogoProps = {
 };
 
 const INITIALS_CLASS =
-  "absolute inset-0 flex items-center justify-center text-sm font-bold tracking-tight text-zinc-700";
+  "absolute inset-0 flex items-center justify-center text-xs font-bold tracking-tight text-zinc-700";
 
 /**
  * External company marks without Next.js image optimizer — avoids noisy

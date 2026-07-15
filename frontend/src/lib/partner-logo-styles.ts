@@ -3,7 +3,15 @@ import type { CSSProperties } from "react";
 
 export const PARTNER_LOGO_CARD_CLASS = "partner-logo-card partner-logo";
 
-export const PARTNER_LOGO_ROW_GAP_CLASS = "gap-x-4 pe-4 sm:gap-x-8 sm:pe-8";
+/** Subtle plate — legible on dark studio rails without heavy white button chrome. */
+export const PARTNER_LOGO_PLATE_CLASS =
+  "border border-zinc-200/50 bg-white/95 dark:border-zinc-500/25 dark:bg-zinc-900/45";
+
+export const PARTNER_LOGO_ROW_GAP_CLASS = "gap-x-3 pe-3 sm:gap-x-5 sm:pe-5";
+
+/** Shared vertical padding for marketing + workspace marquee shells. */
+export const PARTNER_LOGO_MARQUEE_BAND_CLASS =
+  "shrink-0 border-y border-[var(--twin-border)] bg-[var(--twin-surface)]/90 py-2 sm:py-2.5";
 
 /**
  * Per-slug optical height multipliers — preserves aspect ratio (transform scale only).

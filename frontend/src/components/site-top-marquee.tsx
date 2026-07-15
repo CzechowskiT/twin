@@ -12,7 +12,7 @@ const CompanyLogoMarquee = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="company-logo-marquee h-12 animate-pulse border-y border-[var(--twin-border)] bg-[var(--twin-surface)]" />
+      <div className="company-logo-marquee h-10 animate-pulse border-y border-[var(--twin-border)] bg-[var(--twin-surface)]" />
     ),
   },
 );

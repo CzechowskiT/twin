@@ -11,6 +11,8 @@ import { brandLogoUrls, type Brand } from "@/lib/brand-logo-urls";
 import { getPublicMarqueeLogos } from "@/lib/partner-logo-display";
 import {
   PARTNER_LOGO_CARD_CLASS,
+  PARTNER_LOGO_MARQUEE_BAND_CLASS,
+  PARTNER_LOGO_PLATE_CLASS,
   PARTNER_LOGO_ROW_GAP_CLASS,
   partnerLogoOpticalDataAttrs,
   partnerLogoOpticalStyle,
@@ -118,10 +120,6 @@ const MARQUEE_SEGMENTS = 2;
 /** Uniform card — CSS partner-logo-card + img band keeps wide wordmarks inside the plate. */
 const MARK_CARD_CLASS = PARTNER_LOGO_CARD_CLASS;
 
-/** Light plate so colorful favicons stay legible on studio (dark) and light marketing rails. */
-const MARK_PLATE_CLASS =
-  "border border-zinc-200/90 bg-white shadow-sm ring-1 ring-zinc-950/[0.04] dark:border-zinc-500/40 dark:bg-zinc-100 dark:ring-white/10";
-
 function BrandMark({
   brand,
   linkSuffix,
@@ -137,7 +135,7 @@ function BrandMark({
 
   const a11y = `${brand.name}${linkSuffix}`;
 
-  const plateClass = `${MARK_CARD_CLASS} ${MARK_PLATE_CLASS} relative flex shrink-0 items-center justify-center rounded-lg transition-[opacity,box-shadow]`;
+  const plateClass = `${MARK_CARD_CLASS} ${PARTNER_LOGO_PLATE_CLASS} relative flex shrink-0 items-center justify-center rounded-md transition-[opacity,box-shadow]`;
 
   return (
     <span
@@ -198,7 +196,7 @@ export function CompanyLogoMarquee() {
   if (staticMarquee) {
     return (
       <div
-        className="company-logo-marquee shrink-0 border-y border-[var(--twin-border)] bg-[var(--twin-surface)]/90 py-3.5 sm:py-4"
+        className={`company-logo-marquee ${PARTNER_LOGO_MARQUEE_BAND_CLASS}`}
         role="presentation"
       >
         <div className="company-logo-marquee__viewport overflow-x-auto snap-x snap-mandatory [-webkit-overflow-scrolling:touch] px-3 sm:px-5">
@@ -212,7 +210,7 @@ export function CompanyLogoMarquee() {
 
   return (
     <div
-      className="company-logo-marquee shrink-0 border-y border-[var(--twin-border)] bg-[var(--twin-surface)]/90 py-3.5 sm:py-4"
+      className={`company-logo-marquee ${PARTNER_LOGO_MARQUEE_BAND_CLASS}`}
       role="presentation"
     >
       <div className="company-logo-marquee__viewport overflow-x-clip px-3 sm:px-5" aria-hidden>

@@ -115,21 +115,21 @@ test("10 no will-change, backdrop-filter, backdrop-blur on safe track/cards", ()
   assert.doesNotMatch(css, /\.performance-safe-marquee-track[\s\S]{0,200}will-change/);
 });
 
-test("11 readability scale CSS targets 40–48px partner logo height band", () => {
+test("11 readability scale CSS targets 28–32px partner logo height band", () => {
   const css = read("src/app/globals.css");
-  assert.match(css, /\.partner-logo-card[\s\S]{0,200}min-height:\s*5rem/);
-  assert.match(css, /\.partner-logo-card[\s\S]{0,320}min-width:\s*88px/);
-  assert.match(css, /\.partner-logo-card[\s\S]{0,400}max-width:\s*140px/);
-  assert.match(css, /\.partner-logo-card[\s\S]{0,480}padding:\s*0\.75rem 1rem/);
-  assert.match(css, /\.performance-safe-logo-mark[\s\S]{0,200}height:\s*2\.5rem/);
+  assert.match(css, /\.partner-logo-card[\s\S]{0,200}min-height:\s*2\.25rem/);
+  assert.match(css, /\.partner-logo-card[\s\S]{0,320}min-width:\s*56px/);
+  assert.match(css, /\.partner-logo-card[\s\S]{0,400}max-width:\s*96px/);
+  assert.match(css, /\.partner-logo-card[\s\S]{0,480}padding:\s*0\.25rem 0\.5rem/);
+  assert.match(css, /\.performance-safe-logo-mark[\s\S]{0,200}height:\s*1\.75rem/);
   assert.match(
     css,
-    /@media \(min-width: 768px\)[\s\S]{0,240}\.performance-safe-logo-mark[\s\S]{0,200}height:\s*3rem/,
+    /@media \(min-width: 768px\)[\s\S]{0,240}\.performance-safe-logo-mark[\s\S]{0,200}height:\s*2rem/,
   );
-  assert.match(css, /\.partner-logo img[\s\S]{0,200}height:\s*2\.5rem/);
+  assert.match(css, /\.partner-logo img[\s\S]{0,200}height:\s*1\.75rem/);
   assert.match(
     css,
-    /@media \(min-width: 768px\)[\s\S]{0,240}\.partner-logo img[\s\S]{0,200}height:\s*3rem/,
+    /@media \(min-width: 768px\)[\s\S]{0,240}\.partner-logo img[\s\S]{0,200}height:\s*2rem/,
   );
   const styles = read("src/lib/partner-logo-styles.ts");
   assert.match(styles, /PARTNER_LOGO_CARD_CLASS/);

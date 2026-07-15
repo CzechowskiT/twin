@@ -91,7 +91,7 @@ test("7 chip card has fixed box + centering classes so content cannot overflow o
   assert.match(marquee, /from "@\/lib\/partner-logo-styles"/);
   const css = read("src/app/globals.css");
   assert.match(css, /\.partner-logo-card\s*\{[\s\S]{0,200}min-height:/);
-  assert.match(marquee, /items-center justify-center rounded-lg/);
+  assert.match(marquee, /items-center justify-center rounded-md/);
   assert.match(marquee, /relative flex shrink-0 items-center justify-center/);
 });
 
@@ -101,7 +101,7 @@ test("8 mark svg keeps a fixed height and bounded width so the plate never resha
   const ruleMatch = css.match(/\.performance-safe-logo-mark\s*\{([\s\S]{0,300}?)\}/);
   assert.ok(ruleMatch, ".performance-safe-logo-mark rule must exist");
   const rule = ruleMatch![1];
-  assert.match(rule, /height:\s*2\.5rem/, "fixed height prevents vertical layout shift");
+  assert.match(rule, /height:\s*1\.75rem/, "fixed height prevents vertical layout shift");
   assert.match(rule, /width:\s*(100%|[\d.]+rem)/, "width must be explicitly bounded, not auto");
   assert.match(rule, /flex-shrink:\s*0/, "must not get squeezed by flex siblings");
 });
