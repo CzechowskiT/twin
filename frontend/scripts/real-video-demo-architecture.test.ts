@@ -53,14 +53,19 @@ test("4 render and validate scripts registered", () => {
   const pkg = read("package.json");
   assert.match(pkg, /demo:video:render/);
   assert.match(pkg, /demo:video:validate/);
+  assert.match(pkg, /demo:video:visual-validate/);
 });
 
-test("5 remotion composition exists with 42s film", () => {
+test("5 remotion composition exists with 42s film and dedicated scenes", () => {
   const copy = read("remotion/src/copy.ts");
   assert.match(copy, /FILM_DURATION_SEC = 42/);
   const rootTsx = read("remotion/src/Root.tsx");
   assert.match(rootTsx, /ProductFilmEN/);
   assert.match(rootTsx, /ProductFilmPL/);
+  const film = read("remotion/src/ProductFilm.tsx");
+  assert.match(film, /SCENE_MAP/);
+  assert.match(film, /InboxChaosScene/);
+  assert.match(film, /FILM\.bgDark/);
 });
 
 test("6 role flow cards expose three sales roles", () => {
