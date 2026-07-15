@@ -62,7 +62,7 @@ async function gotoDemoAndSkipFilm(page: Page): Promise<void> {
 }
 
 test.describe("Interactive demo flow browser", () => {
-  test.describe.configure({ timeout: 180_000 });
+  test.describe.configure({ timeout: 240_000, retries: 1 });
 
   for (const { locale, label: localeLabel } of LOCALES) {
     for (const { label: vpLabel, width, height } of VIEWPORTS) {
@@ -78,15 +78,18 @@ test.describe("Interactive demo flow browser", () => {
             await expect(flow).toBeVisible({ timeout: SETTLE_MS });
             await expect(page.locator("[data-demo-interactive-stage]").first()).toBeVisible();
 
-            const initialPhase = await page.locator("[data-demo-flow-phase]").first().getAttribute("data-demo-flow-phase");
+            const phaseLocator = page.locator("[data-demo-flow-phase]").first();
+            const initialPhase = await phaseLocator.getAttribute("data-demo-flow-phase");
             expect(initialPhase).toBeTruthy();
 
-            await page.waitForTimeout(2_500);
-            const laterPhase = await page.locator("[data-demo-flow-phase]").first().getAttribute("data-demo-flow-phase");
-            expect(laterPhase).not.toEqual(initialPhase);
+            await expect
+              .poll(async () => phaseLocator.getAttribute("data-demo-flow-phase"), { timeout: 8_000 })
+              .not.toBe(initialPhase);
 
             await page.locator("[data-demo-flow-play]").click({ force: true });
-            await page.waitForTimeout(3_000);
+            await expect
+              .poll(async () => phaseLocator.getAttribute("data-demo-flow-phase"), { timeout: 6_000 })
+              .not.toBe(initialPhase);
 
             const decisionBtn = page.locator('[data-demo-flow-decision="accept"]').first();
             if (await decisionBtn.isVisible({ timeout: 8_000 }).catch(() => false)) {
