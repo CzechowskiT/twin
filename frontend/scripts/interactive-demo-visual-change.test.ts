@@ -127,4 +127,24 @@ test("10 demoCockpit i18n keys mirrored EN/PL", () => {
   assert.match(i18n, /demoCockpit:/);
   assert.match(i18n, /candidateInbox:/);
   assert.match(i18n, /timeline_scan:/);
+  assert.match(i18n, /inviteInterview:/);
+  assert.match(i18n, /careerCompass:/);
+});
+
+test("11 dark mockup density markers — neon CTA, metrics, career compass", () => {
+  const surface = read("src/components/marketing/demo/sales/interactive-flow-surface.tsx");
+  assert.match(surface, /demo-cockpit-cta--neon/);
+  assert.match(surface, /demo-cockpit-metric/);
+  assert.match(surface, /demoCockpit\.inviteInterview/);
+  assert.match(surface, /demoCockpit\.careerCompass/);
+  assert.match(surface, /demoCockpit\.whyFit/);
+  assert.match(surface, /data-demo-cockpit-availability/);
+  const css = read("src/app/globals.css");
+  assert.match(css, /--demo-cockpit-neon/);
+  assert.match(css, /\.demo-cockpit-cta--neon/);
+  assert.match(css, /\.demo-cockpit-metric__fill/);
+  const remotionRecruiter = read("remotion/src/scenes/RecruiterInboxScene.tsx");
+  assert.match(remotionRecruiter, /Dense dark-glass recruiter cockpit/);
+  assert.match(remotionRecruiter, /FILM\.neon/);
+  assert.match(remotionRecruiter, /Invite to interview/);
 });

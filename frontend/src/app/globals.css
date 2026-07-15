@@ -4418,7 +4418,8 @@ html[data-marketing-surface="studio"] .demo-glass-panel {
   --demo-cockpit-panel: #111827;
   --demo-cockpit-border: rgb(56 189 248 / 0.22);
   --demo-cockpit-accent: rgb(56 189 248);
-  --demo-cockpit-success: rgb(52 211 153);
+  --demo-cockpit-success: rgb(34 197 94);
+  --demo-cockpit-neon: #22c55e;
   --demo-cockpit-fg: #f8fafc;
   --demo-cockpit-muted: #94a3b8;
   display: flex;
@@ -4448,6 +4449,19 @@ html[data-marketing-surface="studio"] .demo-glass-panel {
   width: min(92vw, 100%);
   min-height: clamp(420px, 78vh, 860px);
   margin-inline: auto;
+  isolation: isolate;
+}
+
+.interactive-role-flow__stage::before {
+  content: "";
+  position: absolute;
+  inset: -12% -8%;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 55% 45% at 18% 30%, rgb(34 197 94 / 0.12), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 88% 70%, rgb(56 189 248 / 0.14), transparent 55%),
+    radial-gradient(ellipse 40% 35% at 50% 100%, rgb(99 102 241 / 0.08), transparent 50%);
+  pointer-events: none;
 }
 
 .interactive-role-flow__caption {
@@ -4497,9 +4511,14 @@ html[data-marketing-surface="studio"] .demo-glass-panel {
   padding: 0.75rem;
   border-radius: 0.875rem;
   border: 1px solid var(--demo-cockpit-border);
-  background: linear-gradient(165deg, var(--demo-cockpit-bg) 0%, #0f172a 100%);
+  background:
+    linear-gradient(165deg, rgb(11 18 32 / 0.96) 0%, rgb(15 23 42 / 0.98) 55%, rgb(8 14 28 / 0.98) 100%);
   color: var(--demo-cockpit-fg);
-  box-shadow: 0 0 0 1px rgb(15 23 42 / 0.6) inset, 0 12px 40px rgb(0 0 0 / 0.35);
+  box-shadow:
+    0 0 0 1px rgb(56 189 248 / 0.12) inset,
+    0 0 40px rgb(34 197 94 / 0.06),
+    0 18px 48px rgb(0 0 0 / 0.45);
+  backdrop-filter: blur(10px);
 }
 
 .demo-cockpit-grid {
@@ -4784,6 +4803,228 @@ html[data-marketing-surface="studio"] .demo-glass-panel {
   height: 0.5rem;
   border-radius: 50%;
   background: currentColor;
+}
+
+.demo-cockpit-sublabel {
+  margin: -0.15rem 0 0.25rem;
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--demo-cockpit-muted);
+}
+
+.demo-cockpit-sublabel--live {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  font-size: 0.6875rem;
+  color: var(--demo-cockpit-success);
+}
+
+.demo-cockpit-live-dot {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--demo-cockpit-neon);
+  box-shadow: 0 0 8px var(--demo-cockpit-neon);
+}
+
+.demo-cockpit-avatar {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  border: 1px solid rgb(56 189 248 / 0.35);
+  background: linear-gradient(145deg, #1e293b, #0f172a);
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--demo-cockpit-accent);
+}
+
+.demo-cockpit-profile__header {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.demo-cockpit-section-title {
+  margin: 0.65rem 0 0.3rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--demo-cockpit-accent);
+}
+
+.demo-cockpit-checklist {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.6875rem;
+  color: var(--demo-cockpit-fg);
+}
+
+.demo-cockpit-checklist li::before {
+  content: "✓";
+  margin-right: 0.4rem;
+  color: var(--demo-cockpit-neon);
+  font-weight: 700;
+}
+
+.demo-cockpit-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+}
+
+.demo-cockpit-chip {
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.375rem;
+  border: 1px solid rgb(148 163 184 / 0.25);
+  background: rgb(15 23 42 / 0.65);
+  font-size: 0.625rem;
+  color: var(--demo-cockpit-muted);
+}
+
+.demo-cockpit-pill-badge {
+  display: inline-block;
+  margin-bottom: 0.4rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: rgb(59 130 246 / 0.2);
+  color: #93c5fd;
+  font-size: 0.625rem;
+  font-weight: 700;
+}
+
+.demo-cockpit-week {
+  display: flex;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+
+.demo-cockpit-week__day {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.35rem 0.15rem;
+  border-radius: 0.375rem;
+  border: 1px solid rgb(148 163 184 / 0.15);
+  font-size: 0.5625rem;
+  color: var(--demo-cockpit-muted);
+}
+
+.demo-cockpit-week__day--on {
+  border-color: rgb(34 197 94 / 0.45);
+  color: var(--demo-cockpit-success);
+  background: rgb(34 197 94 / 0.08);
+}
+
+.demo-cockpit-week__dot {
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.demo-cockpit-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
+.demo-cockpit-metric__row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.625rem;
+  color: var(--demo-cockpit-muted);
+}
+
+.demo-cockpit-metric__track {
+  height: 0.35rem;
+  border-radius: 999px;
+  background: rgb(30 41 59 / 0.9);
+  overflow: hidden;
+}
+
+.demo-cockpit-metric__fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #3b82f6, #22d3ee);
+  box-shadow: 0 0 10px rgb(59 130 246 / 0.55);
+}
+
+.demo-cockpit-score-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+
+.demo-cockpit-vs-avg {
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--demo-cockpit-neon);
+}
+
+.demo-cockpit-next-step {
+  margin-top: 0.75rem;
+  padding: 0.625rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgb(59 130 246 / 0.35);
+  background: rgb(30 58 138 / 0.25);
+}
+
+.demo-cockpit-score-pill--lg {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.demo-cockpit-cta--neon {
+  border-color: rgb(34 197 94 / 0.65);
+  background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
+  color: #052e16;
+  box-shadow: 0 0 22px rgb(34 197 94 / 0.45);
+}
+
+.demo-cockpit-cta--neon.demo-cockpit-cta--hover,
+.demo-cockpit-cta--neon:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 28px rgb(34 197 94 / 0.65);
+}
+
+.demo-cockpit-cta--ghost {
+  border-color: rgb(148 163 184 / 0.3);
+  background: rgb(15 23 42 / 0.7);
+  color: var(--demo-cockpit-muted);
+}
+
+.demo-cockpit-cta--compact {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.25rem;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+}
+
+.demo-cockpit-review-card--dense {
+  border-style: solid;
+  border-color: rgb(56 189 248 / 0.28);
+  background: rgb(15 23 42 / 0.55);
+  padding: 0.75rem;
 }
 
 @media (max-width: 1024px) {
