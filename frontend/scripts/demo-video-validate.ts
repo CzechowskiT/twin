@@ -23,6 +23,8 @@ const REQUIRED = [
 ] as const;
 
 const MIN_DURATION_SEC = 30;
+const CANONICAL_DURATION_SEC = 45;
+const DURATION_TOLERANCE_SEC = 0.25;
 const MIN_VIDEO_BYTES = 500_000;
 
 type ProbeResult = {
@@ -63,6 +65,9 @@ function validateVideo(path: string, label: string): string[] {
   }
   if (probe.duration < MIN_DURATION_SEC) {
     issues.push(`${label}: duration ${probe.duration.toFixed(1)}s < ${MIN_DURATION_SEC}s`);
+  }
+  if (/twin-product-film-(en|pl)\.(mp4|webm)$/.test(label) && Math.abs(probe.duration - CANONICAL_DURATION_SEC) > DURATION_TOLERANCE_SEC) {
+    issues.push(`${label}: duration ${probe.duration.toFixed(3)}s outside ${CANONICAL_DURATION_SEC}±${DURATION_TOLERANCE_SEC}s`);
   }
   const bytes = readFileSync(path);
   const head = bytes.subarray(0, 512).toString("utf8", 0, 512);

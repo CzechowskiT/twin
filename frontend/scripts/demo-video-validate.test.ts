@@ -14,6 +14,8 @@ test("validate script checks ffprobe video streams and min duration", () => {
   const script = readFileSync(join(root, "scripts/demo-video-validate.ts"), "utf8");
   assert.match(script, /ffprobe/);
   assert.match(script, /MIN_DURATION_SEC = 30/);
+  assert.match(script, /CANONICAL_DURATION_SEC = 45/);
+  assert.match(script, /DURATION_TOLERANCE_SEC = 0\.25/);
   assert.match(script, /twin-product-film-pl\.mp4/);
   assert.match(script, /twin-product-film-en\.webm/);
   assert.match(script, /\.vtt/);

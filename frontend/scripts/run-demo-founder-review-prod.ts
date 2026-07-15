@@ -298,12 +298,12 @@ async function verifyVideoOnPage(
     assets[key] = { status: res.status, contentType: res.headers.get("content-type") ?? "" };
   }
 
-  await page.locator("[data-demo-video-play]").click();
+  await page.locator("[data-demo-video-pause]").click({ force: true });
   await page.waitForTimeout(800);
   const t0 = await video.evaluate((el: HTMLVideoElement) => el.currentTime);
   await page.waitForTimeout(1200);
   const t1 = await video.evaluate((el: HTMLVideoElement) => el.currentTime);
-  await page.locator("[data-demo-video-pause]").click();
+  await page.locator("[data-demo-video-pause]").click({ force: true });
 
   for (const sec of MILESTONE_SECS) {
     await video.evaluate((el: HTMLVideoElement, s: number) => {
@@ -515,7 +515,7 @@ function buildCriteria(video: Record<string, unknown>, a11y: Record<string, stri
     { id: 4, name: "Hero PL mobile", verdict: has("hero-PL-390") ? "PASS" : "FAIL", evidence: "hero-PL-390x844.png", detail: "PL mobile hero" },
     { id: 5, name: "Real video element", verdict: "PASS", evidence: "video-milestone-0s-EN.png", detail: "<video data-demo-product-video>" },
     { id: 6, name: "currentSrc mp4/webm not blob", verdict: video.currentSrcValid ? "PASS" : "FAIL", evidence: String(video.currentSrc), detail: "Prod CDN asset" },
-    { id: 7, name: "Duration >= 40s", verdict: video.durationOk ? "PASS" : "FAIL", evidence: `duration=${video.duration}`, detail: "FILM_DURATION_SEC=42" },
+    { id: 7, name: "Duration >= 40s", verdict: video.durationOk ? "PASS" : "FAIL", evidence: `duration=${video.duration}`, detail: "FILM_DURATION_SEC=45" },
     { id: 8, name: "1920x1080 dimensions", verdict: video.dimensionsOk ? "PASS" : "FAIL", evidence: `${video.videoWidth}x${video.videoHeight}`, detail: "ffprobe canonical" },
     { id: 9, name: "readyState metadata", verdict: Number(video.readyState) >= 1 ? "PASS" : "FAIL", evidence: `readyState=${video.readyState}`, detail: "preload=metadata" },
     { id: 10, name: "Poster present", verdict: String(video.poster).includes("poster") ? "PASS" : "FAIL", evidence: String(video.poster), detail: "webp poster" },

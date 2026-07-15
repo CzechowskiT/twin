@@ -29,7 +29,7 @@ export function ProductFilmPlayer({ onComplete, onSkip, reducedMotion, saveData 
   const [playing, setPlaying] = useState(false);
   const [captionsOn, setCaptionsOn] = useState(false);
   const [ready, setReady] = useState(false);
-  const [firstFrameReady, setFirstFrameReady] = useState(false);
+  const [hasPlayed, setHasPlayed] = useState(false);
   const impressionRef = useRef(false);
   const progressMarksRef = useRef(new Set<number>());
   const completedRef = useRef(false);
@@ -51,6 +51,7 @@ export function ProductFilmPlayer({ onComplete, onSkip, reducedMotion, saveData 
     if (!video) return;
     void video.play();
     setPlaying(true);
+    setHasPlayed(true);
     trackDemoVideoPlay({ locale });
   }, [locale]);
 
@@ -105,7 +106,7 @@ export function ProductFilmPlayer({ onComplete, onSkip, reducedMotion, saveData 
   return (
     <section className="sales-demo-film" data-sales-demo-film aria-label={t("demoSales.filmAria")}>
       <div className="sales-demo-film__player-wrap">
-        {!firstFrameReady ? (
+        {!hasPlayed ? (
           <img
             src={sources.poster}
             alt=""
@@ -123,12 +124,11 @@ export function ProductFilmPlayer({ onComplete, onSkip, reducedMotion, saveData 
           playsInline
           muted
           onLoadedMetadata={() => setReady(true)}
-          onLoadedData={() => setFirstFrameReady(true)}
           onTimeUpdate={handleTimeUpdate}
           onEnded={handleEnded}
           onPlay={() => {
             setPlaying(true);
-            setFirstFrameReady(true);
+            setHasPlayed(true);
           }}
           onPause={() => setPlaying(false)}
         >

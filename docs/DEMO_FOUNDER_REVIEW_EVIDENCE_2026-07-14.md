@@ -6,7 +6,7 @@
 **Vercel deployment:** pending post-fix deploy  
 **Gate F:** PENDING · **Launch:** NO-GO
 
-**Related:** [Gate F decision record](./GATE_F_FOUNDER_DECISION_RECORD_2026-07-09.md) · [Founder demo review package](../reports/FOUNDER_DEMO_REVIEW_PACKAGE.md) · PR #476 real video demo · PR #478 founder-review harness · **fix/demo-reduced-data-fallback**
+**Related:** [Gate F decision record](./GATE_F_FOUNDER_DECISION_RECORD_2026-07-09.md) · [Founder demo review package](../reports/FOUNDER_DEMO_REVIEW_PACKAGE.md) · PR #476 · PR #478 · **[Interactive motion + audio 2026-07-15](./DEMO_INTERACTIVE_MOTION_AUDIO_EVIDENCE_2026-07-15.md)** (PR #483)
 
 ---
 
