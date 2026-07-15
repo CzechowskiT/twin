@@ -1,0 +1,180 @@
+# ONE-SHOT production schema forward-migrate 050 → 077 (R-019 / LB-005).
+# Hard bans: no auto-merge, no admin override, no staging host, no parallel runs,
+# no alembic_version hand-edit, no downgrade.
+name: prod-schema-upgrade-077
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_prod_fingerprint:
+        description: "Must equal autorack.proxy.rlwy.net:40861"
+        required: true
+        type: string
+      confirm_backup_sha256:
+        description: "SHA-256 of the fresh local prod pg_dump taken before this run"
+        required: true
+        type: string
+      confirm_upgrade_head:
+        description: "Type exactly: alembic upgrade head"
+        required: true
+        type: string
+
+concurrency:
+  group: prod-schema-upgrade-077
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  upgrade-prod-050-to-077:
+    name: Production alembic upgrade head (once)
+    runs-on: ubuntu-latest
+    environment: Production
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      EXPECT_HOST: autorack.proxy.rlwy.net
+      EXPECT_PORT: "40861"
+      EXPECT_HEAD: 077_candidate_activity_timeline
+      ALLOWED_FROM: 050_stripe_webhook_events
+    steps:
+      - name: Guard workflow inputs
+        working-directory: .
+        run: |
+          set -euo pipefail
+          test "${{ inputs.confirm_prod_fingerprint }}" = "autorack.proxy.rlwy.net:40861"
+          test "${{ inputs.confirm_upgrade_head }}" = "alembic upgrade head"
+          test -n "${{ inputs.confirm_backup_sha256 }}"
+          echo "Backup SHA (operator-asserted): ${{ inputs.confirm_backup_sha256 }}"
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install backend deps
+        run: pip install -r requirements.txt
+
+      - name: Fingerprint DATABASE_PUBLIC_URL (Postgres service only)
+        env:
+          DATABASE_PUBLIC_URL: ${{ secrets.DATABASE_PUBLIC_URL }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os, sys
+          from urllib.parse import urlparse
+          raw = (os.environ.get("DATABASE_PUBLIC_URL") or "").strip()
+          if not raw:
+              print("HARD STOP: DATABASE_PUBLIC_URL secret unset in Production environment")
+              sys.exit(2)
+          if "demo@twin.career" in raw or "twin.career" in raw.split("@")[-1]:
+              print("HARD STOP: refusing demo@twin.career / twin-service mis-set URL")
+              sys.exit(2)
+          u = urlparse(raw)
+          host, port = u.hostname, str(u.port or "")
+          print(f"Target fingerprint HOST={host} PORT={port} DB={u.path.lstrip('/')}")
+          if host == "monorail.proxy.rlwy.net":
+              print("HARD STOP: staging host monorail")
+              sys.exit(2)
+          if host != os.environ["EXPECT_HOST"] or port != os.environ["EXPECT_PORT"]:
+              print("HARD STOP: fingerprint mismatch")
+              sys.exit(2)
+          # Normalize for Alembic/SQLAlchemy
+          if raw.startswith("postgres://"):
+              raw = "postgresql+psycopg://" + raw[len("postgres://"):]
+          elif raw.startswith("postgresql://") and "+psycopg" not in raw:
+              raw = "postgresql+psycopg://" + raw[len("postgresql://"):]
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as fh:
+              fh.write(f"DATABASE_URL={raw}\n")
+          PY
+
+      - name: Preflight read-only (alembic + row sanity)
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os, sys
+          import sqlalchemy as sa
+          from sqlalchemy import text
+          engine = sa.create_engine(os.environ["DATABASE_URL"])
+          with engine.connect() as conn:
+              rev = conn.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
+              tables = conn.execute(text(
+                  "SELECT count(*) FROM information_schema.tables "
+                  "WHERE table_schema='public' AND table_type='BASE TABLE'"
+              )).scalar_one()
+              users = conn.execute(text("SELECT count(*) FROM users")).scalar_one()
+              cands = conn.execute(text("SELECT count(*) FROM candidates")).scalar_one()
+              matches = conn.execute(text("SELECT count(*) FROM job_matches")).scalar_one()
+              apps = conn.execute(text("SELECT count(*) FROM applications")).scalar_one()
+          print(f"PRE alembic={rev} tables={tables} users={users} candidates={cands} job_matches={matches} applications={apps}")
+          if rev == os.environ["EXPECT_HEAD"]:
+              print("Already at head 077 — skip upgrade (idempotent success)")
+              with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as fh:
+                  fh.write("SKIP_UPGRADE=1\n")
+              raise SystemExit(0)
+          if rev != os.environ["ALLOWED_FROM"]:
+              print(f"HARD STOP: unexpected alembic_version {rev!r} (want 050 or already 077)")
+              sys.exit(2)
+          if int(tables) < 40:
+              print("HARD STOP: table count suspiciously low")
+              sys.exit(2)
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as fh:
+              fh.write(f"PRE_USERS={users}\nPRE_CANDS={cands}\nPRE_MATCHES={matches}\nPRE_APPS={apps}\n")
+              fh.write("SKIP_UPGRADE=0\n")
+          PY
+
+      - name: Exactly one alembic upgrade head
+        if: env.SKIP_UPGRADE != '1'
+        run: |
+          set -euo pipefail
+          python -m alembic heads | tee /tmp/alembic-heads.txt
+          grep -q '077_candidate_activity_timeline' /tmp/alembic-heads.txt
+          # Single invocation — no retry loop (hard ban on blind retry)
+          python -m alembic upgrade head
+
+      - name: Postflight validation
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os, sys
+          import sqlalchemy as sa
+          from sqlalchemy import text
+          engine = sa.create_engine(os.environ["DATABASE_URL"])
+          with engine.connect() as conn:
+              rev = conn.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
+              tables = conn.execute(text(
+                  "SELECT count(*) FROM information_schema.tables "
+                  "WHERE table_schema='public' AND table_type='BASE TABLE'"
+              )).scalar_one()
+              users = conn.execute(text("SELECT count(*) FROM users")).scalar_one()
+              cands = conn.execute(text("SELECT count(*) FROM candidates")).scalar_one()
+              matches = conn.execute(text("SELECT count(*) FROM job_matches")).scalar_one()
+              apps = conn.execute(text("SELECT count(*) FROM applications")).scalar_one()
+              trust = conn.execute(text(
+                  "SELECT count(*) FROM information_schema.tables "
+                  "WHERE table_schema='public' AND table_name='candidate_privacy_requests'"
+              )).scalar_one()
+          print(f"POST alembic={rev} tables={tables} users={users} candidates={cands} job_matches={matches} applications={apps}")
+          if rev != os.environ["EXPECT_HEAD"]:
+              print("HARD STOP: head not 077 after upgrade")
+              sys.exit(2)
+          if int(tables) < 65:
+              print("HARD STOP: expected ~69 tables")
+              sys.exit(2)
+          if int(trust) != 1:
+              print("HARD STOP: candidate_privacy_requests missing")
+              sys.exit(2)
+          # Row sanity — no data loss on core counters when we captured preflight
+          for key, actual in [("PRE_USERS", users), ("PRE_CANDS", cands), ("PRE_MATCHES", matches), ("PRE_APPS", apps)]:
+              prev = os.environ.get(key)
+              if prev is not None and str(actual) != prev:
+                  print(f"HARD STOP: {key} changed {prev} -> {actual}")
+                  sys.exit(2)
+          print("POSTFLIGHT PASS")
+          PY
