@@ -40,8 +40,8 @@ posture.
 | R-015 | API DSN / secrets leak via 500 response body                                                                       | M   | 🟢     | `app/main.py` exception handler sanitises 500; test_public_health_regression.py asserts no DSN / secret / stack in body          | None                                                                                                     | `app/main.py` `http_exception_sanitize_500`, `test_public_health_regression.py`                       |
 | R-016 | `Server: uvicorn` / `X-Powered-By` headers fingerprint the stack                                                   | L   | 🟢     | `poweredByHeader: false` in Next.js config; FastAPI doesn't set its own; test_public_health_regression.py asserts both absent  | None                                                                                                     | `frontend/next.config.ts`, `test_public_health_regression.py`                                          |
 | R-017 | `frontend/.vercel/project.json` drift — `vercel deploy` from local would publish to wrong project                  | L   | 🟡     | Push-based deploy is canonical and unaffected; drift guard script alerts on `bash scripts/check-vercel-canonical-alias.sh`     | Re-link via `vercel link --scope=twin --project=twin` in a maintenance window                              | `VERCEL_CANONICAL_DEPLOY_RUNBOOK_2026-05-27.md`, `VERCEL_CANONICAL_ALIAS_GUARD_2026-05-27.md`         |
-| R-018 | DB backup / restore is not exercised; "we have backups" is unverified                                              | M   | 🔴     | Railway snapshots exist; no restore drill on record                                                                            | Schedule a one-hour restore drill against a staging DB; doc the result                                    | `PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md` gate O7                                                  |
-| R-019 | Data-subject access (export / delete) is partial                                                                   | M   | 🟡     | Export LIVE (`/me/export.json`); self-service delete API+UI on #451 branch (`POST /candidates/me/delete-account`, 6 pytest)     | Prod deploy + founder E2E smoke after train merge                                                           | `PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md` gate L6                                                  |
+| R-018 | DB backup / restore is not exercised; "we have backups" is unverified                                              | M   | 🟢     | O7 staging restore drill PASS + forward-migrate proof (`docs/O7_RESTORE_DRILL_EVIDENCE_2026-07-15.md`); LB-201 CLOSED          | Keep quarterly re-drill on calendar                                                                         | `PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md` gate O7                                                  |
+| R-019 | Data-subject access (export / delete) is partial                                                                   | M   | 🟢     | Export LIVE; self-service delete LIVE; prod disposable E2E PASS after schema 077 (`docs/R019_DELETE_ACCOUNT_PRODUCTION_EVIDENCE_2026-07-15.md`); LB-005 CLOSED | None                                                                                                     | `PUBLIC_LAUNCH_GATE_CHECKLIST_2026-05-27.md` gate L6                                                  |
 | R-020 | Auto-apply submitted to a wrong job → recruiter / candidate trust hit                                              | H   | 🟡     | Per-board allowlist exists; no enforced per-job-board scope on a per-user basis; `daily_limit` from consent caps volume          | Add explicit `board_id IN consented_boards` check in `process_user_nightly_auto_apply`                     | `app/services/nightly_auto_apply.py`, `AUTO_APPLY_RELIABILITY_REPORT.md`                              |
 | R-021 | Recruiter token has no rotation policy / expiry                                                                    | L   | 🔴     | Rotation is manual via Railway env var                                                                                          | Document rotation in `INCIDENT_RESPONSE_RUNBOOK`; add reminder in pilot operating manual                  | `INCIDENT_RESPONSE_RUNBOOK_2026-05-27.md`                                                              |
 | R-022 | `OPS_ADMIN_TOKEN` has no rotation policy / expiry                                                                  | M   | 🔴     | Same                                                                                                                          | Same                                                                                                     | Same                                                                                                  |
@@ -51,12 +51,9 @@ posture.
 
 ## Open vs partial vs closed — summary
 
-- **🔴 Open (5):** R-010, R-011, R-012, R-018, R-021, R-022 (some L sev, three M).
-- **🟡 Partial (7):** R-004, R-013, R-014, R-017, R-019,
-  R-020, R-024.
-- **🟢 Closed (13):** R-001, R-002, R-003, R-005, R-006,
-  R-007, R-008, R-009, R-015, R-016, R-023, R-025, plus the structural ones
-  reflected by the regression tests.
+- **🔴 Open (4):** R-010, R-011, R-012, R-021, R-022 (count includes L/M mix; R-018/R-019 closed 2026-07-15).
+- **🟡 Partial (5):** R-004, R-013, R-014, R-017, R-020, R-024.
+- **🟢 Closed (15+):** prior closed set + R-018 (O7) + R-019 (LB-005 prod delete smoke PASS).
 
 ## Risk reduction roadmap
 
@@ -69,10 +66,8 @@ Order of follow-ups by risk × cost:
    severity, medium cost.** Gated on migration freeze.
 4. **R-020** — per-user `board_id` allowlist on auto-apply.
    **HIGH severity (if it bites), low cost.** Worth promoting.
-5. **R-019** — data-subject self-service (export + delete).
-   **MEDIUM severity, medium cost.** Pre-launch gate L6.
-6. **R-018** — DB restore drill. **MEDIUM severity, low cost
-   if we accept a one-hour exercise.**
+5. ~~**R-019**~~ — **CLOSED 2026-07-15** (prod delete E2E PASS / LB-005).
+6. ~~**R-018**~~ — **CLOSED 2026-07-15** (O7 restore drill / LB-201).
 7. **R-021 / R-022** — token rotation reminders + policy.
    **LOW severity, very low cost.**
 8. **R-009 / R-010 / R-011 / R-012** — per-IP / per-token
