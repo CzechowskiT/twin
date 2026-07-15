@@ -6,15 +6,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "@/components/language-provider";
 import { ProductFilmPlayer } from "@/components/marketing/demo/sales/product-film-player";
 import { RoleFlowCards } from "@/components/marketing/demo/sales/role-flow-cards";
-import { RoleStory } from "@/components/marketing/demo/experience/role-story";
+import { InteractiveRoleFlow } from "@/components/marketing/demo/sales/interactive-role-flow";
 import { MarketingPageSurface } from "@/components/marketing/marketing-page-surface";
 import { Shell } from "@/components/ui";
 import { trackDemoCtaClick } from "@/lib/demo/demo-analytics";
 import { readSaveDataPreference, subscribeSaveDataPreference } from "@/lib/demo/save-data-preference";
-import {
-  salesRoleJourneyScenes,
-  type SalesDemoRole,
-} from "@/lib/demo/sales-demo-config";
+import type { SalesDemoRole } from "@/lib/demo/sales-demo-config";
 
 function usePrefersReducedMotion(): { reducedMotion: boolean; checked: boolean } {
   const [state, setState] = useState({ reducedMotion: false, checked: false });
@@ -146,13 +143,7 @@ export function SalesDemoExperience() {
               tabIndex={-1}
               aria-label={t("demoSales.flowAria")}
             >
-              <RoleStory
-                role={activeRole}
-                onRoleChange={() => undefined}
-                autoStart
-                scenesOverride={salesRoleJourneyScenes(activeRole)}
-                hideRoleSelector
-              />
+              <InteractiveRoleFlow role={activeRole} reducedMotion={reducedMotion} saveData={saveData} />
             </section>
           ) : null}
         </div>

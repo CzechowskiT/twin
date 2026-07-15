@@ -46,7 +46,7 @@ test("2 manifest module is single source for role flows", () => {
   const roleStory = read("src/components/marketing/demo/experience/role-story.tsx");
   assert.match(roleStory, /demo-scene-manifest/);
   const sales = read("src/components/marketing/demo/sales/sales-demo-experience.tsx");
-  assert.match(sales, /salesRoleJourneyScenes/);
+  assert.match(sales, /salesRoleJourneyScenes|InteractiveRoleFlow/);
 });
 
 test("3 analytics wrapper avoids PII props", () => {
@@ -55,6 +55,7 @@ test("3 analytics wrapper avoids PII props", () => {
   assert.match(analytics, /demo_video_impression/);
   assert.match(analytics, /demo_cta_click/);
   assert.match(analytics, /demo_role_select/);
+  assert.match(analytics, /demo_audio_impression/);
   assert.doesNotMatch(analytics, /email/);
 });
 
@@ -102,6 +103,8 @@ test("8 video controls exposed on product film player", () => {
   assert.match(player, /data-demo-video-skip/);
   assert.match(player, /data-demo-video-captions/);
   assert.match(player, /data-demo-product-video/);
+  assert.match(player, /data-demo-video-poster-underlay/);
+  assert.match(player, /type="video\/mp4"/);
 });
 
 test("9 demo fixtures use synthetic IDs only", () => {
@@ -139,7 +142,11 @@ test("11 sales demo e2e hooks for browser smoke", () => {
   assert.match(saveDataSpec, /data-sales-demo-roles/);
   assert.match(founderSpec, /toHaveCount\(0\)/);
   assert.doesNotMatch(founderSpec, /data-founder-led-demo-link/);
-  assert.match(founderSpec, /data-sales-demo-flow/);
+  assert.match(founderSpec, /data-interactive-role-flow/);
+
+  const interactiveFlowSpec = read("e2e/interactive-demo-flow-browser.spec.ts");
+  assert.match(interactiveFlowSpec, /data-demo-flow-phase/);
+  assert.match(interactiveFlowSpec, /data-demo-audio-toggle/);
 
   const a11ySpec = read("e2e/interactive-demo-a11y.spec.ts");
   assert.match(a11ySpec, /data-sales-demo/);

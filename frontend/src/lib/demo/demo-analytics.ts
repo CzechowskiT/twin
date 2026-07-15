@@ -99,6 +99,27 @@ export function trackDemoCtaClick(props: { cta_id: string } & DemoAnalyticsProps
   trackEvent("demo_cta_click", props);
 }
 
+/** Ambient demo music — user-gesture gated, no PII. */
+export function trackDemoAudioImpression(props?: DemoAnalyticsProps) {
+  trackEvent("demo_audio_impression", props);
+}
+
+export function trackDemoAudioPlay(props?: DemoAnalyticsProps) {
+  trackEvent("demo_audio_play", props);
+}
+
+export function trackDemoAudioPause(props?: DemoAnalyticsProps) {
+  trackEvent("demo_audio_pause", props);
+}
+
+export function trackDemoAudioMute(props?: DemoAnalyticsProps) {
+  trackEvent("demo_audio_mute", props);
+}
+
+export function trackDemoAudioUnmute(props?: DemoAnalyticsProps) {
+  trackEvent("demo_audio_unmute", props);
+}
+
 export function trackHomepageCandidateStory(
   event: HomepageCandidateStoryEvent,
   props?: DemoAnalyticsProps,

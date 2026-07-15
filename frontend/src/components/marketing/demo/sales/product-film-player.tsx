@@ -29,6 +29,7 @@ export function ProductFilmPlayer({ onComplete, onSkip, reducedMotion, saveData 
   const [playing, setPlaying] = useState(false);
   const [captionsOn, setCaptionsOn] = useState(true);
   const [ready, setReady] = useState(false);
+  const [firstFrameReady, setFirstFrameReady] = useState(false);
   const impressionRef = useRef(false);
   const progressMarksRef = useRef(new Set<number>());
   const completedRef = useRef(false);
@@ -104,6 +105,15 @@ export function ProductFilmPlayer({ onComplete, onSkip, reducedMotion, saveData 
   return (
     <section className="sales-demo-film" data-sales-demo-film aria-label={t("demoSales.filmAria")}>
       <div className="sales-demo-film__player-wrap">
+        {!firstFrameReady ? (
+          <img
+            src={sources.poster}
+            alt=""
+            aria-hidden
+            className="sales-demo-film__poster-underlay"
+            data-demo-video-poster-underlay
+          />
+        ) : null}
         <video
           ref={videoRef}
           className="sales-demo-film__video"
@@ -113,13 +123,17 @@ export function ProductFilmPlayer({ onComplete, onSkip, reducedMotion, saveData 
           playsInline
           muted
           onLoadedMetadata={() => setReady(true)}
+          onLoadedData={() => setFirstFrameReady(true)}
           onTimeUpdate={handleTimeUpdate}
           onEnded={handleEnded}
-          onPlay={() => setPlaying(true)}
+          onPlay={() => {
+            setPlaying(true);
+            setFirstFrameReady(true);
+          }}
           onPause={() => setPlaying(false)}
         >
-          <source src={sources.webm} type="video/webm" />
           <source src={sources.mp4} type="video/mp4" />
+          <source src={sources.webm} type="video/webm" />
           <track
             kind="captions"
             src={sources.vtt}
