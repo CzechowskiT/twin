@@ -71,10 +71,13 @@ test("4 reduced motion and save-data guards present in sales experience", () => 
   assert.match(roleStory, /autoplayStartedRef/);
 });
 
-test("5 i18n demoSales keys mirrored EN/PL", () => {
+test("5 i18n demoSales and demoCockpit keys mirrored EN/PL", () => {
   const enKeys = Object.keys(en.demoSales);
   const plKeys = Object.keys(dictionaries.pl.demoSales);
   assert.deepEqual(plKeys.sort(), enKeys.sort());
+  const enCockpit = Object.keys(en.demoCockpit);
+  const plCockpit = Object.keys(dictionaries.pl.demoCockpit);
+  assert.deepEqual(plCockpit.sort(), enCockpit.sort());
 });
 
 test("6 launch stance — demo copy has no hard-banned CTAs", () => {

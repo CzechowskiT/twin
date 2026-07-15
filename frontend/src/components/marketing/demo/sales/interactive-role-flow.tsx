@@ -138,15 +138,13 @@ export function InteractiveRoleFlow({ role, reducedMotion, saveData }: Interacti
       data-role={role}
       onPointerDown={unlockGesture}
     >
-      <div className="interactive-role-flow__header flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs font-medium uppercase tracking-wider text-[var(--twin-accent)]">
-          {t(`demoSales.roleTitle_${role}` as TranslationKey)}
-        </p>
+      <div className="interactive-role-flow__toolbar">
         <DemoAudioController enabled={!saveData} gestureUnlocked={gestureUnlocked} />
+        <span className="interactive-role-flow__badge">{t("demoSales.sampleBadge")}</span>
       </div>
 
       <div
-        className="interactive-role-flow__stage relative overflow-hidden rounded-xl border border-[var(--twin-border)] bg-[var(--twin-surface-elevated)] p-3 sm:p-4 min-h-[200px] sm:min-h-[240px]"
+        className="interactive-role-flow__stage"
         data-demo-interactive-stage
         data-demo-flow-phase={step.phase}
         onPointerDown={unlockGesture}
@@ -160,16 +158,13 @@ export function InteractiveRoleFlow({ role, reducedMotion, saveData }: Interacti
           onDecisionClick={handleDecision}
           reducedMotion={effectiveReducedMotion}
         />
-        <p className="absolute bottom-2 right-3 text-[10px] uppercase tracking-wider text-[var(--twin-muted)]">
-          {t("demoSales.sampleBadge")}
-        </p>
       </div>
 
-      <p className="mt-2 text-sm text-[var(--twin-muted-strong)]" data-demo-flow-caption>
+      <p className="interactive-role-flow__caption" data-demo-flow-caption data-demo-canonical-caption>
         {t(step.captionKey)}
       </p>
 
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="interactive-role-flow__controls">
         <button
           type="button"
           className="twin-btn-secondary twin-touch-target text-xs sm:text-sm"
@@ -190,7 +185,7 @@ export function InteractiveRoleFlow({ role, reducedMotion, saveData }: Interacti
 
       {completed ? (
         <div
-          className="demo-outcome-screen mt-4 rounded-xl border border-[var(--twin-accent)]/30 bg-[var(--twin-accent-muted)]/10 p-4 sm:p-5"
+          className="demo-outcome-screen interactive-role-flow__outcome"
           data-demo-outcome
           data-role={role}
         >
@@ -208,16 +203,12 @@ export function InteractiveRoleFlow({ role, reducedMotion, saveData }: Interacti
       ) : null}
 
       {effectiveReducedMotion ? (
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="interactive-role-flow__step-nav">
           {steps.map((s, i) => (
             <button
               key={s.id}
               type="button"
-              className={`rounded-md border px-2 py-1 text-[10px] sm:text-xs ${
-                i === stepIndex
-                  ? "border-[var(--twin-accent)] bg-[var(--twin-accent-muted)]/25"
-                  : "border-[var(--twin-border)]"
-              }`}
+              className={`interactive-role-flow__step-btn ${i === stepIndex ? "interactive-role-flow__step-btn--active" : ""}`}
               data-demo-flow-step={s.id}
               onClick={() => {
                 setGestureUnlocked(true);

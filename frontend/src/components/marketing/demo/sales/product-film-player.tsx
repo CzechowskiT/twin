@@ -27,7 +27,7 @@ export function ProductFilmPlayer({ onComplete, onSkip, reducedMotion, saveData 
   const sources = productFilmSources(locale);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
-  const [captionsOn, setCaptionsOn] = useState(true);
+  const [captionsOn, setCaptionsOn] = useState(false);
   const [ready, setReady] = useState(false);
   const [firstFrameReady, setFirstFrameReady] = useState(false);
   const impressionRef = useRef(false);
