@@ -145,7 +145,7 @@ PostHog not configured in agent env — events verified via static guards only; 
 | `verify:production-v3:077` | **PASS** |
 | `probe:prod-public` ×2 | **220/220 PASS** |
 | `test:real-video-demo` (static) | **7/7 PASS** |
-| `test:interactive-demo-guard` | **13/13 PASS** — save-data + poster fallback guards |
+| `test:interactive-demo-guard` | **12/12 PASS** — save-data + poster fallback guards |
 | `test:demo-save-data-fallback` | **4/4 PASS** |
 | `test:demo-save-data-fallback-browser` | **2/2 PASS** |
 | `founder-led-demo-flow-browser` | **PASS** — SalesDemoExperience selectors |
