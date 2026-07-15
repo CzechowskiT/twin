@@ -68,7 +68,8 @@ test.describe("Founder-led demo flow browser", () => {
         await skipToRoles(page);
         await page.locator(`[data-demo-role-card="${role}"]`).click();
         await expect(page.locator("[data-sales-demo-flow]").first()).toBeVisible({ timeout: ROUTE_SETTLE_MS });
-        await expect(page.locator("[data-demo-animated-surface]").first()).toBeVisible({ timeout: ROUTE_SETTLE_MS });
+        await expect(page.locator("[data-interactive-role-flow]").first()).toBeVisible({ timeout: ROUTE_SETTLE_MS });
+        await expect(page.locator("[data-demo-interactive-stage]").first()).toBeVisible({ timeout: ROUTE_SETTLE_MS });
         const textLen = await page.locator("body").innerText().then((t) => t.replace(/\s+/g, " ").trim().length);
         expect(textLen).toBeGreaterThan(MIN_VISIBLE_TEXT);
       }

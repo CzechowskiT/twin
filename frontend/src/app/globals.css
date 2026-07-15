@@ -4237,11 +4237,21 @@ html[data-marketing-surface="studio"] .demo-glass-panel {
   position: relative;
   border-radius: 1rem;
   overflow: hidden;
-  background: var(--sales-elevated);
+  background: var(--sales-surface);
   border: 1px solid var(--sales-border);
   box-shadow:
     0 4px 24px rgb(15 23 42 / 0.06),
     0 0 0 1px rgb(255 255 255 / 0.8) inset;
+}
+
+.sales-demo-film__poster-underlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .sales-demo-film__video {
@@ -4250,6 +4260,8 @@ html[data-marketing-surface="studio"] .demo-glass-panel {
   aspect-ratio: 16 / 9;
   background: var(--sales-surface);
   object-fit: cover;
+  position: relative;
+  z-index: 2;
 }
 
 .sales-demo-film__play-overlay {
@@ -4397,6 +4409,46 @@ html[data-marketing-surface="studio"] .demo-glass-panel {
   border-radius: 1rem;
   border: 1px solid var(--sales-border);
   background: var(--sales-elevated);
+}
+
+.interactive-role-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.demo-audio-controller {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.demo-audio-controller__pulse {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--sales-accent);
+  animation: demo-audio-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes demo-audio-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .demo-flow-skeleton,
+  .demo-flow-spinner,
+  .demo-audio-controller__pulse {
+    animation: none !important;
+  }
 }
 
 @media (max-width: 390px) {
