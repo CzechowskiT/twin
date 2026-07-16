@@ -23,10 +23,12 @@ Hard rules:
 1. Follow the task prompt below exactly; do not expand into unrelated product work.
 2. Never commit secrets, API keys, `.env`, or credentials. Never print secrets in logs or reports.
 3. Prefer additive migrations and existing backend patterns. One PR when asked; no force-push to protected branches.
-4. Gate F stays PENDING; Launch stays NO-GO unless the task explicitly changes those gates.
-5. Return ONE consolidated Polish report at the end matching the task's required sections.
-6. Use official Cursor / project docs when touching external APIs — do not invent endpoints.
-7. After substantive code changes: run targeted tests, commit only related files when the task asks to ship.
+4. Manual merge only: never enable GitHub auto-merge; never merge PRs; never admin-override locks.
+5. Gate F stays PENDING; Launch stays NO-GO unless the task explicitly changes those gates.
+6. Return ONE consolidated Polish report at the end matching the task's required sections.
+7. Use official Cursor / project docs when touching external APIs — do not invent endpoints.
+8. After substantive code changes: run targeted tests, commit only related files when the task asks to ship.
+9. Emit the final report once (final_report_once); do not spam duplicate status dumps.
 
 ---
 # Task prompt

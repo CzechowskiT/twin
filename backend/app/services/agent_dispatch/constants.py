@@ -40,10 +40,23 @@ CURSOR_V0_RUNNING = "RUNNING"
 
 PROMPT_ENVELOPE_VERSION = "twin-agent-dispatch-prompt/v1"
 
-AGENT_DISPATCH_SCOPE_CREATE = "create"
-AGENT_DISPATCH_SCOPE_READ = "read"
-AGENT_DISPATCH_SCOPE_CANCEL = "cancel"
-AGENT_DISPATCH_SCOPE_ADMIN = "admin"
+# Canonical scopes (MCP / ChatGPT connector contract).
+AGENT_DISPATCH_SCOPE_CREATE = "agent_runs:create"
+AGENT_DISPATCH_SCOPE_READ = "agent_runs:read"
+AGENT_DISPATCH_SCOPE_CANCEL = "agent_runs:cancel"
+AGENT_DISPATCH_SCOPE_ADMIN = "agent_runs:admin"
+
+# Short aliases accepted in AGENT_DISPATCH_TOKENS for ops convenience.
+_SCOPE_ALIASES = {
+    "create": AGENT_DISPATCH_SCOPE_CREATE,
+    "read": AGENT_DISPATCH_SCOPE_READ,
+    "cancel": AGENT_DISPATCH_SCOPE_CANCEL,
+    "admin": AGENT_DISPATCH_SCOPE_ADMIN,
+    AGENT_DISPATCH_SCOPE_CREATE: AGENT_DISPATCH_SCOPE_CREATE,
+    AGENT_DISPATCH_SCOPE_READ: AGENT_DISPATCH_SCOPE_READ,
+    AGENT_DISPATCH_SCOPE_CANCEL: AGENT_DISPATCH_SCOPE_CANCEL,
+    AGENT_DISPATCH_SCOPE_ADMIN: AGENT_DISPATCH_SCOPE_ADMIN,
+}
 
 ALL_DISPATCH_SCOPES = frozenset(
     {
@@ -53,6 +66,19 @@ ALL_DISPATCH_SCOPES = frozenset(
         AGENT_DISPATCH_SCOPE_ADMIN,
     }
 )
+
+DEFAULT_EXECUTION_POLICY = {
+    "single_active_run": True,
+    "manual_merge_only": True,
+    "no_admin_override": True,
+    "no_auto_merge": True,
+    "final_report_once": True,
+}
+
+
+def normalize_scope(scope: str) -> str | None:
+    """Map short or canonical scope names to canonical form."""
+    return _SCOPE_ALIASES.get((scope or "").strip())
 
 
 class DispatchRunStatus(str, Enum):

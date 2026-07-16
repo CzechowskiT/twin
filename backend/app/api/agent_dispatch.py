@@ -28,7 +28,6 @@ from app.services.agent_dispatch.constants import (
 )
 from app.services.agent_dispatch.cursor_client import CursorApiError, CursorCloudAgentsClient
 from app.services.agent_dispatch.service import (
-    admin_force_unlock,
     cancel_run,
     create_dispatch_run,
     ingest_webhook,
@@ -95,9 +94,11 @@ def create_run(
         db,
         settings,
         principal,
+        task_name=body.task_name,
         prompt=body.prompt,
-        repository_url=body.repository_url,
+        repository_url=body.repository_url or body.repository or "",
         base_branch=body.base_branch,
+        execution_policy=body.execution_policy.model_dump(),
         auto_create_pr=body.auto_create_pr,
         branch_name=body.branch_name,
         model_id=body.model_id,
@@ -179,12 +180,19 @@ def force_unlock_endpoint(
     db: Session = Depends(get_db),
     principal: AgentDispatchPrincipal = Depends(get_agent_dispatch_principal),
 ) -> dict[str, Any]:
+    """Hard-banned: execution_policy.no_admin_override — use cancel + lease expiry."""
     require_scope(principal, AGENT_DISPATCH_SCOPE_ADMIN)
-    return admin_force_unlock(
-        db,
-        principal,
-        repo_url=body.repository_url,
-        base_branch=body.base_branch,
+    raise HTTPException(
+        status.HTTP_403_FORBIDDEN,
+        detail={
+            "error": "no_admin_override",
+            "message": (
+                "Force-unlock is disabled. Cancel the active run or wait for "
+                "lease expiry + Cursor reconciliation."
+            ),
+            "repository_url": body.repository_url,
+            "base_branch": body.base_branch,
+        },
     )
 
 

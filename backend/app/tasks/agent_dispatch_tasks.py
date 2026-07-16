@@ -7,7 +7,7 @@ import logging
 from app.config import get_settings
 from app.database.session import SessionLocal
 from app.services.agent_dispatch.constants import ACTIVE_LOCK_STATUSES
-from app.services.agent_dispatch.service import reconcile_run, recover_active_runs
+from app.services.agent_dispatch.service import purge_expired_prompts, reconcile_run, recover_active_runs
 from app.tasks.celery_app import celery_app
 from sqlalchemy import select
 from app.database.models import AgentDispatchRun
@@ -22,6 +22,7 @@ def reconcile_active_dispatch_runs() -> str:
         return "agent-dispatch-poll-disabled"
     db = SessionLocal()
     try:
+        purged = purge_expired_prompts(db)
         rows = (
             db.execute(
                 select(AgentDispatchRun.id).where(
@@ -38,7 +39,7 @@ def reconcile_active_dispatch_runs() -> str:
                 ok += 1
             except Exception:
                 logger.exception("reconcile failed for %s", run_id)
-        return f"reconciled={ok}"
+        return f"reconciled={ok};purged_prompts={purged}"
     finally:
         db.close()
 

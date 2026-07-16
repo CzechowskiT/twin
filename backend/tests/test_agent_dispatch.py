@@ -60,6 +60,26 @@ def _auth():
     return {"Authorization": "Bearer test-dispatch-token"}
 
 
+def _create_payload(**overrides):
+    base = {
+        "task_name": "unit-test-batch",
+        "prompt": "Implement agent dispatcher tests only",
+        "repository": "https://github.com/CzechowskiT/twin",
+        "base_branch": "cursor/phase1-monorepo-scaffold",
+        "execution_policy": {
+            "single_active_run": True,
+            "manual_merge_only": True,
+            "no_admin_override": True,
+            "no_auto_merge": True,
+            "final_report_once": True,
+        },
+        "auto_create_pr": False,
+        "dispatch_now": False,
+    }
+    base.update(overrides)
+    return base
+
+
 def test_health_unauthenticated(dispatch_client):
     client, _ = dispatch_client
     res = client.get("/api/internal/agent-dispatch/health")
@@ -82,7 +102,9 @@ def test_contract_ok(dispatch_client):
     client, _ = dispatch_client
     res = client.get("/api/internal/agent-dispatch/contract", headers=_auth())
     assert res.status_code == 200
-    assert res.json()["mcp_ready"] is True
+    body = res.json()
+    assert body["mcp_ready"] is True
+    assert "agent_runs:create" in body["scopes"] or "agent_runs:admin" in body["scopes"]
 
 
 def test_prompt_envelope_hash_and_redaction():
@@ -97,44 +119,47 @@ def test_create_run_queued_without_cursor_key(dispatch_client):
     res = client.post(
         "/api/internal/agent-dispatch/runs",
         headers=_auth(),
-        json={
-            "prompt": "Implement agent dispatcher tests only",
-            "repository_url": "https://github.com/CzechowskiT/twin",
-            "base_branch": "cursor/phase1-monorepo-scaffold",
-            "dispatch_now": False,
-            "idempotency_key": "idem-1",
-        },
+        json=_create_payload(idempotency_key="idem-1"),
     )
     assert res.status_code == 201
     body = res.json()
     assert body["status"] == "queued"
+    assert body["task_name"] == "unit-test-batch"
+    assert body["auto_create_pr"] is False
+    assert body["execution_policy"]["no_admin_override"] is True
     assert body["prompt_hash"]
     assert "Implement" in body["prompt_preview"]
 
-    # Idempotent replay
     res2 = client.post(
         "/api/internal/agent-dispatch/runs",
         headers=_auth(),
-        json={
-            "prompt": "Implement agent dispatcher tests only",
-            "repository_url": "https://github.com/CzechowskiT/twin",
-            "base_branch": "cursor/phase1-monorepo-scaffold",
-            "dispatch_now": False,
-            "idempotency_key": "idem-1",
-        },
+        json=_create_payload(idempotency_key="idem-1"),
     )
     assert res2.status_code == 201
     assert res2.json()["id"] == body["id"]
 
 
+def test_rejects_weak_execution_policy(dispatch_client):
+    client, _ = dispatch_client
+    res = client.post(
+        "/api/internal/agent-dispatch/runs",
+        headers=_auth(),
+        json=_create_payload(
+            execution_policy={
+                "single_active_run": True,
+                "manual_merge_only": True,
+                "no_admin_override": False,
+                "no_auto_merge": True,
+                "final_report_once": True,
+            }
+        ),
+    )
+    assert res.status_code == 422
+
+
 def test_lock_conflict_409(dispatch_client):
     client, _ = dispatch_client
-    payload = {
-        "prompt": "first",
-        "repository_url": "https://github.com/CzechowskiT/twin",
-        "base_branch": "cursor/phase1-monorepo-scaffold",
-        "dispatch_now": False,
-    }
+    payload = _create_payload()
     assert client.post("/api/internal/agent-dispatch/runs", headers=_auth(), json=payload).status_code == 201
     res = client.post(
         "/api/internal/agent-dispatch/runs",
@@ -150,28 +175,17 @@ def test_repo_allowlist(dispatch_client):
     res = client.post(
         "/api/internal/agent-dispatch/runs",
         headers=_auth(),
-        json={
-            "prompt": "x",
-            "repository_url": "https://github.com/evil/repo",
-            "base_branch": "cursor/phase1-monorepo-scaffold",
-            "dispatch_now": False,
-        },
+        json=_create_payload(repository="https://github.com/evil/repo"),
     )
     assert res.status_code == 403
 
 
 def test_webhook_signature_and_dedupe(dispatch_client):
     client, db = dispatch_client
-    # Seed a run linked to agent id
     create = client.post(
         "/api/internal/agent-dispatch/runs",
         headers=_auth(),
-        json={
-            "prompt": "webhook test",
-            "repository_url": "https://github.com/CzechowskiT/twin",
-            "base_branch": "cursor/phase1-monorepo-scaffold",
-            "dispatch_now": False,
-        },
+        json=_create_payload(prompt="webhook test"),
     )
     run_id = create.json()["id"]
     from app.database.models import AgentDispatchRun
@@ -237,6 +251,9 @@ def test_dispatch_with_mocked_cursor(dispatch_client, monkeypatch):
 
     def handler(request: httpx.Request) -> httpx.Response:
         if request.method == "POST" and request.url.path == "/v1/agents":
+            body = json.loads(request.content.decode())
+            assert body.get("autoCreatePR") is False
+            assert body.get("workOnCurrentBranch") is False
             return httpx.Response(
                 200,
                 json={
@@ -287,13 +304,11 @@ def test_dispatch_with_mocked_cursor(dispatch_client, monkeypatch):
     res = client.post(
         "/api/internal/agent-dispatch/runs",
         headers=_auth(),
-        json={
-            "prompt": "Ship dispatcher",
-            "repository_url": "https://github.com/CzechowskiT/twin",
-            "base_branch": "cursor/phase1-monorepo-scaffold",
-            "dispatch_now": True,
-            "idempotency_key": "mock-dispatch-1",
-        },
+        json=_create_payload(
+            prompt="Ship dispatcher",
+            dispatch_now=True,
+            idempotency_key="mock-dispatch-1",
+        ),
     )
     assert res.status_code == 201
     body = res.json()
@@ -314,12 +329,7 @@ def test_cancel_run(dispatch_client):
     created = client.post(
         "/api/internal/agent-dispatch/runs",
         headers=_auth(),
-        json={
-            "prompt": "cancel me",
-            "repository_url": "https://github.com/CzechowskiT/twin",
-            "base_branch": "cursor/phase1-monorepo-scaffold",
-            "dispatch_now": False,
-        },
+        json=_create_payload(prompt="cancel me"),
     ).json()
     res = client.post(
         f"/api/internal/agent-dispatch/runs/{created['id']}/cancel",
@@ -328,31 +338,20 @@ def test_cancel_run(dispatch_client):
     assert res.status_code == 200
     assert res.json()["status"] == "cancelled"
 
-    # Lock released — new create ok
     res2 = client.post(
         "/api/internal/agent-dispatch/runs",
         headers=_auth(),
-        json={
-            "prompt": "after cancel",
-            "repository_url": "https://github.com/CzechowskiT/twin",
-            "base_branch": "cursor/phase1-monorepo-scaffold",
-            "dispatch_now": False,
-        },
+        json=_create_payload(prompt="after cancel"),
     )
     assert res2.status_code == 201
 
 
-def test_force_unlock_admin(dispatch_client):
+def test_force_unlock_forbidden(dispatch_client):
     client, _ = dispatch_client
     client.post(
         "/api/internal/agent-dispatch/runs",
         headers=_auth(),
-        json={
-            "prompt": "lock",
-            "repository_url": "https://github.com/CzechowskiT/twin",
-            "base_branch": "cursor/phase1-monorepo-scaffold",
-            "dispatch_now": False,
-        },
+        json=_create_payload(prompt="lock"),
     )
     res = client.post(
         "/api/internal/agent-dispatch/admin/force-unlock",
@@ -362,8 +361,8 @@ def test_force_unlock_admin(dispatch_client):
             "base_branch": "cursor/phase1-monorepo-scaffold",
         },
     )
-    assert res.status_code == 200
-    assert res.json()["unlocked"] is True
+    assert res.status_code == 403
+    assert res.json()["detail"]["error"] == "no_admin_override"
 
 
 def test_invalid_webhook_signature(dispatch_client):
