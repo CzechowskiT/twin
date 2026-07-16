@@ -46,11 +46,26 @@ Also fixed `/demo` hero contrast: title was dark navy on dark navy (`--sales-fg:
 - No Gate F YES / Launch GO
 - No `\|\| true` / skipped failing tests
 
+## Post-merge production (2026-07-16)
+
+| Field | Value |
+|-------|-------|
+| PR | [#493](https://github.com/CzechowskiT/twin/pull/493) MERGED |
+| Merge SHA | `482e3a44221b2a64c42b39f3d3f6bb03fd99a86f` |
+| Vercel prod | READY `dpl_3QdYRX8iDDZ5s48V7FxKHAdwKNcJ` |
+| `frontend_commit` | `482e3a44221b2a64c42b39f3d3f6bb03fd99a86f` |
+| `api_commit` | `13076064f0424dd1bded371628e51c7d0bcd1ae8` (unchanged; no Railway) |
+| Prod film EN | HTTP 200, duration ~45.06s, size 17228988 |
+| Hero CSS | `--sales-fg:#f8fafc` on prod `/_next/static/...css` |
+| Prod frame meanL (3/8/17/24/33/38/42s) | ~19–23, white% ≤0.1 (no light panels) |
+| `verify:production-v3:077` | PASS (Launch NO-GO / Gate F PENDING) |
+| `probe:prod-public` ×2 | 110/110 + 110/110 (aggregate 220/220) |
+
 ## Decision fields (batch)
 
 | Field | Value |
 |-------|-------|
-| Full-film dark style DONE | YES (local + PR; prod after merge READY) |
-| Hero contrast FIX | YES |
+| Full-film dark style DONE | YES (local + prod) |
+| Hero contrast FIX | YES (prod CSS confirmed) |
 | Gate F | PENDING |
 | Launch | NO-GO |
