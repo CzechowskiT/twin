@@ -11,6 +11,7 @@
 | Auto-merge / force-push | Policy flags hard-true; no merge APIs; force-unlock **403** |
 | Cursor credential leak | Env-only `CURSOR_CLOUD_AGENTS_API_KEY`; never in repo/CLI argv/artifacts |
 | Allowlist bypass | Repo + base_branch allowlists enforced before lock |
+| Public MCP without auth | Hosted MCP requires Bearer; query-string secrets rejected |
 | CI false success | Optional `AGENT_DISPATCH_REQUIRE_CI_SUCCESS` → `needs_attention` |
 | Admin override | Disabled (`no_admin_override`); cancel + lease expiry only |
 

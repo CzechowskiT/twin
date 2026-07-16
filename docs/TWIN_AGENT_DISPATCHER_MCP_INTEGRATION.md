@@ -1,22 +1,30 @@
-# TWIN Agent Dispatcher — MCP integration readiness
+# TWIN Agent Dispatcher — MCP integration
 
 ## Status
 
-**MCP-ready HTTP contract: yes** · **Hosted MCP server in this batch: no** (next batch).
+**MCP-ready HTTP contract: yes** · **Hosted MCP server: yes** (same Railway backend).
 
-Official Cursor docs (2026-07-16): *“MCP (Model Context Protocol) is not yet supported by the Cloud Agents API”* for launching agents via MCP inside Cursor Cloud. This document covers **calling TWIN Dispatcher from an MCP client** (ChatGPT/Cursor MCP connector), not Cursor-native agent MCP.
+Official Cursor docs (2026-07-16): Cloud Agents API does **not** launch agents via Cursor-native MCP. This document covers **calling TWIN Dispatcher from an MCP client** (ChatGPT connector / Cursor MCP).
 
-## Tool → HTTP map (proposed connector)
+Setup runbook: [TWIN_AGENT_DISPATCHER_CHATGPT_SETUP.md](./TWIN_AGENT_DISPATCHER_CHATGPT_SETUP.md)
+
+## Endpoint
+
+`POST https://<api>/api/internal/agent-dispatch/mcp`  
+Auth: `Authorization: Bearer <AGENT_DISPATCH_TOKEN>`  
+Rate limit: 60/minute (IP). No anonymous access.
+
+## Tool → HTTP map
 
 | MCP tool | HTTP | Scope |
 |----------|------|-------|
-| `twin_agent_dispatch` | `POST /runs` | `agent_runs:create` |
-| `twin_agent_status` | `GET /runs/{id}` | `agent_runs:read` |
-| `twin_agent_wait` | poll `GET /runs/{id}?refresh=true` | `agent_runs:read` |
-| `twin_agent_cancel` | `POST /runs/{id}/cancel` | `agent_runs:cancel` |
-| `twin_agent_report` | `GET /runs/{id}/report` | `agent_runs:read` |
-| `twin_agent_health` | `GET /health` | none |
-| `twin_agent_contract` | `GET /contract` | `agent_runs:read` |
+| `dispatch_twin_agent` | `POST /runs` | `agent_runs:create` |
+| `get_twin_agent_status` | `GET /runs/{id}` | `agent_runs:read` |
+| `get_twin_agent_report` | `GET /runs/{id}/report` | `agent_runs:read` |
+| `get_twin_agent_handoff` | `GET /runs/{id}/handoff` | `agent_runs:read` |
+| `cancel_twin_agent` | `POST /runs/{id}/cancel` | `agent_runs:cancel` |
+| `list_twin_agent_runs` | `GET /runs` | `agent_runs:read` |
+| `reconcile_twin_agent_run` | `POST /runs/{id}/reconcile` | `agent_runs:read` |
 
 ## Create tool arguments
 
@@ -38,16 +46,20 @@ Official Cursor docs (2026-07-16): *“MCP (Model Context Protocol) is not yet s
 }
 ```
 
+Server rejects any weakened `execution_policy` flag.
+
 ## Auth for connector
 
-- `AGENT_DISPATCH_TOKEN` (or scoped token with needed permissions)
-- Never embed Cursor API key in the MCP client — only the dispatcher token
-- Base URL: production API host (`TWIN_API_BASE_URL`)
+- `AGENT_DISPATCH_TOKEN` only in the MCP client
+- Never embed `CURSOR_CLOUD_AGENTS_API_KEY` in ChatGPT / MCP
+- No secrets in query strings
 
 ## Idempotency
 
-Pass `idempotency_key` from ChatGPT/MCP tool calls so retries do not double-dispatch.
+Pass `idempotency_key` from ChatGPT/MCP so retries do not double-dispatch.
 
-## Next batch
+## Version metadata
 
-Ship ChatGPT/MCP connector wrapping the table above + first full autonomous feature run without manual prompt copy.
+- MCP protocol: `2025-06-18`
+- Server: `twin-agent-dispatcher` `1.0.0`
+- Cursor contract date: see `cursor_contract_doc_date` on `/health`

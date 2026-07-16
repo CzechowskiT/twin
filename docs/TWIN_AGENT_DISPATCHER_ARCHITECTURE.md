@@ -12,16 +12,17 @@ Replace manual paste of huge prompts into Cursor with a production-safe HTTP ser
 2. Monitors them (webhook + polling reconciliation)
 3. Enforces a single-active-run lock per `(repository_url, base_branch)`
 4. Captures final report / branch / PR / SHA (+ optional CI)
-5. Exposes CLI + MCP-ready JSON contracts
+5. Exposes CLI + **hosted MCP** (same backend) for ChatGPT without prompt copy
 
 ## Components
 
 ```
-CLI / MCP / founder tooling
+ChatGPT / CLI / MCP client
         │  Bearer AGENT_DISPATCH_TOKEN (+ agent_runs:* scopes)
         ▼
 Dispatcher API  (/api/internal/agent-dispatch/*)
         │
+        ├── Hosted MCP JSON-RPC (POST /mcp) — tools listed below
         ├── Auth (scoped Bearer fingerprints)
         ├── Prompt envelope (policy prefix + SHA-256 + Fernet ciphertext + TTL)
         ├── Lock service (Postgres unique lease + heartbeat)
@@ -32,8 +33,13 @@ Dispatcher API  (/api/internal/agent-dispatch/*)
         ├── Webhook receiver (HMAC sha256=, dedupe by X-Webhook-ID)
         ├── Polling worker (Celery beat reconcile + prompt TTL purge)
         ├── GitHub enricher (branch / PR / SHA / combined status)
+        ├── Report + handoff retrieval (no manual prompt copy)
         └── Redacted audit events
 ```
+
+MCP tools: `dispatch_twin_agent`, `get_twin_agent_status`, `get_twin_agent_report`,
+`get_twin_agent_handoff`, `cancel_twin_agent`, `list_twin_agent_runs`,
+`reconcile_twin_agent_run`. Setup: [TWIN_AGENT_DISPATCHER_CHATGPT_SETUP.md](./TWIN_AGENT_DISPATCHER_CHATGPT_SETUP.md).
 
 ## Create contract
 

@@ -30,6 +30,8 @@ def dispatch_client(monkeypatch):
     monkeypatch.setenv("AGENT_DISPATCH_BASE_BRANCH_ALLOWLIST", "cursor/phase1-monorepo-scaffold")
     monkeypatch.setenv("AGENT_DISPATCH_ENCRYPT_PROMPTS", "true")
     monkeypatch.setenv("AGENT_DISPATCH_WEBHOOK_SECRET", "x" * 32)
+    monkeypatch.delenv("AGENT_DISPATCH_WEBHOOK_PUBLIC_URL", raising=False)
+    monkeypatch.setenv("AGENT_DISPATCH_WEBHOOK_PUBLIC_URL", "")
     monkeypatch.setenv("CURSOR_CLOUD_AGENTS_API_KEY", "")
     monkeypatch.setenv("SECRET_KEY", "unit-test-secret-key-at-least-32-chars!!")
     get_settings.cache_clear()
@@ -238,10 +240,9 @@ def test_canary_blocked_without_credential(dispatch_client):
     assert res.status_code == 200
     body = res.json()
     assert body["status"] == "BLOCKED"
-    assert body["reason"] == (
-        "add Cursor Cloud Agents service-account API credential to production "
-        "secret store under documented name"
-    )
+    assert "CURSOR_CLOUD_AGENTS_API_KEY" in body["reason"]
+    assert "CzechowskiT/twin" in body["reason"]
+    assert body.get("founder_action_required") is True
 
 
 def test_dispatch_with_mocked_cursor(dispatch_client, monkeypatch):
@@ -373,3 +374,120 @@ def test_invalid_webhook_signature(dispatch_client):
         headers={"X-Webhook-Signature": "sha256=deadbeef", "Content-Type": "application/json"},
     )
     assert res.status_code == 401
+
+
+def test_mcp_requires_auth(dispatch_client):
+    client, _ = dispatch_client
+    res = client.post(
+        "/api/internal/agent-dispatch/mcp",
+        json={"jsonrpc": "2.0", "id": 1, "method": "tools/list"},
+    )
+    assert res.status_code == 401
+
+
+def test_mcp_tools_list_and_dispatch_handoff(dispatch_client):
+    client, _ = dispatch_client
+    listed = client.post(
+        "/api/internal/agent-dispatch/mcp",
+        headers=_auth(),
+        json={"jsonrpc": "2.0", "id": 1, "method": "tools/list"},
+    )
+    assert listed.status_code == 200
+    tools = {t["name"] for t in listed.json()["result"]["tools"]}
+    assert {
+        "dispatch_twin_agent",
+        "get_twin_agent_status",
+        "get_twin_agent_report",
+        "get_twin_agent_handoff",
+        "cancel_twin_agent",
+        "list_twin_agent_runs",
+        "reconcile_twin_agent_run",
+    } <= tools
+
+    created = client.post(
+        "/api/internal/agent-dispatch/mcp",
+        headers=_auth(),
+        json={
+            "jsonrpc": "2.0",
+            "id": 2,
+            "method": "tools/call",
+            "params": {
+                "name": "dispatch_twin_agent",
+                "arguments": {
+                    "task_name": "mcp-unit",
+                    "prompt": "Align docs/guard wording for agent dispatcher MCP only.",
+                    "dispatch_now": False,
+                    "idempotency_key": "mcp-unit-1",
+                },
+            },
+        },
+    )
+    assert created.status_code == 200
+    text = created.json()["result"]["content"][0]["text"]
+    run = json.loads(text)
+    assert run["status"] == "queued"
+    run_id = run["id"]
+
+    handoff = client.post(
+        "/api/internal/agent-dispatch/mcp",
+        headers=_auth(),
+        json={
+            "jsonrpc": "2.0",
+            "id": 3,
+            "method": "tools/call",
+            "params": {"name": "get_twin_agent_handoff", "arguments": {"run_id": run_id}},
+        },
+    )
+    assert handoff.status_code == 200
+    package = json.loads(handoff.json()["result"]["content"][0]["text"])
+    assert package["handoff_version"].startswith("twin-agent-dispatch-handoff/")
+    assert package["run_id"] == run_id
+
+    http_handoff = client.get(
+        f"/api/internal/agent-dispatch/runs/{run_id}/handoff",
+        headers=_auth(),
+    )
+    assert http_handoff.status_code == 200
+    assert http_handoff.json()["run_id"] == run_id
+
+
+def test_mcp_rejects_weak_policy(dispatch_client):
+    client, _ = dispatch_client
+    res = client.post(
+        "/api/internal/agent-dispatch/mcp",
+        headers=_auth(),
+        json={
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "tools/call",
+            "params": {
+                "name": "dispatch_twin_agent",
+                "arguments": {
+                    "task_name": "bad-policy",
+                    "prompt": "nope",
+                    "dispatch_now": False,
+                    "execution_policy": {
+                        "single_active_run": True,
+                        "manual_merge_only": True,
+                        "no_admin_override": False,
+                        "no_auto_merge": True,
+                        "final_report_once": True,
+                    },
+                },
+            },
+        },
+    )
+    assert res.status_code == 200
+    assert res.json()["result"]["isError"] is True
+
+
+def test_health_exposes_mcp_without_secrets(dispatch_client):
+    client, _ = dispatch_client
+    res = client.get("/api/internal/agent-dispatch/health")
+    assert res.status_code == 200
+    body = res.json()
+    assert body["mcp_hosted"] is True
+    assert body["mcp_healthy"] is True
+    assert "dispatch_twin_agent" in body["mcp_tools"]
+    assert "test-dispatch-token" not in res.text
+    assert body["encryption_via"] == "SECRET_KEY+token_crypto"
