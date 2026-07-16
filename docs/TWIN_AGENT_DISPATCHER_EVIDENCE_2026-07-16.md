@@ -54,7 +54,18 @@ pytest backend/tests/test_agent_dispatch.py \
 
 ## Canary
 
-`CURSOR_CLOUD_AGENTS_API_KEY` not present in local/CI secret store at evidence time → live canary **BLOCKED** (credential only).
+`CURSOR_CLOUD_AGENTS_API_KEY` not present in Railway at evidence time → live canary **BLOCKED** (credential only).
+
+Founder action (exact):
+
+> Create one Cursor Cloud Agents service-account credential authorized for CzechowskiT/twin and store it in the existing Railway production secret store as CURSOR_CLOUD_AGENTS_API_KEY.
+
+## Hosted MCP batch (follow-up)
+
+- Hosted MCP JSON-RPC at `/api/internal/agent-dispatch/mcp`
+- Tools: dispatch/status/report/handoff/cancel/list/reconcile
+- ChatGPT setup: `docs/TWIN_AGENT_DISPATCHER_CHATGPT_SETUP.md`
+- `AGENT_DISPATCH_TOKEN` + webhook secret set in Railway (values never in repo)
 
 ## Secret scan
 

@@ -612,6 +612,83 @@ def recover_active_runs(db: Session, settings: Settings) -> dict[str, int]:
     return {"reconciled": count}
 
 
+def list_dispatch_runs(
+    db: Session,
+    *,
+    limit: int = 20,
+    status: str | None = None,
+) -> list[AgentDispatchRun]:
+    """Newest-first listing for MCP / CLI."""
+    lim = max(1, min(int(limit or 20), 100))
+    stmt = select(AgentDispatchRun).order_by(AgentDispatchRun.created_at.desc()).limit(lim)
+    if status:
+        stmt = (
+            select(AgentDispatchRun)
+            .where(AgentDispatchRun.status == status.strip())
+            .order_by(AgentDispatchRun.created_at.desc())
+            .limit(lim)
+        )
+    return list(db.execute(stmt).scalars().all())
+
+
+def run_report_dict(db: Session, run_id: str) -> dict[str, Any]:
+    run = db.get(AgentDispatchRun, run_id)
+    if not run:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="run not found")
+    data = run_to_public_dict(run)
+    data["report"] = {
+        "status": run.status,
+        "branch": run.result_branch,
+        "pr_url": run.result_pr_url,
+        "head_sha": run.result_head_sha,
+        "ci_status": run.result_ci_status,
+        "summary": run.result_summary,
+        "error_code": run.error_code,
+        "error_message": run.error_message,
+    }
+    return data
+
+
+def get_run_handoff(db: Session, run_id: str) -> dict[str, Any]:
+    """Structured handoff for ChatGPT/MCP — no manual prompt copy required."""
+    report = run_report_dict(db, run_id)
+    run = db.get(AgentDispatchRun, run_id)
+    assert run is not None
+    return {
+        "handoff_version": "twin-agent-dispatch-handoff/v1",
+        "run_id": run.id,
+        "task_name": run.task_name,
+        "status": run.status,
+        "repository_url": run.repository_url,
+        "base_branch": run.base_branch,
+        "result": {
+            "branch": run.result_branch,
+            "pr_url": run.result_pr_url,
+            "head_sha": run.result_head_sha,
+            "ci_status": run.result_ci_status,
+            "summary": run.result_summary,
+        },
+        "cursor": {
+            "api_version": run.cursor_api_version,
+            "agent_id": run.cursor_agent_id,
+            "run_id": run.cursor_run_id,
+            "status": run.cursor_status,
+            "agent_url": run.cursor_agent_url,
+        },
+        "errors": {
+            "code": run.error_code,
+            "message": run.error_message,
+        },
+        "report": report.get("report"),
+        "public_run": {k: v for k, v in report.items() if k != "report"},
+        "next_steps": [
+            "Review PR manually — Dispatcher never merges.",
+            "Retrieve this handoff via get_twin_agent_handoff / GET .../handoff.",
+            "Do not copy prompts from chat; use run_id only.",
+        ],
+    }
+
+
 def run_to_public_dict(run: AgentDispatchRun) -> dict[str, Any]:
     enrichment = None
     if run.github_enrichment_json:

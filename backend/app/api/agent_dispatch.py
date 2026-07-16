@@ -2,15 +2,18 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.config import Settings, get_settings
-from app.database.models import AgentDispatchRun
+from app.database.models import AgentDispatchRun, AgentDispatchLock
 from app.database.session import get_db
+from app.limiter import limiter
 from app.schemas.agent_dispatch import CreateDispatchRequest, ForceUnlockRequest
 from app.services.agent_dispatch.auth import (
     AgentDispatchPrincipal,
@@ -27,11 +30,22 @@ from app.services.agent_dispatch.constants import (
     CURSOR_API_CREDENTIAL_SECRET_NAME,
 )
 from app.services.agent_dispatch.cursor_client import CursorApiError, CursorCloudAgentsClient
+from app.services.agent_dispatch.mcp_protocol import (
+    MCP_PROTOCOL_VERSION,
+    MCP_SERVER_NAME,
+    MCP_SERVER_VERSION,
+    handle_jsonrpc,
+    mcp_server_info,
+    tool_definitions,
+)
 from app.services.agent_dispatch.service import (
     cancel_run,
     create_dispatch_run,
+    get_run_handoff,
     ingest_webhook,
+    list_dispatch_runs,
     reconcile_run,
+    run_report_dict,
     run_to_public_dict,
 )
 
@@ -42,21 +56,61 @@ def _as_response(run: AgentDispatchRun) -> dict[str, Any]:
     return run_to_public_dict(run)
 
 
+def _secret_fp(value: str) -> str | None:
+    raw = (value or "").strip()
+    if not raw:
+        return None
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:12]
+
+
 @router.get("/health")
-def dispatcher_health(settings: Annotated[Settings, Depends(get_settings)]) -> dict[str, Any]:
-    """Unauthenticated readiness — no secrets."""
+def dispatcher_health(
+    settings: Annotated[Settings, Depends(get_settings)],
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    """Unauthenticated readiness — fingerprints only, no secrets."""
+    auth_configured = bool(
+        (settings.agent_dispatch_token or "").strip()
+        or (settings.agent_dispatch_tokens or "").strip()
+    )
+    webhook_configured = bool((settings.agent_dispatch_webhook_secret or "").strip())
+    cursor_configured = bool((settings.cursor_cloud_agents_api_key or "").strip())
+    # Encryption uses app SECRET_KEY via token_crypto (canonical; no separate AD key).
+    encryption_configured = bool((settings.secret_key or "").strip()) and bool(
+        settings.agent_dispatch_encrypt_prompts
+    )
+    active_locks = 0
+    try:
+        active_locks = int(
+            db.execute(select(func.count()).select_from(AgentDispatchLock)).scalar() or 0
+        )
+    except Exception:
+        active_locks = -1
+    mcp_healthy = auth_configured  # hosted MCP requires Bearer; no anon
     return {
         "ok": True,
         "service": "twin-agent-dispatcher",
         "cursor_contract_version": CURSOR_CONTRACT_VERSION,
         "cursor_contract_doc_date": CURSOR_CONTRACT_DOC_DATE,
-        "auth_configured": bool(
-            (settings.agent_dispatch_token or "").strip()
-            or (settings.agent_dispatch_tokens or "").strip()
-        ),
-        "cursor_credential_configured": bool((settings.cursor_cloud_agents_api_key or "").strip()),
+        "auth_configured": auth_configured,
+        "auth_token_fingerprint": _secret_fp(settings.agent_dispatch_token)
+        or _secret_fp((settings.agent_dispatch_tokens or "").split(",")[0].split(":")[0]),
+        "cursor_credential_configured": cursor_configured,
         "cursor_credential_secret_name": CURSOR_API_CREDENTIAL_SECRET_NAME,
-        "webhook_configured": bool((settings.agent_dispatch_webhook_secret or "").strip()),
+        "webhook_configured": webhook_configured,
+        "webhook_secret_fingerprint": _secret_fp(settings.agent_dispatch_webhook_secret),
+        "encryption_configured": encryption_configured,
+        "encryption_via": "SECRET_KEY+token_crypto",
+        "mcp_hosted": True,
+        "mcp_healthy": mcp_healthy,
+        "mcp_protocol_version": MCP_PROTOCOL_VERSION,
+        "mcp_server": {"name": MCP_SERVER_NAME, "version": MCP_SERVER_VERSION},
+        "mcp_tools": [t["name"] for t in tool_definitions()],
+        "active_lock_count": active_locks,
+        "repo_allowlist_configured": bool((settings.agent_dispatch_repo_allowlist or "").strip()),
+        "base_branch_allowlist_configured": bool(
+            (settings.agent_dispatch_base_branch_allowlist or "").strip()
+        ),
     }
 
 
@@ -78,6 +132,11 @@ def dispatcher_contract(
         "auth": "Basic (API key as username) or Bearer",
         "v1_webhooks": "coming soon — dispatcher uses v0 webhook launch when webhook URL set",
         "mcp_ready": True,
+        "mcp_hosted": True,
+        "mcp_endpoint": "/api/internal/agent-dispatch/mcp",
+        "mcp_protocol_version": MCP_PROTOCOL_VERSION,
+        "mcp_server": mcp_server_info(),
+        "mcp_tools": [t["name"] for t in tool_definitions()],
         "scopes": sorted(principal.scopes),
     }
 
@@ -150,6 +209,18 @@ def reconcile_dispatch_run(
     return _as_response(run)
 
 
+@router.get("/runs")
+def list_runs(
+    db: Session = Depends(get_db),
+    principal: AgentDispatchPrincipal = Depends(get_agent_dispatch_principal),
+    limit: int = 20,
+    status: str | None = None,
+) -> dict[str, Any]:
+    require_scope(principal, AGENT_DISPATCH_SCOPE_READ)
+    rows = list_dispatch_runs(db, limit=limit, status=status)
+    return {"runs": [_as_response(r) for r in rows], "count": len(rows)}
+
+
 @router.get("/runs/{run_id}/report")
 def run_report(
     run_id: str,
@@ -157,21 +228,56 @@ def run_report(
     principal: AgentDispatchPrincipal = Depends(get_agent_dispatch_principal),
 ) -> dict[str, Any]:
     require_scope(principal, AGENT_DISPATCH_SCOPE_READ)
-    run = db.get(AgentDispatchRun, run_id)
-    if not run:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="run not found")
-    data = _as_response(run)
-    data["report"] = {
-        "status": run.status,
-        "branch": run.result_branch,
-        "pr_url": run.result_pr_url,
-        "head_sha": run.result_head_sha,
-        "ci_status": run.result_ci_status,
-        "summary": run.result_summary,
-        "error_code": run.error_code,
-        "error_message": run.error_message,
+    return run_report_dict(db, run_id)
+
+
+@router.get("/runs/{run_id}/handoff")
+def run_handoff(
+    run_id: str,
+    db: Session = Depends(get_db),
+    principal: AgentDispatchPrincipal = Depends(get_agent_dispatch_principal),
+) -> dict[str, Any]:
+    require_scope(principal, AGENT_DISPATCH_SCOPE_READ)
+    return get_run_handoff(db, run_id)
+
+
+@router.get("/mcp/manifest")
+def mcp_manifest(
+    principal: AgentDispatchPrincipal = Depends(get_agent_dispatch_principal),
+) -> dict[str, Any]:
+    """Authenticated tool catalog + version metadata (no anon)."""
+    require_scope(principal, AGENT_DISPATCH_SCOPE_READ)
+    return {
+        "server": mcp_server_info(),
+        "tools": tool_definitions(),
+        "auth": "Authorization: Bearer <AGENT_DISPATCH_TOKEN>",
+        "transport": "streamable-http-jsonrpc",
+        "endpoint": "/api/internal/agent-dispatch/mcp",
     }
-    return data
+
+
+@router.post("/mcp")
+@limiter.limit("60/minute")
+async def mcp_jsonrpc(
+    request: Request,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header()] = None,
+) -> dict[str, Any]:
+    """Hosted MCP JSON-RPC (HTTPS). Bearer required; secrets never in query."""
+    if request.url.query:
+        # Reject credential-bearing query strings if present.
+        q = (request.url.query or "").lower()
+        if "token" in q or "secret" in q or "key" in q or "authorization" in q:
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="secrets must not be in query")
+    principal = get_agent_dispatch_principal(authorization)
+    try:
+        body = await request.json()
+    except Exception as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="invalid JSON") from exc
+    if not isinstance(body, dict):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="JSON-RPC body must be object")
+    return handle_jsonrpc(body, db=db, settings=settings, principal=principal)
 
 
 @router.post("/admin/force-unlock")
@@ -207,10 +313,12 @@ def live_canary(
         return {
             "status": "BLOCKED",
             "reason": (
-                f"add Cursor Cloud Agents service-account API credential to production "
-                f"secret store under documented name"
+                "Create one Cursor Cloud Agents service-account credential "
+                "authorized for CzechowskiT/twin and store it in the existing "
+                "Railway production secret store as CURSOR_CLOUD_AGENTS_API_KEY."
             ),
             "secret_name": CURSOR_API_CREDENTIAL_SECRET_NAME,
+            "founder_action_required": True,
         }
     try:
         info = CursorCloudAgentsClient(settings).api_key_info()

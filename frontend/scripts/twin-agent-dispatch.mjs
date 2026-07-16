@@ -10,6 +10,10 @@
  *   node scripts/twin-agent-dispatch.mjs wait <runId>
  *   node scripts/twin-agent-dispatch.mjs cancel <runId>
  *   node scripts/twin-agent-dispatch.mjs report <runId>
+ *   node scripts/twin-agent-dispatch.mjs handoff <runId>
+ *   node scripts/twin-agent-dispatch.mjs list
+ *   node scripts/twin-agent-dispatch.mjs mcp-list-tools
+ *   node scripts/twin-agent-dispatch.mjs mcp-call <tool> --args-file ./args.json
  *   node scripts/twin-agent-dispatch.mjs canary
  */
 import fs from "node:fs";
@@ -161,6 +165,49 @@ async function cmdReport(runId) {
   console.log(JSON.stringify(data, null, 2));
 }
 
+async function cmdHandoff(runId) {
+  if (!runId) die("usage: handoff <runId>");
+  const data = await api("GET", `/api/internal/agent-dispatch/runs/${runId}/handoff`);
+  console.log(JSON.stringify(data, null, 2));
+}
+
+async function cmdList() {
+  const limit = argValue("--limit") || "20";
+  const status = argValue("--status");
+  const q = new URLSearchParams({ limit });
+  if (status) q.set("status", status);
+  const data = await api("GET", `/api/internal/agent-dispatch/runs?${q}`);
+  console.log(JSON.stringify(data, null, 2));
+}
+
+async function mcpRpc(method, params) {
+  return api("POST", "/api/internal/agent-dispatch/mcp", {
+    jsonrpc: "2.0",
+    id: 1,
+    method,
+    params: params || {},
+  });
+}
+
+async function cmdMcpListTools() {
+  const data = await mcpRpc("tools/list", {});
+  console.log(JSON.stringify(data, null, 2));
+}
+
+async function cmdMcpCall(toolName) {
+  if (!toolName) die("usage: mcp-call <tool> [--args-file path | --args json]");
+  let arguments_ = {};
+  const argsFile = argValue("--args-file");
+  const argsInline = argValue("--args");
+  if (argsFile) {
+    arguments_ = JSON.parse(fs.readFileSync(path.resolve(argsFile), "utf8"));
+  } else if (argsInline) {
+    arguments_ = JSON.parse(argsInline);
+  }
+  const data = await mcpRpc("tools/call", { name: toolName, arguments: arguments_ });
+  console.log(JSON.stringify(data, null, 2));
+}
+
 async function cmdCanary() {
   const data = await api("GET", "/api/internal/agent-dispatch/canary");
   console.log(JSON.stringify(data, null, 2));
@@ -182,6 +229,14 @@ async function main() {
       return cmdCancel(runId);
     case "report":
       return cmdReport(runId);
+    case "handoff":
+      return cmdHandoff(runId);
+    case "list":
+      return cmdList();
+    case "mcp-list-tools":
+      return cmdMcpListTools();
+    case "mcp-call":
+      return cmdMcpCall(runId);
     case "canary":
       return cmdCanary();
     case "health": {
@@ -191,7 +246,7 @@ async function main() {
     }
     default:
       die(
-        "commands: dispatch | status | wait | cancel | report | canary | health",
+        "commands: dispatch | status | wait | cancel | report | handoff | list | mcp-list-tools | mcp-call | canary | health",
       );
   }
 }

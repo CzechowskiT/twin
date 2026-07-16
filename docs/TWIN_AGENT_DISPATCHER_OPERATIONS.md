@@ -11,8 +11,12 @@ Base: `/api/internal/agent-dispatch`
 | POST | `/runs` | `agent_runs:create` | Create dispatch run |
 | GET | `/runs/{id}` | `agent_runs:read` | Status (`?refresh=true` polls Cursor) |
 | POST | `/runs/{id}/reconcile` | `agent_runs:read` | Force poll + enrich |
+| GET | `/runs` | `agent_runs:read` | List recent runs |
 | GET | `/runs/{id}/report` | `agent_runs:read` | Final report slice |
+| GET | `/runs/{id}/handoff` | `agent_runs:read` | ChatGPT/MCP handoff package |
 | POST | `/runs/{id}/cancel` | `agent_runs:cancel` | Cancel + release lock |
+| POST | `/mcp` | Bearer + scopes | Hosted MCP JSON-RPC |
+| GET | `/mcp/manifest` | `agent_runs:read` | Tool schemas + version |
 | POST | `/webhooks/cursor` | HMAC | Cursor statusChange |
 | GET | `/canary` | `agent_runs:admin` | Read-only `/me` probe |
 | POST | `/admin/force-unlock` | — | **403** (`no_admin_override`) |
@@ -51,7 +55,11 @@ Optional: `--create-pr` to ask Cursor to open a PR (manual merge still required)
 
 If `CURSOR_CLOUD_AGENTS_API_KEY` is missing, canary returns **BLOCKED** with the exact founder instruction:
 
-> add Cursor Cloud Agents service-account API credential to production secret store under documented name
+> Create one Cursor Cloud Agents service-account credential authorized for CzechowskiT/twin and store it in the existing Railway production secret store as CURSOR_CLOUD_AGENTS_API_KEY.
+
+Prompt encryption uses existing `SECRET_KEY` via `token_crypto` (no separate `AGENT_DISPATCH_ENCRYPTION_KEY`).
+
+ChatGPT setup: [TWIN_AGENT_DISPATCHER_CHATGPT_SETUP.md](./TWIN_AGENT_DISPATCHER_CHATGPT_SETUP.md)
 
 ## Celery
 
