@@ -28,7 +28,7 @@ export function CalendarScene() {
     >
       <div style={{ display: "flex", gap: 20 }}>
         <div style={{ flex: 1, position: "relative" }}>
-          <div style={{ fontSize: 15, fontWeight: 700, color: FILM.text, marginBottom: 12 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: FILM.cyan, marginBottom: 12 }}>
             Finding common slot
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8 }}>
@@ -37,13 +37,14 @@ export function CalendarScene() {
               const allOverlap = isWed && highlightWed;
               return (
                 <div key={day} style={{ textAlign: "center" }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: FILM.text, marginBottom: 6 }}>{day}</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: FILM.textLight, marginBottom: 6 }}>{day}</div>
                   <div
                     style={{
                       height: 120,
-                      borderRadius: 8,
-                      background: allOverlap ? "#ecfdf5" : "#fff",
-                      border: `2px solid ${allOverlap ? FILM.accent : FILM.border}`,
+                      borderRadius: 10,
+                      background: allOverlap ? `${FILM.neon}14` : "rgba(15,23,42,0.7)",
+                      border: `1px solid ${allOverlap ? FILM.neon : FILM.cyanBorder}`,
+                      boxShadow: allOverlap ? `0 0 20px ${FILM.neon}33` : "none",
                       position: "relative",
                       overflow: "hidden",
                     }}
@@ -67,10 +68,11 @@ export function CalendarScene() {
                             transform: `translateX(${interpolate(overlayProgress, [0, 1], [20, 0])}px)`,
                             fontSize: 9,
                             fontWeight: 700,
-                            color: "#fff",
+                            color: FILM.textLight,
                             display: "flex",
                             alignItems: "center",
                             paddingLeft: 6,
+                            boxShadow: hasSlot ? `0 0 8px ${cal.color}66` : "none",
                           }}
                         >
                           {hasSlot ? cal.label : ""}
@@ -86,7 +88,7 @@ export function CalendarScene() {
                           transform: `translateX(-50%) scale(${spring({ frame: frame - 60, fps, config: { damping: 10 } })})`,
                         }}
                       >
-                        <PulseBadge color={FILM.accent}>Wed 14:00</PulseBadge>
+                        <PulseBadge color={FILM.neon}>Wed 14:00</PulseBadge>
                       </div>
                     ) : null}
                   </div>
@@ -101,25 +103,25 @@ export function CalendarScene() {
               width: 300,
               padding: 16,
               borderRadius: 12,
-              background: "#fff",
-              border: `3px solid ${confirmed ? FILM.accent : FILM.border}`,
-              boxShadow: confirmed ? `0 12px 40px ${FILM.accent}44` : "0 4px 16px rgba(0,0,0,0.08)",
+              background: FILM.bgPanelDark,
+              border: `1px solid ${confirmed ? FILM.neon : FILM.cyanBorder}`,
+              boxShadow: confirmed ? `0 0 32px ${FILM.neon}44` : `0 0 16px ${FILM.cyan}14`,
               position: "relative",
             }}
           >
-            <div style={{ fontSize: 11, fontWeight: 700, color: confirmed ? FILM.accent : FILM.muted, textTransform: "uppercase" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: confirmed ? FILM.neon : FILM.mutedLight, textTransform: "uppercase", letterSpacing: "0.12em" }}>
               {confirmed ? "Confirmed" : "Proposed hold"}
             </div>
-            <div style={{ fontSize: 16, fontWeight: 700, color: FILM.text, marginTop: 8 }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: FILM.textLight, marginTop: 8 }}>
               Interview — NovaTech
             </div>
-            <div style={{ fontSize: 12, color: FILM.muted, marginTop: 4 }}>Wed 14:00 · 45 min · Anna K.</div>
+            <div style={{ fontSize: 12, color: FILM.mutedLight, marginTop: 4 }}>Wed 14:00 · 45 min · Anna K.</div>
             {confirmed ? (
               <>
-                <div style={{ marginTop: 10, fontSize: 11, color: FILM.accentDark, fontWeight: 600 }}>
+                <div style={{ marginTop: 10, fontSize: 11, color: FILM.neon, fontWeight: 600 }}>
                   ✓ Added to Google Calendar
                 </div>
-                <div style={{ marginTop: 6, fontSize: 11, color: FILM.blue, fontWeight: 600 }}>
+                <div style={{ marginTop: 6, fontSize: 11, color: FILM.cyan, fontWeight: 600 }}>
                   ✓ ICS exported · Meet link attached
                 </div>
               </>

@@ -1,115 +1,143 @@
 import React from "react";
 import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 
-import { PulseBadge } from "../components/MotionPrimitives";
+import { sceneEnterOpacity, glassPanel, neonButton, sectionLabel } from "../components/DarkCockpit";
+import { PulseBadge, SuccessFlash } from "../components/MotionPrimitives";
 import { FILM } from "../theme";
 
 type BrandCtaSceneProps = {
   ctaText: string;
 };
 
-const ROLES = [
-  { label: "Candidate", color: FILM.blue, icon: "👤", detail: "94% match · Interested" },
-  { label: "Recruiter", color: FILM.purple, icon: "📋", detail: "Invited · Review done" },
-  { label: "Company", color: FILM.amber, icon: "🏢", detail: "Slot approved" },
-];
-
+/** Finale — dense dark product culmination (calendar of acceptance), not a marketing slide. */
 export function BrandCtaScene({ ctaText }: BrandCtaSceneProps) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const glow = interpolate(frame, [0, 30, 60, 90], [0.5, 1, 0.8, 1], { extrapolateRight: "extend" });
-  const btnScale = spring({ frame: frame - 40, fps, config: { damping: 12, stiffness: 100 } });
+  const enter = spring({ frame, fps, config: { damping: 16, stiffness: 90 } });
+  const confirmed = frame >= 35;
+  const neonPulse = interpolate(frame % 40, [0, 20, 40], [0.4, 0.75, 0.4]);
 
   return (
     <div
       style={{
         width: 1760,
         height: 920,
-        borderRadius: 14,
-        background: `linear-gradient(145deg, ${FILM.bgDark} 0%, ${FILM.bgMid} 60%, #0c1222 100%)`,
-        border: `2px solid ${FILM.accent}44`,
+        borderRadius: 16,
+        padding: 18,
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
+        gap: 12,
         fontFamily: FILM.font,
-        position: "relative",
-        overflow: "hidden",
+        color: FILM.textLight,
+        background: `linear-gradient(165deg, ${FILM.bgDark} 0%, #0c1222 55%, #080e1c 100%)`,
+        border: `1px solid ${FILM.cyanBorder}`,
+        boxShadow: `0 0 0 1px ${FILM.cyan}22 inset, 0 24px 80px rgba(0,0,0,0.55), 0 0 48px ${FILM.neon}14`,
+        opacity: sceneEnterOpacity(enter),
+        transform: `scale(${interpolate(enter, [0, 1], [0.985, 1])})`,
       }}
     >
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: `radial-gradient(ellipse 60% 40% at 50% 30%, ${FILM.accent}18, transparent)`,
-        }}
-      />
-      <div style={{ display: "flex", gap: 24, marginBottom: 36, zIndex: 1 }}>
-        {ROLES.map((role, i) => {
-          const enter = spring({ frame: frame - i * 8, fps, config: { damping: 14 } });
-          const float = Math.sin((frame + i * 20) / 20) * 4;
-          return (
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1.4fr 1fr", gap: 12, flex: 1, minHeight: 0 }}>
+        <aside style={{ ...glassPanel, padding: 14, display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={sectionLabel}>Roles aligned</div>
+          {[
+            { role: "Candidate", detail: "Interested · 94%", color: FILM.blue },
+            { role: "Recruiter", detail: "Invite sent", color: FILM.purple },
+            { role: "Company", detail: "Slot approved", color: FILM.amber },
+          ].map((row, i) => (
             <div
-              key={role.label}
+              key={row.role}
               style={{
-                width: 280,
-                padding: 20,
-                borderRadius: 14,
-                background: "#1e293b",
-                border: `2px solid ${role.color}`,
-                textAlign: "center",
-                opacity: enter,
-                transform: `translateY(${float}px) scale(${interpolate(enter, [0, 1], [0.9, 1])})`,
-                boxShadow: `0 8px 32px ${role.color}33`,
+                padding: "12px 12px",
+                borderRadius: 10,
+                border: `1px solid ${row.color}66`,
+                background: "rgba(15,23,42,0.7)",
+                opacity: interpolate(frame, [i * 6, i * 6 + 14], [0.4, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
               }}
             >
-              <div style={{ fontSize: 32 }}>{role.icon}</div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: FILM.textLight, marginTop: 8 }}>{role.label}</div>
-              <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 6 }}>{role.detail}</div>
-              <div style={{ marginTop: 10 }}>
-                <PulseBadge color={role.color}>Connected</PulseBadge>
-              </div>
+              <div style={{ fontWeight: 700, fontSize: 14 }}>{row.role}</div>
+              <div style={{ fontSize: 12, color: row.color, marginTop: 4, fontWeight: 600 }}>{row.detail}</div>
             </div>
-          );
-        })}
+          ))}
+        </aside>
+
+        <main style={{ ...glassPanel, padding: 16, boxShadow: `0 0 28px ${FILM.neon}18`, position: "relative" }}>
+          <div style={sectionLabel}>Calendar of acceptance</div>
+          <div style={{ fontSize: 28, fontWeight: 800, marginTop: 6 }}>Interview hold confirmed</div>
+          <div style={{ fontSize: 14, color: FILM.mutedLight, marginTop: 4 }}>
+            NovaTech · Senior Backend · Anna K.
+          </div>
+          <div
+            style={{
+              marginTop: 16,
+              padding: 16,
+              borderRadius: 12,
+              border: `1px solid ${confirmed ? FILM.neon : FILM.cyanBorder}`,
+              background: confirmed ? `${FILM.neon}14` : "rgba(15,23,42,0.55)",
+              boxShadow: confirmed ? `0 0 24px ${FILM.neon}33` : "none",
+            }}
+          >
+            <div style={{ fontSize: 12, color: FILM.cyan, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>
+              {confirmed ? "Confirmed slot" : "Proposed hold"}
+            </div>
+            <div style={{ fontSize: 36, fontWeight: 800, color: FILM.neon, marginTop: 6 }}>Wed 14:00</div>
+            <div style={{ fontSize: 13, color: FILM.mutedLight, marginTop: 4 }}>45 min · Google Meet · ICS synced</div>
+            <div style={{ display: "flex", gap: 8, marginTop: 14, flexWrap: "wrap" }}>
+              <PulseBadge color={FILM.neon}>Candidate ✓</PulseBadge>
+              <PulseBadge color={FILM.cyan}>Recruiter ✓</PulseBadge>
+              <PulseBadge color={FILM.amber}>Company ✓</PulseBadge>
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 10, marginTop: 18, alignItems: "center" }}>
+            <div
+              style={{
+                ...neonButton,
+                boxShadow: `0 0 ${16 + neonPulse * 12}px ${FILM.neon}88`,
+                transform: `scale(${Math.max(0.92, spring({ frame: frame - 40, fps, config: { damping: 12 } }))})`,
+              }}
+            >
+              {ctaText}
+            </div>
+          </div>
+          <SuccessFlash startFrame={35} />
+        </main>
+
+        <aside style={{ ...glassPanel, padding: 14, display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={sectionLabel}>Noise removed</div>
+          {[
+            { before: "2,847 unread", after: "1 ranked signal" },
+            { before: "Blind CV pile", after: "Pre-qualified profile" },
+            { before: "Spam interviews", after: "Calendar hold" },
+          ].map((row) => (
+            <div key={row.before} style={{ padding: "10px 0", borderBottom: `1px solid ${FILM.cyanBorder}` }}>
+              <div style={{ fontSize: 11, color: FILM.mutedLight, textDecoration: "line-through" }}>{row.before}</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: FILM.neon, marginTop: 4 }}>{row.after}</div>
+            </div>
+          ))}
+          <div style={{ marginTop: "auto", fontSize: 22, fontWeight: 900, color: FILM.neon, letterSpacing: "-0.02em" }}>
+            TWIN
+          </div>
+          <div style={{ fontSize: 12, color: FILM.mutedLight }}>Acceptance-ready moments only</div>
+        </aside>
       </div>
-      <svg width="600" height="40" style={{ position: "absolute", top: "42%", zIndex: 0 }}>
-        <line x1="100" y1="20" x2="500" y2="20" stroke={FILM.accent} strokeWidth="2" opacity={0.5} strokeDasharray="8 4">
-          <animate attributeName="stroke-dashoffset" from="0" to="-24" dur="1s" repeatCount="indefinite" />
-        </line>
-      </svg>
-      <div
+
+      <footer
         style={{
-          fontSize: 72,
-          fontWeight: 900,
-          color: FILM.accent,
-          letterSpacing: "-0.03em",
-          textShadow: `0 0 ${50 * glow}px ${FILM.accent}`,
-          zIndex: 1,
+          display: "flex",
+          gap: 28,
+          padding: "10px 16px",
+          borderRadius: 10,
+          border: `1px solid ${FILM.cyanBorder}`,
+          background: "rgba(15,23,42,0.9)",
+          fontSize: 12,
         }}
       >
-        TWIN
-      </div>
-      <div style={{ fontSize: 16, color: "#94a3b8", marginTop: 8, zIndex: 1 }}>
-        The right talent · The right role · The right moment
-      </div>
-      <div
-        style={{
-          marginTop: 28,
-          display: "inline-block",
-          padding: "16px 40px",
-          borderRadius: 12,
-          background: FILM.accent,
-          color: "#fff",
-          fontSize: 18,
-          fontWeight: 700,
-          transform: `scale(${Math.max(0.8, btnScale)})`,
-          boxShadow: `0 8px 32px ${FILM.accent}66`,
-          zIndex: 1,
-        }}
-      >
-        {ctaText}
-      </div>
+        {["Match", "Review", "Invite", "Align", "Accept"].map((s, i) => (
+          <div key={s} style={{ display: "flex", alignItems: "center", gap: 8, color: i === 4 ? FILM.neon : FILM.mutedLight, fontWeight: i === 4 ? 700 : 500 }}>
+            <span style={{ width: 8, height: 8, borderRadius: "50%", background: "currentColor", boxShadow: i === 4 ? `0 0 10px ${FILM.neon}` : "none" }} />
+            {s}
+          </div>
+        ))}
+      </footer>
     </div>
   );
 }

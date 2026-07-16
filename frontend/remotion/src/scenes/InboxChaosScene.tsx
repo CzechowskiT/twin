@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, Easing, interpolate, useCurrentFrame } from "remotion";
+import { interpolate, useCurrentFrame } from "remotion";
 
 import {
   AnimatedCounter,
@@ -47,18 +47,20 @@ export function InboxChaosScene() {
     >
       <div style={{ position: "relative", transform: `translateY(${scrollY}px)` }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-          <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: FILM.text }}>
+          <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: FILM.textLight }}>
             Inbox — <AnimatedCounter from={847} to={2847} startFrame={0} durationFrames={90} /> unread
           </h2>
           <span
             style={{
               padding: "5px 14px",
               borderRadius: 20,
-              background: "#fef2f2",
+              background: `${FILM.red}22`,
+              border: `1px solid ${FILM.red}66`,
               color: FILM.red,
               fontSize: 12,
               fontWeight: 700,
               transform: `scale(${1 + Math.sin(frame / 6) * 0.08})`,
+              boxShadow: `0 0 12px ${FILM.red}44`,
             }}
           >
             +{Math.round(interpolate(frame, [0, 90], [12, 47], { extrapolateRight: "clamp" }))}/min
@@ -76,9 +78,9 @@ export function InboxChaosScene() {
                     gap: 12,
                     padding: "12px 14px",
                     borderRadius: 9,
-                    background: row.unread ? "#fff" : "#e2e8f0",
-                    border: `1px solid ${row.unread ? FILM.red : FILM.border}`,
-                    boxShadow: row.unread ? "0 2px 8px rgba(239,68,68,0.12)" : "none",
+                    background: row.unread ? "rgba(15,23,42,0.75)" : "rgba(15,23,42,0.45)",
+                    border: `1px solid ${row.unread ? `${FILM.red}66` : FILM.cyanBorder}`,
+                    boxShadow: row.unread ? `0 0 12px ${FILM.red}22` : "none",
                     transform: `translateX(${wobble}px)`,
                   }}
                 >
@@ -90,18 +92,19 @@ export function InboxChaosScene() {
                         borderRadius: "50%",
                         background: FILM.red,
                         opacity: interpolate(frame % 20, [0, 10, 20], [0.5, 1, 0.5]),
+                        boxShadow: `0 0 8px ${FILM.red}`,
                       }}
                     />
                   ) : (
                     <div style={{ width: 9 }} />
                   )}
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: row.unread ? 700 : 400, color: FILM.text }}>
+                    <div style={{ fontSize: 13, fontWeight: row.unread ? 700 : 400, color: FILM.textLight }}>
                       {row.from}
                     </div>
-                    <div style={{ fontSize: 12, color: FILM.muted }}>{row.subject}</div>
+                    <div style={{ fontSize: 12, color: FILM.mutedLight }}>{row.subject}</div>
                   </div>
-                  <span style={{ fontSize: 11, color: FILM.muted }}>now</span>
+                  <span style={{ fontSize: 11, color: FILM.mutedLight }}>now</span>
                 </div>
               </FlyInItem>
             );
@@ -122,7 +125,7 @@ export function InboxChaosScene() {
                 width: 48,
                 height: 60,
                 borderRadius: 4,
-                background: "#fff",
+                background: "rgba(15,23,42,0.9)",
                 border: `2px solid ${FILM.red}`,
                 transform: `rotate(${cv.rot + drift * 6}deg) translateY(${-drift * 20}px)`,
                 opacity: drift,
@@ -132,7 +135,7 @@ export function InboxChaosScene() {
                 fontSize: 10,
                 fontWeight: 700,
                 color: FILM.red,
-                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                boxShadow: `0 0 14px ${FILM.red}55`,
               }}
             >
               CV

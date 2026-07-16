@@ -6,6 +6,7 @@ import {
   SuccessFlash,
   useCursorPath,
 } from "../components/MotionPrimitives";
+import { sceneEnterOpacity } from "../components/DarkCockpit";
 import { FILM } from "../theme";
 
 const QUEUE = [
@@ -57,8 +58,8 @@ export function RecruiterInboxScene() {
         background: `linear-gradient(165deg, ${FILM.bgDark} 0%, #0c1222 55%, #080e1c 100%)`,
         border: `1px solid ${FILM.cyanBorder}`,
         boxShadow: `0 0 0 1px ${FILM.cyan}22 inset, 0 24px 80px rgba(0,0,0,0.55), 0 0 48px ${FILM.neon}14`,
-        opacity: enter,
-        transform: `scale(${interpolate(enter, [0, 1], [0.97, 1])})`,
+        opacity: sceneEnterOpacity(enter),
+        transform: `scale(${interpolate(enter, [0, 1], [0.985, 1])})`,
       }}
     >
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1.7fr 1fr", gap: 12, flex: 1, minHeight: 0 }}>

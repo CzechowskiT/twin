@@ -157,13 +157,17 @@ async function analyzeFrame(pngPath: string, timeSec: number): Promise<FrameMetr
     .map(([c]) => c);
 
   const lumRange = lumMax - lumMin;
-  const centerIsEmpty =
-    centerLumAvg < MAX_CENTER_DARK_LUM && centerEntropy < MIN_CENTER_ENTROPY;
+  // Dark navy cockpits are intentionally low-luminance; do not treat dense dark
+  // glass panels as "empty". Fail only true voids (caption-only) or light shells.
+  const isLightShell = whitePct > 18 && centerLumAvg > 0.45;
+  const isDarkVoid =
+    centerEmptyPct > 78 && centerEntropy < 1.15 && entropy < 3.2 && whitePct < 2;
   const isBlank =
+    isLightShell ||
+    isDarkVoid ||
     (entropy < MIN_ENTROPY && lumRange < MIN_LUMINANCE_RANGE) ||
     (uniformPct > MAX_UNIFORM_PCT && entropy < 3.0) ||
-    (whitePct > MAX_WHITE_PCT && entropy < 3.2) ||
-    centerIsEmpty;
+    (whitePct > MAX_WHITE_PCT && entropy < 3.2);
 
   return {
     timeSec,

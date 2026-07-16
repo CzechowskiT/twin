@@ -148,3 +148,54 @@ test("11 dark mockup density markers — neon CTA, metrics, career compass", () 
   assert.match(remotionRecruiter, /FILM\.neon/);
   assert.match(remotionRecruiter, /Invite to interview/);
 });
+
+test("12 full-film dark glass — ProductShell + all Remotion scenes reject light panels", () => {
+  const theme = read("remotion/src/theme.ts");
+  assert.match(theme, /bgSoft:\s*"#0c1222"/);
+  assert.match(theme, /bgPanel:\s*"#111827"/);
+  assert.doesNotMatch(theme, /bgPanel:\s*"#ffffff"/);
+  assert.doesNotMatch(theme, /bgSoft:\s*"#f1f5f9"/);
+
+  const shell = read("remotion/src/components/ProductShell.tsx");
+  assert.match(shell, /dark-glass browser chrome/);
+  assert.match(shell, /FILM\.cyanBorder/);
+  assert.doesNotMatch(shell, /background:\s*FILM\.bgSoft/);
+  assert.doesNotMatch(shell, /background:\s*"#f1f5f9"/);
+
+  const darkPrim = read("remotion/src/components/DarkCockpit.ts");
+  assert.match(darkPrim, /sceneEnterOpacity/);
+  assert.match(darkPrim, /glassPanel/);
+
+  const scenes = [
+    "CandidateProfileScene.tsx",
+    "CompanyCockpitScene.tsx",
+    "CalendarScene.tsx",
+    "InboxChaosScene.tsx",
+    "TalentMemoryScene.tsx",
+    "BrandCtaScene.tsx",
+    "RecruiterInboxScene.tsx",
+  ];
+  for (const name of scenes) {
+    const src = read(`remotion/src/scenes/${name}`);
+    assert.doesNotMatch(src, /background:\s*"#fff"/);
+    assert.doesNotMatch(src, /background:\s*"#ffffff"/);
+    assert.doesNotMatch(src, /background:\s*"#e2e8f0"/);
+    assert.doesNotMatch(src, /background:\s*"#ecfdf5"/);
+    assert.match(src, /FILM\.(neon|cyan|bgPanelDark|bgDark)/);
+  }
+
+  const finale = read("remotion/src/scenes/BrandCtaScene.tsx");
+  assert.match(finale, /Calendar of acceptance/);
+  assert.doesNotMatch(finale, /👤|📋|🏢/);
+});
+
+test("13 sales demo hero title stays high-contrast on dark shell", () => {
+  const css = read("src/app/globals.css");
+  const salesBlock = css.slice(css.indexOf(".sales-demo {"), css.indexOf(".sales-demo-hero__ctas"));
+  assert.match(salesBlock, /--sales-fg:\s*#f8fafc/);
+  assert.match(salesBlock, /--sales-muted:\s*#94a3b8/);
+  assert.doesNotMatch(salesBlock, /--sales-fg:\s*rgb\(15 23 42\)/);
+  assert.match(salesBlock, /\.sales-demo-hero__title/);
+  assert.match(salesBlock, /color:\s*var\(--sales-fg\)/);
+  assert.match(salesBlock, /--sales-accent:\s*rgb\(52 211 153\)/);
+});

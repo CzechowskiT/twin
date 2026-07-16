@@ -12,7 +12,7 @@ type ProductShellProps = {
   highlightItem?: number;
 };
 
-/** Full-frame browser chrome — product dominates ≥75% of frame. */
+/** Full-frame dark-glass browser chrome — product dominates ≥75% of frame. */
 export function ProductShell({
   title,
   sidebarLabel,
@@ -29,19 +29,22 @@ export function ProductShell({
       style={{
         width: 1760,
         height: 920,
-        borderRadius: 14,
+        borderRadius: 16,
         overflow: "hidden",
-        boxShadow: "0 32px 100px rgba(0,0,0,0.55)",
-        border: `2px solid ${FILM.border}`,
+        boxShadow: `0 0 0 1px ${FILM.cyan}22 inset, 0 24px 80px rgba(0,0,0,0.55), 0 0 48px ${FILM.neon}14`,
+        border: `1px solid ${FILM.cyanBorder}`,
         display: "flex",
         flexDirection: "column",
         fontFamily: FILM.font,
+        background: `linear-gradient(165deg, ${FILM.bgDark} 0%, #0c1222 55%, #080e1c 100%)`,
+        color: FILM.textLight,
       }}
     >
       <div
         style={{
           height: 40,
-          background: "#334155",
+          background: "rgba(15,23,42,0.95)",
+          borderBottom: `1px solid ${FILM.cyanBorder}`,
           display: "flex",
           alignItems: "center",
           padding: "0 14px",
@@ -57,23 +60,25 @@ export function ProductShell({
             margin: "0 20px",
             height: 26,
             borderRadius: 6,
-            background: "#475569",
+            background: "rgba(30,41,59,0.9)",
+            border: `1px solid ${FILM.cyanBorder}`,
             display: "flex",
             alignItems: "center",
             padding: "0 12px",
-            color: "#94a3b8",
+            color: FILM.mutedLight,
             fontSize: 12,
           }}
         >
           app.twin-society.com/{title}
         </div>
-        <div style={{ fontSize: 11, color: "#94a3b8", opacity: shimmer }}>● live</div>
+        <div style={{ fontSize: 11, color: FILM.cyan, opacity: shimmer }}>● live</div>
       </div>
       <div style={{ flex: 1, display: "flex", minHeight: 0 }}>
         <aside
           style={{
             width: 200,
-            background: "#1e293b",
+            background: "rgba(8,14,28,0.92)",
+            borderRight: `1px solid ${FILM.cyanBorder}`,
             padding: "16px 10px",
             display: "flex",
             flexDirection: "column",
@@ -86,7 +91,7 @@ export function ProductShell({
               fontWeight: 700,
               letterSpacing: "0.14em",
               textTransform: "uppercase",
-              color: FILM.accent,
+              color: FILM.cyan,
               padding: "0 10px 10px",
             }}
           >
@@ -103,9 +108,14 @@ export function ProductShell({
                   borderRadius: 7,
                   fontSize: 13,
                   fontWeight: isActive ? 600 : 400,
-                  color: isActive ? FILM.textLight : "#94a3b8",
-                  background: isActive ? "#334155" : isHighlight ? "#33415588" : "transparent",
-                  borderLeft: isHighlight ? `3px solid ${FILM.accent}` : "3px solid transparent",
+                  color: isActive || isHighlight ? FILM.textLight : FILM.mutedLight,
+                  background: isActive
+                    ? "rgba(56,189,248,0.14)"
+                    : isHighlight
+                      ? "rgba(56,189,248,0.08)"
+                      : "transparent",
+                  borderLeft: isActive || isHighlight ? `3px solid ${FILM.neon}` : "3px solid transparent",
+                  boxShadow: isActive ? `0 0 12px ${FILM.cyan}22` : "none",
                 }}
               >
                 {item}
@@ -116,7 +126,7 @@ export function ProductShell({
         <main
           style={{
             flex: 1,
-            background: FILM.bgSoft,
+            background: "transparent",
             padding: 20,
             overflow: "hidden",
             position: "relative",
