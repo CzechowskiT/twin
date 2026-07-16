@@ -4178,14 +4178,14 @@ html[data-marketing-surface="studio"] .demo-glass-panel {
   }
 }
 
-/* ── Sales demo — real video hero + role cards (light premium SaaS) ── */
+/* ── Sales demo — dark navy glass shell (matches product film / cockpit) ── */
 .sales-demo {
   --sales-accent: rgb(52 211 153);
-  --sales-surface: rgb(248 250 252);
-  --sales-elevated: #fff;
-  --sales-border: rgb(226 232 240);
-  --sales-fg: rgb(15 23 42);
-  --sales-muted: rgb(100 116 139);
+  --sales-surface: rgb(11 18 32);
+  --sales-elevated: rgb(17 24 39 / 0.92);
+  --sales-border: rgb(56 189 248 / 0.22);
+  --sales-fg: #f8fafc;
+  --sales-muted: #94a3b8;
 }
 
 .sales-demo-hero {
@@ -4209,6 +4209,7 @@ html[data-marketing-surface="studio"] .demo-glass-panel {
   line-height: 1.1;
   color: var(--sales-fg);
   letter-spacing: -0.02em;
+  text-shadow: 0 1px 24px rgb(15 23 42 / 0.55);
 }
 
 .sales-demo-hero__lead {

@@ -19,6 +19,13 @@ const ROLES = [
 
 const WHY_FIT = ["Python + FastAPI stack match", "Remote-first culture fit", "Salary band aligned", "Team size preference"];
 
+const glassCard: React.CSSProperties = {
+  background: FILM.bgPanelDark,
+  borderRadius: 12,
+  border: `1px solid ${FILM.cyanBorder}`,
+  boxShadow: `0 0 20px ${FILM.cyan}10`,
+};
+
 export function CandidateProfileScene() {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -29,7 +36,7 @@ export function CandidateProfileScene() {
   });
   const interested = frame >= 170;
   const statusText = interested ? "Interested ✓" : "New match";
-  const statusColor = interested ? FILM.accent : FILM.blue;
+  const neonPulse = interpolate(frame % 40, [0, 20, 40], [0.35, 0.7, 0.35]);
 
   const cursor = useCursorPath([
     { frame: 50, x: 300, y: 250 },
@@ -48,7 +55,7 @@ export function CandidateProfileScene() {
     >
       <div style={{ display: "flex", gap: 16, height: "100%" }}>
         <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 10 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: FILM.accentDark }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: FILM.cyan }}>
             Ranked matches
           </div>
           {ROLES.map((role, i) => {
@@ -58,21 +65,20 @@ export function CandidateProfileScene() {
               <FlyInItem key={role.title} delay={i * 12} fromX={-60} fromY={0}>
                 <div
                   style={{
-                    background: "#fff",
-                    borderRadius: 10,
+                    ...glassCard,
                     padding: 14,
-                    border: `2px solid ${isSelected ? FILM.accent : FILM.border}`,
+                    border: `1px solid ${isSelected ? FILM.neon : FILM.cyanBorder}`,
                     opacity: slideIn,
                     transform: `scale(${interpolate(slideIn, [0, 1], [0.95, 1])})`,
-                    boxShadow: isSelected ? `0 4px 20px ${FILM.accent}33` : "none",
+                    boxShadow: isSelected ? `0 0 24px ${FILM.neon}33` : glassCard.boxShadow,
                   }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
                     <div>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: FILM.text }}>{role.title}</div>
-                      <div style={{ fontSize: 12, color: FILM.muted }}>{role.company} · Warsaw</div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: FILM.textLight }}>{role.title}</div>
+                      <div style={{ fontSize: 12, color: FILM.mutedLight }}>{role.company} · Warsaw</div>
                     </div>
-                    <div style={{ fontSize: isSelected ? 22 : 16, fontWeight: 800, color: isSelected ? FILM.accent : FILM.muted }}>
+                    <div style={{ fontSize: isSelected ? 22 : 16, fontWeight: 800, color: isSelected ? FILM.neon : FILM.mutedLight }}>
                       {Math.round(i === 0 ? scoreAnim : role.score)}%
                     </div>
                   </div>
@@ -89,16 +95,15 @@ export function CandidateProfileScene() {
         <div style={{ width: 360, position: "relative" }}>
           <div
             style={{
-              background: "#fff",
-              borderRadius: 12,
+              ...glassCard,
               padding: 16,
-              border: `2px solid ${FILM.accent}`,
-              boxShadow: `0 8px 28px ${FILM.accent}22`,
+              border: `1px solid ${FILM.neon}66`,
+              boxShadow: `0 0 28px ${FILM.neon}22`,
               minHeight: 420,
             }}
           >
-            <div style={{ fontSize: 12, fontWeight: 700, color: statusColor }}>{statusText}</div>
-            <div style={{ fontSize: 17, fontWeight: 700, color: FILM.text, marginTop: 6 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: interested ? FILM.neon : FILM.cyan }}>{statusText}</div>
+            <div style={{ fontSize: 17, fontWeight: 700, color: FILM.textLight, marginTop: 6 }}>
               Why you fit
             </div>
             <div style={{ overflow: "hidden", height: Math.max(expandHeight, 8) }}>
@@ -111,11 +116,11 @@ export function CandidateProfileScene() {
                     gap: 8,
                     padding: "6px 0",
                     fontSize: 12,
-                    color: FILM.text,
+                    color: FILM.textLight,
                     opacity: frame > 95 + i * 8 ? 1 : 0,
                   }}
                 >
-                  <span style={{ color: FILM.accent, fontWeight: 700 }}>✓</span>
+                  <span style={{ color: FILM.neon, fontWeight: 700 }}>✓</span>
                   {reason}
                 </div>
               ))}
@@ -126,10 +131,10 @@ export function CandidateProfileScene() {
                   key={s}
                   style={{
                     padding: "4px 8px",
-                    borderRadius: 999,
-                    border: `1px solid ${FILM.accent}66`,
-                    background: `${FILM.accent}18`,
-                    color: FILM.accentDark,
+                    borderRadius: 6,
+                    border: `1px solid ${FILM.neon}66`,
+                    background: `${FILM.neon}18`,
+                    color: FILM.neon,
                     fontSize: 11,
                     fontWeight: 600,
                   }}
@@ -145,13 +150,17 @@ export function CandidateProfileScene() {
                 width: "100%",
                 padding: "12px 0",
                 borderRadius: 8,
-                background: interested ? "#ecfdf5" : FILM.accent,
-                color: interested ? FILM.accentDark : "#fff",
-                border: interested ? `2px solid ${FILM.accent}` : "none",
-                fontWeight: 700,
+                background: interested
+                  ? `${FILM.neon}22`
+                  : `linear-gradient(180deg, ${FILM.neon}, #16a34a)`,
+                color: interested ? FILM.neon : "#052e16",
+                border: `1px solid ${FILM.neon}`,
+                fontWeight: 800,
                 fontSize: 14,
                 transform: frame >= 165 && frame < 175 ? "scale(0.95)" : "scale(1)",
-                boxShadow: frame >= 165 && frame < 175 ? "none" : `0 4px 16px ${FILM.accent}44`,
+                boxShadow: interested
+                  ? `0 0 18px ${FILM.neon}66`
+                  : `0 0 ${18 + neonPulse * 14}px ${FILM.neon}88`,
               }}
             >
               {interested ? "Interested ✓" : "Interested"}

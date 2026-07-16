@@ -25,7 +25,7 @@ export function TalentMemoryScene() {
     >
       <div style={{ display: "flex", gap: 20, height: "100%" }}>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 16, fontWeight: 700, color: FILM.text, marginBottom: 12 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: FILM.cyan, marginBottom: 12 }}>
             Organizing scattered candidates → unified profile
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 16 }}>
@@ -42,14 +42,15 @@ export function TalentMemoryScene() {
                     width: 100,
                     height: 70,
                     borderRadius: 8,
-                    background: "#fff",
-                    border: `2px solid ${FILM.purple}`,
+                    background: "rgba(15,23,42,0.75)",
+                    border: `1px solid ${FILM.purple}88`,
+                    boxShadow: `0 0 12px ${FILM.purple}33`,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     fontSize: 11,
                     fontWeight: 600,
-                    color: FILM.muted,
+                    color: FILM.mutedLight,
                     transform: `translate(${x}px, ${y}px) scale(${scale})`,
                     opacity,
                   }}
@@ -62,11 +63,11 @@ export function TalentMemoryScene() {
           <FlyInItem delay={40} fromX={0} fromY={20}>
             <div
               style={{
-                background: "#fff",
+                background: FILM.bgPanelDark,
                 borderRadius: 12,
                 padding: 16,
-                border: `2px solid ${FILM.accent}`,
-                boxShadow: `0 8px 32px ${FILM.accent}33`,
+                border: `1px solid ${FILM.neon}66`,
+                boxShadow: `0 0 28px ${FILM.neon}28`,
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -75,8 +76,9 @@ export function TalentMemoryScene() {
                     width: 48,
                     height: 48,
                     borderRadius: "50%",
-                    background: FILM.purple,
-                    color: "#fff",
+                    background: "linear-gradient(145deg,#1e293b,#0f172a)",
+                    border: `1px solid ${FILM.cyan}66`,
+                    color: FILM.cyan,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -87,8 +89,8 @@ export function TalentMemoryScene() {
                   AK
                 </div>
                 <div>
-                  <div style={{ fontSize: 16, fontWeight: 700, color: FILM.text }}>Anna Kowalska</div>
-                  <div style={{ fontSize: 12, color: FILM.muted }}>Senior Backend Engineer</div>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: FILM.textLight }}>Anna Kowalska</div>
+                  <div style={{ fontSize: 12, color: FILM.mutedLight }}>Senior Backend Engineer</div>
                 </div>
                 <div style={{ marginLeft: "auto" }}>
                   <LoadingDots />
@@ -97,8 +99,16 @@ export function TalentMemoryScene() {
             </div>
           </FlyInItem>
         </div>
-        <div style={{ width: 380 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: FILM.accent, marginBottom: 10 }}>
+        <div
+          style={{
+            width: 380,
+            padding: 14,
+            borderRadius: 12,
+            background: FILM.bgPanelDark,
+            border: `1px solid ${FILM.cyanBorder}`,
+          }}
+        >
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: FILM.cyan, marginBottom: 10 }}>
             Talent Memory forming
           </div>
           {SKILLS.map((s, i) => {
@@ -109,14 +119,14 @@ export function TalentMemoryScene() {
             return (
               <div key={s} style={{ marginBottom: 8 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 3 }}>
-                  <span style={{ color: FILM.text, fontWeight: 600 }}>{s}</span>
-                  <span style={{ color: FILM.accent }}>{Math.round(fill)}%</span>
+                  <span style={{ color: FILM.textLight, fontWeight: 600 }}>{s}</span>
+                  <span style={{ color: FILM.neon }}>{Math.round(fill)}%</span>
                 </div>
                 <ProgressBar progress={fill} color={FILM.blue} height={6} />
               </div>
             );
           })}
-          <div style={{ marginTop: 14, fontSize: 12, fontWeight: 600, color: FILM.text }}>Preferences</div>
+          <div style={{ marginTop: 14, fontSize: 12, fontWeight: 600, color: FILM.textLight }}>Preferences</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
             {PREFS.map((p, i) => {
               const show = frame > 80 + i * 6;
@@ -125,8 +135,9 @@ export function TalentMemoryScene() {
                   key={p}
                   style={{
                     padding: "4px 10px",
-                    borderRadius: 16,
-                    background: "#ede9fe",
+                    borderRadius: 6,
+                    background: `${FILM.purple}22`,
+                    border: `1px solid ${FILM.purple}66`,
                     color: FILM.purple,
                     fontSize: 11,
                     fontWeight: 600,
@@ -139,10 +150,10 @@ export function TalentMemoryScene() {
             })}
           </div>
           <div style={{ marginTop: 14 }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: FILM.text, marginBottom: 4 }}>Availability</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: FILM.textLight, marginBottom: 4 }}>Availability</div>
             <ProgressBar
               progress={interpolate(frame, [100, 130], [0, 100], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })}
-              color={FILM.accent}
+              color={FILM.neon}
             />
           </div>
         </div>
