@@ -10,8 +10,8 @@ from fastapi import Header, HTTPException, status
 
 from app.config import Settings, get_settings
 from app.services.agent_dispatch.constants import (
-    AGENT_DISPATCH_SCOPE_ADMIN,
     ALL_DISPATCH_SCOPES,
+    normalize_scope,
 )
 
 
@@ -27,31 +27,53 @@ def _fingerprint(token: str) -> str:
     return hashlib.sha256(token.encode("utf-8")).hexdigest()[:16]
 
 
+def _normalize_scopes(raw_scopes: frozenset[str] | set[str] | list[str]) -> frozenset[str]:
+    out: set[str] = set()
+    for s in raw_scopes:
+        canon = normalize_scope(s)
+        if canon:
+            out.add(canon)
+    return frozenset(out) & ALL_DISPATCH_SCOPES or ALL_DISPATCH_SCOPES
+
+
+def _parse_entry(part: str) -> tuple[str, frozenset[str]]:
+    """Parse `token:scope1|scope2` where scopes may be short or `agent_runs:*`."""
+    part = part.strip()
+    if not part:
+        return "", ALL_DISPATCH_SCOPES
+
+    # Try each colon as the token/scopes separator; accept when RHS is valid scopes.
+    idx = part.find(":")
+    while idx != -1:
+        token = part[:idx].strip()
+        scopes_s = part[idx + 1 :].strip()
+        scope_parts = [s.strip() for s in scopes_s.replace(",", "|").split("|") if s.strip()]
+        if token and scope_parts and all(normalize_scope(s) for s in scope_parts):
+            return token, _normalize_scopes(scope_parts)
+        idx = part.find(":", idx + 1)
+
+    return part, ALL_DISPATCH_SCOPES
+
+
 def _parse_token_scopes(settings: Settings) -> list[tuple[str, frozenset[str]]]:
-    """Parse AGENT_DISPATCH_TOKENS as `token:scope1|scope2,token2:admin` or single token."""
+    """Parse AGENT_DISPATCH_TOKENS or single AGENT_DISPATCH_TOKEN."""
     raw = (settings.agent_dispatch_tokens or "").strip()
     if not raw:
         single = (settings.agent_dispatch_token or "").strip()
         if not single:
             return []
-        scopes_raw = (settings.agent_dispatch_default_scopes or "create|read|cancel|admin").strip()
-        scopes = frozenset(s.strip() for s in scopes_raw.replace(",", "|").split("|") if s.strip())
-        return [(single, scopes & ALL_DISPATCH_SCOPES or ALL_DISPATCH_SCOPES)]
+        scopes_raw = (
+            settings.agent_dispatch_default_scopes
+            or "agent_runs:create|agent_runs:read|agent_runs:cancel|agent_runs:admin"
+        ).strip()
+        scopes = [s.strip() for s in scopes_raw.replace(",", "|").split("|") if s.strip()]
+        return [(single, _normalize_scopes(scopes))]
 
     entries: list[tuple[str, frozenset[str]]] = []
     for part in raw.split(","):
-        part = part.strip()
-        if not part:
-            continue
-        if ":" in part:
-            token, scopes_s = part.split(":", 1)
-            scopes = frozenset(s.strip() for s in scopes_s.replace(",", "|").split("|") if s.strip())
-        else:
-            token = part
-            scopes = ALL_DISPATCH_SCOPES
-        token = token.strip()
+        token, scopes = _parse_entry(part)
         if token:
-            entries.append((token, scopes & ALL_DISPATCH_SCOPES or ALL_DISPATCH_SCOPES))
+            entries.append((token, scopes))
     return entries
 
 
@@ -77,10 +99,10 @@ def resolve_principal(settings: Settings, authorization: str | None) -> AgentDis
 
 
 def require_scope(principal: AgentDispatchPrincipal, scope: str) -> None:
-    if AGENT_DISPATCH_SCOPE_ADMIN in principal.scopes:
-        return
-    if scope not in principal.scopes:
-        raise HTTPException(status.HTTP_403_FORBIDDEN, detail=f"Missing scope: {scope}")
+    """Require a scope. Admin does not auto-grant create/read/cancel (least privilege)."""
+    needed = normalize_scope(scope) or scope
+    if needed not in principal.scopes:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail=f"Missing scope: {needed}")
 
 
 def get_agent_dispatch_principal(

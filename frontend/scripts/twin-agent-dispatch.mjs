@@ -78,7 +78,11 @@ async function cmdDispatch() {
   }
   if (!prompt.trim()) die("Provide --prompt or --prompt-file");
 
-  const repository_url =
+  const task_name =
+    argValue("--task-name") ||
+    process.env.TWIN_AGENT_DISPATCH_TASK ||
+    "twin-agent-dispatch";
+  const repository =
     argValue("--repo") ||
     process.env.TWIN_AGENT_DISPATCH_REPO ||
     "https://github.com/CzechowskiT/twin";
@@ -89,12 +93,22 @@ async function cmdDispatch() {
   const idempotency_key = argValue("--idempotency-key") || undefined;
   const model_id = argValue("--model") || undefined;
   const dispatch_now = !hasFlag("--no-dispatch");
+  // Opt-in PR open only; never default-on. Manual merge always.
+  const auto_create_pr = hasFlag("--create-pr");
 
   const data = await api("POST", "/api/internal/agent-dispatch/runs", {
+    task_name,
     prompt,
-    repository_url,
+    repository,
     base_branch,
-    auto_create_pr: !hasFlag("--no-pr"),
+    execution_policy: {
+      single_active_run: true,
+      manual_merge_only: true,
+      no_admin_override: true,
+      no_auto_merge: true,
+      final_report_once: true,
+    },
+    auto_create_pr,
     model_id,
     idempotency_key,
     dispatch_now,

@@ -30,6 +30,7 @@ from app.services.agent_dispatch.constants import (
     CURSOR_V1_RUN_EXPIRED,
     CURSOR_V1_RUN_FINISHED,
     CURSOR_V1_TERMINAL,
+    DEFAULT_EXECUTION_POLICY,
     DISPATCH_RUN_TERMINAL,
     DispatchRunStatus,
 )
@@ -41,7 +42,6 @@ from app.services.agent_dispatch.github_enricher import GitHubEnricher
 from app.services.agent_dispatch.locking import (
     LockConflictError,
     acquire_lock,
-    force_unlock,
     heartbeat_lock,
     release_lock,
 )
@@ -75,10 +75,12 @@ def create_dispatch_run(
     settings: Settings,
     principal: AgentDispatchPrincipal,
     *,
+    task_name: str,
     prompt: str,
     repository_url: str,
     base_branch: str,
-    auto_create_pr: bool = True,
+    execution_policy: dict[str, Any] | None = None,
+    auto_create_pr: bool = False,
     branch_name: str | None = None,
     model_id: str | None = None,
     idempotency_key: str | None = None,
@@ -86,6 +88,14 @@ def create_dispatch_run(
     dispatch_now: bool = True,
 ) -> AgentDispatchRun:
     _allowlist_ok(settings, repository_url, base_branch)
+
+    policy = {**DEFAULT_EXECUTION_POLICY, **(execution_policy or {})}
+    for key in DEFAULT_EXECUTION_POLICY:
+        if policy.get(key) is not True:
+            raise HTTPException(
+                status.HTTP_400_BAD_REQUEST,
+                detail=f"execution_policy.{key} must be true",
+            )
 
     if idempotency_key:
         existing = db.execute(
@@ -101,10 +111,12 @@ def create_dispatch_run(
     run = AgentDispatchRun(
         id=str(uuid.uuid4()),
         status=DispatchRunStatus.QUEUED.value,
+        task_name=(task_name or "").strip()[:128] or "unnamed",
         repository_url=repository_url.strip().rstrip("/"),
         base_branch=base_branch.strip(),
         requested_branch_name=branch_name,
-        auto_create_pr=auto_create_pr,
+        auto_create_pr=bool(auto_create_pr),
+        execution_policy_json=json.dumps(policy, sort_keys=True),
         model_id=model_id,
         prompt_envelope_version=envelope.version,
         prompt_hash=envelope.prompt_hash,
@@ -145,7 +157,11 @@ def create_dispatch_run(
         run_id=run.id,
         event_type="run_created",
         actor_fingerprint=principal.token_fingerprint,
-        detail={"prompt_hash": envelope.prompt_hash, "repository_url": run.repository_url},
+        detail={
+            "prompt_hash": envelope.prompt_hash,
+            "repository_url": run.repository_url,
+            "task_name": run.task_name,
+        },
     )
     db.commit()
     db.refresh(run)
@@ -160,11 +176,12 @@ def create_dispatch_run(
 
 
 def _prompt_text_for_dispatch(run: AgentDispatchRun) -> str:
+    if run.prompt_expires_at and datetime.utcnow() > run.prompt_expires_at:
+        raise CursorApiError("prompt TTL expired", status_code=410)
     if run.prompt_ciphertext:
         from app.services.token_crypto import decrypt_secret
 
         return decrypt_secret(run.prompt_ciphertext)
-    # Fallback: rebuild minimal envelope from preview is unsafe — require ciphertext or hash-only fail.
     raise CursorApiError("prompt ciphertext missing; cannot dispatch", status_code=500)
 
 
@@ -189,21 +206,24 @@ def dispatch_to_cursor(db: Session, settings: Settings, run_id: str) -> AgentDis
 
     try:
         prompt_text = _prompt_text_for_dispatch(run)
-    except CursorApiError:
-        # If prompts are hash-only (encryption off and no ciphertext), rebuild from caller is impossible.
-        # Tests set ciphertext; production should enable encryption.
-        from app.services.agent_dispatch.prompt_envelope import TWIN_EXECUTION_POLICY
-
-        if run.prompt_redacted_preview and not settings.agent_dispatch_encrypt_prompts:
-            # Cannot recover full prompt — fail closed.
+    except CursorApiError as exc:
+        if exc.status_code == 410:
             run.status = DispatchRunStatus.FAILED.value
-            run.error_code = "prompt_unavailable"
-            run.error_message = "encrypted prompt required for dispatch"
+            run.error_code = "prompt_ttl_expired"
+            run.error_message = "prompt ciphertext TTL expired before dispatch"
+            run.finished_at = datetime.utcnow()
+            run.prompt_ciphertext = None
             release_lock(db, run_id=run.id)
             db.commit()
-            raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail="prompt_unavailable")
-
-        prompt_text = f"{TWIN_EXECUTION_POLICY}\n{run.prompt_redacted_preview}\n"
+            db.refresh(run)
+            return run
+        run.status = DispatchRunStatus.FAILED.value
+        run.error_code = "prompt_unavailable"
+        run.error_message = "encrypted prompt required for dispatch"
+        run.finished_at = datetime.utcnow()
+        release_lock(db, run_id=run.id)
+        db.commit()
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail="prompt_unavailable") from exc
 
     try:
         created = client.create_agent(
@@ -472,16 +492,40 @@ def admin_force_unlock(
     repo_url: str,
     base_branch: str,
 ) -> dict[str, Any]:
-    lock = force_unlock(db, repo_url=repo_url.strip().rstrip("/"), base_branch=base_branch.strip())
-    write_audit(
-        db,
-        run_id=lock.run_id if lock else None,
-        event_type="force_unlock",
-        actor_fingerprint=principal.token_fingerprint,
-        detail={"repo_url": repo_url, "base_branch": base_branch, "had_lock": lock is not None},
+    """Removed from public API — kept to fail closed if called internally."""
+    raise HTTPException(
+        status.HTTP_403_FORBIDDEN,
+        detail={
+            "error": "no_admin_override",
+            "message": "Force-unlock is disabled under execution_policy.no_admin_override",
+            "repository_url": repo_url,
+            "base_branch": base_branch,
+            "actor": principal.token_fingerprint,
+        },
     )
-    db.commit()
-    return {"unlocked": lock is not None, "previous_run_id": lock.run_id if lock else None}
+
+
+def purge_expired_prompts(db: Session) -> int:
+    """Drop ciphertext for expired prompts (TTL) on non-dispatched or any row past TTL."""
+    now = datetime.utcnow()
+    rows = (
+        db.execute(
+            select(AgentDispatchRun).where(
+                AgentDispatchRun.prompt_ciphertext.isnot(None),
+                AgentDispatchRun.prompt_expires_at.isnot(None),
+                AgentDispatchRun.prompt_expires_at < now,
+            )
+        )
+        .scalars()
+        .all()
+    )
+    n = 0
+    for run in rows:
+        run.prompt_ciphertext = None
+        n += 1
+    if n:
+        db.commit()
+    return n
 
 
 def ingest_webhook(
@@ -575,11 +619,21 @@ def run_to_public_dict(run: AgentDispatchRun) -> dict[str, Any]:
             enrichment = json.loads(run.github_enrichment_json)
         except json.JSONDecodeError:
             enrichment = None
+    policy = None
+    if run.execution_policy_json:
+        try:
+            policy = json.loads(run.execution_policy_json)
+        except json.JSONDecodeError:
+            policy = None
     return {
         "id": run.id,
         "status": run.status,
+        "task_name": run.task_name,
         "repository_url": run.repository_url,
+        "repository": run.repository_url,
         "base_branch": run.base_branch,
+        "execution_policy": policy or dict(DEFAULT_EXECUTION_POLICY),
+        "auto_create_pr": bool(run.auto_create_pr),
         "prompt_hash": run.prompt_hash,
         "prompt_preview": run.prompt_redacted_preview,
         "cursor_api_version": run.cursor_api_version,

@@ -33,6 +33,13 @@ async def lifespan(_app: FastAPI):
 
     validate_production_config()
     apply_celery_runtime_config()
+    # Best-effort: re-poll non-terminal dispatcher locks after API restart (no secrets logged).
+    try:
+        from app.tasks.agent_dispatch_tasks import recover_dispatch_runs_on_startup
+
+        recover_dispatch_runs_on_startup.delay()
+    except Exception:
+        logger.warning("agent-dispatch startup recover enqueue skipped", exc_info=True)
     yield
     engine.dispose()
 

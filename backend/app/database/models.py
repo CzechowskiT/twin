@@ -1619,10 +1619,12 @@ class AgentDispatchRun(Base):
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     status: Mapped[str] = mapped_column(String(32), index=True, default="queued")
+    task_name: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
     repository_url: Mapped[str] = mapped_column(String(512), index=True)
     base_branch: Mapped[str] = mapped_column(String(255), index=True)
     requested_branch_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    auto_create_pr: Mapped[bool] = mapped_column(Boolean, default=True)
+    auto_create_pr: Mapped[bool] = mapped_column(Boolean, default=False)
+    execution_policy_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     model_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
 
     prompt_envelope_version: Mapped[str] = mapped_column(String(64))

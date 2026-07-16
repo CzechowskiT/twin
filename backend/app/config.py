@@ -446,7 +446,9 @@ class Settings(BaseSettings):
     # Bearer tokens for /api/internal/agent-dispatch/* (comma list `token:scopes` or single token).
     agent_dispatch_token: str = ""
     agent_dispatch_tokens: str = ""
-    agent_dispatch_default_scopes: str = "create|read|cancel|admin"
+    agent_dispatch_default_scopes: str = (
+        "agent_runs:create|agent_runs:read|agent_runs:cancel|agent_runs:admin"
+    )
     agent_dispatch_repo_allowlist: str = "https://github.com/CzechowskiT/twin"
     agent_dispatch_base_branch_allowlist: str = "cursor/phase1-monorepo-scaffold"
     agent_dispatch_webhook_secret: str = ""
