@@ -1611,3 +1611,104 @@ class RequestIntakeItem(Base):
         onupdate=datetime.utcnow,
     )
 
+
+class AgentDispatchRun(Base):
+    """Persistent Cursor Cloud Agent dispatch run (TWIN Agent Dispatcher)."""
+
+    __tablename__ = "agent_dispatch_runs"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    status: Mapped[str] = mapped_column(String(32), index=True, default="queued")
+    repository_url: Mapped[str] = mapped_column(String(512), index=True)
+    base_branch: Mapped[str] = mapped_column(String(255), index=True)
+    requested_branch_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    auto_create_pr: Mapped[bool] = mapped_column(Boolean, default=True)
+    model_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
+
+    prompt_envelope_version: Mapped[str] = mapped_column(String(64))
+    prompt_hash: Mapped[str] = mapped_column(String(64), index=True)
+    prompt_redacted_preview: Mapped[str | None] = mapped_column(Text, nullable=True)
+    prompt_ciphertext: Mapped[str | None] = mapped_column(Text, nullable=True)
+    prompt_expires_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+    cursor_api_version: Mapped[str | None] = mapped_column(String(8), nullable=True)
+    cursor_agent_id: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
+    cursor_run_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    cursor_status: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    cursor_agent_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    webhook_secret_fingerprint: Mapped[str | None] = mapped_column(String(32), nullable=True)
+
+    result_branch: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    result_pr_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    result_head_sha: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    result_ci_status: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    result_summary: Mapped[str | None] = mapped_column(Text, nullable=True)
+    github_enrichment_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    error_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    error_message: Mapped[str | None] = mapped_column(String(512), nullable=True)
+
+    idempotency_key: Mapped[str | None] = mapped_column(String(128), unique=True, nullable=True)
+    created_by_fingerprint: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    metadata_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    lease_expires_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    last_polled_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    dispatched_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
+
+
+class AgentDispatchLock(Base):
+    """Single-active-run lock keyed by repository + base branch."""
+
+    __tablename__ = "agent_dispatch_locks"
+    __table_args__ = (UniqueConstraint("repo_url", "base_branch", name="uq_agent_dispatch_lock_repo_branch"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    repo_url: Mapped[str] = mapped_column(String(512), index=True)
+    base_branch: Mapped[str] = mapped_column(String(255), index=True)
+    run_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("agent_dispatch_runs.id", ondelete="CASCADE"), index=True
+    )
+    holder_fingerprint: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    lease_expires_at: Mapped[datetime] = mapped_column(DateTime, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
+
+
+class AgentDispatchWebhookEvent(Base):
+    """Dedupe ledger for Cursor agent webhook deliveries."""
+
+    __tablename__ = "agent_dispatch_webhook_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    delivery_id: Mapped[str] = mapped_column(String(128), unique=True, index=True)
+    event_name: Mapped[str] = mapped_column(String(64))
+    cursor_agent_id: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
+    run_id: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)
+    payload_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    received_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class AgentDispatchAuditEvent(Base):
+    """Append-only redacted audit trail for dispatcher actions."""
+
+    __tablename__ = "agent_dispatch_audit_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    run_id: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)
+    event_type: Mapped[str] = mapped_column(String(64), index=True)
+    actor_fingerprint: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    detail_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+

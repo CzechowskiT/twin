@@ -64,6 +64,15 @@ def create_app() -> FastAPI:
     )
     app.include_router(api_router, prefix="/api/v1")
 
+    # Internal Agent Dispatcher (ops/automation) — scoped Bearer; not end-user JWT.
+    from app.api import agent_dispatch as agent_dispatch_api
+
+    app.include_router(
+        agent_dispatch_api.router,
+        prefix="/api/internal/agent-dispatch",
+        tags=["Agent Dispatcher"],
+    )
+
     @app.exception_handler(HTTPException)
     async def http_exception_sanitize_500(request: Request, exc: HTTPException) -> JSONResponse:
         if exc.status_code == 500:

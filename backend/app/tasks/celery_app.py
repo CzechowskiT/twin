@@ -23,6 +23,7 @@ celery_app.conf.update(
         "app.tasks.placement_tasks",
         "app.tasks.notification_tasks",
         "app.tasks.nightly_auto_apply",
+        "app.tasks.agent_dispatch_tasks",
     ),
 )
 
@@ -108,6 +109,13 @@ def _configure_beat_schedule() -> None:
             "task": "app.tasks.nightly_auto_apply.nightly_auto_apply_sweep",
             "schedule": crontab(hour=nh, minute=nm),
             "options": {"expires": 7200},
+        }
+    if s.agent_dispatch_poll_enabled:
+        interval = max(15, min(600, int(s.agent_dispatch_poll_interval_seconds or 60)))
+        schedule["agent-dispatch-reconcile"] = {
+            "task": "app.tasks.agent_dispatch_tasks.reconcile_active_dispatch_runs",
+            "schedule": float(interval),
+            "options": {"expires": interval},
         }
     celery_app.conf.beat_schedule = schedule
 

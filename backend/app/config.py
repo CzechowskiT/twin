@@ -435,6 +435,33 @@ class Settings(BaseSettings):
     # Recruiter session JWT TTL after pilot-token exchange (default 8h).
     recruiter_jwt_expire_minutes: int = 60 * 8
 
+    # --- TWIN Agent Dispatcher (Cursor Cloud Agents) ---
+    # Production secret name for Cursor service-account API key (never commit the value):
+    # CURSOR_CLOUD_AGENTS_API_KEY
+    cursor_cloud_agents_api_key: str = Field(
+        default="",
+        validation_alias=AliasChoices("CURSOR_CLOUD_AGENTS_API_KEY", "cursor_cloud_agents_api_key"),
+    )
+    cursor_api_base_url: str = "https://api.cursor.com"
+    # Bearer tokens for /api/internal/agent-dispatch/* (comma list `token:scopes` or single token).
+    agent_dispatch_token: str = ""
+    agent_dispatch_tokens: str = ""
+    agent_dispatch_default_scopes: str = "create|read|cancel|admin"
+    agent_dispatch_repo_allowlist: str = "https://github.com/CzechowskiT/twin"
+    agent_dispatch_base_branch_allowlist: str = "cursor/phase1-monorepo-scaffold"
+    agent_dispatch_webhook_secret: str = ""
+    agent_dispatch_webhook_public_url: str = ""
+    agent_dispatch_github_token: str = ""
+    agent_dispatch_encrypt_prompts: bool = True
+    agent_dispatch_prompt_ttl_hours: int = 72
+    agent_dispatch_drop_prompt_on_terminal: bool = True
+    agent_dispatch_lock_lease_seconds: int = 120
+    agent_dispatch_run_timeout_minutes: int = 180
+    agent_dispatch_require_pr: bool = False
+    agent_dispatch_require_ci_success: bool = False
+    agent_dispatch_poll_enabled: bool = True
+    agent_dispatch_poll_interval_seconds: int = 60
+
     @property
     def cors_origin_list(self) -> list[str]:
         return [o for o in (x.strip() for x in self.cors_origins.split(",")) if o]
