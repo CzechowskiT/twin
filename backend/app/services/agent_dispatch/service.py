@@ -240,7 +240,13 @@ def dispatch_to_cursor(db: Session, settings: Settings, run_id: str) -> AgentDis
     except CursorApiError as exc:
         run.status = DispatchRunStatus.FAILED.value
         run.error_code = "cursor_create_failed"
-        run.error_message = str(exc)[:400]
+        # Include status + safe body for ops; never store raw secrets (body already redacted).
+        detail_bits = [str(exc)]
+        if exc.status_code is not None:
+            detail_bits.append(f"status={exc.status_code}")
+        if exc.body:
+            detail_bits.append(exc.body[:200])
+        run.error_message = " | ".join(detail_bits)[:400]
         run.finished_at = datetime.utcnow()
         release_lock(db, run_id=run.id)
         write_audit(
@@ -248,7 +254,7 @@ def dispatch_to_cursor(db: Session, settings: Settings, run_id: str) -> AgentDis
             run_id=run.id,
             event_type="dispatch_failed",
             actor_fingerprint=None,
-            detail={"status_code": exc.status_code},
+            detail={"status_code": exc.status_code, "body_preview": (exc.body or "")[:200]},
         )
         db.commit()
         db.refresh(run)

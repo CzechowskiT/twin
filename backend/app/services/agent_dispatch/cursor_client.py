@@ -153,7 +153,7 @@ class CursorCloudAgentsClient:
             res = client.post("/v1/agents", json=body)
             if res.status_code >= 400:
                 raise CursorApiError(
-                    "Cursor v1 create agent failed",
+                    f"Cursor v1 create agent failed ({res.status_code})",
                     status_code=res.status_code,
                     body=_safe_body(res.text),
                 )
@@ -182,25 +182,26 @@ class CursorCloudAgentsClient:
         webhook_secret: str | None,
         name: str | None,
     ) -> CursorCreateResult:
+        # v0 rejects unrecognized top-level keys (e.g. `name` → 400).
+        # Display name is derived by Cursor from the prompt; pass `name` only on v1.
         body: dict[str, Any] = {
             "prompt": {"text": prompt_text},
             "source": {"repository": repository_url, "ref": starting_ref},
             "target": {"autoCreatePr": auto_create_pr},
             "webhook": {"url": webhook_url},
         }
+        _ = name  # accepted by create_agent for v1; intentionally omitted on v0
         if branch_name:
             body["target"]["branchName"] = branch_name
         if model_id:
             body["model"] = model_id
-        if name:
-            body["name"] = name[:100]
         if webhook_secret and len(webhook_secret) >= 32:
             body["webhook"]["secret"] = webhook_secret
         with self._client() as client:
             res = client.post("/v0/agents", json=body)
             if res.status_code >= 400:
                 raise CursorApiError(
-                    "Cursor v0 launch agent failed",
+                    f"Cursor v0 launch agent failed ({res.status_code})",
                     status_code=res.status_code,
                     body=_safe_body(res.text),
                 )
