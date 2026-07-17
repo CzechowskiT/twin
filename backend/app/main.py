@@ -80,6 +80,25 @@ def create_app() -> FastAPI:
         tags=["Agent Dispatcher"],
     )
 
+    # RFC 9728 / RFC 8414 discovery for ChatGPT MCP OAuth (must be at well-known roots).
+    @app.get("/.well-known/oauth-protected-resource")
+    @app.get("/.well-known/oauth-protected-resource/api/internal/agent-dispatch/mcp")
+    def oauth_protected_resource(request: Request) -> dict:
+        from app.services.agent_dispatch import oauth_as as _oauth
+
+        return _oauth.protected_resource_metadata(
+            get_settings(), str(request.base_url).rstrip("/")
+        )
+
+    @app.get("/.well-known/oauth-authorization-server")
+    @app.get("/.well-known/oauth-authorization-server/api/internal/agent-dispatch/oauth")
+    def oauth_authorization_server(request: Request) -> dict:
+        from app.services.agent_dispatch import oauth_as as _oauth
+
+        return _oauth.authorization_server_metadata(
+            get_settings(), str(request.base_url).rstrip("/")
+        )
+
     @app.exception_handler(HTTPException)
     async def http_exception_sanitize_500(request: Request, exc: HTTPException) -> JSONResponse:
         if exc.status_code == 500:

@@ -6,7 +6,7 @@ import hashlib
 import hmac
 from dataclasses import dataclass
 
-from fastapi import Header, HTTPException, status
+from fastapi import Header, HTTPException, Request, status
 
 from app.config import Settings, get_settings
 from app.services.agent_dispatch.constants import (
@@ -23,7 +23,7 @@ class AgentDispatchPrincipal:
     scopes: frozenset[str]
 
 
-def _fingerprint(token: str) -> str:
+def fingerprint_token(token: str) -> str:
     return hashlib.sha256(token.encode("utf-8")).hexdigest()[:16]
 
 
@@ -55,7 +55,7 @@ def _parse_entry(part: str) -> tuple[str, frozenset[str]]:
     return part, ALL_DISPATCH_SCOPES
 
 
-def _parse_token_scopes(settings: Settings) -> list[tuple[str, frozenset[str]]]:
+def parse_token_scope_entries(settings: Settings) -> list[tuple[str, frozenset[str]]]:
     """Parse AGENT_DISPATCH_TOKENS or single AGENT_DISPATCH_TOKEN."""
     raw = (settings.agent_dispatch_tokens or "").strip()
     if not raw:
@@ -77,9 +77,14 @@ def _parse_token_scopes(settings: Settings) -> list[tuple[str, frozenset[str]]]:
     return entries
 
 
-def resolve_principal(settings: Settings, authorization: str | None) -> AgentDispatchPrincipal:
-    """Validate Bearer token against configured dispatcher tokens."""
-    entries = _parse_token_scopes(settings)
+def resolve_principal(
+    settings: Settings,
+    authorization: str | None,
+    *,
+    request: Request | None = None,
+) -> AgentDispatchPrincipal:
+    """Validate Bearer: static AGENT_DISPATCH_TOKEN or ChatGPT OAuth access JWT."""
+    entries = parse_token_scope_entries(settings)
     if not entries:
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -87,15 +92,47 @@ def resolve_principal(settings: Settings, authorization: str | None) -> AgentDis
         )
     auth = (authorization or "").strip()
     if not auth.startswith("Bearer "):
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Missing Bearer token")
+        raise _unauthorized(settings, request, "Missing Bearer token")
     presented = auth[len("Bearer ") :].strip()
     if not presented:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Missing Bearer token")
+        raise _unauthorized(settings, request, "Missing Bearer token")
 
     for token, scopes in entries:
         if hmac.compare_digest(token, presented):
-            return AgentDispatchPrincipal(token_fingerprint=_fingerprint(token), scopes=scopes)
-    raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid dispatcher token")
+            return AgentDispatchPrincipal(
+                token_fingerprint=fingerprint_token(token), scopes=scopes
+            )
+
+    # ChatGPT MCP connector presents OAuth access tokens (not the long-lived secret).
+    from app.services.agent_dispatch.oauth_as import (
+        mcp_resource_url,
+        resolve_oauth_access_principal,
+    )
+
+    request_base = str(request.base_url).rstrip("/") if request is not None else None
+    oauth_principal = resolve_oauth_access_principal(
+        settings,
+        presented,
+        expected_resource=mcp_resource_url(settings, request_base),
+        request_base=request_base,
+    )
+    if oauth_principal:
+        return oauth_principal
+
+    raise _unauthorized(settings, request, "Invalid dispatcher token")
+
+
+def _unauthorized(
+    settings: Settings, request: Request | None, detail: str
+) -> HTTPException:
+    from app.services.agent_dispatch.oauth_as import www_authenticate_header
+
+    request_base = str(request.base_url).rstrip("/") if request is not None else None
+    return HTTPException(
+        status.HTTP_401_UNAUTHORIZED,
+        detail=detail,
+        headers={"WWW-Authenticate": www_authenticate_header(settings, request_base)},
+    )
 
 
 def require_scope(principal: AgentDispatchPrincipal, scope: str) -> None:
@@ -106,6 +143,7 @@ def require_scope(principal: AgentDispatchPrincipal, scope: str) -> None:
 
 
 def get_agent_dispatch_principal(
+    request: Request,
     authorization: str | None = Header(default=None),
 ) -> AgentDispatchPrincipal:
-    return resolve_principal(get_settings(), authorization)
+    return resolve_principal(get_settings(), authorization, request=request)

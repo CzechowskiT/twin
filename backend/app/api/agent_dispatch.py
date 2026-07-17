@@ -15,10 +15,13 @@ from app.database.models import AgentDispatchRun, AgentDispatchLock
 from app.database.session import get_db
 from app.limiter import limiter
 from app.schemas.agent_dispatch import CreateDispatchRequest, ForceUnlockRequest
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+
 from app.services.agent_dispatch.auth import (
     AgentDispatchPrincipal,
     get_agent_dispatch_principal,
     require_scope,
+    resolve_principal,
 )
 from app.services.agent_dispatch.constants import (
     AGENT_DISPATCH_SCOPE_ADMIN,
@@ -38,6 +41,7 @@ from app.services.agent_dispatch.mcp_protocol import (
     mcp_server_info,
     tool_definitions,
 )
+from app.services.agent_dispatch import oauth_as
 from app.services.agent_dispatch.service import (
     cancel_run,
     create_dispatch_run,
@@ -106,6 +110,9 @@ def dispatcher_health(
         "mcp_protocol_version": MCP_PROTOCOL_VERSION,
         "mcp_server": {"name": MCP_SERVER_NAME, "version": MCP_SERVER_VERSION},
         "mcp_tools": [t["name"] for t in tool_definitions()],
+        "chatgpt_mcp_auth": "oauth2.1+pkce",
+        "chatgpt_actions_openapi": "/api/internal/agent-dispatch/chatgpt/openapi.json",
+        "oauth_authorization_server": "/api/internal/agent-dispatch/oauth",
         "active_lock_count": active_locks,
         "repo_allowlist_configured": bool((settings.agent_dispatch_repo_allowlist or "").strip()),
         "base_branch_allowlist_configured": bool(
@@ -250,10 +257,190 @@ def mcp_manifest(
     return {
         "server": mcp_server_info(),
         "tools": tool_definitions(),
-        "auth": "Authorization: Bearer <AGENT_DISPATCH_TOKEN>",
+        "auth": {
+            "cli_and_actions": "Authorization: Bearer <AGENT_DISPATCH_TOKEN>",
+            "chatgpt_mcp_connector": "OAuth 2.1 authorization code + PKCE (see /oauth)",
+        },
         "transport": "streamable-http-jsonrpc",
         "endpoint": "/api/internal/agent-dispatch/mcp",
     }
+
+
+@router.get("/chatgpt/openapi.json")
+def chatgpt_actions_openapi(
+    request: Request,
+    settings: Settings = Depends(get_settings),
+) -> dict[str, Any]:
+    """Public OpenAPI for Custom GPT Actions (Bearer). No secrets in schema."""
+    return oauth_as.chatgpt_actions_openapi(settings, str(request.base_url).rstrip("/"))
+
+
+@router.get("/chatgpt/setup")
+def chatgpt_setup_hint() -> dict[str, Any]:
+    """Machine-readable registration hints (no secrets)."""
+    return {
+        "preferred": "chatgpt_developer_mode_mcp_oauth",
+        "mcp_server_url": (
+            "https://twin-production-bcd9.up.railway.app/api/internal/agent-dispatch/mcp"
+        ),
+        "auth": "OAuth (ChatGPT does not support static API keys for MCP connectors)",
+        "oauth_authorize": "/api/internal/agent-dispatch/oauth/authorize",
+        "actions_fallback": {
+            "openapi": "/api/internal/agent-dispatch/chatgpt/openapi.json",
+            "auth": "API Key Bearer = AGENT_DISPATCH_TOKEN",
+        },
+        "docs": "docs/TWIN_AGENT_DISPATCHER_CHATGPT_SETUP.md",
+        "one_time_ui_blocker": (
+            "Founder must create a Developer Mode app/connector in ChatGPT UI "
+            "(Settings → Plugins / chatgpt.com/plugins) pointing at the MCP URL; "
+            "OAuth consent pastes AGENT_DISPATCH_TOKEN once."
+        ),
+    }
+
+
+@router.get("/oauth/.well-known/oauth-authorization-server")
+@router.get("/.well-known/oauth-authorization-server")
+def oauth_as_metadata_under_issuer(
+    request: Request,
+    settings: Settings = Depends(get_settings),
+) -> dict[str, Any]:
+    return oauth_as.authorization_server_metadata(settings, str(request.base_url).rstrip("/"))
+
+
+@router.post("/oauth/register")
+@limiter.limit("30/minute")
+async def oauth_register(
+    request: Request,
+    settings: Settings = Depends(get_settings),
+) -> dict[str, Any]:
+    try:
+        body = await request.json()
+    except Exception as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="invalid JSON") from exc
+    if not isinstance(body, dict):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="body must be object")
+    return oauth_as.register_client(settings, body)
+
+
+@router.get("/oauth/authorize", response_class=HTMLResponse)
+def oauth_authorize_get(
+    request: Request,
+    settings: Settings = Depends(get_settings),
+    client_id: str = "",
+    redirect_uri: str = "",
+    response_type: str = "code",
+    state: str | None = None,
+    code_challenge: str = "",
+    code_challenge_method: str = "S256",
+    scope: str | None = None,
+    resource: str | None = None,
+) -> HTMLResponse:
+    if response_type != "code":
+        return HTMLResponse(oauth_as.authorize_page_html(error="response_type must be code"), 400)
+    if code_challenge_method != "S256" or not code_challenge:
+        return HTMLResponse(oauth_as.authorize_page_html(error="PKCE S256 required"), 400)
+    try:
+        oauth_as.validate_client_redirect(settings, client_id, redirect_uri)
+    except HTTPException as exc:
+        return HTMLResponse(oauth_as.authorize_page_html(error=str(exc.detail)), 400)
+    # Stash query params in hidden fields via form action (GET→POST carries query).
+    _ = (state, scope, resource)
+    return HTMLResponse(oauth_as.authorize_page_html())
+
+
+@router.post("/oauth/authorize", response_model=None)
+@limiter.limit("30/minute")
+async def oauth_authorize_post(
+    request: Request,
+    settings: Settings = Depends(get_settings),
+):
+    form = await request.form()
+    token = str(form.get("token") or "")
+    q = request.query_params
+    client_id = q.get("client_id") or ""
+    redirect_uri = q.get("redirect_uri") or ""
+    state = q.get("state")
+    code_challenge = q.get("code_challenge") or ""
+    code_challenge_method = q.get("code_challenge_method") or "S256"
+    scope = q.get("scope") or oauth_as.DEFAULT_SCOPES
+    resource = q.get("resource") or oauth_as.mcp_resource_url(
+        settings, str(request.base_url).rstrip("/")
+    )
+    if code_challenge_method != "S256" or not code_challenge:
+        return HTMLResponse(oauth_as.authorize_page_html(error="PKCE S256 required"), 400)
+    try:
+        oauth_as.validate_client_redirect(settings, client_id, redirect_uri)
+    except HTTPException as exc:
+        return HTMLResponse(oauth_as.authorize_page_html(error=str(exc.detail)), 400)
+    principal = oauth_as.match_dispatcher_token(settings, token)
+    if not principal:
+        return HTMLResponse(oauth_as.authorize_page_html(error="Invalid token"), 401)
+    request_base = str(request.base_url).rstrip("/")
+    code = oauth_as.mint_authorization_code(
+        settings,
+        principal=principal,
+        client_id=client_id,
+        redirect_uri=redirect_uri,
+        code_challenge=code_challenge,
+        resource=resource,
+        scope=scope,
+        request_base=request_base,
+    )
+    return RedirectResponse(
+        oauth_as.build_authorize_redirect(redirect_uri=redirect_uri, code=code, state=state),
+        status_code=302,
+    )
+
+
+@router.post("/oauth/token")
+@limiter.limit("60/minute")
+async def oauth_token(
+    request: Request,
+    settings: Settings = Depends(get_settings),
+) -> JSONResponse:
+    content_type = (request.headers.get("content-type") or "").lower()
+    if "application/json" in content_type:
+        try:
+            data = await request.json()
+        except Exception as exc:
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="invalid JSON") from exc
+    else:
+        form = await request.form()
+        data = {k: form.get(k) for k in form.keys()}
+    if not isinstance(data, dict):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="invalid body")
+    grant = str(data.get("grant_type") or "")
+    client_id = str(data.get("client_id") or "")
+    resource = data.get("resource")
+    resource_s = str(resource) if resource else None
+    request_base = str(request.base_url).rstrip("/")
+    try:
+        if grant == "authorization_code":
+            result = oauth_as.exchange_authorization_code(
+                settings,
+                code=str(data.get("code") or ""),
+                redirect_uri=str(data.get("redirect_uri") or ""),
+                client_id=client_id,
+                code_verifier=str(data.get("code_verifier") or ""),
+                resource=resource_s,
+                request_base=request_base,
+            )
+        elif grant == "refresh_token":
+            result = oauth_as.exchange_refresh_token(
+                settings,
+                refresh_token=str(data.get("refresh_token") or ""),
+                client_id=client_id,
+                resource=resource_s,
+                request_base=request_base,
+            )
+        else:
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="unsupported_grant_type")
+    except HTTPException as exc:
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={"error": str(exc.detail)},
+        )
+    return JSONResponse(result)
 
 
 @router.post("/mcp")
@@ -270,7 +457,7 @@ async def mcp_jsonrpc(
         q = (request.url.query or "").lower()
         if "token" in q or "secret" in q or "key" in q or "authorization" in q:
             raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="secrets must not be in query")
-    principal = get_agent_dispatch_principal(authorization)
+    principal = resolve_principal(settings, authorization, request=request)
     try:
         body = await request.json()
     except Exception as exc:

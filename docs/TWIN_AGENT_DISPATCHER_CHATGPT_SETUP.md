@@ -2,57 +2,64 @@
 
 ## Goal
 
-ChatGPT (or any MCP client) → hosted TWIN MCP → Agent Dispatcher → Cursor Cloud Agent → GitHub branch/PR → structured report/handoff — **without** pasting prompts or Cursor API keys into chat.
+ChatGPT → hosted TWIN MCP → Agent Dispatcher → Cursor Cloud Agent → GitHub branch/PR →
+structured report/handoff — **without** pasting prompts or Cursor API keys into chat.
 
 ## Production endpoint
 
 | Item | Value |
 |------|--------|
 | API base | `https://twin-production-bcd9.up.railway.app` |
-| MCP JSON-RPC | `POST /api/internal/agent-dispatch/mcp` |
+| MCP (Streamable HTTP JSON-RPC) | `POST /api/internal/agent-dispatch/mcp` |
 | MCP manifest | `GET /api/internal/agent-dispatch/mcp/manifest` |
 | Health (public) | `GET /api/internal/agent-dispatch/health` |
+| Setup hint (public) | `GET /api/internal/agent-dispatch/chatgpt/setup` |
+| Actions OpenAPI (public) | `GET /api/internal/agent-dispatch/chatgpt/openapi.json` |
 
-## Auth (required)
+## Why OAuth (not static Bearer) for ChatGPT MCP
 
-```http
-Authorization: Bearer <AGENT_DISPATCH_TOKEN>
-Content-Type: application/json
-```
+Official ChatGPT **Developer Mode** remote MCP auth (OpenAI docs, 2026): **OAuth**, **No Authentication**, or **Mixed Authentication**.  
+ChatGPT does **not** accept a static API key / Bearer field for MCP connectors.
 
-- Token lives only in Railway (`AGENT_DISPATCH_TOKEN`) and the ChatGPT connector secret store.
-- **Never** put the token (or `CURSOR_CLOUD_AGENTS_API_KEY`) in the URL query string.
-- Anonymous MCP calls return **401**. Public MCP without auth is banned.
+TWIN therefore co-hosts a minimal OAuth 2.1 authorization server (auth code + PKCE S256) that issues short-lived access tokens after the founder proves possession of `AGENT_DISPATCH_TOKEN`. CLI / Custom GPT Actions still use `Authorization: Bearer <AGENT_DISPATCH_TOKEN>` directly.
 
-## ChatGPT custom connector / MCP client
+- Token lives only in Railway (`AGENT_DISPATCH_TOKEN`) and is pasted **once** into the OAuth consent page (not stored in ChatGPT as a static MCP key).
+- **Never** put the token (or `CURSOR_CLOUD_AGENTS_API_KEY`) in the MCP URL query string.
+- Anonymous MCP calls return **401** with `WWW-Authenticate` + RFC 9728 `resource_metadata`.
+- Public MCP without auth is banned.
 
-1. Server URL: `https://twin-production-bcd9.up.railway.app/api/internal/agent-dispatch/mcp`
-2. Auth: Bearer token = production `AGENT_DISPATCH_TOKEN`
-3. Transport: Streamable HTTP JSON-RPC (`initialize` → `tools/list` → `tools/call`)
-4. After a run finishes, call `get_twin_agent_handoff` with `run_id` — do not copy agent prompts from the UI.
+## Path A (preferred) — ChatGPT Developer Mode MCP app
 
-### Example `tools/call`
+One-time founder UI (cannot be automated via OpenAI API for personal connectors):
 
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 1,
-  "method": "tools/call",
-  "params": {
-    "name": "dispatch_twin_agent",
-    "arguments": {
-      "task_name": "docs-guard-consistency",
-      "prompt": "…",
-      "repository": "https://github.com/CzechowskiT/twin",
-      "base_branch": "cursor/phase1-monorepo-scaffold",
-      "idempotency_key": "chatgpt-batch-2026-07-16-1",
-      "auto_create_pr": true
-    }
-  }
-}
-```
+1. ChatGPT → **Settings → Security and login** → enable **Developer mode**.
+2. Open **Settings → Plugins** or [chatgpt.com/plugins](https://chatgpt.com/plugins).
+3. Create a developer-mode app / connector:
+   - **Name:** `TWIN Agent Dispatcher`
+   - **MCP server URL:** `https://twin-production-bcd9.up.railway.app/api/internal/agent-dispatch/mcp`
+   - **Authentication:** **OAuth** (not “None”)
+4. Complete OAuth: ChatGPT redirects to TWIN authorize page → paste production `AGENT_DISPATCH_TOKEN` from the secret store → Allow.
+5. Confirm tool list includes `dispatch_twin_agent`, `get_twin_agent_status`, `get_twin_agent_report`, `get_twin_agent_handoff`, `cancel_twin_agent`, `list_twin_agent_runs`, `reconcile_twin_agent_run`.
+6. In a new chat: **Developer mode** → enable the TWIN app → ask ChatGPT to dispatch (do not paste Cursor prompts).
 
-`execution_policy` is server-enforced (all flags must stay `true`). Weakening returns an error.
+Discovery endpoints ChatGPT uses automatically:
+
+| Discovery | URL |
+|-----------|-----|
+| Protected resource metadata | `GET /.well-known/oauth-protected-resource/api/internal/agent-dispatch/mcp` |
+| Authorization server metadata | `GET /.well-known/oauth-authorization-server/api/internal/agent-dispatch/oauth` |
+| Authorize | `GET/POST /api/internal/agent-dispatch/oauth/authorize` |
+| Token | `POST /api/internal/agent-dispatch/oauth/token` |
+| DCR (optional) | `POST /api/internal/agent-dispatch/oauth/register` |
+
+## Path B (fallback) — Custom GPT Actions + Bearer
+
+If MCP connector registration is unavailable on the account:
+
+1. Create a Custom GPT → Actions → Import from URL:  
+   `https://twin-production-bcd9.up.railway.app/api/internal/agent-dispatch/chatgpt/openapi.json`
+2. Authentication: **API Key** → Auth Type **Bearer** → value = production `AGENT_DISPATCH_TOKEN`.
+3. Operations map 1:1 to dispatcher tools (`dispatch_twin_agent`, status, report, handoff, …).
 
 ## Tools
 
@@ -66,17 +73,14 @@ Content-Type: application/json
 | `list_twin_agent_runs` | `agent_runs:read` | Recent runs |
 | `reconcile_twin_agent_run` | `agent_runs:read` | Force reconcile |
 
-Allowlist: `https://github.com/CzechowskiT/twin` + `cursor/phase1-monorepo-scaffold` only.
+Allowlist: `https://github.com/CzechowskiT/twin` + `cursor/phase1-monorepo-scaffold` only.  
+`execution_policy` is server-enforced (all flags must stay `true`).
 
 ## Cursor credential (separate)
 
-Dispatcher calls Cursor with Railway secret `CURSOR_CLOUD_AGENTS_API_KEY` (service-account / Cloud Agents API key). ChatGPT never sees it.
+Dispatcher calls Cursor with Railway secret `CURSOR_CLOUD_AGENTS_API_KEY`. ChatGPT never sees it.
 
-If missing, `GET .../canary` returns **BLOCKED** with the exact founder action:
-
-> Create one Cursor Cloud Agents service-account credential authorized for CzechowskiT/twin and store it in the existing Railway production secret store as CURSOR_CLOUD_AGENTS_API_KEY.
-
-## CLI smoke (same token)
+## CLI smoke (Bearer — same token)
 
 ```bash
 export TWIN_API_BASE_URL=https://twin-production-bcd9.up.railway.app
@@ -86,9 +90,17 @@ node frontend/scripts/twin-agent-dispatch.mjs canary
 node frontend/scripts/twin-agent-dispatch.mjs mcp-list-tools
 ```
 
+OAuth smoke (no ChatGPT UI):
+
+```bash
+# After deploy: GET well-known metadata (public)
+curl -sS "$TWIN_API_BASE_URL/.well-known/oauth-protected-resource/api/internal/agent-dispatch/mcp"
+curl -sS "$TWIN_API_BASE_URL/.well-known/oauth-authorization-server/api/internal/agent-dispatch/oauth"
+```
+
 ## Hard rules
 
 - Manual merge only — Dispatcher never merges.
 - Single active run per repo+base branch (HTTP **409** on conflict).
 - No secrets in logs, repo, or MCP query strings.
-- Gate F / Launch stay **NO-GO** until founder flips them.
+- Do not flip Gate F / Launch from this connector setup alone.
