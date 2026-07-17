@@ -160,11 +160,12 @@ class CursorCloudAgentsClient:
             data = res.json()
         agent = data.get("agent") or {}
         run = data.get("run") or {}
+        run_id = run.get("id") or agent.get("latestRunId")
         return CursorCreateResult(
             api_version="v1",
             agent_id=str(agent.get("id") or ""),
-            run_id=str(run.get("id")) if run.get("id") else None,
-            status=str(run.get("status") or agent.get("status") or "CREATING"),
+            run_id=str(run_id) if run_id else None,
+            status=str(run.get("status") or "CREATING"),
             agent_url=agent.get("url"),
             raw=data,
         )
@@ -217,9 +218,26 @@ class CursorCloudAgentsClient:
         )
 
     def get_run_snapshot(self, *, api_version: str, agent_id: str, run_id: str | None) -> CursorRunSnapshot:
-        if api_version == "v0" or not run_id:
+        if api_version == "v0":
             return self._get_v0(agent_id)
-        return self._get_v1_run(agent_id, run_id)
+        return self._get_v1_run(agent_id, self._resolve_v1_run_id(agent_id, run_id))
+
+    def _resolve_v1_run_id(self, agent_id: str, run_id: str | None) -> str:
+        """Recover a missing v1 run ID without crossing into the legacy v0 API."""
+        if run_id:
+            return run_id
+        with self._client() as client:
+            res = client.get(f"/v1/agents/{agent_id}")
+            if res.status_code >= 400:
+                raise CursorApiError(
+                    "Cursor v1 get agent failed",
+                    status_code=res.status_code,
+                    body=_safe_body(res.text),
+                )
+            latest_run_id = (res.json() or {}).get("latestRunId")
+        if not latest_run_id:
+            raise CursorApiError("Cursor v1 agent has no latest run", status_code=502)
+        return str(latest_run_id)
 
     def _get_v1_run(self, agent_id: str, run_id: str) -> CursorRunSnapshot:
         with self._client() as client:
@@ -268,8 +286,10 @@ class CursorCloudAgentsClient:
         )
 
     def cancel(self, *, api_version: str, agent_id: str, run_id: str | None) -> None:
+        if api_version == "v1":
+            run_id = self._resolve_v1_run_id(agent_id, run_id)
         with self._client() as client:
-            if api_version == "v1" and run_id:
+            if api_version == "v1":
                 res = client.post(f"/v1/agents/{agent_id}/runs/{run_id}/cancel")
                 # 409 run_not_cancellable is acceptable for already-terminal runs.
                 if res.status_code >= 400 and res.status_code != 409:

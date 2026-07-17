@@ -533,3 +533,69 @@ def test_cursor_v0_create_omits_name_key(monkeypatch):
     assert captured["body"]["source"]["repository"] == "https://github.com/CzechowskiT/twin"
     assert captured["body"]["webhook"]["url"] == "https://example.com/hooks/cursor"
     get_settings.cache_clear()
+
+
+def test_cursor_v1_create_uses_agent_latest_run_id(monkeypatch):
+    monkeypatch.setenv("CURSOR_CLOUD_AGENTS_API_KEY", "test-cursor-key")
+    get_settings.cache_clear()
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert request.method == "POST"
+        assert request.url.path == "/v1/agents"
+        return httpx.Response(
+            200,
+            json={
+                "agent": {
+                    "id": "bc-v1-test",
+                    "status": "ACTIVE",
+                    "latestRunId": "run-latest",
+                }
+            },
+        )
+
+    from app.services.agent_dispatch.cursor_client import CursorCloudAgentsClient
+
+    client = CursorCloudAgentsClient(get_settings(), transport=httpx.MockTransport(handler))
+    created = client.create_agent(
+        prompt_text="recover v1 run id",
+        repository_url="https://github.com/CzechowskiT/twin",
+        starting_ref="cursor/phase1-monorepo-scaffold",
+        auto_create_pr=False,
+        branch_name=None,
+        model_id=None,
+        webhook_url=None,
+        webhook_secret=None,
+        name="v1-name-is-valid",
+    )
+    assert created.api_version == "v1"
+    assert created.run_id == "run-latest"
+    assert created.status == "CREATING"
+    get_settings.cache_clear()
+
+
+def test_cursor_v1_missing_run_id_never_uses_v0(monkeypatch):
+    monkeypatch.setenv("CURSOR_CLOUD_AGENTS_API_KEY", "test-cursor-key")
+    get_settings.cache_clear()
+    paths: list[tuple[str, str]] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        paths.append((request.method, request.url.path))
+        if request.method == "GET" and request.url.path == "/v1/agents/bc-v1-test":
+            return httpx.Response(200, json={"id": "bc-v1-test", "latestRunId": "run-latest"})
+        if request.method == "GET" and request.url.path.endswith("/runs/run-latest"):
+            return httpx.Response(200, json={"id": "run-latest", "status": "RUNNING"})
+        if request.method == "POST" and request.url.path.endswith("/runs/run-latest/cancel"):
+            return httpx.Response(200, json={"id": "run-latest"})
+        return httpx.Response(404, json={"error": "not found"})
+
+    from app.services.agent_dispatch.cursor_client import CursorCloudAgentsClient
+
+    client = CursorCloudAgentsClient(get_settings(), transport=httpx.MockTransport(handler))
+    snapshot = client.get_run_snapshot(api_version="v1", agent_id="bc-v1-test", run_id=None)
+    client.cancel(api_version="v1", agent_id="bc-v1-test", run_id=None)
+
+    assert snapshot.run_id == "run-latest"
+    assert snapshot.status == "RUNNING"
+    assert all(not path.startswith("/v0/") for _, path in paths)
+    assert paths.count(("GET", "/v1/agents/bc-v1-test")) == 2
+    get_settings.cache_clear()
