@@ -14,6 +14,27 @@ _SECRET_PATTERNS = (
     re.compile(r"(?i)crsr_[a-zA-Z0-9]{20,}"),
     re.compile(r"(?i)ghp_[a-zA-Z0-9]{20,}"),
 )
+_GIT_ACTION_PROHIBITION = re.compile(
+    r"(?i)\b(?:"
+    r"(?:do\s+not|don't|must\s+not|may\s+not|never)\s+"
+    r"(?:create|make|open|push|write|submit|start|checkout|switch|commit)\w*|"
+    r"nie\s+(?:twórz|tworzyć|zakładaj|zakładać|rób|robić|wykonuj|"
+    r"wykonywać|otwieraj|otwierać|commituj|commitować)|"
+    r"(?:without\s+(?:creating|making|opening|committing)|"
+    r"bez\s+(?:tworzenia|zakładania|robienia|wykonywania|otwierania|commitowania))|"
+    r"zakaz\s+(?:tworzenia|zakładania|robienia|wykonywania|otwierania|commitowania)"
+    r")\b[^.!?;\n]{0,200}"
+)
+_GIT_DIRECT_PROHIBITION = re.compile(
+    r"(?i)\b(?:no|bez)\s+(?:new\s+|any\s+|nowych\s+)?"
+    r"(?=(?:branch|branchy|brancha|branchów|gałąź|gałęzi|commit|pr\b|pr-ów|pull[\s-]+request))"
+    r"[^.!?;\n]{0,200}"
+)
+_GIT_ARTIFACTS = (
+    re.compile(r"(?i)\b(?:branch(?:es)?|brancha|branchy|branchów|gałęzi|gałąź)\b"),
+    re.compile(r"(?i)\bcommit(?:s|ów|u|y|ach)?\b"),
+    re.compile(r"(?i)\b(?:pr(?:s|-ów)?|pull[\s-]+requests?|pull[\s-]+requestu)\b"),
+)
 
 TWIN_EXECUTION_POLICY = """# TWIN Agent Dispatcher — execution policy (mandatory)
 
@@ -48,6 +69,21 @@ def redact_secrets(text: str) -> str:
     for pat in _SECRET_PATTERNS:
         out = pat.sub("[REDACTED]", out)
     return out
+
+
+def prompt_forbids_git_artifacts(user_prompt: str) -> bool:
+    """Detect an explicit ban on branch, commit, and PR creation."""
+    prohibited = [False, False, False]
+    normalized = (user_prompt or "").replace("’", "'")
+    clauses = [
+        *(_GIT_ACTION_PROHIBITION.finditer(normalized)),
+        *(_GIT_DIRECT_PROHIBITION.finditer(normalized)),
+    ]
+    for match in clauses:
+        clause = match.group(0)
+        for index, artifact in enumerate(_GIT_ARTIFACTS):
+            prohibited[index] = prohibited[index] or bool(artifact.search(clause))
+    return all(prohibited)
 
 
 def build_prompt_envelope(user_prompt: str, *, policy_prefix: str | None = None) -> PromptEnvelope:
