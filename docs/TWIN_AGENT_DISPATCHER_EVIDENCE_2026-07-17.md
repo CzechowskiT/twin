@@ -50,6 +50,24 @@ Cursor docs (2026-07-17): Cloud Agents API accepts user API key or **service acc
 | Non-terminal runs | none |
 | Historical runs | `cancelled` smoke `738c5f1a-…`; `failed` credential probe `f7857c2e-…` |
 
+## Runtime contract guard closure
+
+| Evidence | Result |
+|----------|--------|
+| Current Cursor Cloud run | `bc-56b06e60-d470-48e0-87d8-502d1926acee`; source `api`; repo `github.com/CzechowskiT/twin`; branch `fix/dispatcher-runtime-contract-guard` |
+| Starting ref | `c5df0963d0acee479f9178ff7f35226260714506` |
+| Official contract checked | Cursor v1 endpoints + v0 legacy + webhooks, fetched 2026-07-17 |
+| Required v0 guard | `_create_v0` omits top-level `name`; Cursor v0 would reject it with HTTP 400 |
+| Required regression test | `test_cursor_v0_create_omits_name_key` exists and passes |
+| Dispatcher/MCP/CLI | MCP and CLI call only TWIN `/api/internal/agent-dispatch/*`; the Cursor credential remains backend-only |
+| Additional inconsistency found | v1 records without `run_id` incorrectly fell back to v0 read/stop endpoints |
+| Closure | v1 now resolves `agent.latestRunId` through `GET /v1/agents/{id}` and stays on v1 for read/cancel; create also accepts `latestRunId` fallback and never maps agent `ACTIVE` as a run status |
+| Targeted tests | `pytest -q tests/test_agent_dispatch.py` → **21 passed** |
+
+This API-sourced run proves the current Cursor API execution path and branch
+handoff. It does not prove that the still-absent Railway service-account
+credential is installed, so it does not clear the production canary blocker.
+
 ## Live canary / conflict / feature
 
 | Stage | Result |
@@ -57,19 +75,22 @@ Cursor docs (2026-07-17): Cloud Agents API accepts user API key or **service acc
 | Read-only live canary via Cursor | **NOT RUN** (credential blocker — no fake live) |
 | Parallel 409 during live | **NOT RUN** |
 | Cancellation live | **NOT RUN** (N/A); official cancel endpoints exist in contract (`v1` cancel / `v0` stop) |
-| Feature `dispatcher-runtime-contract-guard` | **NOT RUN** |
-| GitHub branch/PR from this batch | **none** (no infra fix PR — code healthy) |
+| Feature `dispatcher-runtime-contract-guard` | **PASS** (contract audit + targeted tests) |
+| GitHub branch/PR from this batch | `fix/dispatcher-runtime-contract-guard`; one manual-merge PR to be opened |
 
 ## Cleanup
 
 - Stale locks: **0**
 - Orphaned/non-terminal runs: **0**
-- No Dispatcher/MCP rebuild; no empty `fix/twin-agent-live-run-closure` PR
+- No migration, frontend, auth, or infrastructure changes
+- No auto-merge or merge action
 
 ## Hard stance
 
 - Gate F: **PENDING** (unchanged)
 - Platform Launch: **NO-GO** (unchanged)
+- Runtime contract guard is closed, but the Railway credential/live-canary
+  evidence gap remains.
 - Access gap (single founder action):
 
 > Create one Cursor Cloud Agents service-account credential authorized for CzechowskiT/twin and store it in the Railway production secret store as CURSOR_CLOUD_AGENTS_API_KEY.

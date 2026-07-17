@@ -41,6 +41,18 @@ MCP tools: `dispatch_twin_agent`, `get_twin_agent_status`, `get_twin_agent_repor
 `get_twin_agent_handoff`, `cancel_twin_agent`, `list_twin_agent_runs`,
 `reconcile_twin_agent_run`. Setup: [TWIN_AGENT_DISPATCHER_CHATGPT_SETUP.md](./TWIN_AGENT_DISPATCHER_CHATGPT_SETUP.md).
 
+## Cursor API contract
+
+| Concern | v1 | v0 webhook path |
+|---------|----|-----------------|
+| Create payload | `repos`, `model: {id}`, optional top-level `name`, `autoCreatePR` | `source` / `target`, `model` string, `autoCreatePr`; **no top-level `name`** (rejected with HTTP 400) |
+| Read | `GET /v1/agents/{id}/runs/{runId}` | `GET /v0/agents/{id}` |
+| Cancel | `POST /v1/agents/{id}/runs/{runId}/cancel` | `POST /v0/agents/{id}/stop` |
+
+`task_name` is TWIN metadata, not a v0 Cursor request field. If a persisted v1
+record lacks `run_id`, the client resolves `latestRunId` through
+`GET /v1/agents/{id}`; it never falls back to a v0 endpoint.
+
 ## Create contract
 
 `POST /api/internal/agent-dispatch/runs`
@@ -69,6 +81,7 @@ MCP tools: `dispatch_twin_agent`, `get_twin_agent_status`, `get_twin_agent_repor
 Failures: `failed` · `timed_out` · `cancelling` → `cancelled`
 
 Cursor v1 run statuses mapped: `CREATING`/`RUNNING` → running; `FINISHED` → awaiting_result; `ERROR` → failed; `CANCELLED` → cancelled; `EXPIRED` → timed_out.
+Cursor v0 agent statuses mapped: `CREATING`/`RUNNING` → running; `FINISHED` → awaiting_result; `ERROR` → failed.
 
 ## Persistence
 
