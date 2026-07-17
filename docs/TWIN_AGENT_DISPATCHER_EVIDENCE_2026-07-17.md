@@ -76,7 +76,7 @@ credential is installed, so it does not clear the production canary blocker.
 | Parallel 409 during live | **NOT RUN** |
 | Cancellation live | **NOT RUN** (N/A); official cancel endpoints exist in contract (`v1` cancel / `v0` stop) |
 | Feature `dispatcher-runtime-contract-guard` | **PASS** (contract audit + targeted tests) |
-| GitHub branch/PR from this batch | `fix/dispatcher-runtime-contract-guard`; one manual-merge PR to be opened |
+| GitHub branch/PR from this batch | `fix/dispatcher-runtime-contract-guard`; draft PR [#499](https://github.com/CzechowskiT/twin/pull/499), manual merge only |
 
 ## Cleanup
 
