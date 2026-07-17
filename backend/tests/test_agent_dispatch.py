@@ -491,3 +491,45 @@ def test_health_exposes_mcp_without_secrets(dispatch_client):
     assert "dispatch_twin_agent" in body["mcp_tools"]
     assert "test-dispatch-token" not in res.text
     assert body["encryption_via"] == "SECRET_KEY+token_crypto"
+
+
+def test_cursor_v0_create_omits_name_key(monkeypatch):
+    """Cursor v0 /agents rejects unrecognized top-level `name` (HTTP 400)."""
+    monkeypatch.setenv("CURSOR_CLOUD_AGENTS_API_KEY", "test-cursor-key")
+    get_settings.cache_clear()
+
+    captured: dict = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.method == "POST" and request.url.path == "/v0/agents":
+            captured["body"] = json.loads(request.content.decode())
+            return httpx.Response(
+                201,
+                json={
+                    "id": "bc-v0-test",
+                    "status": "CREATING",
+                    "target": {"url": "https://cursor.com/agents/bc-v0-test"},
+                },
+            )
+        return httpx.Response(404, json={"error": "not found"})
+
+    from app.services.agent_dispatch.cursor_client import CursorCloudAgentsClient
+
+    client = CursorCloudAgentsClient(get_settings(), transport=httpx.MockTransport(handler))
+    created = client.create_agent(
+        prompt_text="omit name on v0",
+        repository_url="https://github.com/CzechowskiT/twin",
+        starting_ref="cursor/phase1-monorepo-scaffold",
+        auto_create_pr=False,
+        branch_name=None,
+        model_id=None,
+        webhook_url="https://example.com/hooks/cursor",
+        webhook_secret="y" * 32,
+        name="twin-dispatch-should-not-appear",
+    )
+    assert created.api_version == "v0"
+    assert created.agent_id == "bc-v0-test"
+    assert "name" not in captured["body"]
+    assert captured["body"]["source"]["repository"] == "https://github.com/CzechowskiT/twin"
+    assert captured["body"]["webhook"]["url"] == "https://example.com/hooks/cursor"
+    get_settings.cache_clear()
