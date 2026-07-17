@@ -45,11 +45,17 @@ from app.services.agent_dispatch.locking import (
     heartbeat_lock,
     release_lock,
 )
-from app.services.agent_dispatch.prompt_envelope import build_prompt_envelope
+from app.services.agent_dispatch.prompt_envelope import (
+    build_prompt_envelope,
+    prompt_forbids_git_artifacts,
+)
 from app.services.agent_dispatch.webhooks import map_webhook_to_fields, verify_cursor_webhook_signature
 from app.services.token_crypto import encrypt_secret
 
 logger = logging.getLogger(__name__)
+_GIT_ARTIFACT_POLICY_KEY = "git_artifact_policy"
+_READ_ONLY_GIT_ARTIFACT_POLICY = "read_only"
+_WRITABLE_GIT_ARTIFACT_POLICY = "writable"
 
 
 def _allowlist_ok(settings: Settings, repo_url: str, base_branch: str) -> None:
@@ -108,6 +114,12 @@ def create_dispatch_run(
     store_encrypted = bool(settings.agent_dispatch_encrypt_prompts)
     ttl_hours = int(settings.agent_dispatch_prompt_ttl_hours or 0)
 
+    run_metadata = dict(metadata or {})
+    run_metadata[_GIT_ARTIFACT_POLICY_KEY] = (
+        _READ_ONLY_GIT_ARTIFACT_POLICY
+        if prompt_forbids_git_artifacts(prompt)
+        else _WRITABLE_GIT_ARTIFACT_POLICY
+    )
     run = AgentDispatchRun(
         id=str(uuid.uuid4()),
         status=DispatchRunStatus.QUEUED.value,
@@ -125,7 +137,7 @@ def create_dispatch_run(
         prompt_expires_at=(datetime.utcnow() + timedelta(hours=ttl_hours)) if ttl_hours > 0 else None,
         idempotency_key=idempotency_key,
         created_by_fingerprint=principal.token_fingerprint,
-        metadata_json=json.dumps(metadata or {}, default=str),
+        metadata_json=json.dumps(run_metadata, default=str),
         lease_expires_at=datetime.utcnow()
         + timedelta(seconds=int(settings.agent_dispatch_lock_lease_seconds or 120)),
     )
@@ -637,16 +649,41 @@ def list_dispatch_runs(
     return list(db.execute(stmt).scalars().all())
 
 
+def _read_only_git_artifacts(run: AgentDispatchRun) -> bool:
+    metadata: dict[str, Any] = {}
+    if run.metadata_json:
+        try:
+            loaded = json.loads(run.metadata_json)
+            metadata = loaded if isinstance(loaded, dict) else {}
+        except json.JSONDecodeError:
+            metadata = {}
+    policy = metadata.get(_GIT_ARTIFACT_POLICY_KEY)
+    if policy is not None:
+        return policy == _READ_ONLY_GIT_ARTIFACT_POLICY
+    return prompt_forbids_git_artifacts(run.prompt_redacted_preview or "")
+
+
+def _git_artifacts_for_response(run: AgentDispatchRun) -> dict[str, str | None]:
+    if _read_only_git_artifacts(run):
+        return {"branch": None, "commit": None, "pr": None}
+    return {
+        "branch": run.result_branch,
+        "commit": run.result_head_sha,
+        "pr": run.result_pr_url,
+    }
+
+
 def run_report_dict(db: Session, run_id: str) -> dict[str, Any]:
     run = db.get(AgentDispatchRun, run_id)
     if not run:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="run not found")
+    artifacts = _git_artifacts_for_response(run)
     data = run_to_public_dict(run)
     data["report"] = {
         "status": run.status,
-        "branch": run.result_branch,
-        "pr_url": run.result_pr_url,
-        "head_sha": run.result_head_sha,
+        **artifacts,
+        "pr_url": artifacts["pr"],
+        "head_sha": artifacts["commit"],
         "ci_status": run.result_ci_status,
         "summary": run.result_summary,
         "error_code": run.error_code,
@@ -660,6 +697,7 @@ def get_run_handoff(db: Session, run_id: str) -> dict[str, Any]:
     report = run_report_dict(db, run_id)
     run = db.get(AgentDispatchRun, run_id)
     assert run is not None
+    report_body = report["report"]
     return {
         "handoff_version": "twin-agent-dispatch-handoff/v1",
         "run_id": run.id,
@@ -668,9 +706,11 @@ def get_run_handoff(db: Session, run_id: str) -> dict[str, Any]:
         "repository_url": run.repository_url,
         "base_branch": run.base_branch,
         "result": {
-            "branch": run.result_branch,
-            "pr_url": run.result_pr_url,
-            "head_sha": run.result_head_sha,
+            "branch": report_body["branch"],
+            "commit": report_body["commit"],
+            "pr": report_body["pr"],
+            "pr_url": report_body["pr_url"],
+            "head_sha": report_body["head_sha"],
             "ci_status": run.result_ci_status,
             "summary": run.result_summary,
         },
@@ -696,6 +736,7 @@ def get_run_handoff(db: Session, run_id: str) -> dict[str, Any]:
 
 
 def run_to_public_dict(run: AgentDispatchRun) -> dict[str, Any]:
+    artifacts = _git_artifacts_for_response(run)
     enrichment = None
     if run.github_enrichment_json:
         try:
@@ -724,9 +765,9 @@ def run_to_public_dict(run: AgentDispatchRun) -> dict[str, Any]:
         "cursor_run_id": run.cursor_run_id,
         "cursor_status": run.cursor_status,
         "cursor_agent_url": run.cursor_agent_url,
-        "result_branch": run.result_branch,
-        "result_pr_url": run.result_pr_url,
-        "result_head_sha": run.result_head_sha,
+        "result_branch": artifacts["branch"],
+        "result_pr_url": artifacts["pr"],
+        "result_head_sha": artifacts["commit"],
         "result_ci_status": run.result_ci_status,
         "result_summary": run.result_summary,
         "error_code": run.error_code,

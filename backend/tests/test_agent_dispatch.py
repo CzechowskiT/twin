@@ -5,7 +5,6 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
-from datetime import datetime
 
 import httpx
 import pytest
@@ -19,7 +18,11 @@ from app.database.models import Base
 from app.database.session import get_db
 from app.main import app
 from app.services.agent_dispatch.constants import CURSOR_CONTRACT_DOC_DATE, CURSOR_CONTRACT_VERSION
-from app.services.agent_dispatch.prompt_envelope import build_prompt_envelope, redact_secrets
+from app.services.agent_dispatch.prompt_envelope import (
+    build_prompt_envelope,
+    prompt_forbids_git_artifacts,
+    redact_secrets,
+)
 from app.services.agent_dispatch.webhooks import verify_cursor_webhook_signature
 
 
@@ -114,6 +117,33 @@ def test_prompt_envelope_hash_and_redaction():
     assert env.prompt_hash
     assert "sk-secret" not in env.redacted_preview
     assert "[REDACTED]" in redact_secrets("token: abcdef")
+
+
+@pytest.mark.parametrize(
+    "prompt",
+    [
+        "Analyze only. Do not create a branch, commit, or PR.",
+        "Tylko analiza. Nie twórz brancha, commitów ani PR.",
+        "Read-only: no branches, commits, or pull requests.",
+        "You may not create branches, commits, or PRs.",
+        "Don’t create a branch, commit, or PR.",
+        "Bez branchów, commitów i PR-ów.",
+    ],
+)
+def test_detects_explicit_read_only_git_artifact_policy(prompt):
+    assert prompt_forbids_git_artifacts(prompt) is True
+
+
+@pytest.mark.parametrize(
+    "prompt",
+    [
+        "Create a branch and commit the fix; do not merge the PR.",
+        "No questions—create a branch, commit, and PR.",
+        "Do not delete the branch, amend the commit, or merge the PR.",
+    ],
+)
+def test_does_not_treat_other_git_restrictions_as_read_only(prompt):
+    assert prompt_forbids_git_artifacts(prompt) is False
 
 
 def test_create_run_queued_without_cursor_key(dispatch_client):
@@ -452,6 +482,96 @@ def test_mcp_tools_list_and_dispatch_handoff(dispatch_client):
     )
     assert http_handoff.status_code == 200
     assert http_handoff.json()["run_id"] == run_id
+
+
+def _mcp_run_payload(client, tool_name, run_id, request_id):
+    response = client.post(
+        "/api/internal/agent-dispatch/mcp",
+        headers=_auth(),
+        json={
+            "jsonrpc": "2.0",
+            "id": request_id,
+            "method": "tools/call",
+            "params": {"name": tool_name, "arguments": {"run_id": run_id}},
+        },
+    )
+    assert response.status_code == 200
+    return json.loads(response.json()["result"]["content"][0]["text"])
+
+
+def test_read_only_report_and_handoff_hide_phantom_git_artifacts(dispatch_client):
+    client, db = dispatch_client
+    created = client.post(
+        "/api/internal/agent-dispatch/runs",
+        headers=_auth(),
+        json=_create_payload(
+            prompt="Analyze only. Do not create a branch, commit, or PR.",
+            idempotency_key="read-only-artifacts",
+        ),
+    ).json()
+    from app.database.models import AgentDispatchRun
+
+    run = db.get(AgentDispatchRun, created["id"])
+    run.result_branch = "cursor/technical-working-branch"
+    run.result_head_sha = "a" * 40
+    run.result_pr_url = "https://github.com/CzechowskiT/twin/pull/999"
+    db.commit()
+
+    report = client.get(
+        f"/api/internal/agent-dispatch/runs/{run.id}/report", headers=_auth()
+    ).json()
+    handoff = client.get(
+        f"/api/internal/agent-dispatch/runs/{run.id}/handoff", headers=_auth()
+    ).json()
+    mcp_report = _mcp_run_payload(client, "get_twin_agent_report", run.id, 10)
+    mcp_handoff = _mcp_run_payload(client, "get_twin_agent_handoff", run.id, 11)
+
+    for payload in (report, mcp_report):
+        assert {key: payload["report"][key] for key in ("branch", "commit", "pr")} == {
+            "branch": None,
+            "commit": None,
+            "pr": None,
+        }
+        assert payload["report"]["head_sha"] is None
+        assert payload["report"]["pr_url"] is None
+        assert payload["result_branch"] is None
+    for payload in (handoff, mcp_handoff):
+        assert {key: payload["result"][key] for key in ("branch", "commit", "pr")} == {
+            "branch": None,
+            "commit": None,
+            "pr": None,
+        }
+        assert payload["public_run"]["result_branch"] is None
+        assert "technical-working-branch" not in json.dumps(payload)
+
+
+def test_writable_run_preserves_existing_git_artifact_contract(dispatch_client):
+    client, db = dispatch_client
+    created = client.post(
+        "/api/internal/agent-dispatch/runs",
+        headers=_auth(),
+        json=_create_payload(prompt="Implement, commit, and open a PR."),
+    ).json()
+    from app.database.models import AgentDispatchRun
+
+    run = db.get(AgentDispatchRun, created["id"])
+    run.result_branch = "fix/report-contract"
+    run.result_head_sha = "b" * 40
+    run.result_pr_url = "https://github.com/CzechowskiT/twin/pull/1000"
+    db.commit()
+
+    report = client.get(
+        f"/api/internal/agent-dispatch/runs/{run.id}/report", headers=_auth()
+    ).json()
+    handoff = client.get(
+        f"/api/internal/agent-dispatch/runs/{run.id}/handoff", headers=_auth()
+    ).json()
+    assert report["report"]["branch"] == report["result_branch"] == run.result_branch
+    assert report["report"]["head_sha"] == report["report"]["commit"] == run.result_head_sha
+    assert report["report"]["pr_url"] == report["report"]["pr"] == run.result_pr_url
+    assert handoff["result"]["branch"] == run.result_branch
+    assert handoff["result"]["head_sha"] == run.result_head_sha
+    assert handoff["result"]["pr_url"] == run.result_pr_url
 
 
 def test_mcp_rejects_weak_policy(dispatch_client):
