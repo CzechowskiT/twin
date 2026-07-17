@@ -383,6 +383,9 @@ def test_mcp_requires_auth(dispatch_client):
         json={"jsonrpc": "2.0", "id": 1, "method": "tools/list"},
     )
     assert res.status_code == 401
+    www = res.headers.get("www-authenticate", "")
+    assert "resource_metadata=" in www
+    assert "oauth-protected-resource" in www
 
 
 def test_mcp_tools_list_and_dispatch_handoff(dispatch_client):
@@ -599,3 +602,121 @@ def test_cursor_v1_missing_run_id_never_uses_v0(monkeypatch):
     assert all(not path.startswith("/v0/") for _, path in paths)
     assert paths.count(("GET", "/v1/agents/bc-v1-test")) == 2
     get_settings.cache_clear()
+
+
+def _pkce_pair() -> tuple[str, str]:
+    import base64
+    import hashlib
+    import secrets
+
+    verifier = secrets.token_urlsafe(48)
+    challenge = (
+        base64.urlsafe_b64encode(hashlib.sha256(verifier.encode()).digest())
+        .rstrip(b"=")
+        .decode()
+    )
+    return verifier, challenge
+
+
+def test_chatgpt_oauth_metadata_and_token_exchange(dispatch_client):
+    client, _ = dispatch_client
+    prm = client.get("/.well-known/oauth-protected-resource/api/internal/agent-dispatch/mcp")
+    assert prm.status_code == 200
+    assert prm.json()["resource"].endswith("/api/internal/agent-dispatch/mcp")
+    assert prm.json()["authorization_servers"]
+
+    as_meta = client.get(
+        "/.well-known/oauth-authorization-server/api/internal/agent-dispatch/oauth"
+    )
+    assert as_meta.status_code == 200
+    body = as_meta.json()
+    assert body["code_challenge_methods_supported"] == ["S256"]
+    assert "authorization_code" in body["grant_types_supported"]
+    assert body.get("client_id_metadata_document_supported") is True
+
+    openapi = client.get("/api/internal/agent-dispatch/chatgpt/openapi.json")
+    assert openapi.status_code == 200
+    assert openapi.json()["paths"]["/api/internal/agent-dispatch/runs"]["post"][
+        "operationId"
+    ] == "dispatch_twin_agent"
+
+    verifier, challenge = _pkce_pair()
+    redirect = "https://chatgpt.com/connector/oauth/test-callback"
+    client_id = "chatgpt-test-client"
+    auth_get = client.get(
+        "/api/internal/agent-dispatch/oauth/authorize",
+        params={
+            "response_type": "code",
+            "client_id": client_id,
+            "redirect_uri": redirect,
+            "code_challenge": challenge,
+            "code_challenge_method": "S256",
+            "resource": "http://testserver/api/internal/agent-dispatch/mcp",
+        },
+    )
+    assert auth_get.status_code == 200
+    assert "AGENT_DISPATCH_TOKEN" in auth_get.text
+
+    auth_post = client.post(
+        "/api/internal/agent-dispatch/oauth/authorize",
+        params={
+            "response_type": "code",
+            "client_id": client_id,
+            "redirect_uri": redirect,
+            "code_challenge": challenge,
+            "code_challenge_method": "S256",
+            "state": "st1",
+            "resource": "http://testserver/api/internal/agent-dispatch/mcp",
+        },
+        data={"token": "test-dispatch-token"},
+        follow_redirects=False,
+    )
+    assert auth_post.status_code == 302
+    loc = auth_post.headers["location"]
+    assert loc.startswith(redirect)
+    assert "code=" in loc
+    from urllib.parse import parse_qs, urlparse
+
+    code = parse_qs(urlparse(loc).query)["code"][0]
+
+    token_res = client.post(
+        "/api/internal/agent-dispatch/oauth/token",
+        data={
+            "grant_type": "authorization_code",
+            "code": code,
+            "redirect_uri": redirect,
+            "client_id": client_id,
+            "code_verifier": verifier,
+            "resource": "http://testserver/api/internal/agent-dispatch/mcp",
+        },
+    )
+    assert token_res.status_code == 200
+    access = token_res.json()["access_token"]
+    assert token_res.json()["token_type"] == "Bearer"
+
+    listed = client.post(
+        "/api/internal/agent-dispatch/mcp",
+        headers={"Authorization": f"Bearer {access}"},
+        json={"jsonrpc": "2.0", "id": 1, "method": "tools/list"},
+    )
+    assert listed.status_code == 200
+    names = {t["name"] for t in listed.json()["result"]["tools"]}
+    assert "dispatch_twin_agent" in names
+
+
+def test_oauth_rejects_wrong_token(dispatch_client):
+    client, _ = dispatch_client
+    _, challenge = _pkce_pair()
+    res = client.post(
+        "/api/internal/agent-dispatch/oauth/authorize",
+        params={
+            "response_type": "code",
+            "client_id": "c1",
+            "redirect_uri": "https://chatgpt.com/connector/oauth/x",
+            "code_challenge": challenge,
+            "code_challenge_method": "S256",
+        },
+        data={"token": "wrong-token"},
+        follow_redirects=False,
+    )
+    assert res.status_code == 401

@@ -60,6 +60,9 @@ def _tool(
     description: str,
     properties: dict[str, Any],
     required: list[str] | None = None,
+    *,
+    read_only: bool = False,
+    destructive: bool = False,
 ) -> dict[str, Any]:
     return {
         "name": name,
@@ -69,6 +72,12 @@ def _tool(
             "properties": properties,
             "required": required or [],
             "additionalProperties": False,
+        },
+        "annotations": {
+            "readOnlyHint": read_only,
+            "destructiveHint": destructive,
+            "idempotentHint": read_only,
+            "openWorldHint": False,
         },
     }
 
@@ -121,24 +130,28 @@ def tool_definitions() -> list[dict[str, Any]]:
                 "refresh": {"type": "boolean", "default": False},
             },
             ["run_id"],
+            read_only=True,
         ),
         _tool(
             "get_twin_agent_report",
             "Get structured final report for a run (no manual prompt copy).",
             {"run_id": {"type": "string", "minLength": 1}},
             ["run_id"],
+            read_only=True,
         ),
         _tool(
             "get_twin_agent_handoff",
             "Get ChatGPT/MCP handoff package (status, report, PR, branch, CI).",
             {"run_id": {"type": "string", "minLength": 1}},
             ["run_id"],
+            read_only=True,
         ),
         _tool(
             "cancel_twin_agent",
             "Cancel an active dispatcher run (and Cursor agent when possible).",
             {"run_id": {"type": "string", "minLength": 1}},
             ["run_id"],
+            destructive=True,
         ),
         _tool(
             "list_twin_agent_runs",
@@ -147,6 +160,7 @@ def tool_definitions() -> list[dict[str, Any]]:
                 "limit": {"type": "integer", "minimum": 1, "maximum": 100, "default": 20},
                 "status": {"type": "string"},
             },
+            read_only=True,
         ),
         _tool(
             "reconcile_twin_agent_run",
@@ -289,8 +303,10 @@ def handle_jsonrpc(
                     "version": MCP_SERVER_VERSION,
                 },
                 "instructions": (
-                    "TWIN Agent Dispatcher MCP. Use Bearer AGENT_DISPATCH_TOKEN. "
-                    "Never pass CURSOR_CLOUD_AGENTS_API_KEY. Manual merge only."
+                    "TWIN Agent Dispatcher MCP for ChatGPT. "
+                    "Auth: OAuth 2.1 (ChatGPT connector) or Bearer AGENT_DISPATCH_TOKEN (CLI/Actions). "
+                    "Never pass CURSOR_CLOUD_AGENTS_API_KEY. After runs, call get_twin_agent_handoff. "
+                    "Manual merge only; do not copy prompts from the UI."
                 ),
             }
         )

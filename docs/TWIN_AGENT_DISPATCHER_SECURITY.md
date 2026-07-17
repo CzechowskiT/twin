@@ -18,7 +18,11 @@
 ## Auth
 
 `Authorization: Bearer <AGENT_DISPATCH_TOKEN>`  
-Optional multi-token: `AGENT_DISPATCH_TOKENS=tokA:agent_runs:create|agent_runs:read,tokB:agent_runs:admin`  
+Optional multi-token: `AGENT_DISPATCH_TOKENS=tokA:agent_runs:create|agent_runs:read,tokB:agent_runs:admin`
+
+**ChatGPT MCP connector:** Official ChatGPT Developer Mode supports OAuth / No Auth / Mixed — not static API keys. TWIN co-hosts OAuth 2.1 (auth code + PKCE); consent proves possession of `AGENT_DISPATCH_TOKEN` and issues short-lived access JWTs. See `docs/TWIN_AGENT_DISPATCHER_CHATGPT_SETUP.md`.
+
+Unauthenticated MCP calls return **401** with `WWW-Authenticate` + RFC 9728 `resource_metadata`. Secrets never in query strings.  
 Short aliases `create|read|cancel|admin` normalize to `agent_runs:*`.
 
 Admin scope does **not** auto-grant create/read/cancel (least privilege). Tokens used in ops typically carry all four scopes.

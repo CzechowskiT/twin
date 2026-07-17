@@ -50,9 +50,11 @@ Server rejects any weakened `execution_policy` flag.
 
 ## Auth for connector
 
-- `AGENT_DISPATCH_TOKEN` only in the MCP client
+- **ChatGPT MCP connector:** OAuth 2.1 (auth code + PKCE). ChatGPT does not support static API keys for MCP. See [TWIN_AGENT_DISPATCHER_CHATGPT_SETUP.md](./TWIN_AGENT_DISPATCHER_CHATGPT_SETUP.md).
+- **CLI / Custom GPT Actions:** `Authorization: Bearer <AGENT_DISPATCH_TOKEN>`
 - Never embed `CURSOR_CLOUD_AGENTS_API_KEY` in ChatGPT / MCP
 - No secrets in query strings
+- Unauthenticated MCP → **401** + `WWW-Authenticate` with `resource_metadata`
 
 ## Idempotency
 
