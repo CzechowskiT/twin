@@ -4,15 +4,24 @@ from __future__ import annotations
 
 import logging
 
+from celery.signals import worker_ready
 from app.config import get_settings
 from app.database.session import SessionLocal
 from app.services.agent_dispatch.constants import ACTIVE_LOCK_STATUSES
 from app.services.agent_dispatch.service import purge_expired_prompts, reconcile_run, recover_active_runs
+from app.services.agent_dispatch.operator_service import recover_operator_runs
+from app.services.agent_dispatch.operator_service import OperatorService
 from app.tasks.celery_app import celery_app
 from sqlalchemy import select
 from app.database.models import AgentDispatchRun
 
 logger = logging.getLogger(__name__)
+
+
+@worker_ready.connect
+def recover_dispatcher_when_worker_starts(**_kwargs) -> None:
+    """A restarted worker resumes stages that were explicitly started earlier."""
+    recover_dispatch_runs_on_startup.delay()
 
 
 @celery_app.task(name="app.tasks.agent_dispatch_tasks.reconcile_active_dispatch_runs")
@@ -39,7 +48,11 @@ def reconcile_active_dispatch_runs() -> str:
                 ok += 1
             except Exception:
                 logger.exception("reconcile failed for %s", run_id)
-        return f"reconciled={ok};purged_prompts={purged}"
+        operator = recover_operator_runs(db, settings)
+        return (
+            f"reconciled={ok};purged_prompts={purged};"
+            f"operator_recovered={operator.get('recovered', 0)}"
+        )
     finally:
         db.close()
 
@@ -50,6 +63,34 @@ def recover_dispatch_runs_on_startup() -> str:
     db = SessionLocal()
     try:
         result = recover_active_runs(db, settings)
-        return f"recovered={result.get('reconciled', 0)}"
+        operator = recover_operator_runs(db, settings)
+        return (
+            f"recovered={result.get('reconciled', 0)};"
+            f"operator_recovered={operator.get('recovered', 0)}"
+        )
+    finally:
+        db.close()
+
+
+@celery_app.task(
+    name="app.tasks.agent_dispatch_tasks.run_agent_dispatch_operator",
+    acks_late=True,
+    reject_on_worker_lost=True,
+)
+def run_agent_dispatch_operator(
+    run_id: str,
+    correlation_id: str | None,
+    actor_fingerprint: str,
+) -> str:
+    """Execute the explicitly authorized Operator workflow in a durable worker."""
+    settings = get_settings()
+    db = SessionLocal()
+    try:
+        run = OperatorService(
+            db,
+            settings,
+            actor_fingerprint=actor_fingerprint,
+        ).run(run_id, correlation_id=correlation_id)
+        return f"run_id={run.id};status={run.status}"
     finally:
         db.close()

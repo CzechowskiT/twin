@@ -38,6 +38,7 @@ from app.services.agent_dispatch.constants import (
     CURSOR_V1_TERMINAL,
     DEFAULT_EXECUTION_POLICY,
     DISPATCH_RUN_TERMINAL,
+    OPERATOR_RUN_STATUSES,
     DispatchRunStatus,
 )
 from app.services.agent_dispatch.cursor_client import (
@@ -322,6 +323,8 @@ def reconcile_run(db: Session, settings: Settings, run_id: str) -> AgentDispatch
     run = db.get(AgentDispatchRun, run_id)
     if not run:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="run not found")
+    if run.status in OPERATOR_RUN_STATUSES:
+        return run
     if run.status in DISPATCH_RUN_TERMINAL and run.status != DispatchRunStatus.NEEDS_ATTENTION.value:
         return run
     if run.status == DispatchRunStatus.NEEDS_ATTENTION.value:
@@ -502,6 +505,29 @@ def finalize_with_github(db: Session, settings: Settings, run_id: str) -> AgentD
         if reconcile_ok:
             enrichment = _github_enrichment(run, settings, expected)
     _persist_enrichment(run, enrichment)
+    if _operator_handoff_ready(settings, expected, enrichment):
+        from app.services.agent_dispatch.operator_github import OperatorGitHubError
+        from app.services.agent_dispatch.operator_service import OperatorService
+
+        try:
+            db.commit()
+            return OperatorService(db, settings).handoff(run.id)
+        except OperatorGitHubError as exc:
+            run.status = DispatchRunStatus.NEEDS_ATTENTION.value
+            run.error_code = exc.reason_code
+            run.error_message = exc.reason_code
+            run.finished_at = datetime.utcnow()
+            release_lock(db, run_id=run.id)
+            write_audit(
+                db,
+                run_id=run.id,
+                event_type="operator_handoff_failed",
+                actor_fingerprint=None,
+                detail={"reason_code": exc.reason_code},
+            )
+            db.commit()
+            db.refresh(run)
+            return run
     _set_artifact_status(run, expected, enrichment, reconcile_ok)
     run.finished_at = datetime.utcnow()
     release_lock(db, run_id=run.id)
@@ -523,6 +549,24 @@ def finalize_with_github(db: Session, settings: Settings, run_id: str) -> AgentD
     db.commit()
     db.refresh(run)
     return run
+
+
+def _operator_handoff_ready(
+    settings: Settings,
+    expected: dict[str, bool],
+    enrichment: GitHubEnrichment,
+) -> bool:
+    """Require explicit operator enablement plus verified PR and CI before handoff."""
+    verified = enrichment.verified_artifacts
+    return bool(
+        settings.agent_dispatch_operator_enabled
+        and expected["merge_required"]
+        and not expected["read_only"]
+        and verified.get("pr_exists")
+        and verified.get("ci_passed")
+        and not verified.get("merge_verified")
+        and not enrichment.verification_error
+    )
 
 
 def _timeout_run(db: Session, settings: Settings, run: AgentDispatchRun) -> AgentDispatchRun:
@@ -552,11 +596,22 @@ def cancel_run(
     principal: AgentDispatchPrincipal,
     run_id: str,
 ) -> AgentDispatchRun:
-    run = db.get(AgentDispatchRun, run_id)
+    run = db.execute(
+        select(AgentDispatchRun)
+        .where(AgentDispatchRun.id == run_id)
+        .with_for_update()
+    ).scalar_one_or_none()
     if not run:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="run not found")
     if run.status in DISPATCH_RUN_TERMINAL:
         return run
+    if run.status in OPERATOR_RUN_STATUSES - {
+        DispatchRunStatus.WAITING_FOR_OPERATOR.value
+    }:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            detail={"error": "operator_in_progress"},
+        )
 
     run.status = DispatchRunStatus.CANCELLING.value
     db.commit()
@@ -663,7 +718,9 @@ def ingest_webhook(
     run = None
     if agent_id:
         run = db.execute(
-            select(AgentDispatchRun).where(AgentDispatchRun.cursor_agent_id == agent_id)
+            select(AgentDispatchRun)
+            .where(AgentDispatchRun.cursor_agent_id == agent_id)
+            .with_for_update()
         ).scalar_one_or_none()
 
     row = AgentDispatchWebhookEvent(
@@ -677,7 +734,11 @@ def ingest_webhook(
     db.add(row)
     db.flush()
 
-    if run and run.status not in DISPATCH_RUN_TERMINAL:
+    if (
+        run
+        and run.status not in DISPATCH_RUN_TERMINAL
+        and run.status not in OPERATOR_RUN_STATUSES
+    ):
         run.cursor_status = fields.get("cursor_status")
         if fields.get("branch_name"):
             run.result_branch = fields["branch_name"]

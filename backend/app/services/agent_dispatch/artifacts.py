@@ -83,6 +83,7 @@ def infer_expected_artifacts(prompt: str, *, auto_create_pr: bool = False) -> di
         r"\b(?:do not|don't|without|no)\b.{0,20}\b(?:pr|pull request)\b",
         r"\b(?:nie|bez)\b.{0,20}\b(?:pr|pull request)\b",
     )
+    ci = ci or merge
     commit = _mentions(
         text,
         r"\bcommit\b",
