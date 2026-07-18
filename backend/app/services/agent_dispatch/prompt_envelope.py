@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 from dataclasses import dataclass
+from typing import Any
 
 from app.services.agent_dispatch.constants import PROMPT_ENVELOPE_VERSION
 
@@ -29,6 +31,8 @@ Hard rules:
 7. Use official Cursor / project docs when touching external APIs — do not invent endpoints.
 8. After substantive code changes: run targeted tests, commit only related files when the task asks to ship.
 9. Emit the final report once (final_report_once); do not spam duplicate status dumps.
+10. Your own completion claim is not authoritative. Report evidence for every expected artifact;
+    the Dispatcher independently reconciles and decides the final status.
 
 ---
 # Task prompt
@@ -50,12 +54,21 @@ def redact_secrets(text: str) -> str:
     return out
 
 
-def build_prompt_envelope(user_prompt: str, *, policy_prefix: str | None = None) -> PromptEnvelope:
+def build_prompt_envelope(
+    user_prompt: str,
+    *,
+    policy_prefix: str | None = None,
+    expected_artifacts: dict[str, Any] | None = None,
+) -> PromptEnvelope:
     body = (user_prompt or "").strip()
     if not body:
         raise ValueError("prompt text is required")
     prefix = policy_prefix if policy_prefix is not None else TWIN_EXECUTION_POLICY
-    rendered = f"{prefix}\n{body}\n"
+    contract = ""
+    if expected_artifacts is not None:
+        serialized = json.dumps(expected_artifacts, sort_keys=True, separators=(",", ":"))
+        contract = f"\n# Dispatcher expected_artifacts\n{serialized}\n"
+    rendered = f"{prefix}{contract}\n{body}\n"
     digest = hashlib.sha256(rendered.encode("utf-8")).hexdigest()
     preview = redact_secrets(body)
     if len(preview) > 240:

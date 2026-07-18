@@ -20,6 +20,12 @@ from app.database.models import (
     AgentDispatchWebhookEvent,
 )
 from app.services.agent_dispatch.audit import write_audit
+from app.services.agent_dispatch.artifacts import (
+    infer_expected_artifacts,
+    missing_reason,
+    normalize_expected,
+    normalize_verified,
+)
 from app.services.agent_dispatch.auth import AgentDispatchPrincipal
 from app.services.agent_dispatch.constants import (
     ACTIVE_LOCK_STATUSES,
@@ -38,7 +44,7 @@ from app.services.agent_dispatch.cursor_client import (
     CursorApiError,
     CursorCloudAgentsClient,
 )
-from app.services.agent_dispatch.github_enricher import GitHubEnricher
+from app.services.agent_dispatch.github_enricher import GitHubEnricher, GitHubEnrichment
 from app.services.agent_dispatch.locking import (
     LockConflictError,
     acquire_lock,
@@ -104,7 +110,13 @@ def create_dispatch_run(
         if existing:
             return existing
 
-    envelope = build_prompt_envelope(prompt)
+    expected_artifacts = infer_expected_artifacts(prompt, auto_create_pr=auto_create_pr)
+    expected_artifacts["pr_required"] |= bool(settings.agent_dispatch_require_pr)
+    expected_artifacts["ci_required"] |= bool(settings.agent_dispatch_require_ci_success)
+    expected_artifacts["commit_required"] |= (
+        expected_artifacts["pr_required"] or expected_artifacts["ci_required"]
+    )
+    envelope = build_prompt_envelope(prompt, expected_artifacts=expected_artifacts)
     store_encrypted = bool(settings.agent_dispatch_encrypt_prompts)
     ttl_hours = int(settings.agent_dispatch_prompt_ttl_hours or 0)
 
@@ -126,6 +138,8 @@ def create_dispatch_run(
         idempotency_key=idempotency_key,
         created_by_fingerprint=principal.token_fingerprint,
         metadata_json=json.dumps(metadata or {}, default=str),
+        expected_artifacts_json=json.dumps(expected_artifacts, sort_keys=True),
+        verified_artifacts_json=json.dumps(normalize_verified(None), sort_keys=True),
         lease_expires_at=datetime.utcnow()
         + timedelta(seconds=int(settings.agent_dispatch_lock_lease_seconds or 120)),
     )
@@ -308,8 +322,10 @@ def reconcile_run(db: Session, settings: Settings, run_id: str) -> AgentDispatch
     run = db.get(AgentDispatchRun, run_id)
     if not run:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="run not found")
-    if run.status in DISPATCH_RUN_TERMINAL:
+    if run.status in DISPATCH_RUN_TERMINAL and run.status != DispatchRunStatus.NEEDS_ATTENTION.value:
         return run
+    if run.status == DispatchRunStatus.NEEDS_ATTENTION.value:
+        return finalize_with_github(db, settings, run.id)
     if not run.cursor_agent_id:
         return run
 
@@ -334,6 +350,12 @@ def reconcile_run(db: Session, settings: Settings, run_id: str) -> AgentDispatch
             actor_fingerprint=None,
             detail={"status_code": exc.status_code},
         )
+        if run.status == DispatchRunStatus.AWAITING_RESULT.value:
+            run.status = DispatchRunStatus.NEEDS_ATTENTION.value
+            run.error_code = "reconcile_failed"
+            run.error_message = "Cursor state refresh failed before artifact verification"
+            run.finished_at = datetime.utcnow()
+            release_lock(db, run_id=run.id)
         db.commit()
         return run
 
@@ -371,23 +393,57 @@ def reconcile_run(db: Session, settings: Settings, run_id: str) -> AgentDispatch
     return run
 
 
-def finalize_with_github(db: Session, settings: Settings, run_id: str) -> AgentDispatchRun:
-    run = db.get(AgentDispatchRun, run_id)
-    if not run:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="run not found")
+def _expected_for_run(run: AgentDispatchRun) -> dict[str, bool]:
+    try:
+        raw = json.loads(run.expected_artifacts_json or "{}")
+    except json.JSONDecodeError:
+        raw = {}
+    return normalize_expected(raw)
 
-    enricher = GitHubEnricher(settings)
-    enrichment = enricher.enrich(
+
+def _refresh_cursor_artifacts(
+    run: AgentDispatchRun,
+    settings: Settings,
+) -> bool:
+    if not run.cursor_agent_id:
+        return True
+    try:
+        snapshot = CursorCloudAgentsClient(settings).get_run_snapshot(
+            api_version=run.cursor_api_version or "v1",
+            agent_id=run.cursor_agent_id,
+            run_id=run.cursor_run_id,
+        )
+    except CursorApiError:
+        return False
+    run.cursor_status = snapshot.status
+    run.result_branch = snapshot.branch_name or run.result_branch
+    run.result_pr_url = snapshot.pr_url or run.result_pr_url
+    if snapshot.result_text:
+        run.result_summary = snapshot.result_text[:8000]
+    run.last_polled_at = datetime.utcnow()
+    return True
+
+
+def _github_enrichment(
+    run: AgentDispatchRun,
+    settings: Settings,
+    expected: dict[str, bool],
+) -> GitHubEnrichment:
+    return GitHubEnricher(settings).enrich(
         repository_url=run.repository_url,
         branch_name=run.result_branch,
         pr_url=run.result_pr_url,
-        require_pr=bool(settings.agent_dispatch_require_pr),
-        require_ci=bool(settings.agent_dispatch_require_ci_success),
+        expected_artifacts=expected,
+        expected_base_branch=run.base_branch,
     )
+
+
+def _persist_enrichment(run: AgentDispatchRun, enrichment: GitHubEnrichment) -> None:
     run.result_branch = enrichment.branch_name or run.result_branch
     run.result_pr_url = enrichment.pr_url or run.result_pr_url
     run.result_head_sha = enrichment.head_sha
     run.result_ci_status = enrichment.ci_status
+    run.verified_artifacts_json = json.dumps(enrichment.verified_artifacts, sort_keys=True)
     run.github_enrichment_json = json.dumps(
         {
             "ok": enrichment.ok,
@@ -396,17 +452,57 @@ def finalize_with_github(db: Session, settings: Settings, run_id: str) -> AgentD
             "repo": enrichment.repo,
             "pr_number": enrichment.pr_number,
             "ci_status": enrichment.ci_status,
+            "verified_artifacts": enrichment.verified_artifacts,
+            "verification_error": enrichment.verification_error,
         },
         default=str,
     )
 
-    if enrichment.ok:
-        run.status = DispatchRunStatus.SUCCEEDED.value
-    else:
-        run.status = DispatchRunStatus.NEEDS_ATTENTION.value
-        run.error_code = "github_mismatch"
-        run.error_message = enrichment.attention_reason
 
+def _set_artifact_status(
+    run: AgentDispatchRun,
+    expected: dict[str, bool],
+    enrichment: GitHubEnrichment,
+    reconcile_ok: bool,
+) -> None:
+    reason = missing_reason(expected, enrichment.verified_artifacts)
+    if reconcile_ok and not reason and not enrichment.verification_error:
+        run.status = DispatchRunStatus.SUCCEEDED.value
+        run.error_code = None
+        run.error_message = None
+        return
+    run.status = DispatchRunStatus.NEEDS_ATTENTION.value
+    if not reconcile_ok or enrichment.verification_error:
+        reason = "reconcile_failed"
+    run.error_code = reason
+    run.error_message = reason
+
+
+def finalize_with_github(db: Session, settings: Settings, run_id: str) -> AgentDispatchRun:
+    run = db.get(AgentDispatchRun, run_id)
+    if not run:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="run not found")
+    expected = _expected_for_run(run)
+    enrichment = _github_enrichment(run, settings, expected)
+    reason = missing_reason(expected, enrichment.verified_artifacts)
+    reconcile_ok = True
+    if reason or enrichment.verification_error:
+        reconcile_ok = _refresh_cursor_artifacts(run, settings)
+        cursor_active = run.cursor_agent_id and (run.cursor_status or "").upper() in {
+            "CREATING",
+            "RUNNING",
+        }
+        if reconcile_ok and cursor_active:
+            run.status = DispatchRunStatus.AWAITING_RESULT.value
+            db.commit()
+            db.refresh(run)
+            return run
+        if run.cursor_agent_id and (run.cursor_status or "").upper() != "FINISHED":
+            reconcile_ok = False
+        if reconcile_ok:
+            enrichment = _github_enrichment(run, settings, expected)
+    _persist_enrichment(run, enrichment)
+    _set_artifact_status(run, expected, enrichment, reconcile_ok)
     run.finished_at = datetime.utcnow()
     release_lock(db, run_id=run.id)
     write_audit(
@@ -414,7 +510,12 @@ def finalize_with_github(db: Session, settings: Settings, run_id: str) -> AgentD
         run_id=run.id,
         event_type="finalized",
         actor_fingerprint=None,
-        detail={"status": run.status, "sha": enrichment.head_sha, "ci": enrichment.ci_status},
+        detail={
+            "status": run.status,
+            "sha": enrichment.head_sha,
+            "ci": enrichment.ci_status,
+            "reason_code": run.error_code,
+        },
     )
     # Drop ciphertext after success path when TTL policy says so.
     if run.prompt_ciphertext and settings.agent_dispatch_drop_prompt_on_terminal:
@@ -642,15 +743,21 @@ def run_report_dict(db: Session, run_id: str) -> dict[str, Any]:
     if not run:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="run not found")
     data = run_to_public_dict(run)
+    expected = _expected_for_run(run)
+    verified = _verified_for_run(run)
+    branch, pr_url, head_sha = _visible_git_result(run, expected)
     data["report"] = {
         "status": run.status,
-        "branch": run.result_branch,
-        "pr_url": run.result_pr_url,
-        "head_sha": run.result_head_sha,
+        "branch": branch,
+        "pr": pr_url,
+        "pr_url": pr_url,
+        "head_sha": head_sha,
         "ci_status": run.result_ci_status,
         "summary": run.result_summary,
         "error_code": run.error_code,
         "error_message": run.error_message,
+        "expected_artifacts": expected,
+        "verified_artifacts": verified,
     }
     return data
 
@@ -660,17 +767,23 @@ def get_run_handoff(db: Session, run_id: str) -> dict[str, Any]:
     report = run_report_dict(db, run_id)
     run = db.get(AgentDispatchRun, run_id)
     assert run is not None
+    expected = _expected_for_run(run)
+    verified = _verified_for_run(run)
+    branch, pr_url, head_sha = _visible_git_result(run, expected)
     return {
-        "handoff_version": "twin-agent-dispatch-handoff/v1",
+        "handoff_version": "twin-agent-dispatch-handoff/v2",
         "run_id": run.id,
         "task_name": run.task_name,
         "status": run.status,
         "repository_url": run.repository_url,
         "base_branch": run.base_branch,
+        "expected_artifacts": expected,
+        "verified_artifacts": verified,
         "result": {
-            "branch": run.result_branch,
-            "pr_url": run.result_pr_url,
-            "head_sha": run.result_head_sha,
+            "branch": branch,
+            "pr": pr_url,
+            "pr_url": pr_url,
+            "head_sha": head_sha,
             "ci_status": run.result_ci_status,
             "summary": run.result_summary,
         },
@@ -695,6 +808,23 @@ def get_run_handoff(db: Session, run_id: str) -> dict[str, Any]:
     }
 
 
+def _verified_for_run(run: AgentDispatchRun) -> dict[str, bool]:
+    try:
+        raw = json.loads(run.verified_artifacts_json or "{}")
+    except json.JSONDecodeError:
+        raw = {}
+    return normalize_verified(raw)
+
+
+def _visible_git_result(
+    run: AgentDispatchRun,
+    expected: dict[str, bool],
+) -> tuple[str | None, str | None, str | None]:
+    if expected["read_only"]:
+        return None, None, None
+    return run.result_branch, run.result_pr_url, run.result_head_sha
+
+
 def run_to_public_dict(run: AgentDispatchRun) -> dict[str, Any]:
     enrichment = None
     if run.github_enrichment_json:
@@ -708,6 +838,11 @@ def run_to_public_dict(run: AgentDispatchRun) -> dict[str, Any]:
             policy = json.loads(run.execution_policy_json)
         except json.JSONDecodeError:
             policy = None
+    expected = _expected_for_run(run)
+    verified = _verified_for_run(run)
+    if expected["read_only"]:
+        enrichment = None
+    branch, pr_url, head_sha = _visible_git_result(run, expected)
     return {
         "id": run.id,
         "status": run.status,
@@ -724,9 +859,9 @@ def run_to_public_dict(run: AgentDispatchRun) -> dict[str, Any]:
         "cursor_run_id": run.cursor_run_id,
         "cursor_status": run.cursor_status,
         "cursor_agent_url": run.cursor_agent_url,
-        "result_branch": run.result_branch,
-        "result_pr_url": run.result_pr_url,
-        "result_head_sha": run.result_head_sha,
+        "result_branch": branch,
+        "result_pr_url": pr_url,
+        "result_head_sha": head_sha,
         "result_ci_status": run.result_ci_status,
         "result_summary": run.result_summary,
         "error_code": run.error_code,
@@ -736,4 +871,6 @@ def run_to_public_dict(run: AgentDispatchRun) -> dict[str, Any]:
         "dispatched_at": run.dispatched_at.isoformat() + "Z" if run.dispatched_at else None,
         "finished_at": run.finished_at.isoformat() + "Z" if run.finished_at else None,
         "github_enrichment": enrichment,
+        "expected_artifacts": expected,
+        "verified_artifacts": verified,
     }

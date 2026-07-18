@@ -13,6 +13,7 @@ on:
       - "backend/tests/test_agent_dispatch.py"
       - "backend/alembic/versions/078_agent_dispatch.py"
       - "backend/alembic/versions/079_agent_dispatch_policy.py"
+      - "backend/alembic/versions/080_agent_dispatch_artifacts.py"
 
 jobs:
   unit:

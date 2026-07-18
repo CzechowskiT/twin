@@ -19,6 +19,9 @@ from app.database.models import Base
 from app.database.session import get_db
 from app.main import app
 from app.services.agent_dispatch.constants import CURSOR_CONTRACT_DOC_DATE, CURSOR_CONTRACT_VERSION
+from app.services.agent_dispatch.artifacts import infer_expected_artifacts, missing_reason
+from app.services.agent_dispatch.cursor_client import CursorApiError, CursorRunSnapshot
+from app.services.agent_dispatch.github_enricher import GitHubEnricher, GitHubEnrichment
 from app.services.agent_dispatch.prompt_envelope import build_prompt_envelope, redact_secrets
 from app.services.agent_dispatch.webhooks import verify_cursor_webhook_signature
 
@@ -720,3 +723,503 @@ def test_oauth_rejects_wrong_token(dispatch_client):
         follow_redirects=False,
     )
     assert res.status_code == 401
+
+
+def _expected(prompt: str) -> dict[str, bool]:
+    return infer_expected_artifacts(prompt)
+
+
+def _verified(**overrides: bool) -> dict[str, bool]:
+    base = {
+        "pr_exists": False,
+        "merge_verified": False,
+        "deployment_verified": False,
+        "ci_passed": False,
+        "regression_passed": False,
+        "commit_exists": False,
+        "head_sha_verified": False,
+    }
+    base.update(overrides)
+    return base
+
+
+@pytest.mark.parametrize(
+    ("expected_key", "reason"),
+    [
+        ("pr_required", "expected_pr_missing"),
+        ("merge_required", "expected_merge_missing"),
+        ("deployment_required", "expected_deployment_missing"),
+        ("commit_required", "expected_commit_missing"),
+        ("ci_required", "expected_ci_missing"),
+        ("regression_required", "expected_regression_missing"),
+    ],
+)
+def test_missing_artifact_reason_codes(expected_key, reason):
+    expected = _expected("")
+    expected[expected_key] = True
+    assert missing_reason(expected, _verified()) == reason
+
+
+@pytest.mark.parametrize(
+    ("prompt", "expected"),
+    [
+        ("Open a PR but do not merge it", {"pr_required": True, "merge_required": False}),
+        ("Remove read-only mode and commit the fix", {"read_only": False, "commit_required": True}),
+        ("Fix the bug and push changes", {"commit_required": True}),
+        (
+            "never merge PRs\n# Task prompt\nCreate, merge, and deploy the PR",
+            {"pr_required": True, "merge_required": True, "deployment_required": True},
+        ),
+    ],
+)
+def test_expected_artifact_inference_handles_negation(prompt, expected):
+    inferred = infer_expected_artifacts(prompt)
+    assert {key: inferred[key] for key in expected} == expected
+
+
+def _enrichment(
+    verified: dict[str, bool],
+    *,
+    reason: str | None,
+    pr_url: str | None = "https://github.com/CzechowskiT/twin/pull/42",
+    verification_error: bool = False,
+) -> GitHubEnrichment:
+    return GitHubEnrichment(
+        owner="CzechowskiT",
+        repo="twin",
+        branch_name="feat/artifacts",
+        pr_number=42 if pr_url else None,
+        pr_url=pr_url,
+        head_sha="a" * 40 if verified["commit_exists"] else None,
+        ci_status="success" if verified["ci_passed"] else "pending",
+        verified_artifacts=verified,
+        ok=reason is None and not verification_error,
+        attention_reason=reason,
+        verification_error=verification_error,
+        raw={},
+    )
+
+
+def _github_handler(
+    *,
+    merged: bool = False,
+    ci: str = "success",
+    deployment: bool = False,
+    regression: bool = False,
+    pr_exists: bool = True,
+    base_branch: str = "cursor/phase1-monorepo-scaffold",
+):
+    def handler(request: httpx.Request) -> httpx.Response:
+        path = request.url.path
+        if path.endswith("/pulls/42"):
+            if not pr_exists:
+                return httpx.Response(404, json={"message": "Not Found"})
+            return httpx.Response(
+                200,
+                json={
+                    "number": 42,
+                    "head": {"sha": "head-sha", "ref": "feat/artifacts"},
+                    "base": {"ref": base_branch},
+                    "merged_at": "2026-07-18T12:00:00Z" if merged else None,
+                    "merge_commit_sha": "merge-sha" if merged else None,
+                },
+            )
+        if path.endswith("/commits/head-sha"):
+            return httpx.Response(200, json={"sha": "head-sha"})
+        if path.endswith("/status"):
+            return httpx.Response(200, json={"state": ci})
+        if path.endswith("/check-runs"):
+            runs = [{"name": "unit", "status": "completed", "conclusion": ci}]
+            if regression:
+                runs.append(
+                    {
+                        "name": "production-regression",
+                        "status": "completed",
+                        "conclusion": "success",
+                    }
+                )
+            return httpx.Response(200, json={"check_runs": runs})
+        if path.endswith("/deployments"):
+            return httpx.Response(200, json=[{"id": 7}] if deployment else [])
+        if path.endswith("/deployments/7/statuses"):
+            return httpx.Response(200, json=[{"state": "success"}])
+        return httpx.Response(404, json={"path": path})
+
+    return handler
+
+
+def _github_enricher(dispatch_client, monkeypatch, **handler_options) -> GitHubEnricher:
+    monkeypatch.setenv("AGENT_DISPATCH_GITHUB_TOKEN", "test-github-token")
+    get_settings.cache_clear()
+    return GitHubEnricher(
+        get_settings(),
+        transport=httpx.MockTransport(_github_handler(**handler_options)),
+    )
+
+
+def test_read_only_report_and_handoff_hide_git_artifacts(dispatch_client):
+    client, db = dispatch_client
+    created = client.post(
+        "/api/internal/agent-dispatch/runs",
+        headers=_auth(),
+        json=_create_payload(
+            prompt="Read-only audit. Do not create a branch, commit, or PR.",
+            idempotency_key="read-only-artifacts",
+        ),
+    ).json()
+    from app.database.models import AgentDispatchRun
+
+    run = db.get(AgentDispatchRun, created["id"])
+    run.result_branch = "cursor/technical-worker-branch"
+    run.result_pr_url = "https://github.com/CzechowskiT/twin/pull/42"
+    run.result_head_sha = "a" * 40
+    run.github_enrichment_json = json.dumps({"pr_number": 42})
+    db.commit()
+
+    report = client.get(
+        f"/api/internal/agent-dispatch/runs/{run.id}/report", headers=_auth()
+    ).json()["report"]
+    handoff = client.get(
+        f"/api/internal/agent-dispatch/runs/{run.id}/handoff", headers=_auth()
+    ).json()
+    assert report["branch"] is report["head_sha"] is report["pr"] is None
+    assert handoff["result"]["branch"] is None
+    assert handoff["result"]["head_sha"] is None
+    assert handoff["result"]["pr"] is None
+    assert handoff["public_run"]["github_enrichment"] is None
+    assert report["expected_artifacts"]["read_only"] is True
+
+
+def test_pr_artifact_is_verified(dispatch_client, monkeypatch):
+    enrichment = _github_enricher(dispatch_client, monkeypatch).enrich(
+        repository_url="https://github.com/CzechowskiT/twin",
+        branch_name="feat/artifacts",
+        pr_url="https://github.com/CzechowskiT/twin/pull/42",
+        expected_artifacts=_expected("Create a PR"),
+        expected_base_branch="cursor/phase1-monorepo-scaffold",
+    )
+    assert enrichment.ok is True
+    assert enrichment.verified_artifacts["pr_exists"] is True
+    assert enrichment.verified_artifacts["commit_exists"] is True
+
+
+def test_pr_on_wrong_base_is_not_verified(dispatch_client, monkeypatch):
+    enrichment = _github_enricher(
+        dispatch_client,
+        monkeypatch,
+        base_branch="unrelated-base",
+    ).enrich(
+        repository_url="https://github.com/CzechowskiT/twin",
+        branch_name="feat/artifacts",
+        pr_url="https://github.com/CzechowskiT/twin/pull/42",
+        expected_artifacts=_expected("Create a PR"),
+        expected_base_branch="cursor/phase1-monorepo-scaffold",
+    )
+    assert enrichment.verified_artifacts["pr_exists"] is False
+    assert enrichment.attention_reason == "expected_pr_missing"
+
+
+def test_merge_artifact_is_verified(dispatch_client, monkeypatch):
+    enrichment = _github_enricher(dispatch_client, monkeypatch, merged=True).enrich(
+        repository_url="https://github.com/CzechowskiT/twin",
+        branch_name="feat/artifacts",
+        pr_url="https://github.com/CzechowskiT/twin/pull/42",
+        expected_artifacts=_expected("Create and merge the PR"),
+    )
+    assert enrichment.ok is True
+    assert enrichment.verified_artifacts["merge_verified"] is True
+
+
+def test_deployment_artifact_is_verified(dispatch_client, monkeypatch):
+    enrichment = _github_enricher(
+        dispatch_client, monkeypatch, merged=True, deployment=True
+    ).enrich(
+        repository_url="https://github.com/CzechowskiT/twin",
+        branch_name="feat/artifacts",
+        pr_url="https://github.com/CzechowskiT/twin/pull/42",
+        expected_artifacts=_expected("Merge the PR and deploy to production"),
+    )
+    assert enrichment.ok is True
+    assert enrichment.verified_artifacts["deployment_verified"] is True
+
+
+def test_missing_pr_never_succeeds(dispatch_client, monkeypatch):
+    enrichment = _github_enricher(dispatch_client, monkeypatch, pr_exists=False).enrich(
+        repository_url="https://github.com/CzechowskiT/twin",
+        branch_name="feat/artifacts",
+        pr_url="https://github.com/CzechowskiT/twin/pull/42",
+        expected_artifacts=_expected("Create a PR"),
+    )
+    assert enrichment.ok is False
+    assert enrichment.attention_reason == "expected_pr_missing"
+
+
+def test_missing_pr_after_reconcile_returns_needs_attention(dispatch_client, monkeypatch):
+    client, db = dispatch_client
+    created = client.post(
+        "/api/internal/agent-dispatch/runs",
+        headers=_auth(),
+        json=_create_payload(prompt="Create a PR", idempotency_key="missing-pr-final"),
+    ).json()
+    from app.database.models import AgentDispatchRun
+    from app.services.agent_dispatch import service as svc
+
+    run = db.get(AgentDispatchRun, created["id"])
+    run.cursor_agent_id = "bc-missing-pr"
+    run.cursor_run_id = "run-missing-pr"
+    run.cursor_api_version = "v1"
+    run.status = "running"
+    db.commit()
+
+    class FinishedCursor:
+        def __init__(self, settings):
+            pass
+
+        def get_run_snapshot(self, **kwargs):
+            return CursorRunSnapshot(
+                "v1",
+                "bc-missing-pr",
+                "run-missing-pr",
+                "FINISHED",
+                "agent claimed success",
+                "feat/artifacts",
+                None,
+                None,
+                {},
+            )
+
+    class MissingGitHub:
+        def __init__(self, settings):
+            pass
+
+        def enrich(self, **kwargs):
+            return _enrichment(
+                _verified(),
+                reason="expected_pr_missing",
+                pr_url=None,
+            )
+
+    monkeypatch.setattr(svc, "CursorCloudAgentsClient", FinishedCursor)
+    monkeypatch.setattr(svc, "GitHubEnricher", MissingGitHub)
+    response = client.post(
+        f"/api/internal/agent-dispatch/runs/{run.id}/reconcile", headers=_auth()
+    ).json()
+    assert response["status"] == "needs_attention"
+    assert response["error_code"] == "expected_pr_missing"
+    assert response["verified_artifacts"]["pr_exists"] is False
+
+
+def test_missing_ci_never_succeeds(dispatch_client, monkeypatch):
+    enrichment = _github_enricher(dispatch_client, monkeypatch, ci="pending").enrich(
+        repository_url="https://github.com/CzechowskiT/twin",
+        branch_name="feat/artifacts",
+        pr_url="https://github.com/CzechowskiT/twin/pull/42",
+        expected_artifacts=_expected("Create a PR and wait for CI"),
+    )
+    assert enrichment.ok is False
+    assert enrichment.attention_reason == "expected_ci_missing"
+
+
+def test_skipped_ci_never_succeeds(dispatch_client, monkeypatch):
+    enrichment = _github_enricher(dispatch_client, monkeypatch, ci="skipped").enrich(
+        repository_url="https://github.com/CzechowskiT/twin",
+        branch_name="feat/artifacts",
+        pr_url="https://github.com/CzechowskiT/twin/pull/42",
+        expected_artifacts=_expected("Create a PR and run CI"),
+    )
+    assert enrichment.verified_artifacts["ci_passed"] is False
+    assert enrichment.attention_reason == "expected_ci_missing"
+
+
+def test_github_api_error_is_reconcile_failed(dispatch_client, monkeypatch):
+    monkeypatch.setenv("AGENT_DISPATCH_GITHUB_TOKEN", "test-github-token")
+    get_settings.cache_clear()
+    enricher = GitHubEnricher(
+        get_settings(),
+        transport=httpx.MockTransport(
+            lambda request: httpx.Response(503, json={"message": "unavailable"})
+        ),
+    )
+    enrichment = enricher.enrich(
+        repository_url="https://github.com/CzechowskiT/twin",
+        branch_name="feat/artifacts",
+        pr_url="https://github.com/CzechowskiT/twin/pull/42",
+        expected_artifacts=_expected("Create a PR"),
+    )
+    assert enrichment.verification_error is True
+    assert enrichment.attention_reason == "reconcile_failed"
+
+
+def test_missing_deployment_never_succeeds(dispatch_client, monkeypatch):
+    enrichment = _github_enricher(dispatch_client, monkeypatch, merged=True).enrich(
+        repository_url="https://github.com/CzechowskiT/twin",
+        branch_name="feat/artifacts",
+        pr_url="https://github.com/CzechowskiT/twin/pull/42",
+        expected_artifacts=_expected("Merge and deploy to production"),
+    )
+    assert enrichment.ok is False
+    assert enrichment.attention_reason == "expected_deployment_missing"
+
+
+def test_regression_artifact_is_verified(dispatch_client, monkeypatch):
+    enrichment = _github_enricher(
+        dispatch_client, monkeypatch, ci="success", regression=True
+    ).enrich(
+        repository_url="https://github.com/CzechowskiT/twin",
+        branch_name="feat/artifacts",
+        pr_url="https://github.com/CzechowskiT/twin/pull/42",
+        expected_artifacts=_expected("Create a PR, run CI and a regression test"),
+    )
+    assert enrichment.ok is True
+    assert enrichment.verified_artifacts["regression_passed"] is True
+
+
+def test_reconcile_error_returns_reason_code(dispatch_client, monkeypatch):
+    client, db = dispatch_client
+    created = client.post(
+        "/api/internal/agent-dispatch/runs",
+        headers=_auth(),
+        json=_create_payload(prompt="Create a PR", idempotency_key="reconcile-error"),
+    ).json()
+    from app.database.models import AgentDispatchRun
+    from app.services.agent_dispatch import service as svc
+
+    run = db.get(AgentDispatchRun, created["id"])
+    run.cursor_agent_id = "bc-reconcile-error"
+    run.cursor_api_version = "v1"
+    run.status = "awaiting_result"
+    db.commit()
+
+    class BrokenCursor:
+        def __init__(self, settings):
+            pass
+
+        def get_run_snapshot(self, **kwargs):
+            raise CursorApiError("poll failed", status_code=503)
+
+    monkeypatch.setattr(svc, "CursorCloudAgentsClient", BrokenCursor)
+    result = svc.finalize_with_github(db, get_settings(), run.id)
+    assert result.status == "needs_attention"
+    assert result.error_code == "reconcile_failed"
+
+
+def test_webhook_delay_reconciles_cursor_before_success(dispatch_client, monkeypatch):
+    client, db = dispatch_client
+    created = client.post(
+        "/api/internal/agent-dispatch/runs",
+        headers=_auth(),
+        json=_create_payload(prompt="Create a PR", idempotency_key="webhook-delay"),
+    ).json()
+    from app.database.models import AgentDispatchRun
+    from app.services.agent_dispatch import service as svc
+
+    run = db.get(AgentDispatchRun, created["id"])
+    run.cursor_agent_id = "bc-webhook-delay"
+    run.cursor_api_version = "v0"
+    run.status = "running"
+    db.commit()
+
+    class DelayedCursor:
+        def __init__(self, settings):
+            pass
+
+        def get_run_snapshot(self, **kwargs):
+            return CursorRunSnapshot(
+                "v0",
+                "bc-webhook-delay",
+                None,
+                "FINISHED",
+                "done",
+                "feat/artifacts",
+                "https://github.com/CzechowskiT/twin/pull/42",
+                None,
+                {},
+            )
+
+    class DelayedGitHub:
+        def __init__(self, settings):
+            pass
+
+        def enrich(self, **kwargs):
+            if kwargs["pr_url"]:
+                return _enrichment(
+                    _verified(pr_exists=True, commit_exists=True, head_sha_verified=True),
+                    reason=None,
+                )
+            return _enrichment(_verified(), reason="expected_pr_missing", pr_url=None)
+
+    monkeypatch.setattr(svc, "CursorCloudAgentsClient", DelayedCursor)
+    monkeypatch.setattr(svc, "GitHubEnricher", DelayedGitHub)
+    payload = {"id": "bc-webhook-delay", "status": "FINISHED", "target": {}}
+    raw = json.dumps(payload).encode()
+    signature = "sha256=" + hmac.new(b"x" * 32, raw, hashlib.sha256).hexdigest()
+    response = client.post(
+        "/api/internal/agent-dispatch/webhooks/cursor",
+        content=raw,
+        headers={"X-Webhook-Signature": signature, "X-Webhook-ID": "delayed"},
+    )
+    assert response.status_code == 200
+    assert db.get(AgentDispatchRun, run.id).status == "succeeded"
+
+
+def test_polling_delay_rechecks_github_before_success(dispatch_client, monkeypatch):
+    client, db = dispatch_client
+    created = client.post(
+        "/api/internal/agent-dispatch/runs",
+        headers=_auth(),
+        json=_create_payload(prompt="Create a PR and run CI", idempotency_key="poll-delay"),
+    ).json()
+    from app.database.models import AgentDispatchRun
+    from app.services.agent_dispatch import service as svc
+
+    run = db.get(AgentDispatchRun, created["id"])
+    run.cursor_agent_id = "bc-poll-delay"
+    run.cursor_run_id = "run-poll-delay"
+    run.cursor_api_version = "v1"
+    run.status = "running"
+    db.commit()
+    calls = {"cursor": 0, "github": 0}
+
+    class PollCursor:
+        def __init__(self, settings):
+            pass
+
+        def get_run_snapshot(self, **kwargs):
+            calls["cursor"] += 1
+            return CursorRunSnapshot(
+                "v1",
+                "bc-poll-delay",
+                "run-poll-delay",
+                "FINISHED",
+                "done",
+                "feat/artifacts",
+                "https://github.com/CzechowskiT/twin/pull/42",
+                None,
+                {},
+            )
+
+    class PollGitHub:
+        def __init__(self, settings):
+            pass
+
+        def enrich(self, **kwargs):
+            calls["github"] += 1
+            passed = calls["github"] > 1
+            return _enrichment(
+                _verified(
+                    pr_exists=True,
+                    commit_exists=True,
+                    head_sha_verified=True,
+                    ci_passed=passed,
+                ),
+                reason=None if passed else "expected_ci_missing",
+            )
+
+    monkeypatch.setattr(svc, "CursorCloudAgentsClient", PollCursor)
+    monkeypatch.setattr(svc, "GitHubEnricher", PollGitHub)
+    response = client.post(
+        f"/api/internal/agent-dispatch/runs/{run.id}/reconcile", headers=_auth()
+    )
+    assert response.json()["status"] == "succeeded"
+    assert response.json()["verified_artifacts"]["ci_passed"] is True
+    assert calls == {"cursor": 2, "github": 2}

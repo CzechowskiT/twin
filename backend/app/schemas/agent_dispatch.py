@@ -95,3 +95,5 @@ class DispatchRunResponse(BaseModel):
     dispatched_at: str | None = None
     finished_at: str | None = None
     github_enrichment: dict[str, Any] | None = None
+    expected_artifacts: dict[str, bool] | None = None
+    verified_artifacts: dict[str, bool] | None = None
