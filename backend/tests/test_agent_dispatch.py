@@ -810,6 +810,44 @@ def test_read_only_inference_forbids_all_git_and_delivery_artifacts():
 
 
 @pytest.mark.parametrize(
+    "prompt",
+    [
+        (
+            "Verify the PR, perform a manual merge and deployment, then run a "
+            "production read-only regression test."
+        ),
+        (
+            "Zweryfikuj PR, wykonaj manual merge i deployment, a następnie "
+            "produkcyjny test regresyjny read-only."
+        ),
+    ],
+)
+def test_read_only_regression_scope_preserves_full_delivery_artifacts(prompt):
+    assert infer_expected_artifacts(prompt) == {
+        "pr_required": True,
+        "merge_required": True,
+        "deployment_required": True,
+        "ci_required": True,
+        "regression_required": True,
+        "commit_required": True,
+        "read_only": False,
+    }
+
+
+@pytest.mark.parametrize(
+    "prompt",
+    [
+        "Use a read-only workflow for repository inspection only.",
+        "Inspect the repository only, without changes.",
+    ],
+)
+def test_read_only_workflow_remains_read_only(prompt):
+    inferred = infer_expected_artifacts(prompt)
+    assert all(not value for key, value in inferred.items() if key != "read_only")
+    assert inferred["read_only"] is True
+
+
+@pytest.mark.parametrize(
     ("verified_key", "reason"),
     [
         ("pr_exists", "expected_pr_missing"),

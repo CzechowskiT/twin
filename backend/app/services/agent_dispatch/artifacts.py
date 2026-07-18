@@ -21,6 +21,16 @@ VERIFIED_KEYS = (
 )
 
 _READ_ONLY = re.compile(r"\b(read[\s-]?only|tylko do odczytu)\b", re.I)
+_READ_ONLY_REGRESSION = re.compile(
+    r"(?:"
+    r"\b(?:read[\s-]?only|tylko do odczytu)\b"
+    r"(?:\s+[\w-]+){0,3}\s+\b(?:regression|regres\w*)\b"
+    r"|"
+    r"\b(?:regression|regres\w*)\b"
+    r"(?:\s+[\w-]+){0,3}\s+\b(?:read[\s-]?only|tylko do odczytu)\b"
+    r")",
+    re.I,
+)
 _NOT_READ_ONLY = re.compile(
     r"\b(remove|disable|turn off|usuń|wyłącz)\b.{0,16}\bread[\s-]?only\b",
     re.I,
@@ -35,19 +45,37 @@ _NO_GIT_WRITES = re.compile(
     r"(?:do not|don't|nie|bez).{0,24}branch.{0,16}commit.{0,16}(?:pr|pull request)",
     re.I,
 )
+_INSPECTION = re.compile(
+    r"\b(inspect|audit|review|analy[sz]\w*|inspek\w*|audyt\w*|przejrzyj)\b",
+    re.I,
+)
+_NO_CHANGES = re.compile(
+    r"\b(no changes|without changes|do not (?:modify|change)|"
+    r"bez zmian|nie (?:modyfikuj|zmieniaj))\b",
+    re.I,
+)
 
 
 def _mentions(text: str, *patterns: str) -> bool:
     return any(re.search(pattern, text, re.I) is not None for pattern in patterns)
 
 
+def _has_unscoped_read_only(text: str) -> bool:
+    scoped_spans = [match.span() for match in _READ_ONLY_REGRESSION.finditer(text)]
+    return any(
+        not any(start <= match.start() and match.end() <= end for start, end in scoped_spans)
+        for match in _READ_ONLY.finditer(text)
+    )
+
+
 def is_explicit_read_only(prompt: str) -> bool:
     """Only hide git artifacts when the prompt explicitly bans all git writes."""
     text = " ".join((prompt or "").split())
     return bool(
-        (_READ_ONLY.search(text) and not _NOT_READ_ONLY.search(text))
+        (_has_unscoped_read_only(text) and not _NOT_READ_ONLY.search(text))
         or _NO_GIT_WRITES.search(text)
         or (_NO_BRANCH.search(text) and _NO_COMMIT.search(text) and _NO_PR.search(text))
+        or (_INSPECTION.search(text) and _NO_CHANGES.search(text))
     )
 
 
@@ -71,6 +99,7 @@ def infer_expected_artifacts(prompt: str, *, auto_create_pr: bool = False) -> di
     regression = _mentions(text, r"\bregression\b", r"\bregres\w*\b")
     regression &= not _mentions(text, r"\b(?:skip|without|no)\b.{0,20}\bregres")
     ci = _mentions(text, r"\bci\b", r"\bcontinuous integration\b", r"\bzielon\w+ (?:ci|check)")
+    ci = ci or (merge and (deployment or regression))
     ci &= not _mentions(text, r"\b(?:skip|without|no)\b.{0,20}\bci\b")
     pr = bool(auto_create_pr) or _mentions(
         text,
