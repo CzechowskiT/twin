@@ -142,7 +142,15 @@ def missing_reason(expected: dict[str, Any], verified: dict[str, Any]) -> str | 
         ("pr_required", "pr_exists", "expected_pr_missing"),
         ("merge_required", "merge_verified", "expected_merge_missing"),
         ("deployment_required", "deployment_verified", "expected_deployment_missing"),
-        ("commit_required", "commit_exists", "expected_commit_missing"),
+    )
+    for required, present, reason in checks:
+        if expected.get(required) and not verified.get(present):
+            return reason
+    if expected.get("commit_required") and not (
+        verified.get("commit_exists") and verified.get("head_sha_verified")
+    ):
+        return "expected_commit_missing"
+    checks = (
         ("ci_required", "ci_passed", "expected_ci_missing"),
         ("regression_required", "regression_passed", "expected_regression_missing"),
     )
@@ -150,3 +158,19 @@ def missing_reason(expected: dict[str, Any], verified: dict[str, Any]) -> str | 
         if expected.get(required) and not verified.get(present):
             return reason
     return None
+
+
+def artifact_outcome(
+    expected: dict[str, Any],
+    verified: dict[str, Any],
+    *,
+    reconcile_ok: bool = True,
+    verification_error: bool = False,
+) -> tuple[str, str | None]:
+    """Return the final workflow outcome without trusting an agent-reported status."""
+    reason = missing_reason(normalize_expected(expected), normalize_verified(verified))
+    if not reconcile_ok or verification_error:
+        return "needs_attention", "reconcile_failed"
+    if reason:
+        return "needs_attention", reason
+    return "succeeded", None

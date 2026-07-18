@@ -21,6 +21,7 @@ from app.database.models import (
 )
 from app.services.agent_dispatch.audit import write_audit
 from app.services.agent_dispatch.artifacts import (
+    artifact_outcome,
     infer_expected_artifacts,
     missing_reason,
     normalize_expected,
@@ -401,6 +402,17 @@ def _expected_for_run(run: AgentDispatchRun) -> dict[str, bool]:
     return normalize_expected(raw)
 
 
+def _expected_contract_present(run: AgentDispatchRun) -> bool:
+    try:
+        raw = json.loads(run.expected_artifacts_json or "{}")
+    except json.JSONDecodeError:
+        return False
+    required = set(normalize_expected(None))
+    return isinstance(raw, dict) and all(
+        key in raw and isinstance(raw[key], bool) for key in required
+    )
+
+
 def _refresh_cursor_artifacts(
     run: AgentDispatchRun,
     settings: Settings,
@@ -451,7 +463,16 @@ def _persist_enrichment(run: AgentDispatchRun, enrichment: GitHubEnrichment) -> 
             "owner": enrichment.owner,
             "repo": enrichment.repo,
             "pr_number": enrichment.pr_number,
+            "head_sha": enrichment.head_sha,
+            "merge_sha": enrichment.merge_sha,
+            "deployment_sha": enrichment.deployment_sha,
+            "deployment_ids": list(enrichment.deployment_ids),
+            "deployment_environments": enrichment.raw.get("deployment_environments", {}),
             "ci_status": enrichment.ci_status,
+            "regression_status": enrichment.regression_status,
+            "regression_check_names": enrichment.raw.get("regression_check_names", []),
+            "merge_actor": enrichment.raw.get("merge_actor"),
+            "merged_at": enrichment.raw.get("merged_at"),
             "verified_artifacts": enrichment.verified_artifacts,
             "verification_error": enrichment.verification_error,
         },
@@ -465,17 +486,28 @@ def _set_artifact_status(
     enrichment: GitHubEnrichment,
     reconcile_ok: bool,
 ) -> None:
-    reason = missing_reason(expected, enrichment.verified_artifacts)
-    if reconcile_ok and not reason and not enrichment.verification_error:
-        run.status = DispatchRunStatus.SUCCEEDED.value
-        run.error_code = None
-        run.error_message = None
-        return
-    run.status = DispatchRunStatus.NEEDS_ATTENTION.value
-    if not reconcile_ok or enrichment.verification_error:
-        reason = "reconcile_failed"
+    outcome, reason = artifact_outcome(
+        expected,
+        enrichment.verified_artifacts,
+        reconcile_ok=reconcile_ok,
+        verification_error=enrichment.verification_error,
+    )
+    run.status = outcome
     run.error_code = reason
-    run.error_message = reason
+    run.error_message = _reason_message(reason)
+
+
+def _reason_message(reason: str | None) -> str | None:
+    messages = {
+        "expected_pr_missing": "Required pull request was not verified after reconciliation.",
+        "expected_commit_missing": "Required commit and head SHA were not verified.",
+        "expected_ci_missing": "Required CI checks did not reach a verified passing state.",
+        "expected_merge_missing": "Required manual merge was not verified.",
+        "expected_deployment_missing": "Required production deployments were not verified.",
+        "expected_regression_missing": "Required production regression did not pass.",
+        "reconcile_failed": "Artifact reconciliation failed; success is not permitted.",
+    }
+    return messages.get(reason, reason)
 
 
 def finalize_with_github(db: Session, settings: Settings, run_id: str) -> AgentDispatchRun:
@@ -485,14 +517,15 @@ def finalize_with_github(db: Session, settings: Settings, run_id: str) -> AgentD
     expected = _expected_for_run(run)
     enrichment = _github_enrichment(run, settings, expected)
     reason = missing_reason(expected, enrichment.verified_artifacts)
-    reconcile_ok = True
+    reconcile_ok = _expected_contract_present(run)
     if reason or enrichment.verification_error:
-        reconcile_ok = _refresh_cursor_artifacts(run, settings)
+        refresh_ok = _refresh_cursor_artifacts(run, settings)
+        reconcile_ok = reconcile_ok and refresh_ok
         cursor_active = run.cursor_agent_id and (run.cursor_status or "").upper() in {
             "CREATING",
             "RUNNING",
         }
-        if reconcile_ok and cursor_active:
+        if refresh_ok and reconcile_ok and cursor_active:
             run.status = DispatchRunStatus.AWAITING_RESULT.value
             db.commit()
             db.refresh(run)
@@ -746,15 +779,29 @@ def run_report_dict(db: Session, run_id: str) -> dict[str, Any]:
     expected = _expected_for_run(run)
     verified = _verified_for_run(run)
     branch, pr_url, head_sha = _visible_git_result(run, expected)
+    evidence = _artifact_evidence(run)
+    if expected["read_only"]:
+        evidence = _empty_artifact_evidence()
     data["report"] = {
         "status": run.status,
+        "final_status": run.status,
         "branch": branch,
         "pr": pr_url,
         "pr_url": pr_url,
         "head_sha": head_sha,
+        "merge_sha": evidence["merge_sha"],
+        "deployment_sha": evidence["deployment_sha"],
+        "deployment_id": evidence["deployment_id"],
+        "deployment_ids": evidence["deployment_ids"],
+        "deployment_environments": evidence["deployment_environments"],
         "ci_status": run.result_ci_status,
+        "regression_status": evidence["regression_status"],
+        "regression_check_names": evidence["regression_check_names"],
+        "merge_actor": evidence["merge_actor"],
+        "merged_at": evidence["merged_at"],
         "summary": run.result_summary,
         "error_code": run.error_code,
+        "reason_code": run.error_code,
         "error_message": run.error_message,
         "expected_artifacts": expected,
         "verified_artifacts": verified,
@@ -775,6 +822,7 @@ def get_run_handoff(db: Session, run_id: str) -> dict[str, Any]:
         "run_id": run.id,
         "task_name": run.task_name,
         "status": run.status,
+        "final_status": run.status,
         "repository_url": run.repository_url,
         "base_branch": run.base_branch,
         "expected_artifacts": expected,
@@ -784,7 +832,16 @@ def get_run_handoff(db: Session, run_id: str) -> dict[str, Any]:
             "pr": pr_url,
             "pr_url": pr_url,
             "head_sha": head_sha,
+            "merge_sha": report["report"]["merge_sha"],
+            "deployment_sha": report["report"]["deployment_sha"],
+            "deployment_id": report["report"]["deployment_id"],
+            "deployment_ids": report["report"]["deployment_ids"],
+            "deployment_environments": report["report"]["deployment_environments"],
             "ci_status": run.result_ci_status,
+            "regression_status": report["report"]["regression_status"],
+            "regression_check_names": report["report"]["regression_check_names"],
+            "merge_actor": report["report"]["merge_actor"],
+            "merged_at": report["report"]["merged_at"],
             "summary": run.result_summary,
         },
         "cursor": {
@@ -796,6 +853,7 @@ def get_run_handoff(db: Session, run_id: str) -> dict[str, Any]:
         },
         "errors": {
             "code": run.error_code,
+            "reason_code": run.error_code,
             "message": run.error_message,
         },
         "report": report.get("report"),
@@ -814,6 +872,39 @@ def _verified_for_run(run: AgentDispatchRun) -> dict[str, bool]:
     except json.JSONDecodeError:
         raw = {}
     return normalize_verified(raw)
+
+
+def _artifact_evidence(run: AgentDispatchRun) -> dict[str, Any]:
+    try:
+        raw = json.loads(run.github_enrichment_json or "{}")
+    except json.JSONDecodeError:
+        raw = {}
+    deployment_ids = raw.get("deployment_ids") or []
+    return {
+        "merge_sha": raw.get("merge_sha"),
+        "deployment_sha": raw.get("deployment_sha"),
+        "deployment_ids": deployment_ids,
+        "deployment_id": deployment_ids[0] if deployment_ids else None,
+        "deployment_environments": raw.get("deployment_environments") or {},
+        "regression_status": raw.get("regression_status"),
+        "regression_check_names": raw.get("regression_check_names") or [],
+        "merge_actor": raw.get("merge_actor"),
+        "merged_at": raw.get("merged_at"),
+    }
+
+
+def _empty_artifact_evidence() -> dict[str, Any]:
+    return {
+        "merge_sha": None,
+        "deployment_sha": None,
+        "deployment_ids": [],
+        "deployment_id": None,
+        "deployment_environments": {},
+        "regression_status": None,
+        "regression_check_names": [],
+        "merge_actor": None,
+        "merged_at": None,
+    }
 
 
 def _visible_git_result(
@@ -840,12 +931,15 @@ def run_to_public_dict(run: AgentDispatchRun) -> dict[str, Any]:
             policy = None
     expected = _expected_for_run(run)
     verified = _verified_for_run(run)
+    evidence = _artifact_evidence(run)
     if expected["read_only"]:
         enrichment = None
+        evidence = _empty_artifact_evidence()
     branch, pr_url, head_sha = _visible_git_result(run, expected)
     return {
         "id": run.id,
         "status": run.status,
+        "final_status": run.status,
         "task_name": run.task_name,
         "repository_url": run.repository_url,
         "repository": run.repository_url,
@@ -862,9 +956,14 @@ def run_to_public_dict(run: AgentDispatchRun) -> dict[str, Any]:
         "result_branch": branch,
         "result_pr_url": pr_url,
         "result_head_sha": head_sha,
+        "result_merge_sha": evidence["merge_sha"],
+        "result_deployment_sha": evidence["deployment_sha"],
+        "result_deployment_ids": evidence["deployment_ids"],
         "result_ci_status": run.result_ci_status,
+        "result_regression_status": evidence["regression_status"],
         "result_summary": run.result_summary,
         "error_code": run.error_code,
+        "reason_code": run.error_code,
         "error_message": run.error_message,
         "idempotency_key": run.idempotency_key,
         "created_at": run.created_at.isoformat() + "Z" if run.created_at else None,

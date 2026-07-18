@@ -71,6 +71,7 @@ class ForceUnlockRequest(BaseModel):
 class DispatchRunResponse(BaseModel):
     id: str
     status: str
+    final_status: str
     task_name: str | None = None
     repository_url: str
     base_branch: str
@@ -86,9 +87,14 @@ class DispatchRunResponse(BaseModel):
     result_branch: str | None = None
     result_pr_url: str | None = None
     result_head_sha: str | None = None
+    result_merge_sha: str | None = None
+    result_deployment_sha: str | None = None
+    result_deployment_ids: list[int] = Field(default_factory=list)
     result_ci_status: str | None = None
+    result_regression_status: str | None = None
     result_summary: str | None = None
     error_code: str | None = None
+    reason_code: str | None = None
     error_message: str | None = None
     idempotency_key: str | None = None
     created_at: str | None = None

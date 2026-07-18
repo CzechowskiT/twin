@@ -454,6 +454,9 @@ class Settings(BaseSettings):
     agent_dispatch_webhook_secret: str = ""
     agent_dispatch_webhook_public_url: str = ""
     agent_dispatch_github_token: str = ""
+    # GitHub deployment environment names that must all reach success for TWIN production.
+    agent_dispatch_production_environments: str = "Production,responsible-success / production"
+    agent_dispatch_regression_check_names: str = "production-regression"
     agent_dispatch_encrypt_prompts: bool = True
     agent_dispatch_prompt_ttl_hours: int = 72
     agent_dispatch_drop_prompt_on_terminal: bool = True
