@@ -467,7 +467,9 @@ class Settings(BaseSettings):
     agent_dispatch_operator_timeout_seconds: int = 900
     agent_dispatch_operator_poll_seconds: int = 15
     agent_dispatch_operator_max_retries: int = 3
+    agent_dispatch_operator_mutation_workflow: str = ""
     agent_dispatch_operator_regression_workflow: str = ""
+    agent_dispatch_operator_deployment_environment: str = "Production"
     agent_dispatch_operator_non_bypass_identity: bool = False
 
     @property

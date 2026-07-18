@@ -412,7 +412,7 @@ def test_recovery_resumes_explicitly_requested_waiting_run(operator_db, monkeypa
     assert github.merge_calls == 1
 
 
-def test_regression_crash_window_fails_closed_without_redispatch(operator_db):
+def test_regression_crash_window_recovers_idempotent_dispatch(operator_db):
     db, settings = operator_db
     run = _run(
         db,
@@ -433,10 +433,9 @@ def test_regression_crash_window_fails_closed_without_redispatch(operator_db):
 
     result = OperatorService(db, settings, github=github).run(run.id)
 
-    assert result.status == "needs_attention"
-    assert result.error_code == "operator_regression_dispatch_unresolved"
-    assert github.regression_dispatches == 0
-    assert json.loads(result.verified_artifacts_json)["regression_passed"] is False
+    assert result.status == "succeeded"
+    assert github.regression_dispatches == 1
+    assert json.loads(result.verified_artifacts_json)["regression_passed"] is True
 
 
 def test_finalize_blocks_other_active_run_and_lock(operator_db):
@@ -543,3 +542,73 @@ def test_transport_failure_has_retryable_reason(operator_db):
 
     assert exc.value.reason_code == "operator_github_retryable"
     assert exc.value.retryable is True
+
+
+def test_regression_dispatch_uses_official_response_contract(operator_db):
+    _, settings = operator_db
+    captured: dict = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured["version"] = request.headers["X-GitHub-Api-Version"]
+        if request.method == "GET":
+            return httpx.Response(200, json={"workflow_runs": []})
+        captured["body"] = json.loads(request.content)
+        return httpx.Response(
+            200,
+            json={"workflow_run_id": 91, "html_url": "https://github.com/run/91"},
+        )
+
+    client = GitHubOperatorClient(settings, transport=httpx.MockTransport(handler))
+    result = client.trigger_regression(
+        repository_url="https://github.com/CzechowskiT/twin",
+        workflow="operator-service.yml",
+        ref="cursor/phase1-monorepo-scaffold",
+        sha="a" * 40,
+    )
+
+    assert result["workflow_run_id"] == 91
+    assert captured["version"] == "2026-03-10"
+    assert captured["body"]["inputs"]["expected_sha"] == "a" * 40
+    assert "return_run_details" not in captured["body"]
+
+
+def test_workflow_merge_reuses_successful_run_without_second_dispatch(operator_db):
+    _, settings = operator_db
+    settings.agent_dispatch_operator_mutation_workflow = "operator-service.yml"
+    calls: list[tuple[str, str]] = []
+    title = "operator-merge-pr-42-" + ("a" * 40)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls.append((request.method, request.url.path))
+        if request.url.path.endswith("/runs"):
+            return httpx.Response(
+                200,
+                json={"workflow_runs": [{"id": 91, "display_title": title, "conclusion": "success"}]},
+            )
+        if request.url.path.endswith("/actions/runs/91"):
+            return httpx.Response(200, json={"status": "completed", "conclusion": "success"})
+        return httpx.Response(
+            200,
+            json={
+                "number": 42,
+                "html_url": "https://github.com/CzechowskiT/twin/pull/42",
+                "state": "closed",
+                "draft": False,
+                "mergeable": True,
+                "head": {"ref": "feat/operator", "sha": "a" * 40},
+                "base": {"ref": "cursor/phase1-monorepo-scaffold"},
+                "merged": True,
+                "merge_commit_sha": "b" * 40,
+            },
+        )
+
+    client = GitHubOperatorClient(settings, transport=httpx.MockTransport(handler))
+    merge_sha = client.execute_standard_merge(
+        repository_url="https://github.com/CzechowskiT/twin",
+        pr_url="https://github.com/CzechowskiT/twin/pull/42",
+        expected_head_sha="a" * 40,
+        commit_title="Operator test",
+    )
+
+    assert merge_sha == "b" * 40
+    assert not any(method in {"POST", "PUT"} for method, _ in calls)

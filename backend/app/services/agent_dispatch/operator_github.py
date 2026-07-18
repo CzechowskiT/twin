@@ -47,10 +47,11 @@ class GitHubOperatorClient:
         transport: httpx.BaseTransport | None = None,
         sleeper: Callable[[float], None] = time.sleep,
     ):
+        self._settings = settings
         token = (settings.agent_dispatch_github_token or "").strip()
         self._headers = {
             "Accept": "application/vnd.github+json",
-            "X-GitHub-Api-Version": "2022-11-28",
+            "X-GitHub-Api-Version": "2026-03-10",
             "User-Agent": "twin-agent-dispatch-operator",
         }
         if token:
@@ -140,6 +141,29 @@ class GitHubOperatorClient:
         expected_head_sha: str,
         commit_title: str,
     ) -> str:
+        workflow = self._settings.agent_dispatch_operator_mutation_workflow.strip()
+        if workflow:
+            return self._merge_via_workflow(
+                repository_url=repository_url,
+                pr_url=pr_url,
+                expected_head_sha=expected_head_sha,
+                workflow=workflow,
+            )
+        return self._execute_direct_merge(
+            repository_url=repository_url,
+            pr_url=pr_url,
+            expected_head_sha=expected_head_sha,
+            commit_title=commit_title,
+        )
+
+    def _execute_direct_merge(
+        self,
+        *,
+        repository_url: str,
+        pr_url: str,
+        expected_head_sha: str,
+        commit_title: str,
+    ) -> str:
         owner, repo, number = self._pr_location(repository_url, pr_url)
         response = self._request(
             "PUT",
@@ -158,6 +182,38 @@ class GitHubOperatorClient:
         if not sha:
             raise OperatorGitHubError("operator_merge_sha_missing")
         return sha
+
+    def _merge_via_workflow(
+        self,
+        *,
+        repository_url: str,
+        pr_url: str,
+        expected_head_sha: str,
+        workflow: str,
+    ) -> str:
+        _, _, number = self._pr_location(repository_url, pr_url)
+        key = f"pr-{number}-{expected_head_sha}"
+        dispatch = self._dispatch_workflow(
+            repository_url=repository_url,
+            workflow=workflow,
+            ref=self._settings.agent_dispatch_base_branch_allowlist,
+            operation="merge",
+            idempotency_key=key,
+            inputs={
+                "pr_number": str(number),
+                "expected_head_sha": expected_head_sha,
+                "expected_base_ref": self._settings.agent_dispatch_base_branch_allowlist,
+            },
+        )
+        self._wait_workflow(
+            repository_url=repository_url,
+            workflow_run_id=int(dispatch["workflow_run_id"]),
+            failure_code="operator_merge_rejected",
+        )
+        pr = self.get_pull_request(repository_url, pr_url)
+        if not pr.merged or pr.head_sha != expected_head_sha or not pr.merge_sha:
+            raise OperatorGitHubError("operator_merge_sha_unverified")
+        return pr.merge_sha
 
     def verify_commit(self, repository_url: str, sha: str) -> bool:
         owner, repo = self._repo(repository_url)
@@ -200,24 +256,24 @@ class GitHubOperatorClient:
         repository_url: str,
         workflow: str,
         ref: str,
+        sha: str,
     ) -> dict[str, Any]:
         if not workflow:
             raise OperatorGitHubError("operator_regression_workflow_missing")
-        owner, repo = self._repo(repository_url)
-        response = self._request(
-            "POST",
-            f"/repos/{owner}/{repo}/actions/workflows/{workflow}/dispatches",
-            json={"ref": ref, "return_run_details": True},
-            allowed={200},
+        return self._dispatch_workflow(
+            repository_url=repository_url,
+            workflow=workflow,
+            ref=ref,
+            operation="regression",
+            idempotency_key=sha,
+            inputs={
+                "expected_sha": sha,
+                "expected_base_ref": ref,
+                "deployment_environment": (
+                    self._settings.agent_dispatch_operator_deployment_environment
+                ),
+            },
         )
-        body = response.json()
-        run_id = body.get("workflow_run_id")
-        if not run_id:
-            raise OperatorGitHubError("operator_regression_run_missing")
-        return {
-            "workflow_run_id": int(run_id),
-            "triggered_at": datetime.now(timezone.utc).isoformat(),
-        }
 
     def regression_passed(
         self,
@@ -238,6 +294,142 @@ class GitHubOperatorClient:
             and run.get("status") == "completed"
             and run.get("conclusion") == "success"
         )
+
+    def _dispatch_workflow(
+        self,
+        *,
+        repository_url: str,
+        workflow: str,
+        ref: str,
+        operation: str,
+        idempotency_key: str,
+        inputs: dict[str, str],
+    ) -> dict[str, Any]:
+        existing = self._find_workflow_run(
+            repository_url=repository_url,
+            workflow=workflow,
+            ref=ref,
+            operation=operation,
+            idempotency_key=idempotency_key,
+        )
+        if existing and existing.get("conclusion") in {None, "success"}:
+            return self._workflow_artifact(existing)
+        owner, repo = self._repo(repository_url)
+        payload = {
+            "ref": ref,
+            "inputs": {
+                "operation": operation,
+                "idempotency_key": idempotency_key,
+                **inputs,
+            },
+        }
+        response = self._request(
+            "POST",
+            f"/repos/{owner}/{repo}/actions/workflows/{workflow}/dispatches",
+            json=payload,
+            allowed={200, 204},
+        )
+        if response.status_code == 200:
+            return self._dispatch_response_artifact(response.json())
+        return self._discover_dispatched_run(
+            repository_url, workflow, ref, operation, idempotency_key
+        )
+
+    def _find_workflow_run(
+        self,
+        *,
+        repository_url: str,
+        workflow: str,
+        ref: str,
+        operation: str,
+        idempotency_key: str,
+    ) -> dict[str, Any] | None:
+        owner, repo = self._repo(repository_url)
+        body = self._request(
+            "GET",
+            f"/repos/{owner}/{repo}/actions/workflows/{workflow}/runs",
+            params={"event": "workflow_dispatch", "branch": ref, "per_page": 100},
+        ).json()
+        title = f"operator-{operation}-{idempotency_key}"
+        return next(
+            (run for run in body.get("workflow_runs", []) if run.get("display_title") == title),
+            None,
+        )
+
+    def _discover_dispatched_run(
+        self,
+        repository_url: str,
+        workflow: str,
+        ref: str,
+        operation: str,
+        idempotency_key: str,
+    ) -> dict[str, Any]:
+        for attempt in range(self._poll_attempts()):
+            run = self._find_workflow_run(
+                repository_url=repository_url,
+                workflow=workflow,
+                ref=ref,
+                operation=operation,
+                idempotency_key=idempotency_key,
+            )
+            if run:
+                return self._workflow_artifact(run)
+            if attempt + 1 < self._poll_attempts():
+                self._sleeper(self._poll_seconds())
+        raise OperatorGitHubError("operator_workflow_dispatch_unresolved", retryable=True)
+
+    def _wait_workflow(
+        self,
+        *,
+        repository_url: str,
+        workflow_run_id: int,
+        failure_code: str,
+    ) -> dict[str, Any]:
+        owner, repo = self._repo(repository_url)
+        for attempt in range(self._poll_attempts()):
+            run = self._request(
+                "GET", f"/repos/{owner}/{repo}/actions/runs/{workflow_run_id}"
+            ).json()
+            if run.get("status") == "completed":
+                if run.get("conclusion") != "success":
+                    raise OperatorGitHubError(failure_code)
+                return run
+            if attempt + 1 < self._poll_attempts():
+                self._sleeper(self._poll_seconds())
+        raise OperatorGitHubError("operator_workflow_timeout", retryable=True)
+
+    def _poll_attempts(self) -> int:
+        timeout = max(1, int(self._settings.agent_dispatch_operator_timeout_seconds or 1))
+        interval = max(1, int(self._settings.agent_dispatch_operator_poll_seconds or 1))
+        return max(1, timeout // interval)
+
+    def _poll_seconds(self) -> float:
+        return max(
+            0.0,
+            float(self._settings.agent_dispatch_operator_poll_seconds or 0),
+        )
+
+    @staticmethod
+    def _dispatch_response_artifact(body: dict[str, Any]) -> dict[str, Any]:
+        run_id = body.get("workflow_run_id")
+        if not run_id:
+            raise OperatorGitHubError("operator_workflow_run_missing")
+        return {
+            "workflow_run_id": int(run_id),
+            "run_url": body.get("html_url") or body.get("run_url"),
+            "triggered_at": datetime.now(timezone.utc).isoformat(),
+        }
+
+    @staticmethod
+    def _workflow_artifact(run: dict[str, Any]) -> dict[str, Any]:
+        run_id = run.get("id")
+        if not run_id:
+            raise OperatorGitHubError("operator_workflow_run_missing")
+        return {
+            "workflow_run_id": int(run_id),
+            "run_url": run.get("html_url"),
+            "triggered_at": run.get("created_at"),
+        }
 
     def _check_runs(self, owner: str, repo: str, sha: str) -> list[dict[str, Any]]:
         runs: list[dict[str, Any]] = []

@@ -486,6 +486,9 @@ class OperatorService:
             deployment = self.github.deployment_for_sha(
                 repository_url=run.repository_url,
                 sha=sha,
+                environment=(
+                    self.settings.agent_dispatch_operator_deployment_environment
+                ),
             )
             if deployment:
                 return deployment
@@ -500,20 +503,19 @@ class OperatorService:
             workflow_run_id = int(dispatch["workflow_run_id"])
         else:
             intent = artifacts.get("regression_intent") or {}
-            if intent:
-                raise OperatorGitHubError("operator_regression_dispatch_unresolved")
-            else:
+            if not intent:
                 intent = {
                     "workflow": self.settings.agent_dispatch_operator_regression_workflow,
                     "requested_at": datetime.now(timezone.utc).isoformat(),
                     "correlation_id": run.operator_correlation_id,
                 }
                 self._save_artifacts(run, regression_intent=intent)
-                dispatch = self.github.trigger_regression(
-                    repository_url=run.repository_url,
-                    workflow=str(intent["workflow"]),
-                    ref=run.base_branch,
-                )
+            dispatch = self.github.trigger_regression(
+                repository_url=run.repository_url,
+                workflow=str(intent["workflow"]),
+                ref=run.base_branch,
+                sha=sha,
+            )
             workflow_run_id = int(dispatch["workflow_run_id"])
             self._save_artifacts(run, regression_dispatch=dispatch)
         for attempt in range(self._poll_attempts()):

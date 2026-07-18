@@ -51,7 +51,7 @@ Optional: `--create-pr` to ask Cursor to open a PR (manual merge still required)
 | `AGENT_DISPATCH_TOKENS` | optional | Multi-token `tok:agent_runs:create\|agent_runs:read,...` |
 | `AGENT_DISPATCH_WEBHOOK_SECRET` | if webhooks | ≥32 chars; HMAC verify |
 | `AGENT_DISPATCH_WEBHOOK_PUBLIC_URL` | if webhooks | Public HTTPS URL for Cursor callbacks |
-| `AGENT_DISPATCH_GITHUB_TOKEN` | optional; required for Operator | PR/SHA/CI enrichment and standard merge |
+| `AGENT_DISPATCH_GITHUB_TOKEN` | optional; required for Operator | Dedicated GitHub App installation token; Actions write plus read-only PR/contents/deployments access when workflow mode is enabled |
 | `AGENT_DISPATCH_REPO_ALLOWLIST` | recommended | Default: `https://github.com/CzechowskiT/twin` |
 | `AGENT_DISPATCH_BASE_BRANCH_ALLOWLIST` | recommended | Default: `cursor/phase1-monorepo-scaffold` |
 
@@ -76,6 +76,16 @@ The merge credential must be a dedicated identity without administrator or
 ruleset bypass rights; attest this deployment prerequisite with
 `AGENT_DISPATCH_OPERATOR_NON_BYPASS_IDENTITY=true`. Operator refuses to run
 without that explicit capability declaration.
+
+Production uses `.github/workflows/operator-service.yml` for GitHub mutations:
+set both `AGENT_DISPATCH_OPERATOR_MUTATION_WORKFLOW` and
+`AGENT_DISPATCH_OPERATOR_REGRESSION_WORKFLOW` to `operator-service.yml`.
+The external installation token only dispatches and observes Actions; the
+ephemeral workflow `GITHUB_TOKEN` has explicit `contents: write`,
+`pull-requests: write`, `actions: read`, and `deployments: read` permissions.
+The workflow hard-rejects every repository except `CzechowskiT/twin` and every
+base except `cursor/phase1-monorepo-scaffold`. A direct merge token remains
+supported only when `AGENT_DISPATCH_OPERATOR_MUTATION_WORKFLOW` is empty.
 
 ## Deploy
 

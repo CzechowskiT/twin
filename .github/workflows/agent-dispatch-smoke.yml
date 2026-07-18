@@ -6,8 +6,30 @@ name: agent-dispatch-smoke
 
 on:
   workflow_dispatch:
+    inputs:
+      operator_operation:
+        description: Bootstrap only; normal value runs tests
+        required: true
+        default: test
+        type: choice
+        options: [test, merge]
+      pr_number:
+        required: false
+        type: string
+      expected_head_sha:
+        required: false
+        type: string
+      expected_base_ref:
+        required: false
+        default: cursor/phase1-monorepo-scaffold
+        type: string
+      idempotency_key:
+        required: false
+        type: string
   pull_request:
     paths:
+      - ".github/workflows/agent-dispatch-smoke.yml"
+      - ".github/workflows/operator-service.yml"
       - "backend/app/services/agent_dispatch/**"
       - "backend/app/api/agent_dispatch.py"
       - "backend/tests/test_agent_dispatch.py"
@@ -19,7 +41,10 @@ on:
 
 jobs:
   unit:
+    if: inputs.operator_operation != 'merge'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     defaults:
       run:
         working-directory: backend
@@ -37,3 +62,18 @@ jobs:
           AGENT_DISPATCH_TOKEN: "ci-dispatch-token"
         run: |
           pytest tests/test_agent_dispatch.py tests/test_agent_dispatch_operator.py tests/test_alembic_single_head.py -q
+
+  bootstrap-operator-merge:
+    if: inputs.operator_operation == 'merge'
+    permissions:
+      actions: read
+      contents: write
+      deployments: read
+      pull-requests: write
+    uses: ./.github/workflows/operator-service.yml
+    with:
+      operation: merge
+      pr_number: ${{ inputs.pr_number }}
+      expected_head_sha: ${{ inputs.expected_head_sha }}
+      expected_base_ref: ${{ inputs.expected_base_ref }}
+      idempotency_key: ${{ inputs.idempotency_key }}
