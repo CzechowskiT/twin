@@ -9,6 +9,7 @@ from typing import Any, Callable
 from urllib.parse import urlparse
 
 import httpx
+from jose import jwt
 
 from app.config import Settings
 from app.services.agent_dispatch.github_enricher import parse_github_repo, parse_pr_url
@@ -48,15 +49,22 @@ class GitHubOperatorClient:
         sleeper: Callable[[float], None] = time.sleep,
     ):
         self._settings = settings
-        token = (settings.agent_dispatch_github_token or "").strip()
+        self._token = (settings.agent_dispatch_github_token or "").strip()
+        self._app_client_id = (
+            settings.agent_dispatch_github_app_client_id or ""
+        ).strip()
+        self._app_installation_id = (
+            settings.agent_dispatch_github_app_installation_id or ""
+        ).strip()
+        self._app_private_key = (
+            settings.agent_dispatch_github_app_private_key or ""
+        ).strip().replace("\\n", "\n")
         self._headers = {
             "Accept": "application/vnd.github+json",
             "X-GitHub-Api-Version": "2026-03-10",
             "User-Agent": "twin-agent-dispatch-operator",
         }
-        if token:
-            self._headers["Authorization"] = f"Bearer {token}"
-        self._configured = bool(token)
+        self._configured = bool(self._token or self._app_credentials_complete())
         self._transport = transport
         self._sleeper = sleeper
 
@@ -456,10 +464,14 @@ class GitHubOperatorClient:
     ) -> httpx.Response:
         if not self._configured:
             raise OperatorGitHubError("operator_capability_missing")
+        headers = {
+            **self._headers,
+            "Authorization": f"Bearer {self._access_token()}",
+        }
         try:
             with httpx.Client(
                 base_url="https://api.github.com",
-                headers=self._headers,
+                headers=headers,
                 timeout=30.0,
                 transport=self._transport,
             ) as client:
@@ -475,6 +487,67 @@ class GitHubOperatorClient:
             code = "operator_github_retryable" if retryable else "operator_github_rejected"
             raise OperatorGitHubError(code, retryable=retryable)
         return response
+
+    def _access_token(self) -> str:
+        if self._token:
+            return self._token
+        self._token = self._mint_installation_token()
+        return self._token
+
+    def _mint_installation_token(self) -> str:
+        now = int(time.time())
+        app_jwt = jwt.encode(
+            {"iat": now - 60, "exp": now + 540, "iss": self._app_client_id},
+            self._app_private_key,
+            algorithm="RS256",
+        )
+        permissions = {
+            "actions": "write",
+            "checks": "read",
+            "contents": (
+                "read"
+                if self._settings.agent_dispatch_operator_mutation_workflow
+                else "write"
+            ),
+            "deployments": "read",
+            "pull_requests": (
+                "read"
+                if self._settings.agent_dispatch_operator_mutation_workflow
+                else "write"
+            ),
+            "statuses": "read",
+        }
+        try:
+            with httpx.Client(
+                base_url="https://api.github.com",
+                headers={**self._headers, "Authorization": f"Bearer {app_jwt}"},
+                timeout=30.0,
+                transport=self._transport,
+            ) as client:
+                response = client.post(
+                    f"/app/installations/{self._app_installation_id}/access_tokens",
+                    json={"repositories": ["twin"], "permissions": permissions},
+                )
+        except httpx.TransportError as exc:
+            raise OperatorGitHubError(
+                "operator_github_retryable", retryable=True
+            ) from exc
+        if response.status_code != 201:
+            raise OperatorGitHubError("operator_credential_required")
+        token = str(response.json().get("token") or "")
+        if not token:
+            raise OperatorGitHubError("operator_credential_required")
+        return token
+
+    def _app_credentials_complete(self) -> bool:
+        values = (
+            self._app_client_id,
+            self._app_installation_id,
+            self._app_private_key,
+        )
+        if any(values) and not all(values):
+            raise OperatorGitHubError("operator_credential_required")
+        return all(values)
 
     @staticmethod
     def _pr(body: dict[str, Any]) -> PullRequestState:

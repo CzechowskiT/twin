@@ -612,3 +612,34 @@ def test_workflow_merge_reuses_successful_run_without_second_dispatch(operator_d
 
     assert merge_sha == "b" * 40
     assert not any(method in {"POST", "PUT"} for method, _ in calls)
+
+
+def test_github_app_mints_repo_scoped_installation_token(operator_db, monkeypatch):
+    _, settings = operator_db
+    settings.agent_dispatch_github_token = ""
+    settings.agent_dispatch_github_app_client_id = "Iv1.test"
+    settings.agent_dispatch_github_app_installation_id = "77"
+    settings.agent_dispatch_github_app_private_key = "test-private-key"
+    settings.agent_dispatch_operator_mutation_workflow = "operator-service.yml"
+    captured: dict = {}
+    monkeypatch.setattr(
+        "app.services.agent_dispatch.operator_github.jwt.encode",
+        lambda *args, **kwargs: "signed-app-jwt",
+    )
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path.endswith("/access_tokens"):
+            captured["mint"] = json.loads(request.content)
+            return httpx.Response(201, json={"token": "installation-token"})
+        captured["authorization"] = request.headers["Authorization"]
+        return httpx.Response(200, json={"sha": "a" * 40})
+
+    client = GitHubOperatorClient(settings, transport=httpx.MockTransport(handler))
+    assert client.verify_commit(
+        "https://github.com/CzechowskiT/twin",
+        "a" * 40,
+    )
+    assert captured["mint"]["repositories"] == ["twin"]
+    assert captured["mint"]["permissions"]["actions"] == "write"
+    assert captured["mint"]["permissions"]["contents"] == "read"
+    assert captured["authorization"] == "Bearer installation-token"

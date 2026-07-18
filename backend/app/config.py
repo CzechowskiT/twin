@@ -454,6 +454,9 @@ class Settings(BaseSettings):
     agent_dispatch_webhook_secret: str = ""
     agent_dispatch_webhook_public_url: str = ""
     agent_dispatch_github_token: str = ""
+    agent_dispatch_github_app_client_id: str = ""
+    agent_dispatch_github_app_installation_id: str = ""
+    agent_dispatch_github_app_private_key: str = ""
     agent_dispatch_encrypt_prompts: bool = True
     agent_dispatch_prompt_ttl_hours: int = 72
     agent_dispatch_drop_prompt_on_terminal: bool = True
