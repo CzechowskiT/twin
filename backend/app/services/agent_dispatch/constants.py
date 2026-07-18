@@ -88,6 +88,11 @@ class DispatchRunStatus(str, Enum):
     DISPATCHING = "dispatching"
     RUNNING = "running"
     AWAITING_RESULT = "awaiting_result"
+    WAITING_FOR_OPERATOR = "waiting_for_operator"
+    MERGING = "merging"
+    DEPLOYING = "deploying"
+    REGRESSION = "regression"
+    FINALIZING = "finalizing"
     SUCCEEDED = "succeeded"
     FAILED = "failed"
     TIMED_OUT = "timed_out"
@@ -96,12 +101,24 @@ class DispatchRunStatus(str, Enum):
     NEEDS_ATTENTION = "needs_attention"
 
 
+OPERATOR_RUN_STATUSES = frozenset(
+    {
+        DispatchRunStatus.WAITING_FOR_OPERATOR.value,
+        DispatchRunStatus.MERGING.value,
+        DispatchRunStatus.DEPLOYING.value,
+        DispatchRunStatus.REGRESSION.value,
+        DispatchRunStatus.FINALIZING.value,
+    }
+)
+
+
 ACTIVE_LOCK_STATUSES = frozenset(
     {
         DispatchRunStatus.QUEUED.value,
         DispatchRunStatus.DISPATCHING.value,
         DispatchRunStatus.RUNNING.value,
         DispatchRunStatus.AWAITING_RESULT.value,
+        *OPERATOR_RUN_STATUSES,
         DispatchRunStatus.CANCELLING.value,
     }
 )

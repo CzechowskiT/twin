@@ -11,9 +11,11 @@ on:
       - "backend/app/services/agent_dispatch/**"
       - "backend/app/api/agent_dispatch.py"
       - "backend/tests/test_agent_dispatch.py"
+      - "backend/tests/test_agent_dispatch_operator.py"
       - "backend/alembic/versions/078_agent_dispatch.py"
       - "backend/alembic/versions/079_agent_dispatch_policy.py"
       - "backend/alembic/versions/080_agent_dispatch_artifacts.py"
+      - "backend/alembic/versions/081_agent_dispatch_operator.py"
 
 jobs:
   unit:
@@ -34,4 +36,4 @@ jobs:
           SECRET_KEY: "ci-secret-key-at-least-32-characters-long!!"
           AGENT_DISPATCH_TOKEN: "ci-dispatch-token"
         run: |
-          pytest tests/test_agent_dispatch.py tests/test_alembic_single_head.py -q
+          pytest tests/test_agent_dispatch.py tests/test_agent_dispatch_operator.py tests/test_alembic_single_head.py -q

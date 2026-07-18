@@ -68,6 +68,15 @@ class ForceUnlockRequest(BaseModel):
     base_branch: str
 
 
+class OperatorRunRequest(BaseModel):
+    correlation_id: str | None = Field(default=None, min_length=8, max_length=64)
+
+
+class OperatorCreatePullRequestRequest(OperatorRunRequest):
+    title: str = Field(..., min_length=1, max_length=256)
+    body: str = Field(default="", max_length=65_536)
+
+
 class DispatchRunResponse(BaseModel):
     id: str
     status: str

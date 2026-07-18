@@ -463,6 +463,12 @@ class Settings(BaseSettings):
     agent_dispatch_require_ci_success: bool = False
     agent_dispatch_poll_enabled: bool = True
     agent_dispatch_poll_interval_seconds: int = 60
+    agent_dispatch_operator_enabled: bool = False
+    agent_dispatch_operator_timeout_seconds: int = 900
+    agent_dispatch_operator_poll_seconds: int = 15
+    agent_dispatch_operator_max_retries: int = 3
+    agent_dispatch_operator_regression_workflow: str = ""
+    agent_dispatch_operator_non_bypass_identity: bool = False
 
     @property
     def cors_origin_list(self) -> list[str]:

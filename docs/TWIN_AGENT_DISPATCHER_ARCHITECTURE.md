@@ -33,6 +33,7 @@ Dispatcher API  (/api/internal/agent-dispatch/*)
         ├── Webhook receiver (HMAC sha256=, dedupe by X-Webhook-ID)
         ├── Polling worker (Celery beat reconcile + prompt TTL purge)
         ├── GitHub enricher (branch / PR / SHA / combined status)
+        ├── Operator Service (explicit verified mutations; disabled by default)
         ├── Report + handoff retrieval (no manual prompt copy)
         └── Redacted audit events
 ```
@@ -76,8 +77,9 @@ record lacks `run_id`, the client resolves `latestRunId` through
 
 ## State machine (TWIN)
 
-`queued` → `dispatching` → `running` → `awaiting_result` → `succeeded`  
-                                           ↘ `needs_attention` (GitHub mismatch)  
+`queued` → `dispatching` → `running` → `awaiting_result` → `succeeded`
+                                           ↘ `waiting_for_operator` → `merging` → `deploying` → `regression` → `finalizing` → `succeeded`
+                                           ↘ `needs_attention` (GitHub mismatch or Operator failure)
 Failures: `failed` · `timed_out` · `cancelling` → `cancelled`
 
 Cursor v1 run statuses mapped: `CREATING`/`RUNNING` → running; `FINISHED` → awaiting_result; `ERROR` → failed; `CANCELLED` → cancelled; `EXPIRED` → timed_out.
@@ -85,12 +87,31 @@ Cursor v0 agent statuses mapped: `CREATING`/`RUNNING` → running; `FINISHED` �
 
 ## Persistence
 
-Tables (migrations `078_agent_dispatch` + `079_agent_dispatch_policy`):
+Tables (migrations `078_agent_dispatch` through `081_agent_dispatch_operator`):
 
 - `agent_dispatch_runs` (+ `task_name`, `execution_policy_json`)
 - `agent_dispatch_locks` (unique `repo_url + base_branch`)
 - `agent_dispatch_webhook_events` (delivery dedupe)
 - `agent_dispatch_audit_events` (redacted)
+- `agent_dispatch_operator_operations` (idempotency, retries, restart recovery)
+
+## Operator boundary
+
+The Dispatcher can enter `waiting_for_operator` only when the persisted execution
+policy is unchanged, the task explicitly requires merge, the PR is mergeable, and
+both PR existence and CI PASS were verified. The admin-scoped
+`POST /runs/{id}/operator/run` is the explicit manual action required by
+`manual_merge_only`; it returns `202` after enqueueing a durable worker task,
+and no background task starts a waiting merge without that explicit call.
+
+Operator uses GitHub's standard merge endpoint with the expected head SHA. It
+does not request auto-merge, admin override, force push, or branch-protection
+bypass. Enabling it requires an explicit deployment attestation that the
+dedicated GitHub identity has no administrator/ruleset bypass rights. Each
+stage records a correlation ID, structured log, low-cardinality
+metric, redacted audit event, and idempotent operation row. Startup recovery
+resumes stages already in progress but never starts `waiting_for_operator`.
+Report and handoff v2 response shapes are unchanged.
 
 ## Why inside TWIN backend
 
