@@ -1646,6 +1646,8 @@ class AgentDispatchRun(Base):
     result_ci_status: Mapped[str | None] = mapped_column(String(32), nullable=True)
     result_summary: Mapped[str | None] = mapped_column(Text, nullable=True)
     github_enrichment_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    expected_artifacts_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    verified_artifacts_json: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     error_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
     error_message: Mapped[str | None] = mapped_column(String(512), nullable=True)
