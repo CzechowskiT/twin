@@ -12,6 +12,7 @@ from app.api import (
     csp_reports,
     demo,
     export_requests,
+    founder_command,
     ops,
     investor_data_room,
     applications,
@@ -108,6 +109,9 @@ api_router.include_router(auto_apply_settings.router, prefix="/auto-apply", tags
 api_router.include_router(feedback.router, prefix="/feedback", tags=["Feedback"])
 api_router.include_router(admin_ops.router, prefix="/admin", tags=["Admin"])
 api_router.include_router(ops.router, prefix="/ops", tags=["Ops"])
+api_router.include_router(
+    founder_command.router, prefix="/founder-command", tags=["Founder Command"]
+)
 api_router.include_router(investor_data_room.router, prefix="/investor", tags=["Investor"])
 api_router.include_router(company.router, prefix="/company", tags=["Company"])
 api_router.include_router(recruiter.router, prefix="/recruiter", tags=["Recruiter"])

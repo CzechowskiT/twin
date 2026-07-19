@@ -1765,3 +1765,109 @@ class AgentDispatchOperatorOperation(Base):
         onupdate=datetime.utcnow,
     )
 
+
+class FounderCommand(Base):
+    """Founder Command Center durable command (direction → plan → loop)."""
+
+    __tablename__ = "founder_commands"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    status: Mapped[str] = mapped_column(String(32), index=True, default="draft")
+    current_stage: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    direction: Mapped[str] = mapped_column(Text)
+    autonomy_level: Mapped[int] = mapped_column(Integer, default=3)
+    batch_index: Mapped[int] = mapped_column(Integer, default=0)
+    max_batches: Mapped[int] = mapped_column(Integer, default=5)
+    max_runtime_minutes: Mapped[int] = mapped_column(Integer, default=180)
+    max_consecutive_failures: Mapped[int] = mapped_column(Integer, default=2)
+    max_retries_per_stage: Mapped[int] = mapped_column(Integer, default=3)
+    max_open_prs: Mapped[int] = mapped_column(Integer, default=3)
+    max_active_runs: Mapped[int] = mapped_column(Integer, default=1)
+    stage_retry_count: Mapped[int] = mapped_column(Integer, default=0)
+    consecutive_failures: Mapped[int] = mapped_column(Integer, default=0)
+    plan_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    plan_hash: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    project_state_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    links_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    live_summary: Mapped[str | None] = mapped_column(Text, nullable=True)
+    final_summary: Mapped[str | None] = mapped_column(Text, nullable=True)
+    dispatch_run_id: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)
+    idempotency_key: Mapped[str | None] = mapped_column(String(128), unique=True, nullable=True)
+    created_by_fingerprint: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    error_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    error_message: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
+
+
+class FounderCommandTimelineEvent(Base):
+    """Append-only timeline for a founder command."""
+
+    __tablename__ = "founder_command_timeline_events"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    command_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("founder_commands.id", ondelete="CASCADE"), index=True
+    )
+    stage: Mapped[str] = mapped_column(String(64), index=True)
+    message: Mapped[str] = mapped_column(String(512))
+    detail_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class FounderDecision(Base):
+    """Approval policy decision record."""
+
+    __tablename__ = "founder_decisions"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    command_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("founder_commands.id", ondelete="CASCADE"), index=True
+    )
+    operation: Mapped[str] = mapped_column(String(64), index=True)
+    title: Mapped[str] = mapped_column(String(256))
+    risk: Mapped[str] = mapped_column(String(32), index=True)
+    status: Mapped[str] = mapped_column(String(32), index=True, default="pending")
+    evidence_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    actor_fingerprint: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    decided_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class FounderCommandNotification(Base):
+    """In-app founder notifications (email/Slack/push adapters later)."""
+
+    __tablename__ = "founder_command_notifications"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    command_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("founder_commands.id", ondelete="CASCADE"), index=True
+    )
+    kind: Mapped[str] = mapped_column(String(64), index=True)
+    title: Mapped[str] = mapped_column(String(256))
+    body: Mapped[str] = mapped_column(Text)
+    links_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    channel: Mapped[str] = mapped_column(String(32), default="in_app")
+    read_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class FounderCommandAuditEvent(Base):
+    """Append-only redacted audit trail for founder commands."""
+
+    __tablename__ = "founder_command_audit_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    command_id: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)
+    event_type: Mapped[str] = mapped_column(String(64), index=True)
+    actor_fingerprint: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    detail_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
