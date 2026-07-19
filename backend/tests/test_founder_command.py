@@ -11,7 +11,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.config import get_settings
-from app.database.models import Base, FounderCommand
+from app.database.models import Base, FounderCommand, FounderDecision
 from app.database.session import get_db
 from app.main import app
 from app.services.founder_command.approval_policy import classify_operation
@@ -306,14 +306,73 @@ def test_level4_requires_caps():
 def test_approval_policy_safe_vs_high_risk():
     risk, disp = classify_operation("diagnose", {"execution_mode": "analysis"})
     assert disp == "auto"
-    risk2, disp2 = classify_operation("production_deploy", {"execution_mode": "deploy"})
+    guarded_deploy = {
+        "execution_mode": "deploy",
+        "execution_contract": {
+            "commit_required": True,
+            "pr_required": True,
+            "deployment_required": True,
+            "production_regression_required": True,
+        },
+    }
+    risk2, disp2 = classify_operation("production_deploy", guarded_deploy)
     assert disp2 == "auto"
     assert risk2 == "high"
+    _, unguarded = classify_operation(
+        "production_deploy",
+        {"execution_mode": "deploy"},
+    )
+    assert unguarded == "require_approval"
     risk3, disp3 = classify_operation("force_unlock", {"execution_mode": "deploy"})
     assert disp3 == "require_approval"
     assert risk3 == "critical"
     risk4, disp4 = classify_operation("merge_to_base", {"execution_mode": "deploy"})
     assert disp4 == "require_approval"
+
+
+def test_ci_gated_deploy_command_does_not_wait_for_approval(founder_client, monkeypatch):
+    client, db = founder_client
+    monkeypatch.setattr(
+        "app.services.founder_command.service.tick_command",
+        lambda *_args, **_kwargs: None,
+    )
+    monkeypatch.setattr(
+        "app.tasks.founder_command_tasks.tick_founder_command.delay",
+        lambda *_args, **_kwargs: None,
+    )
+
+    response = client.post(
+        "/api/v1/founder-command/commands",
+        headers={**_csrf(client), "Idempotency-Key": "ci-gated-deploy-auto"},
+        json={
+            "direction": "Wdróż standardową zmianę po zielonym CI.",
+            "action": "start",
+            "autonomy_level": 3,
+            "max_batches": 1,
+            "max_runtime_minutes": 60,
+            "execution_mode": "deploy",
+            "execution_contract": {
+                "execution_mode": "mutating",
+                "read_only": False,
+                "mutation_required": True,
+                "commit_required": True,
+                "pr_required": True,
+                "merge_required": False,
+                "deployment_required": True,
+                "production_regression_required": True,
+                "operator_execution_required": True,
+            },
+        },
+    )
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["status"] == "queued"
+    assert body["pending_decisions"] == []
+    decision = db.query(FounderDecision).filter_by(command_id=body["id"]).one()
+    assert decision.operation == "standard_production_deploy"
+    assert decision.risk == "high"
+    assert decision.status == "auto_approved"
 
 
 def test_csrf_roundtrip():

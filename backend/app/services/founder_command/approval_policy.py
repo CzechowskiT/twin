@@ -19,13 +19,34 @@ from app.services.founder_command.constants import (
 )
 
 
+def _is_ci_gated_standard_deploy(op: str, plan: dict[str, Any]) -> bool:
+    """Allow deploy auto-approval only when delivery evidence stays mandatory."""
+    if op not in STANDARD_AUTO_DEPLOY_OPS:
+        return False
+    contract = plan.get("execution_contract")
+    if not isinstance(contract, dict):
+        return False
+    regression_required = contract.get(
+        "production_regression_required",
+        contract.get("regression_required"),
+    )
+    return (
+        contract.get("deployment_required") is True
+        and regression_required is True
+        and contract.get("commit_required") is True
+        and contract.get("pr_required") is True
+    )
+
+
 def classify_operation(op: str, plan: dict[str, Any]) -> tuple[str, str]:
     """Return (risk, disposition) where disposition is auto|require_approval."""
     if op in HIGH_RISK_OPS:
         return DecisionRisk.CRITICAL.value, "require_approval"
-    # Standard deploy after green CI — no founder approval; keep risk label for audit.
-    if op in STANDARD_AUTO_DEPLOY_OPS:
+    # CI-gated standard deploy needs no founder approval; keep risk label for audit.
+    if _is_ci_gated_standard_deploy(op, plan):
         return DecisionRisk.HIGH.value, "auto"
+    if op in STANDARD_AUTO_DEPLOY_OPS:
+        return DecisionRisk.HIGH.value, "require_approval"
     if op in SAFE_AUTO_OPS:
         return DecisionRisk.LOW.value, "auto"
     mode = plan.get("execution_mode")
