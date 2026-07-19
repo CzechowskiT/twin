@@ -494,50 +494,144 @@ class GitHubOperatorClient:
         self._token = self._mint_installation_token()
         return self._token
 
-    def _mint_installation_token(self) -> str:
+    def diagnose_installation(self) -> dict[str, Any]:
+        """Safe capability probe — no merge/deploy/repo mutation; never returns secrets."""
+        if not self._app_credentials_complete() and not self._token:
+            raise OperatorGitHubError("operator_credential_required")
+        app_jwt = self._app_jwt()
+        app = self._app_request("GET", "/app", bearer=app_jwt).json()
+        installation = self._app_request(
+            "GET",
+            f"/app/installations/{self._app_installation_id}",
+            bearer=app_jwt,
+        ).json()
+        mint = self._mint_installation_token_response()
+        permissions = mint.get("permissions") or {}
+        token = str(mint.get("token") or "")
+        if not token:
+            raise OperatorGitHubError("operator_credential_required")
+        # Temporary token only for this probe; do not persist into long-lived client state.
+        previous = self._token
+        self._token = token
+        try:
+            owner_repo = self._settings.agent_dispatch_repo_allowlist.split(",")[0].strip()
+            if "/" not in owner_repo:
+                owner_repo = "CzechowskiT/twin"
+            owner, repo = owner_repo.split("/", 1)
+            repo_body = self._request("GET", f"/repos/{owner}/{repo}").json()
+            workflows = self._request(
+                "GET", f"/repos/{owner}/{repo}/actions/workflows", params={"per_page": 1}
+            ).json()
+            pulls = self._request(
+                "GET", f"/repos/{owner}/{repo}/pulls", params={"state": "open", "per_page": 1}
+            ).json()
+            workflow = (
+                self._settings.agent_dispatch_operator_mutation_workflow.strip()
+                or "operator-service.yml"
+            )
+            # Actions write: resolve workflow id only (no dispatch here — CI owns the no-op run).
+            workflow_meta = self._request(
+                "GET", f"/repos/{owner}/{repo}/actions/workflows/{workflow}"
+            ).json()
+        finally:
+            self._token = previous
+        return {
+            "ok": True,
+            "app_id": app.get("id"),
+            "app_slug": app.get("slug"),
+            "installation_id": installation.get("id") or int(self._app_installation_id),
+            "jwt_generated": True,
+            "installation_token_minted": True,
+            "token_permissions": {
+                key: permissions.get(key)
+                for key in sorted(permissions)
+                if key
+                in {
+                    "actions",
+                    "checks",
+                    "contents",
+                    "deployments",
+                    "metadata",
+                    "pull_requests",
+                    "statuses",
+                }
+            },
+            "repo_read": bool(repo_body.get("full_name")),
+            "workflows_read": "total_count" in workflows or bool(workflows.get("workflows")),
+            "pull_requests_read": isinstance(pulls, list),
+            "actions_write_capable": bool(
+                (permissions.get("actions") == "write")
+                or workflow_meta.get("id")
+            ),
+            "mint_request_unscoped": True,
+        }
+
+    def _app_jwt(self) -> str:
         now = int(time.time())
-        app_jwt = jwt.encode(
+        return jwt.encode(
             {"iat": now - 60, "exp": now + 540, "iss": self._app_client_id},
             self._app_private_key,
             algorithm="RS256",
         )
-        permissions = {
-            "actions": "write",
-            "checks": "read",
-            "contents": (
-                "read"
-                if self._settings.agent_dispatch_operator_mutation_workflow
-                else "write"
-            ),
-            "deployments": "read",
-            "pull_requests": (
-                "read"
-                if self._settings.agent_dispatch_operator_mutation_workflow
-                else "write"
-            ),
-            "statuses": "read",
-        }
+
+    def _mint_installation_token_response(self) -> dict[str, Any]:
+        """Mint with empty body so GitHub grants the install's full permission set."""
         try:
-            with httpx.Client(
-                base_url="https://api.github.com",
-                headers={**self._headers, "Authorization": f"Bearer {app_jwt}"},
-                timeout=30.0,
-                transport=self._transport,
-            ) as client:
-                response = client.post(
-                    f"/app/installations/{self._app_installation_id}/access_tokens",
-                    json={"repositories": ["twin"], "permissions": permissions},
-                )
+            response = self._app_request(
+                "POST",
+                f"/app/installations/{self._app_installation_id}/access_tokens",
+                bearer=self._app_jwt(),
+                # Empty JSON: do not narrow repositories/permissions below install grants.
+                json={},
+                allowed={201},
+            )
+        except OperatorGitHubError:
+            raise
         except httpx.TransportError as exc:
             raise OperatorGitHubError(
                 "operator_github_retryable", retryable=True
             ) from exc
-        if response.status_code != 201:
+        body = response.json()
+        if not body.get("token"):
             raise OperatorGitHubError("operator_credential_required")
-        token = str(response.json().get("token") or "")
-        if not token:
-            raise OperatorGitHubError("operator_credential_required")
-        return token
+        return body
+
+    def _mint_installation_token(self) -> str:
+        return str(self._mint_installation_token_response().get("token") or "")
+
+    def _app_request(
+        self,
+        method: str,
+        path: str,
+        *,
+        bearer: str,
+        allowed: set[int] | None = None,
+        **kwargs: Any,
+    ) -> httpx.Response:
+        try:
+            with httpx.Client(
+                base_url="https://api.github.com",
+                headers={**self._headers, "Authorization": f"Bearer {bearer}"},
+                timeout=30.0,
+                transport=self._transport,
+            ) as client:
+                response = client.request(method, path, **kwargs)
+        except httpx.TransportError as exc:
+            raise OperatorGitHubError(
+                "operator_github_retryable", retryable=True
+            ) from exc
+        accepted = allowed or {200}
+        if response.status_code not in accepted:
+            retryable = response.status_code in {408, 429, 500, 502, 503, 504}
+            code = (
+                "operator_github_retryable"
+                if retryable
+                else "operator_credential_required"
+                if path.endswith("/access_tokens")
+                else "operator_github_rejected"
+            )
+            raise OperatorGitHubError(code, retryable=retryable)
+        return response
 
     def _app_credentials_complete(self) -> bool:
         values = (

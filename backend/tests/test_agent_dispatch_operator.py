@@ -614,7 +614,8 @@ def test_workflow_merge_reuses_successful_run_without_second_dispatch(operator_d
     assert not any(method in {"POST", "PUT"} for method, _ in calls)
 
 
-def test_github_app_mints_repo_scoped_installation_token(operator_db, monkeypatch):
+def test_github_app_mints_unscoped_installation_token(operator_db, monkeypatch):
+    """Installation token mint must not narrow repositories/permissions below the install."""
     _, settings = operator_db
     settings.agent_dispatch_github_token = ""
     settings.agent_dispatch_github_app_client_id = "Iv1.test"
@@ -629,8 +630,21 @@ def test_github_app_mints_repo_scoped_installation_token(operator_db, monkeypatc
 
     def handler(request: httpx.Request) -> httpx.Response:
         if request.url.path.endswith("/access_tokens"):
-            captured["mint"] = json.loads(request.content)
-            return httpx.Response(201, json={"token": "installation-token"})
+            captured["mint"] = json.loads(request.content or b"{}")
+            captured["mint_auth"] = request.headers["Authorization"]
+            return httpx.Response(
+                201,
+                json={
+                    "token": "installation-token",
+                    "permissions": {
+                        "actions": "write",
+                        "contents": "write",
+                        "deployments": "read",
+                        "metadata": "read",
+                        "pull_requests": "write",
+                    },
+                },
+            )
         captured["authorization"] = request.headers["Authorization"]
         return httpx.Response(200, json={"sha": "a" * 40})
 
@@ -639,7 +653,90 @@ def test_github_app_mints_repo_scoped_installation_token(operator_db, monkeypatc
         "https://github.com/CzechowskiT/twin",
         "a" * 40,
     )
-    assert captured["mint"]["repositories"] == ["twin"]
-    assert captured["mint"]["permissions"]["actions"] == "write"
-    assert captured["mint"]["permissions"]["contents"] == "read"
+    assert captured["mint"] == {}
+    assert "repositories" not in captured["mint"]
+    assert "permissions" not in captured["mint"]
+    assert captured["mint_auth"] == "Bearer signed-app-jwt"
     assert captured["authorization"] == "Bearer installation-token"
+
+
+def test_github_app_installation_diagnostic_covers_required_capabilities(
+    operator_db, monkeypatch
+):
+    """Safe diagnostic (no secrets): app, install, JWT, mint, perms, repo/workflows/PRs read."""
+    _, settings = operator_db
+    settings.agent_dispatch_github_token = ""
+    settings.agent_dispatch_github_app_client_id = "Iv1.test-app"
+    settings.agent_dispatch_github_app_installation_id = "99001"
+    settings.agent_dispatch_github_app_private_key = "test-private-key"
+    settings.agent_dispatch_repo_allowlist = "CzechowskiT/twin"
+    settings.agent_dispatch_operator_mutation_workflow = "operator-service.yml"
+    jwt_calls: list[dict] = []
+    monkeypatch.setattr(
+        "app.services.agent_dispatch.operator_github.jwt.encode",
+        lambda payload, key, algorithm: (
+            jwt_calls.append({"payload": payload, "algorithm": algorithm, "key_set": bool(key)})
+            or "signed-app-jwt"
+        ),
+    )
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        path = request.url.path
+        auth = request.headers.get("Authorization", "")
+        if path == "/app":
+            assert auth == "Bearer signed-app-jwt"
+            return httpx.Response(200, json={"id": 42, "slug": "twin-operator"})
+        if path == "/app/installations/99001":
+            assert auth == "Bearer signed-app-jwt"
+            return httpx.Response(200, json={"id": 99001, "app_id": 42})
+        if path.endswith("/access_tokens"):
+            assert auth == "Bearer signed-app-jwt"
+            assert json.loads(request.content or b"{}") == {}
+            return httpx.Response(
+                201,
+                json={
+                    "token": "installation-token",
+                    "permissions": {
+                        "actions": "write",
+                        "checks": "read",
+                        "contents": "write",
+                        "deployments": "read",
+                        "metadata": "read",
+                        "pull_requests": "write",
+                        "statuses": "read",
+                    },
+                },
+            )
+        assert auth == "Bearer installation-token"
+        if path == "/repos/CzechowskiT/twin":
+            return httpx.Response(200, json={"full_name": "CzechowskiT/twin"})
+        if path == "/repos/CzechowskiT/twin/actions/workflows":
+            return httpx.Response(200, json={"total_count": 3, "workflows": []})
+        if path == "/repos/CzechowskiT/twin/pulls":
+            return httpx.Response(200, json=[{"number": 1}])
+        if path.endswith("/actions/workflows/operator-service.yml"):
+            return httpx.Response(
+                200,
+                json={"id": 315889248, "path": ".github/workflows/operator-service.yml"},
+            )
+        return httpx.Response(404, json={"message": "unexpected path"})
+
+    client = GitHubOperatorClient(settings, transport=httpx.MockTransport(handler))
+    result = client.diagnose_installation()
+
+    assert result["ok"] is True
+    assert result["app_id"] == 42
+    assert result["app_slug"] == "twin-operator"
+    assert result["installation_id"] == 99001
+    assert result["jwt_generated"] is True
+    assert result["installation_token_minted"] is True
+    assert result["token_permissions"]["actions"] == "write"
+    assert result["token_permissions"]["pull_requests"] == "write"
+    assert result["repo_read"] is True
+    assert result["workflows_read"] is True
+    assert result["pull_requests_read"] is True
+    assert result["actions_write_capable"] is True
+    assert result["mint_request_unscoped"] is True
+    assert "token" not in result
+    assert jwt_calls and jwt_calls[0]["payload"]["iss"] == "Iv1.test-app"
+    assert jwt_calls[0]["algorithm"] == "RS256"
