@@ -8,7 +8,7 @@ on:
         description: Authorized Operator Service operation
         required: true
         type: choice
-        options: [merge, regression]
+        options: [merge, regression, diagnose]
       idempotency_key:
         description: Stable operation key
         required: true
@@ -59,6 +59,8 @@ on:
         required: false
         default: Production
         type: string
+
+# diagnose: read-only / no-op capability probe — never merges, deploys, or mutates repo content.
 
 concurrency:
   group: operator-${{ github.repository }}-${{ inputs.idempotency_key }}
@@ -154,3 +156,44 @@ jobs:
           ref: ${{ inputs.expected_sha }}
       - name: Production regression
         run: chmod +x scripts/verify-prod-health.sh && ./scripts/verify-prod-health.sh
+
+  diagnose:
+    if: inputs.operation == 'diagnose'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      deployments: read
+      pull-requests: read
+    steps:
+      - name: No-op GitHub App / Actions capability probe
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          EXPECTED_BASE_REF: ${{ inputs.expected_base_ref }}
+          IDEMPOTENCY_KEY: ${{ inputs.idempotency_key }}
+        run: |
+          set -euo pipefail
+          [[ "$REPOSITORY" == "CzechowskiT/twin" ]]
+          [[ "$EXPECTED_BASE_REF" == "cursor/phase1-monorepo-scaffold" ]]
+          [[ "$IDEMPOTENCY_KEY" =~ ^[A-Za-z0-9._:-]{1,160}$ ]]
+
+          # Read-only probes — no merge, no deploy, no content mutation.
+          full_name=$(gh api "repos/$REPOSITORY" --jq .full_name)
+          [[ "$full_name" == "CzechowskiT/twin" ]]
+
+          workflow_count=$(gh api "repos/$REPOSITORY/actions/workflows" --jq .total_count)
+          [[ "$workflow_count" =~ ^[0-9]+$ ]]
+
+          gh api "repos/$REPOSITORY/actions/workflows/operator-service.yml" --jq .path \
+            | grep -qx '.github/workflows/operator-service.yml'
+
+          # PRs read (list only; do not mutate).
+          gh api "repos/$REPOSITORY/pulls?state=open&per_page=1" --jq 'type' | grep -qx 'array'
+
+          # Confirm this run is workflow_dispatch diagnose (Actions write path exercised by dispatch).
+          run_json=$(gh api "repos/$REPOSITORY/actions/runs/${{ github.run_id }}")
+          [[ "$(jq -r '.event' <<<"$run_json")" == "workflow_dispatch" ]]
+          [[ "$(jq -r '.name' <<<"$run_json")" == "operator-service" ]]
+
+          echo "operator_diagnose_ok repository=$full_name workflows=$workflow_count run_id=${{ github.run_id }}"
