@@ -3,7 +3,7 @@ export const FOUNDER_COMMAND_MESSAGES_EN = {
   title: "Founder Command Center",
   subtitle: "Set direction. Approve decisions. Read short summaries with links — no copy-paste.",
   operatorHint:
-    "Your primary founder interface is the private Custom GPT TWIN Product Operator (Actions); FCC is the fallback dashboard.",
+    "Use the private Custom GPT TWIN Product Operator (Actions) as your primary founder interface; FCC is the fallback dashboard.",
   sessionReady: "Signed in as founder — Start is ready.",
   sessionChecking: "Checking founder session…",
   redirectingLogin: "Redirecting to login…",
@@ -61,7 +61,7 @@ export const FOUNDER_COMMAND_MESSAGES_PL = {
   subtitle:
     "Ustaw kierunek. Akceptuj decyzje. Czytaj krótkie podsumowania z linkami — bez kopiowania promptów.",
   operatorHint:
-    "Głównym interfejsem foundera jest prywatny Custom GPT TWIN Product Operator (Actions); FCC to panel zapasowy.",
+    "Używaj prywatnego Custom GPT TWIN Product Operator (Actions) jako głównego interfejsu foundera; FCC to panel zapasowy.",
   sessionReady: "Zalogowano jako founder — Start jest gotowy.",
   sessionChecking: "Sprawdzanie sesji foundera…",
   redirectingLogin: "Przekierowanie do logowania…",
