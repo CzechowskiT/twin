@@ -24,6 +24,7 @@ celery_app.conf.update(
         "app.tasks.notification_tasks",
         "app.tasks.nightly_auto_apply",
         "app.tasks.agent_dispatch_tasks",
+        "app.tasks.founder_command_tasks",
     ),
 )
 
@@ -116,6 +117,13 @@ def _configure_beat_schedule() -> None:
             "task": "app.tasks.agent_dispatch_tasks.reconcile_active_dispatch_runs",
             "schedule": float(interval),
             "options": {"expires": interval},
+        }
+    if s.founder_command_enabled:
+        fc_interval = max(15, min(300, int(s.founder_command_poll_interval_seconds or 20)))
+        schedule["founder-command-reconcile"] = {
+            "task": "app.tasks.founder_command_tasks.reconcile_founder_commands",
+            "schedule": float(fc_interval),
+            "options": {"expires": fc_interval},
         }
     celery_app.conf.beat_schedule = schedule
 

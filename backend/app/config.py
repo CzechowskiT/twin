@@ -478,6 +478,14 @@ class Settings(BaseSettings):
     agent_dispatch_operator_deployment_environment: str = "Production"
     agent_dispatch_operator_non_bypass_identity: bool = False
 
+    # Founder Command Center (founder-only ops surface)
+    founder_command_enabled: bool = True
+    founder_command_token: str = ""
+    founder_command_csrf_secret: str = ""
+    founder_command_default_autonomy_level: int = 3
+    founder_command_poll_interval_seconds: int = 20
+
+
     @property
     def cors_origin_list(self) -> list[str]:
         return [o for o in (x.strip() for x in self.cors_origins.split(",")) if o]

@@ -49,6 +49,10 @@ import {
   CANDIDATE_REWARDS_MESSAGES_EN,
   CANDIDATE_REWARDS_MESSAGES_PL,
 } from "./candidate-rewards-messages";
+import {
+  FOUNDER_COMMAND_MESSAGES_EN,
+  FOUNDER_COMMAND_MESSAGES_PL,
+} from "./founder-command-messages";
 
 export type Locale = "en" | "pl" | "es" | "it" | "fr" | "de" | "zh" | "ar" | "ja";
 
@@ -106,6 +110,7 @@ export type TranslationKey =
   | `nav.${keyof typeof en.nav}`
   | `home.${keyof typeof en.home}`
   | `candidateRewards.${keyof typeof CANDIDATE_REWARDS_MESSAGES_EN}`
+  | `founderCommand.${keyof typeof FOUNDER_COMMAND_MESSAGES_EN}`
   | `faq.${keyof typeof FAQ_MESSAGES_EN}`
   | `site.${keyof typeof SITE_MESSAGES_EN}`
   | `calculator.${keyof typeof en.calculator}`
@@ -573,6 +578,7 @@ const en = {
     vacationTestCtaCalculator: "Open ROI calculator",
   },
   candidateRewards: CANDIDATE_REWARDS_MESSAGES_EN,
+  founderCommand: FOUNDER_COMMAND_MESSAGES_EN,
   faq: FAQ_MESSAGES_EN,
   site: SITE_MESSAGES_EN,
   dashboard: {
@@ -8982,6 +8988,7 @@ const pl: MessageTree = {
     vacationTestCtaCalculator: "Kalkulator ROI",
   },
   candidateRewards: CANDIDATE_REWARDS_MESSAGES_PL,
+  founderCommand: FOUNDER_COMMAND_MESSAGES_PL,
   faq: FAQ_MESSAGES_PL,
   site: SITE_MESSAGES_PL,
   dashboard: {
