@@ -188,6 +188,8 @@ def create_twin_command(
         max_runtime_minutes=max_runtime,
         idempotency_key=key,
         sync_ticks=0,
+        explicit_execution_mode=body.execution_mode,
+        explicit_execution_contract=body.execution_contract,
     )
     base = public_api_base(settings, str(request.base_url).rstrip("/"))
     links = command_links(command.id, base)

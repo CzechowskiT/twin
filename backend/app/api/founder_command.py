@@ -152,6 +152,8 @@ def founder_create_command(
         max_batches=body.max_batches,
         max_runtime_minutes=body.max_runtime_minutes,
         idempotency_key=key,
+        explicit_execution_mode=body.execution_mode,
+        explicit_execution_contract=body.execution_contract,
     )
     return command_to_public(db, command, settings)
 

@@ -103,17 +103,24 @@ SAFE_AUTO_OPS = frozenset(
     }
 )
 
-# Always require explicit founder approval.
+# Always require explicit founder approval (destructive / override — not standard CI deploy).
 HIGH_RISK_OPS = frozenset(
     {
         "merge_to_base",
-        "production_deploy",
         "schema_migration",
         "secret_rotation",
         "force_unlock",
         "change_allowlist",
         "continuous_without_caps",
         "destructive_data",
+    }
+)
+
+# Standard Railway/Vercel deploy after green CI — auto under Approval Policy.
+STANDARD_AUTO_DEPLOY_OPS = frozenset(
+    {
+        "production_deploy",
+        "standard_production_deploy",
     }
 )
 
