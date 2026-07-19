@@ -194,6 +194,7 @@ jobs:
           # Confirm this run is workflow_dispatch diagnose (Actions write path exercised by dispatch).
           run_json=$(gh api "repos/$REPOSITORY/actions/runs/${{ github.run_id }}")
           [[ "$(jq -r '.event' <<<"$run_json")" == "workflow_dispatch" ]]
-          [[ "$(jq -r '.name' <<<"$run_json")" == "operator-service" ]]
+          # run-name overrides Actions API .name; pin to workflow path instead.
+          [[ "$(jq -r '.path' <<<"$run_json")" == ".github/workflows/operator-service.yml" ]]
 
           echo "operator_diagnose_ok repository=$full_name workflows=$workflow_count run_id=${{ github.run_id }}"
