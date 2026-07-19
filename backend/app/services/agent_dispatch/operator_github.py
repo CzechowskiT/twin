@@ -283,6 +283,36 @@ class GitHubOperatorClient:
             },
         )
 
+    def trigger_diagnose(
+        self,
+        *,
+        repository_url: str,
+        ref: str,
+        idempotency_key: str,
+    ) -> dict[str, Any]:
+        """Dispatch operator-service.yml operation=diagnose and wait for success."""
+        workflow = (
+            self._settings.agent_dispatch_operator_mutation_workflow.strip()
+            or "operator-service.yml"
+        )
+        artifact = self._dispatch_workflow(
+            repository_url=repository_url,
+            workflow=workflow,
+            ref=ref,
+            operation="diagnose",
+            idempotency_key=idempotency_key,
+            inputs={"expected_base_ref": ref},
+        )
+        run_id = int(artifact.get("workflow_run_id") or 0)
+        if not run_id:
+            raise OperatorGitHubError("operator_workflow_dispatch_unresolved", retryable=True)
+        completed = self._wait_workflow(
+            repository_url=repository_url,
+            workflow_run_id=run_id,
+            failure_code="operator_diagnose_failed",
+        )
+        return self._workflow_artifact(completed)
+
     def regression_passed(
         self,
         *,

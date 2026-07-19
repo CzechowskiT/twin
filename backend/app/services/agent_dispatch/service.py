@@ -684,6 +684,47 @@ def finalize_with_github(db: Session, settings: Settings, run_id: str) -> AgentD
             db.commit()
             db.refresh(run)
             return run
+    if _operator_diagnose_required(settings, expected):
+        from app.services.agent_dispatch.operator_github import (
+            GitHubOperatorClient,
+            OperatorGitHubError,
+        )
+
+        try:
+            diagnose = GitHubOperatorClient(settings).trigger_diagnose(
+                repository_url=run.repository_url,
+                ref=run.base_branch,
+                idempotency_key=(run.idempotency_key or run.id)[:160],
+            )
+            enrichment_raw = json.loads(run.github_enrichment_json or "{}")
+            enrichment_raw["operator_diagnose"] = diagnose
+            run.github_enrichment_json = json.dumps(enrichment_raw, default=str)
+            write_audit(
+                db,
+                run_id=run.id,
+                event_type="operator_diagnose_dispatched",
+                actor_fingerprint=None,
+                detail={
+                    "workflow_run_id": diagnose.get("workflow_run_id"),
+                    "workflow_run_url": diagnose.get("run_url"),
+                },
+            )
+        except OperatorGitHubError as exc:
+            run.status = DispatchRunStatus.NEEDS_ATTENTION.value
+            run.error_code = "expected_operator_diagnose_missing"
+            run.error_message = exc.reason_code
+            run.finished_at = datetime.utcnow()
+            release_lock(db, run_id=run.id)
+            write_audit(
+                db,
+                run_id=run.id,
+                event_type="operator_diagnose_failed",
+                actor_fingerprint=None,
+                detail={"reason_code": exc.reason_code},
+            )
+            db.commit()
+            db.refresh(run)
+            return run
     _set_artifact_status(run, expected, enrichment, reconcile_ok)
     run.finished_at = datetime.utcnow()
     release_lock(db, run_id=run.id)
@@ -705,6 +746,19 @@ def finalize_with_github(db: Session, settings: Settings, run_id: str) -> AgentD
     db.commit()
     db.refresh(run)
     return run
+
+
+def _operator_diagnose_required(settings: Settings, expected: dict[str, Any]) -> bool:
+    """Workflow-only mutating contracts must execute Operator diagnose before success."""
+    return bool(
+        settings.agent_dispatch_operator_enabled
+        and expected.get("operator_execution_required")
+        and not expected.get("read_only")
+        and not expected.get("merge_required")
+        and not expected.get("commit_required")
+        and not expected.get("pr_required")
+        and not expected.get("deployment_required")
+    )
 
 
 def _operator_handoff_ready(
