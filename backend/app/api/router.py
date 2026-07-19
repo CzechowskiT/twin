@@ -6,6 +6,7 @@ from app.api import (
     audit_events,
     auto_apply_settings,
     admin_ops,
+    chatgpt_twin,
     company,
     company_feedback_persistence,
     consent,
@@ -111,6 +112,9 @@ api_router.include_router(admin_ops.router, prefix="/admin", tags=["Admin"])
 api_router.include_router(ops.router, prefix="/ops", tags=["Ops"])
 api_router.include_router(
     founder_command.router, prefix="/founder-command", tags=["Founder Command"]
+)
+api_router.include_router(
+    chatgpt_twin.router, prefix="/chatgpt/twin", tags=["ChatGPT Twin Product Operator"]
 )
 api_router.include_router(investor_data_room.router, prefix="/investor", tags=["Investor"])
 api_router.include_router(company.router, prefix="/company", tags=["Company"])

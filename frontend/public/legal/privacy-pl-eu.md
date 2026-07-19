@@ -57,3 +57,13 @@ Używamy storage **niezbędnego** do logowania, bezpieczeństwa i języka. Jeśl
 ## Kontakt
 
 Użyj kanału kontaktu podanego na stronie w sprawach prywatności.
+
+---
+
+## Custom GPT Actions (założyciel / operator) {#custom-gpt-actions}
+
+TWIN może udostępniać **prywatnego Custom GPT** („TWIN Product Operator”), który wywołuje nasz HTTPS Actions API z długotrwałym **kluczem API** przechowywanym wyłącznie w konfiguracji GPT u operatora oraz w magazynie sekretów backendu (Railway). To **nie** jest publiczna aplikacja GPT Store i **nie** jest łącznikiem MCP.
+
+**Co może przetwarzać Actions API:** tekst poleceń założyciela, identyfikatory komend i decyzji, zredagowany status projektu oraz linki inżynierskie. Odpowiedzi są zaprojektowane tak, by **nie zawierały** sekretów, pełnych promptów Product Agenta ani surowych logów.
+
+**Kontrola:** utrzymuj GPT jako prywatnego; rotacja klucza w Railway odcina dostęp. Klucz nigdy nie trafia do dokumentu OpenAPI ani frontendu.

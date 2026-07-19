@@ -39,3 +39,13 @@ Strictly necessary storage for login and settings; optional analytics/marketing 
 ## Third parties
 
 We use **Anthropic Claude** and aggregate listings from public job boards. Subprocessor and transfer details will expand as the product matures.
+
+---
+
+## Custom GPT Actions (founder / operator) {#custom-gpt-actions}
+
+TWIN may expose a **private Custom GPT** (“TWIN Product Operator”) that calls our HTTPS Actions API with a long-lived **API key** stored only in the operator’s ChatGPT GPT configuration and in our backend secret store (Railway). This is **not** a public GPT Store app and is **not** an MCP connector.
+
+**What the Actions API may process:** founder command text, command/decision identifiers, redacted project status, and engineering links. Responses are designed to **omit** secrets, full Product Agent prompts, and raw logs.
+
+**Control:** keep the GPT private; rotate the Railway API key to revoke access. The key is never placed in the OpenAPI document or frontend.

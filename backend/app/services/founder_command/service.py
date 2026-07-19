@@ -153,6 +153,7 @@ def create_command(
     max_batches: int | None = None,
     max_runtime_minutes: int | None = None,
     idempotency_key: str | None = None,
+    sync_ticks: int = 4,
 ) -> FounderCommand:
     if idempotency_key:
         existing = db.execute(
@@ -263,7 +264,8 @@ def create_command(
         command.status = CommandStatus.QUEUED.value
         command.current_stage = CommandStage.RESOLVE_STATE.value
         # Kick first ticks synchronously for snappy UI; Celery continues.
-        for _ in range(4):
+        # ChatGPT Actions pass sync_ticks=0 so the HTTP response returns promptly.
+        for _ in range(max(0, int(sync_ticks))):
             tick_command(db, settings, command.id, actor_fingerprint=principal.fingerprint)
             db.refresh(command)
             if command.status in COMMAND_TERMINAL | {
@@ -283,7 +285,13 @@ def create_command(
         command_id=command.id,
         event_type="command_created",
         actor_fingerprint=principal.fingerprint,
-        detail={"action": action, "autonomy_level": level, "blocked": approval["blocked"]},
+        detail={
+            "action": action,
+            "autonomy_level": level,
+            "blocked": approval["blocked"],
+            "sync_ticks": max(0, int(sync_ticks)),
+            "via": principal.via,
+        },
     )
     db.commit()
     db.refresh(command)
@@ -301,7 +309,11 @@ def create_command(
 
             tick_founder_command.delay(command.id)
         except Exception:
-            pass
+            if max(0, int(sync_ticks)) == 0:
+                # Still advance one tick when Celery is unavailable so durable loop starts.
+                tick_command(db, settings, command.id, actor_fingerprint=principal.fingerprint)
+                db.commit()
+                db.refresh(command)
     return command
 
 
@@ -351,19 +363,28 @@ def resume_command(
     return command
 
 
-def cancel_command(db: Session, command_id: str, principal: FounderPrincipal) -> FounderCommand:
+def cancel_command(
+    db: Session,
+    command_id: str,
+    principal: FounderPrincipal,
+    *,
+    reason: str | None = None,
+) -> FounderCommand:
     command = db.get(FounderCommand, command_id)
     if not command:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="command_not_found")
     command.status = CommandStatus.CANCELLED.value
     command.finished_at = datetime.utcnow()
-    command.live_summary = "Cancelled by founder"
+    summary = "Cancelled by founder"
+    if reason:
+        summary = f"Cancelled by founder: {reason.strip()[:400]}"
+    command.live_summary = summary
     write_founder_audit(
         db,
         command_id=command.id,
         event_type="cancelled",
         actor_fingerprint=principal.fingerprint,
-        detail={},
+        detail={"reason": (reason or "")[:500]},
     )
     db.commit()
     return command

@@ -57,3 +57,15 @@ We use **strictly necessary** storage for sign-in, security, and language. If yo
 ## Contact
 
 Use the contact channel published on the site for privacy requests.
+
+---
+
+## Custom GPT Actions (founder / operator) {#custom-gpt-actions}
+
+TWIN may expose a **private Custom GPT** (“TWIN Product Operator”) that calls our HTTPS Actions API with a long-lived **API key** stored only in the operator’s ChatGPT GPT configuration and in our backend secret store (Railway). This is **not** a public GPT Store app and is **not** an MCP connector.
+
+**What the Actions API may process:** founder command text (goals/directions), command and decision identifiers, redacted project status (e.g. deployment SHAs, counters, Gate/Launch stance), and links to existing engineering surfaces (e.g. pull requests). The API is designed to **omit** secrets, full Product Agent prompts, and raw execution logs from Action responses.
+
+**What we do not put in the OpenAPI document or frontend:** the Actions API key. Rotation is supported by replacing the Railway secret (and optionally keeping a short dual-key window).
+
+**Your control:** keep the Custom GPT private; revoke or rotate the API key in Railway to cut off access. OAuth for Actions may be added later; the current MVP is API-key Bearer auth scoped only to the `/api/v1/chatgpt/twin` namespace.
