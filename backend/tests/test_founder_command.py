@@ -87,6 +87,22 @@ def test_planner_analysis_preserves_false_flags():
     assert plan["product_agent_prompt_hash"]
 
 
+def test_planner_diagnostic_forces_analysis_at_default_level():
+    """Polish diagnostic wording must stay read-only even at default autonomy L3."""
+    plan = plan_from_command(
+        command_text="Wykonaj bezpieczny diagnostyczny batch autonomicznie.",
+        project_state={"repo": {}, "production": {}, "counters": {}},
+        autonomy_level=3,
+        max_batches=1,
+        max_runtime_minutes=90,
+        action="start",
+    )
+    assert plan["execution_mode"] == "analysis"
+    assert plan["execution_contract"]["read_only"] is True
+    assert plan["execution_contract"]["mutation_required"] is False
+    assert "production_deploy" not in (plan.get("approval_needs") or [])
+
+
 def test_level4_requires_caps():
     with pytest.raises(ValueError, match="level_4"):
         plan_from_command(
