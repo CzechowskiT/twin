@@ -19,7 +19,7 @@ from app.database.models import (
     AgentDispatchOperatorOperation,
     AgentDispatchRun,
 )
-from app.services.agent_dispatch.artifacts import normalize_expected, normalize_verified
+from app.services.agent_dispatch.artifacts import normalize_expected, normalize_verified, sha_matches
 from app.services.agent_dispatch.audit import write_audit
 from app.services.agent_dispatch.constants import (
     ACTIVE_LOCK_STATUSES,
@@ -208,7 +208,7 @@ class OperatorService:
             "verify_deployment_sha",
             merge_sha,
             correlation,
-            lambda: {"verified": deployment.get("sha") == merge_sha},
+            lambda: {"verified": sha_matches(str(deployment.get("sha") or ""), merge_sha)},
         )
         if artifact.get("verified") is not True:
             raise OperatorGitHubError("operator_deployment_sha_mismatch")

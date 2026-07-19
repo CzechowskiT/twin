@@ -28,7 +28,7 @@ from app.services.agent_dispatch.auth import (
     require_scope,
     resolve_principal,
 )
-from app.services.agent_dispatch.artifacts import artifact_outcome
+from app.services.agent_dispatch.artifacts import artifact_gate_canary_probe
 from app.services.agent_dispatch.constants import (
     AGENT_DISPATCH_SCOPE_ADMIN,
     AGENT_DISPATCH_SCOPE_CANCEL,
@@ -75,30 +75,9 @@ def _secret_fp(value: str) -> str | None:
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:12]
 
 
-def _artifact_gate_canary() -> dict[str, str | None]:
-    expected = {
-        "pr_required": True,
-        "merge_required": True,
-        "deployment_required": True,
-        "ci_required": True,
-        "regression_required": True,
-        "commit_required": True,
-    }
-    verified = {
-        "pr_exists": True,
-        "merge_verified": True,
-        "deployment_verified": False,
-        "ci_passed": True,
-        "regression_passed": True,
-        "commit_exists": True,
-        "head_sha_verified": True,
-    }
-    status_value, reason = artifact_outcome(expected, verified)
-    return {
-        "status": status_value,
-        "reason_code": reason,
-        "missing_artifact": "deployment_verified",
-    }
+def _artifact_gate_canary() -> dict[str, Any]:
+    """Contract-scoped readiness probe — must PASS when deploy is not required."""
+    return artifact_gate_canary_probe()
 
 
 @router.get("/health")
