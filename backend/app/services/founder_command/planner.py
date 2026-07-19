@@ -19,7 +19,7 @@ from app.services.founder_command.constants import (
 
 
 _DIAGNOSTIC = re.compile(
-    r"\b(diagnos|inspect|audit|analy[sz]|read[\s-]?only|bezpieczn|diagnostycz)\b",
+    r"\b(diagnos\w*|inspect\w*|audit\w*|analy[sz]\w*|read[\s-]?only|bezpieczn\w*|diagnostycz\w*)\b",
     re.I,
 )
 _DEPLOY = re.compile(r"\b(deploy|railway|vercel|production|produkcj)\b", re.I)
