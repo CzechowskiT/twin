@@ -89,6 +89,11 @@ def test_planner_analysis_preserves_false_flags():
 
 def test_planner_diagnostic_forces_analysis_at_default_level():
     """Polish diagnostic wording must stay read-only even at default autonomy L3."""
+    from app.services.agent_dispatch.artifacts import (
+        has_mutation_requirement,
+        resolve_execution_contract,
+    )
+
     plan = plan_from_command(
         command_text="Wykonaj bezpieczny diagnostyczny batch autonomicznie.",
         project_state={"repo": {}, "production": {}, "counters": {}},
@@ -101,6 +106,13 @@ def test_planner_diagnostic_forces_analysis_at_default_level():
     assert plan["execution_contract"]["read_only"] is True
     assert plan["execution_contract"]["mutation_required"] is False
     assert "production_deploy" not in (plan.get("approval_needs") or [])
+    prompt = plan["product_agent_prompt"]
+    assert has_mutation_requirement(prompt) is False
+    resolved = resolve_execution_contract(
+        prompt, explicit=plan["execution_contract"], auto_create_pr=False
+    )
+    assert resolved["execution_mode"] == "read_only"
+    assert resolved["read_only"] is True
 
 
 def test_level4_requires_caps():
