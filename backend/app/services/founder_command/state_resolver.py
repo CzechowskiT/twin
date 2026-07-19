@@ -16,6 +16,7 @@ from app.database.models import (
     FounderCommand,
     FounderDecision,
 )
+from app.services.agent_dispatch.artifacts import sha_matches
 from app.services.agent_dispatch.constants import ACTIVE_LOCK_STATUSES, DISPATCH_RUN_TERMINAL
 from app.services.founder_command.constants import (
     ACTIVE_COMMAND_STATUSES,
@@ -119,9 +120,7 @@ def resolve_project_state(db: Session, settings: Settings) -> dict[str, Any]:
                 }
             )
 
-    alignment = "aligned" if api_sha and api_sha.startswith(repo_head_hint[:12]) else "unknown"
-    if api_sha and repo_head_hint and api_sha == repo_head_hint:
-        alignment = "aligned"
+    alignment = "aligned" if sha_matches(api_sha, repo_head_hint) else "unknown"
 
     return {
         "resolved_at": datetime.utcnow().isoformat() + "Z",

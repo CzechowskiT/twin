@@ -16,7 +16,12 @@ from app.database.session import get_db
 from app.main import app
 from app.services.founder_command.approval_policy import classify_operation
 from app.services.founder_command.auth import FounderPrincipal, issue_csrf_token, verify_csrf
-from app.services.founder_command.constants import AutonomyLevel, GATE_F_STATUS, LAUNCH_STANCE
+from app.services.founder_command.constants import (
+    AutonomyLevel,
+    GATE_F_STATUS,
+    KNOWN_PROD_SHA_HINT,
+    LAUNCH_STANCE,
+)
 from app.services.founder_command.planner import plan_from_command
 from app.services.founder_command.state_resolver import resolve_project_state
 
@@ -148,6 +153,32 @@ def test_state_resolver_includes_gate_and_launch(founder_client):
     assert state["gate_f"]["status"] == GATE_F_STATUS
     assert state["launch"]["stance"] == LAUNCH_STANCE
     assert "counters" in state
+
+
+def test_state_resolver_aligns_with_known_backend_deploy(founder_client, monkeypatch):
+    _, db = founder_client
+    monkeypatch.setattr(
+        "app.services.founder_command.state_resolver._git_commit_from_health",
+        lambda: KNOWN_PROD_SHA_HINT,
+    )
+
+    production = resolve_project_state(db, get_settings())["production"]
+
+    assert production["api_git_commit"] == KNOWN_PROD_SHA_HINT
+    assert production["repo_head_hint"] == KNOWN_PROD_SHA_HINT
+    assert production["alignment_status"] == "aligned"
+
+
+def test_state_resolver_does_not_mask_unknown_deploy(founder_client, monkeypatch):
+    _, db = founder_client
+    monkeypatch.setattr(
+        "app.services.founder_command.state_resolver._git_commit_from_health",
+        lambda: "844176fb158555c8dd0c1d60dcaba29eb9e66915",
+    )
+
+    production = resolve_project_state(db, get_settings())["production"]
+
+    assert production["alignment_status"] == "unknown"
 
 
 def test_create_analyze_command_no_manual_prompt_copy(founder_client):

@@ -78,6 +78,15 @@ jobs:
     timeout-minutes: 20
     needs: [backend-smoke, frontend-build]
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Resolve deployment targets
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          chmod +x scripts/production-deployment-targets.sh
+          scripts/production-deployment-targets.sh "$BEFORE_SHA" "$GITHUB_SHA" >> "$GITHUB_ENV"
       - name: Wait for production SHA and verify negative artifact gate
         env:
           API_HEALTH: https://twin-production-bcd9.up.railway.app/api/v1/health
@@ -89,9 +98,14 @@ jobs:
             local url="$2"
             local field="$3"
             for attempt in $(seq 1 60); do
-              deployed=$(curl -fsS --max-time 15 "$url" | \
-                FIELD="$field" python3 -c \
-                'import json,os,sys; print(json.load(sys.stdin).get(os.environ["FIELD"], ""))' || true)
+              deployed=""
+              if payload=$(curl -fsS --max-time 15 "$url"); then
+                if parsed=$(FIELD="$field" python3 -c \
+                  'import json,os,sys; print(json.load(sys.stdin).get(os.environ["FIELD"], ""))' \
+                  <<< "$payload"); then
+                  deployed="$parsed"
+                fi
+              fi
               if [[ "$deployed" == "$GITHUB_SHA" ]]; then
                 echo "$label production SHA verified"
                 return 0
@@ -102,8 +116,16 @@ jobs:
             echo "$label did not deploy $GITHUB_SHA"
             return 1
           }
-          wait_for_sha API "$API_HEALTH" git_commit
-          wait_for_sha frontend "$FRONTEND_HEALTH" frontend_commit
+          if [[ "$API_DEPLOY_REQUIRED" == "true" ]]; then
+            wait_for_sha API "$API_HEALTH" git_commit
+          else
+            echo "API deployment not required for this component scope"
+          fi
+          if [[ "$FRONTEND_DEPLOY_REQUIRED" == "true" ]]; then
+            wait_for_sha frontend "$FRONTEND_HEALTH" frontend_commit
+          else
+            echo "Frontend deployment not required for this component scope"
+          fi
           canary=$(curl -fsS --max-time 15 "$DISPATCHER_HEALTH" | python3 -c \
             'import json,sys; c=json.load(sys.stdin)["artifact_gate_canary"]; print(c["status"]+" "+str(c.get("reason_code")))')
           test "$canary" = "PASS None"
