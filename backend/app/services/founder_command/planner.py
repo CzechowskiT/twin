@@ -28,9 +28,9 @@ _CONTINUOUS = re.compile(r"\b(continu|ciągł|keep (going|shipping)|wystarczy|lo
 
 
 def _infer_mode(command_text: str, autonomy_level: int) -> str:
-    if autonomy_level <= AutonomyLevel.ANALYSIS.value or _DIAGNOSTIC.search(command_text):
-        if autonomy_level <= AutonomyLevel.ANALYSIS.value:
-            return "analysis"
+    # Diagnostic / read-only language always forces analysis, even at L2–L4.
+    if _DIAGNOSTIC.search(command_text) or autonomy_level <= AutonomyLevel.ANALYSIS.value:
+        return "analysis"
     if autonomy_level >= AutonomyLevel.CONTINUOUS.value and _CONTINUOUS.search(command_text):
         return "continuous"
     if autonomy_level >= AutonomyLevel.DEPLOY.value and _DEPLOY.search(command_text):
