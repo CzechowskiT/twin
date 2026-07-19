@@ -15,6 +15,7 @@ from app.services.founder_command.constants import (
     DecisionStatus,
     HIGH_RISK_OPS,
     SAFE_AUTO_OPS,
+    STANDARD_AUTO_DEPLOY_OPS,
 )
 
 
@@ -22,6 +23,9 @@ def classify_operation(op: str, plan: dict[str, Any]) -> tuple[str, str]:
     """Return (risk, disposition) where disposition is auto|require_approval."""
     if op in HIGH_RISK_OPS:
         return DecisionRisk.CRITICAL.value, "require_approval"
+    # Standard deploy after green CI — no founder approval; keep risk label for audit.
+    if op in STANDARD_AUTO_DEPLOY_OPS:
+        return DecisionRisk.HIGH.value, "auto"
     if op in SAFE_AUTO_OPS:
         return DecisionRisk.LOW.value, "auto"
     mode = plan.get("execution_mode")
@@ -30,7 +34,8 @@ def classify_operation(op: str, plan: dict[str, Any]) -> tuple[str, str]:
     if mode == "build":
         return DecisionRisk.MEDIUM.value, "auto"
     if mode in {"deploy", "continuous"}:
-        return DecisionRisk.HIGH.value, "require_approval"
+        # Mode alone is not high-risk; only explicit HIGH_RISK_OPS block.
+        return DecisionRisk.MEDIUM.value, "auto"
     return DecisionRisk.MEDIUM.value, "require_approval"
 
 
@@ -47,13 +52,21 @@ def evaluate_plan_approvals(
     primary_op = {
         "analysis": "diagnose",
         "build": "plan_batch",
-        "deploy": "production_deploy",
+        # Standard deploy path — auto under Approval Policy (not duplicated below).
+        "deploy": "standard_production_deploy",
         "continuous": "continuous_without_caps"
         if not (plan.get("limits") or {}).get("max_batches")
         else "continue_safe_batch",
     }.get(mode, "plan_batch")
 
-    ops = [primary_op, *needs]
+    # Deduplicate while preserving order (avoids double production_deploy decisions).
+    seen: set[str] = set()
+    ops: list[str] = []
+    for op in [primary_op, *needs]:
+        if op in seen:
+            continue
+        seen.add(op)
+        ops.append(op)
     decisions: list[FounderDecision] = []
     blocked = False
     for op in ops:

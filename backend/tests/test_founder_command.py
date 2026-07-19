@@ -115,6 +115,183 @@ def test_planner_diagnostic_forces_analysis_at_default_level():
     assert resolved["read_only"] is True
 
 
+def test_planner_mutating_polish_approval_policy_not_read_only():
+    """Zmień Approval Policy + testy + PR + wdroż → mutating, never fixed diagnostic goal."""
+    plan = plan_from_command(
+        command_text="Zmień Approval Policy, dodaj testy, utwórz PR, wdroż i zweryfikuj",
+        project_state={"repo": {}, "production": {}, "counters": {}},
+        autonomy_level=3,
+        max_batches=5,
+        max_runtime_minutes=360,
+        action="start",
+    )
+    assert plan["execution_mode"] in {"build", "deploy"}
+    assert plan["execution_mode"] != "analysis"
+    contract = plan["execution_contract"]
+    assert contract["read_only"] is False
+    assert contract["execution_mode"] == "mutating"
+    assert contract["mutation_required"] is True
+    assert contract["commit_required"] is True
+    assert contract["pr_required"] is True
+    assert "Diagnose TWIN production readiness without mutations" not in plan["goal"]
+    assert "Approval Policy" in plan["goal"] or "Zmień" in plan["goal"]
+
+
+def test_planner_explicit_analysis_polish_read_only():
+    plan = plan_from_command(
+        command_text="Przeanalizuj stan bez zmian",
+        project_state={"repo": {}, "production": {}, "counters": {}},
+        autonomy_level=3,
+        max_batches=2,
+        max_runtime_minutes=60,
+        action="start",
+    )
+    assert plan["execution_mode"] == "analysis"
+    assert plan["execution_contract"]["read_only"] is True
+    assert plan["execution_contract"]["mutation_required"] is False
+
+
+def test_planner_analyze_action_with_mutating_scope_fails():
+    from app.services.founder_command.planner import PLANNER_EXECUTION_MODE_MISMATCH
+
+    with pytest.raises(ValueError, match=PLANNER_EXECUTION_MODE_MISMATCH):
+        plan_from_command(
+            command_text="Zmień Approval Policy, dodaj testy, utwórz PR, wdroż i zweryfikuj",
+            project_state={"repo": {}, "production": {}, "counters": {}},
+            autonomy_level=3,
+            max_batches=5,
+            max_runtime_minutes=360,
+            action="analyze",
+        )
+
+
+def test_planner_explicit_api_contract_overrides_text():
+    plan = plan_from_command(
+        command_text="Something ambiguous without clear verbs",
+        project_state={"repo": {}, "production": {}, "counters": {}},
+        autonomy_level=3,
+        max_batches=2,
+        max_runtime_minutes=60,
+        action="start",
+        explicit_execution_mode="deploy",
+        explicit_execution_contract={
+            "read_only": False,
+            "mutation_required": True,
+            "commit_required": True,
+            "pr_required": True,
+            "deployment_required": True,
+        },
+    )
+    assert plan["execution_mode"] == "deploy"
+    assert plan["execution_contract"]["read_only"] is False
+    assert plan["execution_contract"]["deployment_required"] is True
+
+
+def test_planner_fallback_does_not_change_mutating_goal():
+    text = "Zmień Approval Policy, dodaj testy, utwórz PR, wdroż i zweryfikuj"
+    plan = plan_from_command(
+        command_text=text,
+        project_state={"repo": {}, "production": {}, "counters": {}},
+        autonomy_level=3,
+        max_batches=5,
+        max_runtime_minutes=360,
+        action="start",
+    )
+    assert plan["goal"] == text or text.startswith(plan["goal"].rstrip("…")[:50])
+    assert plan["goal"] != "Diagnose TWIN production readiness without mutations"
+    assert plan["goal"] != "Ship the next safe MVP batch toward Founder Command autonomy"
+
+
+def test_active_lock_preserves_mutating_plan(founder_client, monkeypatch):
+    """Lock may queue/wait — must not rewrite mutating plan to analysis."""
+    from fastapi import HTTPException
+
+    client, db = founder_client
+
+    def fake_create(*_a, **_k):
+        raise HTTPException(
+            status_code=409,
+            detail={
+                "error": "active_run_lock",
+                "lock_run_id": "f35d294e-169c-458d-b3fd-dcaba5a42a87",
+            },
+        )
+
+    monkeypatch.setattr(
+        "app.services.founder_command.execution_loop.create_dispatch_run", fake_create
+    )
+
+    headers = _csrf(client)
+    res = client.post(
+        "/api/v1/founder-command/commands",
+        headers={**headers, "Idempotency-Key": "lock-preserve-mutating"},
+        json={
+            "direction": "Zmień Approval Policy, dodaj testy, utwórz PR, wdroż i zweryfikuj",
+            "action": "start",
+            "autonomy_level": 3,
+            "max_batches": 2,
+            "max_runtime_minutes": 60,
+        },
+    )
+    assert res.status_code == 200, res.text
+    body = res.json()
+    assert body["plan"]["execution_mode"] in {"build", "deploy"}
+    assert body["plan"]["execution_contract"]["read_only"] is False
+    assert "Diagnose TWIN" not in (body["plan"].get("goal") or "")
+
+    from app.services.founder_command.execution_loop import tick_command
+    from app.config import get_settings
+
+    settings = get_settings()
+    cid = body["id"]
+    row = db.get(FounderCommand, cid)
+    assert row
+    row.status = "queued"
+    row.current_stage = "dispatch"
+    db.commit()
+
+    tick_command(db, settings, cid, actor_fingerprint="test")
+    db.refresh(row)
+    plan = json.loads(row.plan_json or "{}")
+    assert plan.get("execution_mode") in {"build", "deploy"}
+    assert plan.get("execution_contract", {}).get("read_only") is False
+    assert row.status == "queued"
+    assert "lock" in (row.live_summary or "").lower() or row.current_stage == "dispatch"
+
+
+def test_idempotency_rejects_different_execution_contract(founder_client):
+    client, db = founder_client
+    headers = _csrf(client)
+    key = "idem-contract-mismatch"
+    first = client.post(
+        "/api/v1/founder-command/commands",
+        headers=headers,
+        json={
+            "direction": "Przeanalizuj stan bez zmian",
+            "action": "analyze",
+            "autonomy_level": 1,
+            "max_batches": 1,
+            "max_runtime_minutes": 30,
+            "idempotency_key": key,
+        },
+    )
+    assert first.status_code == 200, first.text
+    second = client.post(
+        "/api/v1/founder-command/commands",
+        headers=_csrf(client),
+        json={
+            "direction": "Zmień Approval Policy, dodaj testy, utwórz PR, wdroż i zweryfikuj",
+            "action": "start",
+            "autonomy_level": 3,
+            "max_batches": 5,
+            "max_runtime_minutes": 360,
+            "idempotency_key": key,
+        },
+    )
+    assert second.status_code == 409
+    assert second.json()["detail"] == "idempotency_execution_contract_mismatch"
+
+
 def test_level4_requires_caps():
     with pytest.raises(ValueError, match="level_4"):
         plan_from_command(
@@ -130,8 +307,13 @@ def test_approval_policy_safe_vs_high_risk():
     risk, disp = classify_operation("diagnose", {"execution_mode": "analysis"})
     assert disp == "auto"
     risk2, disp2 = classify_operation("production_deploy", {"execution_mode": "deploy"})
-    assert disp2 == "require_approval"
-    assert risk2 == "critical"
+    assert disp2 == "auto"
+    assert risk2 == "high"
+    risk3, disp3 = classify_operation("force_unlock", {"execution_mode": "deploy"})
+    assert disp3 == "require_approval"
+    assert risk3 == "critical"
+    risk4, disp4 = classify_operation("merge_to_base", {"execution_mode": "deploy"})
+    assert disp4 == "require_approval"
 
 
 def test_csrf_roundtrip():
@@ -237,7 +419,7 @@ def test_pause_resume_cancel(founder_client, monkeypatch):
         "/api/v1/founder-command/commands",
         headers={**headers, "Idempotency-Key": "pause-1"},
         json={
-            "direction": "Build a tiny safe batch with diagnose only wording",
+            "direction": "Wykonaj bezpieczny diagnostyczny batch tylko do odczytu.",
             "action": "start",
             "autonomy_level": 1,
             "max_batches": 2,

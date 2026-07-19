@@ -36,9 +36,32 @@ from app.services.founder_command.constants import (
 )
 from app.services.founder_command.execution_loop import tick_command
 from app.services.founder_command.notifications import list_notifications, notify_founder
-from app.services.founder_command.planner import plan_from_command
+from app.services.founder_command.planner import (
+    PLANNER_EXECUTION_MODE_MISMATCH,
+    plan_contract_fingerprint,
+    plan_from_command,
+)
 from app.services.founder_command.state_resolver import resolve_project_state
 from app.services.founder_command.summaries import build_final_summary, build_live_summary
+
+
+def _existing_plan_fingerprint(command: FounderCommand) -> str | None:
+    try:
+        plan = json.loads(command.plan_json or "{}")
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(plan, dict):
+        return None
+    stored = plan.get("contract_fingerprint")
+    if isinstance(stored, str) and stored:
+        return stored
+    contract = plan.get("execution_contract") if isinstance(plan.get("execution_contract"), dict) else {}
+    return plan_contract_fingerprint(
+        direction=command.direction or "",
+        execution_mode=str(plan.get("execution_mode") or ""),
+        autonomy_level=int(command.autonomy_level or 0),
+        contract=contract,
+    )
 
 
 def _timeline_dict(row: FounderCommandTimelineEvent) -> dict[str, Any]:
@@ -154,14 +177,9 @@ def create_command(
     max_runtime_minutes: int | None = None,
     idempotency_key: str | None = None,
     sync_ticks: int = 4,
+    explicit_execution_mode: str | None = None,
+    explicit_execution_contract: dict[str, Any] | None = None,
 ) -> FounderCommand:
-    if idempotency_key:
-        existing = db.execute(
-            select(FounderCommand).where(FounderCommand.idempotency_key == idempotency_key)
-        ).scalar_one_or_none()
-        if existing:
-            return existing
-
     level = int(autonomy_level or settings.founder_command_default_autonomy_level or DEFAULT_AUTONOMY_LEVEL)
     if level < 1 or level > 4:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="autonomy_level must be 1..4")
@@ -182,9 +200,28 @@ def create_command(
             max_batches=max_batches,
             max_runtime_minutes=max_runtime_minutes,
             action=action,
+            explicit_execution_mode=explicit_execution_mode,
+            explicit_execution_contract=explicit_execution_contract,
         )
     except ValueError as exc:
-        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+        detail = str(exc)
+        code = status.HTTP_409_CONFLICT if detail == PLANNER_EXECUTION_MODE_MISMATCH else status.HTTP_400_BAD_REQUEST
+        raise HTTPException(code, detail=detail) from exc
+
+    if idempotency_key:
+        existing = db.execute(
+            select(FounderCommand).where(FounderCommand.idempotency_key == idempotency_key)
+        ).scalar_one_or_none()
+        if existing:
+            existing_fp = _existing_plan_fingerprint(existing)
+            new_fp = plan.get("contract_fingerprint")
+            if existing_fp and new_fp and existing_fp != new_fp:
+                raise HTTPException(
+                    status.HTTP_409_CONFLICT,
+                    detail="idempotency_execution_contract_mismatch",
+                )
+            # Same key + same contract → replay; do not replan as analysis under lock.
+            return existing
 
     command = FounderCommand(
         id=str(uuid.uuid4()),
