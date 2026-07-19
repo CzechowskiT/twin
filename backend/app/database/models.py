@@ -1648,6 +1648,11 @@ class AgentDispatchRun(Base):
     github_enrichment_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     expected_artifacts_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     verified_artifacts_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    execution_mode: Mapped[str | None] = mapped_column(String(16), nullable=True, index=True)
+    read_only: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    mutation_required: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    operator_execution_required: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    execution_contract_hash: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
     operator_correlation_id: Mapped[str | None] = mapped_column(
         String(64), nullable=True, index=True
     )

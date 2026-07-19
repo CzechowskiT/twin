@@ -144,6 +144,131 @@ def test_create_run_queued_without_cursor_key(dispatch_client):
     assert res2.json()["id"] == body["id"]
 
 
+def test_explicit_mutating_contract_is_persisted(dispatch_client):
+    client, db = dispatch_client
+    payload = _create_payload(
+        prompt="Execute the requested production workflow.",
+        idempotency_key="explicit-mutating-contract",
+        execution_mode="mutating",
+        read_only=False,
+        mutation_required=True,
+        merge_required=True,
+        deployment_required=True,
+        production_regression_required=True,
+        operator_execution_required=True,
+    )
+    res = client.post("/api/internal/agent-dispatch/runs", headers=_auth(), json=payload)
+
+    assert res.status_code == 201
+    body = res.json()
+    assert body["execution_mode"] == "mutating"
+    assert body["read_only"] is False
+    assert body["mutation_required"] is True
+    assert body["operator_execution_required"] is True
+    assert body["expected_artifacts"]["regression_required"] is True
+
+    from app.database.models import AgentDispatchRun
+
+    db.expire_all()
+    stored = db.get(AgentDispatchRun, body["id"])
+    assert stored.execution_mode == "mutating"
+    assert stored.read_only is False
+    assert stored.execution_contract_hash
+
+
+def test_invalid_read_only_mutation_contract_is_rejected(dispatch_client):
+    client, _ = dispatch_client
+    res = client.post(
+        "/api/internal/agent-dispatch/runs",
+        headers=_auth(),
+        json=_create_payload(
+            execution_mode="read_only",
+            read_only=True,
+            commit_required=True,
+        ),
+    )
+    assert res.status_code == 422
+    assert "invalid_execution_contract" in res.text
+
+
+def test_generic_prompt_accepts_explicit_read_only_contract(dispatch_client):
+    client, _ = dispatch_client
+    res = client.post(
+        "/api/internal/agent-dispatch/runs",
+        headers=_auth(),
+        json=_create_payload(
+            prompt="Audit authentication behavior.",
+            execution_mode="read_only",
+            read_only=True,
+        ),
+    )
+    assert res.status_code == 201
+    assert res.json()["execution_mode"] == "read_only"
+    assert res.json()["read_only"] is True
+
+
+def test_execution_mode_and_read_only_must_agree(dispatch_client):
+    client, _ = dispatch_client
+    res = client.post(
+        "/api/internal/agent-dispatch/runs",
+        headers=_auth(),
+        json=_create_payload(
+            prompt="Audit only.",
+            execution_mode="read_only",
+            read_only=False,
+        ),
+    )
+    assert res.status_code == 422
+    assert "invalid_execution_contract" in res.text
+
+
+def test_idempotency_does_not_reuse_read_only_run_for_mutation(dispatch_client):
+    client, _ = dispatch_client
+    key = "execution-contract-idempotency"
+    first = client.post(
+        "/api/internal/agent-dispatch/runs",
+        headers=_auth(),
+        json=_create_payload(
+            prompt="Read-only audit. Do not create a branch, commit, or PR.",
+            execution_mode="read_only",
+            read_only=True,
+            idempotency_key=key,
+        ),
+    )
+    assert first.status_code == 201
+    second = client.post(
+        "/api/internal/agent-dispatch/runs",
+        headers=_auth(),
+        json=_create_payload(
+            prompt="Fix and commit the classifier.",
+            execution_mode="mutating",
+            read_only=False,
+            mutation_required=True,
+            idempotency_key=key,
+        ),
+    )
+    assert second.status_code == 409
+    assert second.json()["detail"]["error"] == "idempotency_execution_contract_mismatch"
+
+
+def test_idempotency_rejects_different_prompt_with_same_contract(dispatch_client):
+    client, _ = dispatch_client
+    key = "idempotency-request-fingerprint"
+    first = client.post(
+        "/api/internal/agent-dispatch/runs",
+        headers=_auth(),
+        json=_create_payload(prompt="Fix classifier A.", idempotency_key=key),
+    )
+    assert first.status_code == 201
+    second = client.post(
+        "/api/internal/agent-dispatch/runs",
+        headers=_auth(),
+        json=_create_payload(prompt="Fix classifier B.", idempotency_key=key),
+    )
+    assert second.status_code == 409
+    assert second.json()["detail"]["error"] == "idempotency_request_mismatch"
+
+
 def test_rejects_weak_execution_policy(dispatch_client):
     client, _ = dispatch_client
     res = client.post(
@@ -399,7 +524,8 @@ def test_mcp_tools_list_and_dispatch_handoff(dispatch_client):
         json={"jsonrpc": "2.0", "id": 1, "method": "tools/list"},
     )
     assert listed.status_code == 200
-    tools = {t["name"] for t in listed.json()["result"]["tools"]}
+    definitions = listed.json()["result"]["tools"]
+    tools = {t["name"] for t in definitions}
     assert {
         "dispatch_twin_agent",
         "get_twin_agent_status",
@@ -409,6 +535,20 @@ def test_mcp_tools_list_and_dispatch_handoff(dispatch_client):
         "list_twin_agent_runs",
         "reconcile_twin_agent_run",
     } <= tools
+    dispatch_schema = next(t for t in definitions if t["name"] == "dispatch_twin_agent")[
+        "inputSchema"
+    ]
+    assert {
+        "execution_mode",
+        "read_only",
+        "mutation_required",
+        "commit_required",
+        "pr_required",
+        "merge_required",
+        "deployment_required",
+        "production_regression_required",
+        "operator_execution_required",
+    } <= set(dispatch_schema["properties"])
 
     created = client.post(
         "/api/internal/agent-dispatch/mcp",
@@ -422,6 +562,10 @@ def test_mcp_tools_list_and_dispatch_handoff(dispatch_client):
                 "arguments": {
                     "task_name": "mcp-unit",
                     "prompt": "Align docs/guard wording for agent dispatcher MCP only.",
+                    "execution_mode": "mutating",
+                    "read_only": False,
+                    "mutation_required": True,
+                    "operator_execution_required": True,
                     "dispatch_now": False,
                     "idempotency_key": "mcp-unit-1",
                 },
@@ -432,6 +576,8 @@ def test_mcp_tools_list_and_dispatch_handoff(dispatch_client):
     text = created.json()["result"]["content"][0]["text"]
     run = json.loads(text)
     assert run["status"] == "queued"
+    assert run["execution_mode"] == "mutating"
+    assert run["read_only"] is False
     run_id = run["id"]
 
     handoff = client.post(
@@ -639,9 +785,13 @@ def test_chatgpt_oauth_metadata_and_token_exchange(dispatch_client):
 
     openapi = client.get("/api/internal/agent-dispatch/chatgpt/openapi.json")
     assert openapi.status_code == 200
-    assert openapi.json()["paths"]["/api/internal/agent-dispatch/runs"]["post"][
+    openapi_body = openapi.json()
+    assert openapi_body["paths"]["/api/internal/agent-dispatch/runs"]["post"][
         "operationId"
     ] == "dispatch_twin_agent"
+    properties = openapi_body["components"]["schemas"]["DispatchCreate"]["properties"]
+    assert properties["execution_mode"]["enum"] == ["read_only", "mutating"]
+    assert "operator_execution_required" in properties
 
     verifier, challenge = _pkce_pair()
     redirect = "https://chatgpt.com/connector/oauth/test-callback"
@@ -775,6 +925,139 @@ def test_missing_artifact_reason_codes(expected_key, reason):
 def test_expected_artifact_inference_handles_negation(prompt, expected):
     inferred = infer_expected_artifacts(prompt)
     assert {key: inferred[key] for key in expected} == expected
+
+
+def test_mutating_requirement_wins_over_incidental_read_only_scope():
+    inferred = infer_expected_artifacts(
+        "Fix and commit the classifier. Perform a read-only investigation first."
+    )
+    assert inferred["execution_mode"] == "mutating"
+    assert inferred["read_only"] is False
+    assert inferred["mutation_required"] is True
+    assert inferred["operator_execution_required"] is True
+    assert inferred["commit_required"] is True
+
+
+def test_read_only_smoke_null_artifacts_remains_read_only():
+    inferred = infer_expected_artifacts(
+        "Run a read-only smoke; branch/commit/PR null and no mutations."
+    )
+    assert inferred["execution_mode"] == "read_only"
+    assert inferred["read_only"] is True
+    assert inferred["mutation_required"] is False
+
+
+def test_mutating_request_recovers_misclassified_run_and_orphaned_lock(dispatch_client):
+    client, db = dispatch_client
+    legacy = client.post(
+        "/api/internal/agent-dispatch/runs",
+        headers=_auth(),
+        json=_create_payload(
+            prompt="Read-only audit. Do not create a branch, commit, or PR.",
+            execution_mode="read_only",
+            read_only=True,
+            idempotency_key="legacy-read-only-lock",
+        ),
+    )
+    assert legacy.status_code == 201
+
+    from sqlalchemy import select
+
+    from app.database.models import (
+        AgentDispatchAuditEvent,
+        AgentDispatchLock,
+        AgentDispatchRun,
+    )
+    from app.services.agent_dispatch.prompt_envelope import build_prompt_envelope
+    from app.services.token_crypto import encrypt_secret
+
+    old_run = db.get(AgentDispatchRun, legacy.json()["id"])
+    legacy_expected = json.loads(old_run.expected_artifacts_json)
+    misclassified = build_prompt_envelope(
+        "Fix files and commit them. Perform read-only investigation first.",
+        expected_artifacts=legacy_expected,
+    )
+    old_run.prompt_ciphertext = encrypt_secret(misclassified.rendered_text)
+    old_run.prompt_hash = misclassified.prompt_hash
+    db.commit()
+
+    replacement = client.post(
+        "/api/internal/agent-dispatch/runs",
+        headers=_auth(),
+        json=_create_payload(
+            prompt="Fix files and commit them.",
+            execution_mode="mutating",
+            read_only=False,
+            mutation_required=True,
+            commit_required=True,
+            operator_execution_required=True,
+            idempotency_key="replacement-mutating-run",
+        ),
+    )
+    assert replacement.status_code == 201
+
+    db.expire_all()
+    old_run = db.get(AgentDispatchRun, legacy.json()["id"])
+    assert old_run.status == "failed"
+    assert old_run.error_code == "invalid_execution_contract"
+    lock = db.execute(select(AgentDispatchLock)).scalar_one()
+    assert lock.run_id == replacement.json()["id"]
+    events = db.execute(
+        select(AgentDispatchAuditEvent.event_type).where(
+            AgentDispatchAuditEvent.run_id == old_run.id
+        )
+    ).scalars()
+    assert {
+        "invalid_execution_contract_terminalized",
+        "orphaned_lock_released",
+    }.issubset(set(events))
+
+
+def test_misclassified_lock_with_active_cursor_is_not_released(dispatch_client):
+    client, db = dispatch_client
+    legacy = client.post(
+        "/api/internal/agent-dispatch/runs",
+        headers=_auth(),
+        json=_create_payload(
+            prompt="Read-only audit.",
+            execution_mode="read_only",
+            read_only=True,
+            idempotency_key="active-cursor-read-only-lock",
+        ),
+    )
+    assert legacy.status_code == 201
+
+    from app.database.models import AgentDispatchRun
+    from app.services.agent_dispatch.prompt_envelope import build_prompt_envelope
+    from app.services.token_crypto import encrypt_secret
+
+    old_run = db.get(AgentDispatchRun, legacy.json()["id"])
+    expected = json.loads(old_run.expected_artifacts_json)
+    misclassified = build_prompt_envelope(
+        "Fix and commit files. Perform a read-only investigation first.",
+        expected_artifacts=expected,
+    )
+    old_run.prompt_ciphertext = encrypt_secret(misclassified.rendered_text)
+    old_run.prompt_hash = misclassified.prompt_hash
+    old_run.cursor_agent_id = "bc-active"
+    old_run.status = "running"
+    db.commit()
+
+    replacement = client.post(
+        "/api/internal/agent-dispatch/runs",
+        headers=_auth(),
+        json=_create_payload(
+            prompt="Fix and commit files.",
+            execution_mode="mutating",
+            read_only=False,
+            mutation_required=True,
+            idempotency_key="blocked-replacement-run",
+        ),
+    )
+    assert replacement.status_code == 409
+    assert replacement.json()["detail"]["error"] == "active_run_lock"
+    db.expire_all()
+    assert db.get(AgentDispatchRun, old_run.id).status == "running"
 
 
 def _enrichment(

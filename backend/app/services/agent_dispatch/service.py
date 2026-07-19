@@ -16,15 +16,18 @@ from sqlalchemy.orm import Session
 
 from app.config import Settings
 from app.database.models import (
+    AgentDispatchLock,
     AgentDispatchRun,
     AgentDispatchWebhookEvent,
 )
 from app.services.agent_dispatch.audit import write_audit
 from app.services.agent_dispatch.artifacts import (
-    infer_expected_artifacts,
+    execution_contract_hash,
+    has_mutation_requirement,
     missing_reason,
     normalize_expected,
     normalize_verified,
+    resolve_execution_contract,
 )
 from app.services.agent_dispatch.auth import AgentDispatchPrincipal
 from app.services.agent_dispatch.constants import (
@@ -54,7 +57,7 @@ from app.services.agent_dispatch.locking import (
 )
 from app.services.agent_dispatch.prompt_envelope import build_prompt_envelope
 from app.services.agent_dispatch.webhooks import map_webhook_to_fields, verify_cursor_webhook_signature
-from app.services.token_crypto import encrypt_secret
+from app.services.token_crypto import decrypt_secret, encrypt_secret
 
 logger = logging.getLogger(__name__)
 
@@ -77,6 +80,64 @@ def _allowlist_ok(settings: Settings, repo_url: str, base_branch: str) -> None:
         raise HTTPException(status.HTTP_403_FORBIDDEN, detail="base_branch not allowlisted")
 
 
+def _misclassified_read_only_holder(run: AgentDispatchRun) -> bool:
+    expected = _expected_for_run(run)
+    if not expected["read_only"] or not run.prompt_ciphertext:
+        return False
+    try:
+        rendered = decrypt_secret(run.prompt_ciphertext)
+        if hashlib.sha256(rendered.encode()).hexdigest() != run.prompt_hash:
+            return False
+        return has_mutation_requirement(rendered)
+    except Exception:
+        logger.warning("Could not inspect execution contract for lock holder %s", run.id)
+        return False
+
+
+def _recover_invalid_read_only_holder(
+    db: Session,
+    *,
+    repository_url: str,
+    base_branch: str,
+    actor_fingerprint: str,
+) -> None:
+    """Terminalize only a provably misclassified read-only lock holder."""
+    lock = db.execute(
+        select(AgentDispatchLock)
+        .where(
+            AgentDispatchLock.repo_url == repository_url.strip().rstrip("/"),
+            AgentDispatchLock.base_branch == base_branch.strip(),
+        )
+        .with_for_update()
+    ).scalar_one_or_none()
+    holder = db.get(AgentDispatchRun, lock.run_id) if lock else None
+    if not holder or holder.status not in ACTIVE_LOCK_STATUSES:
+        return
+    if not _misclassified_read_only_holder(holder):
+        return
+    if holder.cursor_agent_id:
+        return
+    holder.status = DispatchRunStatus.FAILED.value
+    holder.error_code = "invalid_execution_contract"
+    holder.error_message = "Superseded after deterministic execution-contract validation"
+    holder.finished_at = holder.updated_at = datetime.utcnow()
+    write_audit(
+        db,
+        run_id=holder.id,
+        event_type="invalid_execution_contract_terminalized",
+        actor_fingerprint=actor_fingerprint,
+        detail={"lock_id": lock.id if lock else None, "replacement_mode": "mutating"},
+    )
+    release_lock(db, run_id=holder.id)
+    write_audit(
+        db,
+        run_id=holder.id,
+        event_type="orphaned_lock_released",
+        actor_fingerprint=actor_fingerprint,
+        detail={"lock_id": lock.id if lock else None, "reason": "misclassified_read_only"},
+    )
+
+
 def create_dispatch_run(
     db: Session,
     settings: Settings,
@@ -87,6 +148,7 @@ def create_dispatch_run(
     repository_url: str,
     base_branch: str,
     execution_policy: dict[str, Any] | None = None,
+    execution_contract: dict[str, Any] | None = None,
     auto_create_pr: bool = False,
     branch_name: str | None = None,
     model_id: str | None = None,
@@ -104,20 +166,59 @@ def create_dispatch_run(
                 detail=f"execution_policy.{key} must be true",
             )
 
+    explicit_contract = dict(execution_contract or {})
+    if settings.agent_dispatch_require_pr:
+        explicit_contract["pr_required"] = True
+    if settings.agent_dispatch_require_ci_success:
+        explicit_contract["commit_required"] = True
+    try:
+        expected_artifacts = resolve_execution_contract(
+            prompt,
+            explicit=explicit_contract,
+            auto_create_pr=auto_create_pr,
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            detail={"error": "invalid_execution_contract"},
+        ) from exc
+    expected_artifacts["ci_required"] |= bool(settings.agent_dispatch_require_ci_success)
+    contract_hash = execution_contract_hash(expected_artifacts)
+    envelope = build_prompt_envelope(prompt, expected_artifacts=expected_artifacts)
+
     if idempotency_key:
         existing = db.execute(
             select(AgentDispatchRun).where(AgentDispatchRun.idempotency_key == idempotency_key)
         ).scalar_one_or_none()
         if existing:
+            existing_hash = existing.execution_contract_hash or execution_contract_hash(
+                _expected_for_run(existing)
+            )
+            if existing_hash != contract_hash:
+                raise HTTPException(
+                    status.HTTP_409_CONFLICT,
+                    detail={"error": "idempotency_execution_contract_mismatch"},
+                )
+            same_request = (
+                existing.repository_url == repository_url.strip().rstrip("/")
+                and existing.base_branch == base_branch.strip()
+                and existing.prompt_hash == envelope.prompt_hash
+                and existing.created_by_fingerprint == principal.token_fingerprint
+            )
+            if not same_request:
+                raise HTTPException(
+                    status.HTTP_409_CONFLICT,
+                    detail={"error": "idempotency_request_mismatch"},
+                )
             return existing
 
-    expected_artifacts = infer_expected_artifacts(prompt, auto_create_pr=auto_create_pr)
-    expected_artifacts["pr_required"] |= bool(settings.agent_dispatch_require_pr)
-    expected_artifacts["ci_required"] |= bool(settings.agent_dispatch_require_ci_success)
-    expected_artifacts["commit_required"] |= (
-        expected_artifacts["pr_required"] or expected_artifacts["ci_required"]
-    )
-    envelope = build_prompt_envelope(prompt, expected_artifacts=expected_artifacts)
+    if expected_artifacts["execution_mode"] == "mutating":
+        _recover_invalid_read_only_holder(
+            db,
+            repository_url=repository_url,
+            base_branch=base_branch,
+            actor_fingerprint=principal.token_fingerprint,
+        )
     store_encrypted = bool(settings.agent_dispatch_encrypt_prompts)
     ttl_hours = int(settings.agent_dispatch_prompt_ttl_hours or 0)
 
@@ -141,6 +242,11 @@ def create_dispatch_run(
         metadata_json=json.dumps(metadata or {}, default=str),
         expected_artifacts_json=json.dumps(expected_artifacts, sort_keys=True),
         verified_artifacts_json=json.dumps(normalize_verified(None), sort_keys=True),
+        execution_mode=expected_artifacts["execution_mode"],
+        read_only=expected_artifacts["read_only"],
+        mutation_required=expected_artifacts["mutation_required"],
+        operator_execution_required=expected_artifacts["operator_execution_required"],
+        execution_contract_hash=contract_hash,
         lease_expires_at=datetime.utcnow()
         + timedelta(seconds=int(settings.agent_dispatch_lock_lease_seconds or 120)),
     )
@@ -396,11 +502,17 @@ def reconcile_run(db: Session, settings: Settings, run_id: str) -> AgentDispatch
     return run
 
 
-def _expected_for_run(run: AgentDispatchRun) -> dict[str, bool]:
+def _expected_for_run(run: AgentDispatchRun) -> dict[str, Any]:
     try:
         raw = json.loads(run.expected_artifacts_json or "{}")
     except json.JSONDecodeError:
         raw = {}
+    if run.execution_mode and "execution_mode" not in raw:
+        raw["execution_mode"] = run.execution_mode
+    for key in ("read_only", "mutation_required", "operator_execution_required"):
+        value = getattr(run, key, None)
+        if value is not None and key not in raw:
+            raw[key] = value
     return normalize_expected(raw)
 
 
@@ -430,7 +542,7 @@ def _refresh_cursor_artifacts(
 def _github_enrichment(
     run: AgentDispatchRun,
     settings: Settings,
-    expected: dict[str, bool],
+    expected: dict[str, Any],
 ) -> GitHubEnrichment:
     return GitHubEnricher(settings).enrich(
         repository_url=run.repository_url,
@@ -464,7 +576,7 @@ def _persist_enrichment(run: AgentDispatchRun, enrichment: GitHubEnrichment) -> 
 
 def _set_artifact_status(
     run: AgentDispatchRun,
-    expected: dict[str, bool],
+    expected: dict[str, Any],
     enrichment: GitHubEnrichment,
     reconcile_ok: bool,
 ) -> None:
@@ -553,13 +665,14 @@ def finalize_with_github(db: Session, settings: Settings, run_id: str) -> AgentD
 
 def _operator_handoff_ready(
     settings: Settings,
-    expected: dict[str, bool],
+    expected: dict[str, Any],
     enrichment: GitHubEnrichment,
 ) -> bool:
     """Require explicit operator enablement plus verified PR and CI before handoff."""
     verified = enrichment.verified_artifacts
     return bool(
         settings.agent_dispatch_operator_enabled
+        and expected["operator_execution_required"]
         and expected["merge_required"]
         and not expected["read_only"]
         and verified.get("pr_exists")
@@ -879,7 +992,7 @@ def _verified_for_run(run: AgentDispatchRun) -> dict[str, bool]:
 
 def _visible_git_result(
     run: AgentDispatchRun,
-    expected: dict[str, bool],
+    expected: dict[str, Any],
 ) -> tuple[str | None, str | None, str | None]:
     if expected["read_only"]:
         return None, None, None
@@ -912,6 +1025,10 @@ def run_to_public_dict(run: AgentDispatchRun) -> dict[str, Any]:
         "repository": run.repository_url,
         "base_branch": run.base_branch,
         "execution_policy": policy or dict(DEFAULT_EXECUTION_POLICY),
+        "execution_mode": expected["execution_mode"],
+        "read_only": expected["read_only"],
+        "mutation_required": expected["mutation_required"],
+        "operator_execution_required": expected["operator_execution_required"],
         "auto_create_pr": bool(run.auto_create_pr),
         "prompt_hash": run.prompt_hash,
         "prompt_preview": run.prompt_redacted_preview,

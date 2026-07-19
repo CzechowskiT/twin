@@ -114,6 +114,15 @@ def tool_definitions() -> list[dict[str, Any]]:
                     "default": MCP_BASE_BRANCH_ALLOWLIST[0],
                 },
                 "execution_policy": policy_schema,
+                "execution_mode": {"type": "string", "enum": ["read_only", "mutating"]},
+                "read_only": {"type": "boolean"},
+                "mutation_required": {"type": "boolean"},
+                "commit_required": {"type": "boolean"},
+                "pr_required": {"type": "boolean"},
+                "merge_required": {"type": "boolean"},
+                "deployment_required": {"type": "boolean"},
+                "production_regression_required": {"type": "boolean"},
+                "operator_execution_required": {"type": "boolean"},
                 "auto_create_pr": {"type": "boolean", "default": False},
                 "idempotency_key": {"type": "string", "maxLength": 128},
                 "model_id": {"type": "string", "maxLength": 128},
@@ -213,6 +222,21 @@ def call_tool(
                 repository_url=repo,
                 base_branch=base,
                 execution_policy=policy,
+                execution_contract={
+                    key: args[key]
+                    for key in (
+                        "execution_mode",
+                        "read_only",
+                        "mutation_required",
+                        "commit_required",
+                        "pr_required",
+                        "merge_required",
+                        "deployment_required",
+                        "production_regression_required",
+                        "operator_execution_required",
+                    )
+                    if key in args
+                },
                 auto_create_pr=bool(args.get("auto_create_pr") or False),
                 branch_name=args.get("branch_name"),
                 model_id=args.get("model_id"),

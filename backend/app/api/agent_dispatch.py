@@ -176,6 +176,7 @@ def create_run(
         repository_url=body.repository_url or body.repository or "",
         base_branch=body.base_branch,
         execution_policy=body.execution_policy.model_dump(),
+        execution_contract=body.execution_contract(),
         auto_create_pr=body.auto_create_pr,
         branch_name=body.branch_name,
         model_id=body.model_id,
