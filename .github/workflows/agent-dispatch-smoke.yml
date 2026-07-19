@@ -38,6 +38,7 @@ on:
       - "backend/alembic/versions/079_agent_dispatch_policy.py"
       - "backend/alembic/versions/080_agent_dispatch_artifacts.py"
       - "backend/alembic/versions/081_agent_dispatch_operator.py"
+      - "backend/alembic/versions/082_agent_dispatch_execution_contract.py"
 
 jobs:
   unit:
