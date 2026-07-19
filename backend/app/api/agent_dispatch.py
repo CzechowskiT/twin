@@ -14,7 +14,12 @@ from app.config import Settings, get_settings
 from app.database.models import AgentDispatchRun, AgentDispatchLock
 from app.database.session import get_db
 from app.limiter import limiter
-from app.schemas.agent_dispatch import CreateDispatchRequest, ForceUnlockRequest
+from app.schemas.agent_dispatch import (
+    CreateDispatchRequest,
+    ForceUnlockRequest,
+    OperatorCreatePullRequestRequest,
+    OperatorRunRequest,
+)
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 
 from app.services.agent_dispatch.auth import (
@@ -42,6 +47,8 @@ from app.services.agent_dispatch.mcp_protocol import (
     mcp_server_info,
     tool_definitions,
 )
+from app.services.agent_dispatch.operator_observability import operator_metrics_snapshot
+from app.services.agent_dispatch.operator_service import OperatorService
 from app.services.agent_dispatch import oauth_as
 from app.services.agent_dispatch.service import (
     cancel_run,
@@ -141,6 +148,10 @@ def dispatcher_health(
         "chatgpt_actions_openapi": "/api/internal/agent-dispatch/chatgpt/openapi.json",
         "oauth_authorization_server": "/api/internal/agent-dispatch/oauth",
         "active_lock_count": active_locks,
+        "operator": {
+            "enabled": bool(settings.agent_dispatch_operator_enabled),
+            "metrics": operator_metrics_snapshot(),
+        },
         "repo_allowlist_configured": bool((settings.agent_dispatch_repo_allowlist or "").strip()),
         "base_branch_allowlist_configured": bool(
             (settings.agent_dispatch_base_branch_allowlist or "").strip()
@@ -193,6 +204,7 @@ def create_run(
         repository_url=body.repository_url or body.repository or "",
         base_branch=body.base_branch,
         execution_policy=body.execution_policy.model_dump(),
+        execution_contract=body.execution_contract(),
         auto_create_pr=body.auto_create_pr,
         branch_name=body.branch_name,
         model_id=body.model_id,
@@ -274,6 +286,53 @@ def run_handoff(
 ) -> dict[str, Any]:
     require_scope(principal, AGENT_DISPATCH_SCOPE_READ)
     return get_run_handoff(db, run_id)
+
+
+@router.post("/runs/{run_id}/operator/create-pull-request")
+def operator_create_pull_request(
+    run_id: str,
+    body: OperatorCreatePullRequestRequest,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    principal: AgentDispatchPrincipal = Depends(get_agent_dispatch_principal),
+) -> dict[str, Any]:
+    """Explicit Operator PR creation; never enables auto-merge."""
+    require_scope(principal, AGENT_DISPATCH_SCOPE_ADMIN)
+    return OperatorService(
+        db,
+        settings,
+        actor_fingerprint=principal.token_fingerprint,
+    ).create_pull_request(
+        run_id,
+        title=body.title,
+        body=body.body,
+        correlation_id=body.correlation_id,
+    )
+
+
+@router.post("/runs/{run_id}/operator/run", status_code=status.HTTP_202_ACCEPTED)
+def run_operator(
+    run_id: str,
+    body: OperatorRunRequest,
+    db: Session = Depends(get_db),
+    principal: AgentDispatchPrincipal = Depends(get_agent_dispatch_principal),
+) -> dict[str, Any]:
+    """Explicit manual Operator execution; GitHub branch protection remains authoritative."""
+    require_scope(principal, AGENT_DISPATCH_SCOPE_ADMIN)
+    service = OperatorService(
+        db,
+        get_settings(),
+        actor_fingerprint=principal.token_fingerprint,
+    )
+    run = service.request(run_id, correlation_id=body.correlation_id)
+    from app.tasks.agent_dispatch_tasks import run_agent_dispatch_operator
+
+    run_agent_dispatch_operator.delay(
+        run_id,
+        run.operator_correlation_id,
+        principal.token_fingerprint,
+    )
+    return _as_response(run)
 
 
 @router.get("/mcp/manifest")

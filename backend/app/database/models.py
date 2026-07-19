@@ -1648,6 +1648,20 @@ class AgentDispatchRun(Base):
     github_enrichment_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     expected_artifacts_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     verified_artifacts_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    execution_mode: Mapped[str | None] = mapped_column(String(16), nullable=True, index=True)
+    read_only: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    mutation_required: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    operator_execution_required: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    execution_contract_hash: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    operator_correlation_id: Mapped[str | None] = mapped_column(
+        String(64), nullable=True, index=True
+    )
+    operator_requested_at: Mapped[datetime | None] = mapped_column(
+        DateTime, nullable=True, index=True
+    )
+    operator_requested_by: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    operator_artifacts_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    operator_updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     error_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
     error_message: Mapped[str | None] = mapped_column(String(512), nullable=True)
@@ -1715,4 +1729,39 @@ class AgentDispatchAuditEvent(Base):
     actor_fingerprint: Mapped[str | None] = mapped_column(String(32), nullable=True)
     detail_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class AgentDispatchOperatorOperation(Base):
+    """Idempotent, restart-safe ledger for one Operator stage."""
+
+    __tablename__ = "agent_dispatch_operator_operations"
+    __table_args__ = (
+        UniqueConstraint(
+            "run_id",
+            "operation",
+            "idempotency_key",
+            name="uq_agent_dispatch_operator_operation",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    run_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("agent_dispatch_runs.id", ondelete="CASCADE"), index=True
+    )
+    operation: Mapped[str] = mapped_column(String(64), index=True)
+    idempotency_key: Mapped[str] = mapped_column(String(128))
+    correlation_id: Mapped[str] = mapped_column(String(64), index=True)
+    owner_token: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    lease_expires_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, index=True)
+    status: Mapped[str] = mapped_column(String(32), default="started", index=True)
+    attempt_count: Mapped[int] = mapped_column(Integer, default=1)
+    artifact_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    error_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    started_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
 

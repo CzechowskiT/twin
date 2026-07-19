@@ -32,11 +32,13 @@ def acquire_lock(
     # Expire stale leases first.
     stale = (
         db.execute(
-            select(AgentDispatchLock).where(
+            select(AgentDispatchLock)
+            .where(
                 AgentDispatchLock.repo_url == repo_url,
                 AgentDispatchLock.base_branch == base_branch,
                 AgentDispatchLock.lease_expires_at < now,
             )
+            .with_for_update()
         )
         .scalars()
         .all()
@@ -46,10 +48,12 @@ def acquire_lock(
     db.flush()
 
     existing = db.execute(
-        select(AgentDispatchLock).where(
+        select(AgentDispatchLock)
+        .where(
             AgentDispatchLock.repo_url == repo_url,
             AgentDispatchLock.base_branch == base_branch,
         )
+        .with_for_update()
     ).scalar_one_or_none()
     if existing:
         holder = db.get(AgentDispatchRun, existing.run_id)

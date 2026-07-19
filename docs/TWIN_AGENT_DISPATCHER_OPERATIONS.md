@@ -15,6 +15,8 @@ Base: `/api/internal/agent-dispatch`
 | GET | `/runs/{id}/report` | `agent_runs:read` | Final report slice |
 | GET | `/runs/{id}/handoff` | `agent_runs:read` | ChatGPT/MCP handoff package |
 | POST | `/runs/{id}/cancel` | `agent_runs:cancel` | Cancel + release lock |
+| POST | `/runs/{id}/operator/create-pull-request` | `agent_runs:admin` | Idempotent explicit PR creation |
+| POST | `/runs/{id}/operator/run` | `agent_runs:admin` | Explicit standard merge and verified release gates |
 | POST | `/mcp` | Bearer + scopes | Hosted MCP JSON-RPC |
 | GET | `/mcp/manifest` | `agent_runs:read` | Tool schemas + version |
 | POST | `/webhooks/cursor` | HMAC | Cursor statusChange |
@@ -49,7 +51,10 @@ Optional: `--create-pr` to ask Cursor to open a PR (manual merge still required)
 | `AGENT_DISPATCH_TOKENS` | optional | Multi-token `tok:agent_runs:create\|agent_runs:read,...` |
 | `AGENT_DISPATCH_WEBHOOK_SECRET` | if webhooks | ≥32 chars; HMAC verify |
 | `AGENT_DISPATCH_WEBHOOK_PUBLIC_URL` | if webhooks | Public HTTPS URL for Cursor callbacks |
-| `AGENT_DISPATCH_GITHUB_TOKEN` | optional | PR/SHA/CI enrichment |
+| `AGENT_DISPATCH_GITHUB_TOKEN` | optional fallback | Static token for enrichment or Operator |
+| `AGENT_DISPATCH_GITHUB_APP_CLIENT_ID` | preferred for Operator | Dedicated GitHub App client ID |
+| `AGENT_DISPATCH_GITHUB_APP_INSTALLATION_ID` | preferred for Operator | Installation limited to `CzechowskiT/twin` |
+| `AGENT_DISPATCH_GITHUB_APP_PRIVATE_KEY` | preferred for Operator | Private key stored only in Railway; mints one-hour installation tokens |
 | `AGENT_DISPATCH_REPO_ALLOWLIST` | recommended | Default: `https://github.com/CzechowskiT/twin` |
 | `AGENT_DISPATCH_BASE_BRANCH_ALLOWLIST` | recommended | Default: `cursor/phase1-monorepo-scaffold` |
 
@@ -65,10 +70,31 @@ ChatGPT setup: [TWIN_AGENT_DISPATCHER_CHATGPT_SETUP.md](./TWIN_AGENT_DISPATCHER_
 
 Beat entry `agent-dispatch-reconcile` every `AGENT_DISPATCH_POLL_INTERVAL_SECONDS` (default 60). Also purges expired prompt ciphertexts. Disable with `AGENT_DISPATCH_POLL_ENABLED=false`. API lifespan enqueues startup recover.
 
+Operator is disabled by default (`AGENT_DISPATCH_OPERATOR_ENABLED=false`).
+Configure a bounded timeout/poll interval and
+`AGENT_DISPATCH_OPERATOR_REGRESSION_WORKFLOW` before enabling it. Startup
+recovery resumes only `merging`, `deploying`, `regression`, and `finalizing`;
+`waiting_for_operator` always requires a new explicit admin-scoped call.
+The merge credential must be a dedicated identity without administrator or
+ruleset bypass rights; attest this deployment prerequisite with
+`AGENT_DISPATCH_OPERATOR_NON_BYPASS_IDENTITY=true`. Operator refuses to run
+without that explicit capability declaration.
+
+Production uses `.github/workflows/operator-service.yml` for GitHub mutations:
+set both `AGENT_DISPATCH_OPERATOR_MUTATION_WORKFLOW` and
+`AGENT_DISPATCH_OPERATOR_REGRESSION_WORKFLOW` to `operator-service.yml`.
+The external GitHub App token is minted at runtime, restricted again to the
+`twin` repository, and only dispatches/observes Actions. The ephemeral workflow
+`GITHUB_TOKEN` has explicit `contents: write`,
+`pull-requests: write`, `actions: read`, and `deployments: read` permissions.
+The workflow hard-rejects every repository except `CzechowskiT/twin` and every
+base except `cursor/phase1-monorepo-scaffold`. A direct merge token remains
+supported only when `AGENT_DISPATCH_OPERATOR_MUTATION_WORKFLOW` is empty.
+
 ## Deploy
 
 1. Merge PR into `cursor/phase1-monorepo-scaffold`
-2. Railway API deploys → `alembic upgrade` applies `078` + `079`
+2. Railway API deploys → `alembic upgrade` applies migrations through `081`
 3. Set secrets above
 4. `GET /api/internal/agent-dispatch/health`
 
@@ -77,3 +103,8 @@ Beat entry `agent-dispatch-reconcile` every `AGENT_DISPATCH_POLL_INTERVAL_SECOND
 1. `POST /runs/{id}/cancel` (preferred)
 2. Wait for lock lease expiry; next create reclaim stale lease after Cursor reconcile
 3. Never force-push scaffold; never auto-merge
+
+Operator failures are fail-closed: the run becomes `needs_attention`, keeps
+unverified artifact flags false, records a stable `reason_code`, and releases
+its lock. A missing merge-capable token/tool is
+`operator_capability_missing`; it must never be simulated.
