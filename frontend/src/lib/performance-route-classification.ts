@@ -7,7 +7,8 @@ export function isWorkspacePath(pathname: string): boolean {
     pathname.startsWith("/company") ||
     pathname.startsWith("/workspace") ||
     pathname.startsWith("/profile") ||
-    pathname.startsWith("/onboarding")
+    pathname.startsWith("/onboarding") ||
+    pathname.startsWith("/admin")
   );
 }
 
