@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -15,6 +15,9 @@ class CreateTwinCommandRequest(BaseModel):
     max_runtime_minutes: int | None = Field(default=None, ge=5, le=24 * 60)
     approval_policy: str = "founder_decisions_and_high_risk_only"
     idempotency_key: str | None = Field(default=None, max_length=128)
+    # Explicit contract from Actions takes precedence over text inference.
+    execution_mode: Literal["analysis", "build", "deploy", "continuous"] | None = None
+    execution_contract: dict[str, Any] | None = None
 
     @field_validator("direction")
     @classmethod

@@ -14,6 +14,9 @@ class CreateFounderCommandRequest(BaseModel):
     max_batches: int | None = Field(default=None, ge=1, le=50)
     max_runtime_minutes: int | None = Field(default=None, ge=5, le=24 * 60)
     idempotency_key: str | None = Field(default=None, max_length=128)
+    # Explicit contract from API takes precedence over text inference.
+    execution_mode: Literal["analysis", "build", "deploy", "continuous"] | None = None
+    execution_contract: dict[str, Any] | None = None
 
     @field_validator("direction")
     @classmethod

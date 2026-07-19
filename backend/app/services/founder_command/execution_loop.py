@@ -321,6 +321,26 @@ def _stage_dispatch(
         db.commit()
         return command
     except Exception as exc:
+        # Active lock: queue/wait only — never rewrite mutating plan to analysis.
+        detail = getattr(exc, "detail", None)
+        lock_conflict = False
+        if isinstance(detail, dict) and detail.get("error") == "active_run_lock":
+            lock_conflict = True
+        elif "active_run_lock" in str(exc):
+            lock_conflict = True
+        if lock_conflict:
+            command.status = CommandStatus.QUEUED.value
+            command.current_stage = CommandStage.DISPATCH.value
+            command.live_summary = "Waiting for active run lock — plan unchanged"
+            _append_timeline(
+                db,
+                command,
+                stage=CommandStage.DISPATCH.value,
+                message="Queued behind active lock (plan preserved)",
+                detail={"error": "active_run_lock"},
+            )
+            db.commit()
+            return command
         logger.exception("founder command dispatch failed")
         command.stage_retry_count = retries + 1
         command.consecutive_failures = (command.consecutive_failures or 0) + 1
