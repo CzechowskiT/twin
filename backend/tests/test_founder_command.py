@@ -19,7 +19,6 @@ from app.services.founder_command.auth import FounderPrincipal, issue_csrf_token
 from app.services.founder_command.constants import (
     AutonomyLevel,
     GATE_F_STATUS,
-    KNOWN_PROD_SHA_HINT,
     LAUNCH_STANCE,
 )
 from app.services.founder_command.planner import plan_from_command
@@ -337,29 +336,38 @@ def test_state_resolver_includes_gate_and_launch(founder_client):
     assert "counters" in state
 
 
-def test_state_resolver_aligns_with_known_backend_deploy(founder_client, monkeypatch):
+def test_state_resolver_aligns_with_platform_deploy_metadata(founder_client, monkeypatch):
     _, db = founder_client
+    deployed_sha = "58538e79f8c8e508d27f2aa7cb17450cb15e37c2"
     monkeypatch.setattr(
         "app.services.founder_command.state_resolver._git_commit_from_health",
-        lambda: KNOWN_PROD_SHA_HINT,
+        lambda: deployed_sha,
     )
 
     production = resolve_project_state(db, get_settings())["production"]
 
-    assert production["api_git_commit"] == KNOWN_PROD_SHA_HINT
-    assert production["repo_head_hint"] == KNOWN_PROD_SHA_HINT
+    assert production["api_git_commit"] == deployed_sha
+    assert production["repo_head_hint"] == deployed_sha
+    assert production["repo_head_source"] == "deployment_metadata"
     assert production["alignment_status"] == "aligned"
 
 
-def test_state_resolver_does_not_mask_unknown_deploy(founder_client, monkeypatch):
+def test_state_resolver_does_not_mask_configured_head_mismatch(founder_client, monkeypatch):
     _, db = founder_client
+    settings = get_settings()
+    monkeypatch.setattr(
+        settings,
+        "founder_command_repo_head_hint",
+        "1a5d577c9c21279bb68c19bc1cfa5d7bcac04dfe",
+    )
     monkeypatch.setattr(
         "app.services.founder_command.state_resolver._git_commit_from_health",
         lambda: "844176fb158555c8dd0c1d60dcaba29eb9e66915",
     )
 
-    production = resolve_project_state(db, get_settings())["production"]
+    production = resolve_project_state(db, settings)["production"]
 
+    assert production["repo_head_source"] == "configured"
     assert production["alignment_status"] == "unknown"
 
 

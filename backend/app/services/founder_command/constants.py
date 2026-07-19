@@ -19,8 +19,6 @@ DEFAULT_MAX_ACTIVE_RUNS = 1
 
 GATE_F_STATUS = "PASS"
 LAUNCH_STANCE = "GO"
-# Railway backend deploy SHA. Frontend-only scaffold commits must not advance it.
-KNOWN_PROD_SHA_HINT = "1a5d577c9c21279bb68c19bc1cfa5d7bcac04dfe"
 
 
 class AutonomyLevel(int, Enum):
