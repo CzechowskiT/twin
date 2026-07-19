@@ -484,6 +484,8 @@ class Settings(BaseSettings):
     founder_command_csrf_secret: str = ""
     founder_command_default_autonomy_level: int = 3
     founder_command_poll_interval_seconds: int = 20
+    # Optional independent pin; blank trusts the hosting platform's deployed repo SHA.
+    founder_command_repo_head_hint: str = ""
 
     # Custom GPT Actions — TWIN Product Operator (Railway-only secret; never frontend/Vercel)
     chatgpt_twin_actions_api_key: str = ""

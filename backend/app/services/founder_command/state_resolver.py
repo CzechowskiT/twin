@@ -16,11 +16,11 @@ from app.database.models import (
     FounderCommand,
     FounderDecision,
 )
+from app.services.agent_dispatch.artifacts import sha_matches
 from app.services.agent_dispatch.constants import ACTIVE_LOCK_STATUSES, DISPATCH_RUN_TERMINAL
 from app.services.founder_command.constants import (
     ACTIVE_COMMAND_STATUSES,
     GATE_F_STATUS,
-    KNOWN_PROD_SHA_HINT,
     LAUNCH_STANCE,
     ROADMAP_P0,
     ROADMAP_P1,
@@ -46,10 +46,19 @@ def _git_commit_from_health() -> str | None:
         return None
 
 
+def _repo_head_hint(settings: Settings, api_sha: str | None) -> tuple[str | None, str]:
+    configured = (settings.founder_command_repo_head_hint or "").strip()
+    if configured:
+        return configured, "configured"
+    if api_sha:
+        return api_sha, "deployment_metadata"
+    return None, "unavailable"
+
+
 def resolve_project_state(db: Session, settings: Settings) -> dict[str, Any]:
     """Build canonical ProjectState — not merely the last Cursor report."""
     api_sha = _git_commit_from_health()
-    repo_head_hint = KNOWN_PROD_SHA_HINT
+    repo_head_hint, repo_head_source = _repo_head_hint(settings, api_sha)
 
     active_runs = (
         db.execute(
@@ -119,9 +128,7 @@ def resolve_project_state(db: Session, settings: Settings) -> dict[str, Any]:
                 }
             )
 
-    alignment = "aligned" if api_sha and api_sha.startswith(repo_head_hint[:12]) else "unknown"
-    if api_sha and repo_head_hint and api_sha == repo_head_hint:
-        alignment = "aligned"
+    alignment = "aligned" if sha_matches(api_sha, repo_head_hint) else "unknown"
 
     return {
         "resolved_at": datetime.utcnow().isoformat() + "Z",
@@ -135,6 +142,7 @@ def resolve_project_state(db: Session, settings: Settings) -> dict[str, Any]:
         "production": {
             "api_git_commit": api_sha,
             "repo_head_hint": repo_head_hint,
+            "repo_head_source": repo_head_source,
             "alignment_status": alignment,
             "frontend_url": "https://twin-sooty.vercel.app",
             "api_url": "https://twin-production-bcd9.up.railway.app",
