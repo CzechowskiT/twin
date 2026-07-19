@@ -53,9 +53,16 @@ def test_alembic_recovery_module_exports() -> None:
 
 
 def test_alembic_recovery_skips_current_chain_revisions() -> None:
-    from scripts.alembic_prod_recovery import CURRENT_CHAIN_PREFIXES
+    from scripts.alembic_prod_recovery import (
+        CURRENT_CHAIN_PREFIXES,
+        _is_current_chain_revision,
+    )
 
     assert "077_candidate_activity_timeline".startswith(
         next(p for p in CURRENT_CHAIN_PREFIXES if p == "077_")
     )
     assert "071_recruiter_workspace_activation".startswith("071_")
+    assert _is_current_chain_revision("078_agent_dispatch")
+    assert _is_current_chain_revision("083_founder_command")
+    assert not _is_current_chain_revision("051_company_role_fields")
+    assert not _is_current_chain_revision("057_candidate_evidence_items")
