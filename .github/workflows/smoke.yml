@@ -73,37 +73,20 @@ jobs:
         run: chmod +x scripts/verify-prod-health.sh && ./scripts/verify-prod-health.sh
 
   production-regression:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/cursor/phase1-monorepo-scaffold'
+    if: >-
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/cursor/phase1-monorepo-scaffold')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: [backend-smoke, frontend-build]
     steps:
-      - name: Wait for production SHA and verify negative artifact gate
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify component deployment alignment and artifact gate
         env:
           API_HEALTH: https://twin-production-bcd9.up.railway.app/api/v1/health
           DISPATCHER_HEALTH: https://twin-production-bcd9.up.railway.app/api/internal/agent-dispatch/health
           FRONTEND_HEALTH: https://twin-sooty.vercel.app/api/public-health
-        run: |
-          wait_for_sha() {
-            local label="$1"
-            local url="$2"
-            local field="$3"
-            for attempt in $(seq 1 60); do
-              deployed=$(curl -fsS --max-time 15 "$url" | \
-                FIELD="$field" python3 -c \
-                'import json,os,sys; print(json.load(sys.stdin).get(os.environ["FIELD"], ""))' || true)
-              if [[ "$deployed" == "$GITHUB_SHA" ]]; then
-                echo "$label production SHA verified"
-                return 0
-              fi
-              echo "$label deployment pending ($attempt/60)"
-              sleep 15
-            done
-            echo "$label did not deploy $GITHUB_SHA"
-            return 1
-          }
-          wait_for_sha API "$API_HEALTH" git_commit
-          wait_for_sha frontend "$FRONTEND_HEALTH" frontend_commit
-          canary=$(curl -fsS --max-time 15 "$DISPATCHER_HEALTH" | python3 -c \
-            'import json,sys; c=json.load(sys.stdin)["artifact_gate_canary"]; print(c["status"]+" "+str(c.get("reason_code")))')
-          test "$canary" = "PASS None"
+          EXPECTED_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.sha }}
+        run: ./scripts/verify-prod-deploy-alignment.sh "$EXPECTED_SHA"

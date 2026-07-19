@@ -17,6 +17,7 @@ from app.main import app
 from app.services.founder_command.approval_policy import classify_operation
 from app.services.founder_command.auth import FounderPrincipal, issue_csrf_token, verify_csrf
 from app.services.founder_command.constants import AutonomyLevel, GATE_F_STATUS, LAUNCH_STANCE
+from app.services.founder_command.deployment_alignment import DeploymentAlignment
 from app.services.founder_command.planner import plan_from_command
 from app.services.founder_command.state_resolver import resolve_project_state
 
@@ -31,6 +32,7 @@ def founder_client(monkeypatch):
     monkeypatch.setenv("AGENT_DISPATCH_TOKEN", "test-dispatch-token")
     monkeypatch.setenv("AGENT_DISPATCH_REPO_ALLOWLIST", "https://github.com/CzechowskiT/twin")
     monkeypatch.setenv("AGENT_DISPATCH_BASE_BRANCH_ALLOWLIST", "cursor/phase1-monorepo-scaffold")
+    monkeypatch.setenv("AGENT_DISPATCH_GITHUB_TOKEN", "")
     monkeypatch.setenv("AGENT_DISPATCH_ENCRYPT_PROMPTS", "true")
     monkeypatch.setenv("CURSOR_CLOUD_AGENTS_API_KEY", "")
     monkeypatch.setenv("CELERY_TASK_ALWAYS_EAGER", "true")
@@ -141,12 +143,19 @@ def test_csrf_roundtrip():
     verify_csrf(settings, principal, token)
 
 
-def test_state_resolver_includes_gate_and_launch(founder_client):
+def test_state_resolver_includes_gate_launch_and_alignment(founder_client, monkeypatch):
     client, db = founder_client
     settings = get_settings()
+    monkeypatch.setattr(
+        "app.services.founder_command.state_resolver.resolve_deployment_alignment",
+        lambda *_args: DeploymentAlignment("repo-sha", "component_aligned", "frontend_only"),
+    )
     state = resolve_project_state(db, settings)
     assert state["gate_f"]["status"] == GATE_F_STATUS
     assert state["launch"]["stance"] == LAUNCH_STANCE
+    assert state["production"]["repo_head_hint"] == "repo-sha"
+    assert state["production"]["alignment_status"] == "component_aligned"
+    assert state["production"]["alignment_reason"] == "frontend_only"
     assert "counters" in state
 
 
