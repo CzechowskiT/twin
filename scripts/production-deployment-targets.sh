@@ -16,7 +16,7 @@ changed_paths() {
 api_required=false
 frontend_required=false
 
-while IFS= read -r path; do
+while IFS= read -r path || [[ -n "$path" ]]; do
   [[ -z "$path" ]] && continue
   case "$path" in
     backend/*|.env.railway.example|docker-compose*.yml)
