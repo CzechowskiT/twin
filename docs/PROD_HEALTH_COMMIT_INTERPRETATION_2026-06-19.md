@@ -46,6 +46,23 @@ For a given verification slice:
 
 Mismatch on short SHA alone is **not** automatically a deploy failure — check which platform the PR touched.
 
+## Founder Command alignment
+
+Founder Command resolves `production.repo_head_hint` from the configured base
+branch through GitHub's official branch API, then compares
+`production.api_git_commit` with that SHA through the compare API.
+
+| `alignment_status` | Meaning |
+|--------------------|---------|
+| `aligned` | Railway API SHA equals repository HEAD. |
+| `component_aligned` | Repository is ahead, but no `backend/`, `deploy/`, or `.env.railway.example` path changed. |
+| `drift` | Backend-affecting changes exist after the deployed API SHA, or git history diverged. |
+| `unknown` | Required SHA, GitHub configuration, or complete comparison evidence is unavailable. |
+
+`alignment_reason` carries the machine-readable explanation. The resolver fails
+closed when GitHub compare returns its 300-file limit instead of treating partial
+evidence as aligned.
+
 ## Docs-only drift gate (prod smoke helpers)
 
 Prod smoke wrappers (`verify:prod-*`, `placement-events-auth-smoke`, `prod-authenticated-persistence-smoke`) emit:

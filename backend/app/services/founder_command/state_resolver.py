@@ -20,12 +20,12 @@ from app.services.agent_dispatch.constants import ACTIVE_LOCK_STATUSES, DISPATCH
 from app.services.founder_command.constants import (
     ACTIVE_COMMAND_STATUSES,
     GATE_F_STATUS,
-    KNOWN_PROD_SHA_HINT,
     LAUNCH_STANCE,
     ROADMAP_P0,
     ROADMAP_P1,
     ROADMAP_P2,
 )
+from app.services.founder_command.deployment_alignment import resolve_deployment_alignment
 
 
 def _safe_json(raw: str | None) -> Any:
@@ -49,7 +49,7 @@ def _git_commit_from_health() -> str | None:
 def resolve_project_state(db: Session, settings: Settings) -> dict[str, Any]:
     """Build canonical ProjectState — not merely the last Cursor report."""
     api_sha = _git_commit_from_health()
-    repo_head_hint = KNOWN_PROD_SHA_HINT
+    deployment_alignment = resolve_deployment_alignment(settings, api_sha)
 
     active_runs = (
         db.execute(
@@ -119,10 +119,6 @@ def resolve_project_state(db: Session, settings: Settings) -> dict[str, Any]:
                 }
             )
 
-    alignment = "aligned" if api_sha and api_sha.startswith(repo_head_hint[:12]) else "unknown"
-    if api_sha and repo_head_hint and api_sha == repo_head_hint:
-        alignment = "aligned"
-
     return {
         "resolved_at": datetime.utcnow().isoformat() + "Z",
         "repo": {
@@ -134,8 +130,9 @@ def resolve_project_state(db: Session, settings: Settings) -> dict[str, Any]:
         },
         "production": {
             "api_git_commit": api_sha,
-            "repo_head_hint": repo_head_hint,
-            "alignment_status": alignment,
+            "repo_head_hint": deployment_alignment.repo_head,
+            "alignment_status": deployment_alignment.status,
+            "alignment_reason": deployment_alignment.reason,
             "frontend_url": "https://twin-sooty.vercel.app",
             "api_url": "https://twin-production-bcd9.up.railway.app",
         },
