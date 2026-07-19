@@ -289,6 +289,9 @@ export function FounderCommandCenter() {
           {t("founderCommand.title")}
         </h1>
         <p className="twin-muted mt-2 max-w-xl text-sm">{t("founderCommand.subtitle")}</p>
+        <p className="twin-muted mt-2 max-w-xl text-sm" data-fcc-operator-hint>
+          {t("founderCommand.operatorHint")}
+        </p>
         <p className="mt-2 text-sm font-medium text-[var(--twin-accent)]" data-fcc-session="ready">
           {t("founderCommand.sessionReady")}
         </p>
