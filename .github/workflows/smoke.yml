@@ -105,5 +105,5 @@ jobs:
           wait_for_sha API "$API_HEALTH" git_commit
           wait_for_sha frontend "$FRONTEND_HEALTH" frontend_commit
           canary=$(curl -fsS --max-time 15 "$DISPATCHER_HEALTH" | python3 -c \
-            'import json,sys; c=json.load(sys.stdin)["artifact_gate_canary"]; print(c["status"]+" "+c["reason_code"])')
-          test "$canary" = "needs_attention expected_deployment_missing"
+            'import json,sys; c=json.load(sys.stdin)["artifact_gate_canary"]; print(c["status"]+" "+str(c.get("reason_code")))')
+          test "$canary" = "PASS None"

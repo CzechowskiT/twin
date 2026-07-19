@@ -225,37 +225,59 @@ def infer_expected_artifacts(prompt: str, *, auto_create_pr: bool = False) -> di
     }
 
 
+_EXPLICIT_CONTRACT_KEYS = (
+    "execution_mode",
+    "read_only",
+    *MUTATION_KEYS,
+    "ci_required",
+    "regression_required",
+    "production_regression_required",
+)
+_DELIVERY_KEYS = (
+    "commit_required",
+    "pr_required",
+    "merge_required",
+    "deployment_required",
+    "ci_required",
+    "regression_required",
+)
+
+
 def resolve_execution_contract(
     prompt: str,
     *,
     explicit: dict[str, Any] | None = None,
     auto_create_pr: bool = False,
 ) -> dict[str, Any]:
-    """Merge inference with explicit caller intent; mutation always wins."""
+    """Merge inference with explicit caller intent; mutation always wins.
+
+    Explicit True/False flags override prompt inference for those keys. Delivery
+    implications (merge→PR/CI, delivery→commit) only fill keys the caller did
+    not set — so a mutating operator diagnose with commit_required=false and
+    deployment_required=false stays workflow-only.
+    """
     contract = infer_expected_artifacts(prompt, auto_create_pr=auto_create_pr)
     supplied = {key: value for key, value in (explicit or {}).items() if value is not None}
     validate_execution_contract(supplied)
 
-    for key in MUTATION_KEYS:
-        if supplied.get(key) is True:
-            contract[key] = True
-    if supplied.get("production_regression_required") is True:
-        contract["regression_required"] = True
+    for key in _EXPLICIT_CONTRACT_KEYS:
+        if key in supplied:
+            contract[key] = supplied[key]
+    if "production_regression_required" in supplied:
+        contract["regression_required"] = bool(supplied["production_regression_required"])
+    elif "regression_required" in supplied:
+        contract["production_regression_required"] = bool(supplied["regression_required"])
     if supplied.get("execution_mode") == "mutating" or supplied.get("read_only") is False:
         contract["mutation_required"] = True
+        contract["read_only"] = False
+        contract["execution_mode"] = "mutating"
+    if supplied.get("operator_execution_required") is True:
+        contract["operator_execution_required"] = True
     explicit_read_only = (
         supplied.get("execution_mode") == "read_only" or supplied.get("read_only") is True
     )
     prompt_requires_mutation = has_mutation_requirement(prompt) or any(
-        contract.get(key) is True
-        for key in (
-            "commit_required",
-            "pr_required",
-            "merge_required",
-            "deployment_required",
-            "ci_required",
-            "regression_required",
-        )
+        contract.get(key) is True for key in _DELIVERY_KEYS
     )
     if explicit_read_only:
         if prompt_requires_mutation:
@@ -271,21 +293,28 @@ def resolve_execution_contract(
         validate_execution_contract(contract)
         return contract
 
-    contract["pr_required"] |= bool(contract["merge_required"])
-    contract["ci_required"] |= bool(contract["merge_required"])
-    contract["commit_required"] |= bool(
-        contract["pr_required"]
-        or contract["deployment_required"]
-        or contract["ci_required"]
-        or contract["regression_required"]
+    def _imply(key: str) -> None:
+        if key not in supplied:
+            contract[key] = True
+
+    if contract["merge_required"]:
+        _imply("pr_required")
+        _imply("ci_required")
+    delivery_needs_commit = any(
+        contract.get(key)
+        for key in ("pr_required", "deployment_required", "ci_required", "regression_required")
     )
+    if delivery_needs_commit:
+        if supplied.get("commit_required") is False:
+            raise ValueError("invalid_execution_contract")
+        contract["commit_required"] = True
     mutating = any(contract.get(key) is True for key in MUTATION_KEYS)
     if mutating:
         contract.update(
             execution_mode="mutating",
             read_only=False,
             mutation_required=True,
-            operator_execution_required=True,
+            operator_execution_required=supplied.get("operator_execution_required") is not False,
         )
     else:
         contract.update(
@@ -367,6 +396,99 @@ def missing_reason(expected: dict[str, Any], verified: dict[str, Any]) -> str | 
     return None
 
 
+ARTIFACT_STATE_NOT_REQUIRED = "not_required"
+ARTIFACT_STATE_PRESENT = "expected_present"
+ARTIFACT_STATE_PENDING = "expected_pending"
+ARTIFACT_STATE_MISSING = "expected_missing"
+ARTIFACT_STATE_INCONSISTENT = "inconsistent"
+CONTRACT_BACKFILL_VERSION = "artifact-contract-v1"
+
+
+def sha_matches(left: str | None, right: str | None) -> bool:
+    """Compare full or abbreviated Git SHAs without weakening length floors."""
+    a = (left or "").strip().lower()
+    b = (right or "").strip().lower()
+    if not a or not b:
+        return False
+    if a == b:
+        return True
+    if len(a) < 7 or len(b) < 7:
+        return False
+    hex_chars = "0123456789abcdef"
+    if not (all(c in hex_chars for c in a) and all(c in hex_chars for c in b)):
+        return False
+    shorter, longer = (a, b) if len(a) <= len(b) else (b, a)
+    return longer.startswith(shorter)
+
+
+def artifact_requirement_states(
+    expected: dict[str, Any],
+    verified: dict[str, Any],
+    *,
+    pending: dict[str, bool] | None = None,
+    linked: dict[str, bool] | None = None,
+) -> dict[str, str]:
+    """Explicit per-artifact gate states derived only from the stored contract."""
+    exp = normalize_expected(expected)
+    ver = normalize_verified(verified)
+    pending_flags = pending or {}
+    linked_flags = linked or {}
+    pairs = (
+        ("pr", "pr_required", "pr_exists"),
+        ("merge", "merge_required", "merge_verified"),
+        ("deployment", "deployment_required", "deployment_verified"),
+        ("ci", "ci_required", "ci_passed"),
+        ("regression", "regression_required", "regression_passed"),
+    )
+    states: dict[str, str] = {}
+    for name, required_key, verified_key in pairs:
+        if not exp.get(required_key):
+            states[name] = ARTIFACT_STATE_NOT_REQUIRED
+            continue
+        if linked_flags.get(name) is False:
+            states[name] = ARTIFACT_STATE_INCONSISTENT
+        elif ver.get(verified_key):
+            states[name] = ARTIFACT_STATE_PRESENT
+        elif pending_flags.get(name):
+            states[name] = ARTIFACT_STATE_PENDING
+        else:
+            states[name] = ARTIFACT_STATE_MISSING
+    if not exp.get("commit_required"):
+        states["commit"] = ARTIFACT_STATE_NOT_REQUIRED
+    elif linked_flags.get("commit") is False:
+        states["commit"] = ARTIFACT_STATE_INCONSISTENT
+    elif ver.get("commit_exists") and ver.get("head_sha_verified"):
+        states["commit"] = ARTIFACT_STATE_PRESENT
+    elif pending_flags.get("commit"):
+        states["commit"] = ARTIFACT_STATE_PENDING
+    else:
+        states["commit"] = ARTIFACT_STATE_MISSING
+    return states
+
+
+def backfill_execution_contract(
+    raw: dict[str, Any] | None,
+    *,
+    source: str,
+    reason: str,
+) -> tuple[dict[str, Any], dict[str, str]]:
+    """Deterministic normalize for incomplete stored contracts; never invent flags."""
+    payload = dict(raw or {})
+    if payload.get("read_only") is True and any(payload.get(key) is True for key in MUTATION_KEYS):
+        raise ValueError("invalid_execution_contract")
+    if payload.get("execution_mode") == "read_only" and any(
+        payload.get(key) is True for key in MUTATION_KEYS
+    ):
+        raise ValueError("invalid_execution_contract")
+    contract = normalize_expected(payload)
+    meta = {
+        "reason": reason,
+        "source": source,
+        "version": CONTRACT_BACKFILL_VERSION,
+    }
+    return contract, meta
+
+
 def artifact_outcome(
     expected: dict[str, Any],
     verified: dict[str, Any],
@@ -381,3 +503,38 @@ def artifact_outcome(
     if reason:
         return "needs_attention", reason
     return "succeeded", None
+
+
+def artifact_gate_canary_probe() -> dict[str, Any]:
+    """Health-probe for contract-scoped gating (operator diagnose / no deploy)."""
+    expected = {
+        "execution_mode": "mutating",
+        "read_only": False,
+        "mutation_required": True,
+        "operator_execution_required": True,
+        "commit_required": False,
+        "pr_required": False,
+        "merge_required": False,
+        "deployment_required": False,
+        "ci_required": False,
+        "regression_required": False,
+        "production_regression_required": False,
+    }
+    verified = normalize_verified(None)
+    outcome, reason = artifact_outcome(expected, verified)
+    states = artifact_requirement_states(expected, verified)
+    missing = next(
+        (
+            name
+            for name, state in states.items()
+            if state in {ARTIFACT_STATE_MISSING, ARTIFACT_STATE_INCONSISTENT}
+        ),
+        None,
+    )
+    return {
+        "status": "PASS" if outcome == "succeeded" else "needs_attention",
+        "reason_code": reason,
+        "missing_artifact": missing,
+        "artifact_states": states,
+        "contract": normalize_expected(expected),
+    }

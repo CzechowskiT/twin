@@ -20,9 +20,17 @@ from app.database.session import get_db
 from app.main import app
 from app.services.agent_dispatch.constants import CURSOR_CONTRACT_DOC_DATE, CURSOR_CONTRACT_VERSION
 from app.services.agent_dispatch.artifacts import (
+    ARTIFACT_STATE_MISSING,
+    ARTIFACT_STATE_NOT_REQUIRED,
+    ARTIFACT_STATE_PRESENT,
+    artifact_gate_canary_probe,
     artifact_outcome,
+    artifact_requirement_states,
+    backfill_execution_contract,
     infer_expected_artifacts,
     missing_reason,
+    resolve_execution_contract,
+    sha_matches,
 )
 from app.services.agent_dispatch.cursor_client import CursorApiError, CursorRunSnapshot
 from app.services.agent_dispatch.github_enricher import GitHubEnricher, GitHubEnrichment
@@ -644,11 +652,11 @@ def test_health_exposes_mcp_without_secrets(dispatch_client):
     body = res.json()
     assert body["mcp_hosted"] is True
     assert body["mcp_healthy"] is True
-    assert body["artifact_gate_canary"] == {
-        "status": "needs_attention",
-        "reason_code": "expected_deployment_missing",
-        "missing_artifact": "deployment_verified",
-    }
+    assert body["artifact_gate_canary"]["status"] == "PASS"
+    assert body["artifact_gate_canary"]["reason_code"] is None
+    assert body["artifact_gate_canary"]["missing_artifact"] is None
+    assert body["artifact_gate_canary"]["artifact_states"]["deployment"] == "not_required"
+    assert body["artifact_gate_canary"]["contract"]["deployment_required"] is False
     assert "dispatch_twin_agent" in body["mcp_tools"]
     assert "test-dispatch-token" not in res.text
     assert body["encryption_via"] == "SECRET_KEY+token_crypto"
@@ -1052,6 +1060,193 @@ def test_full_delivery_succeeds_only_when_every_artifact_is_verified():
         regression_passed=True,
     )
     assert artifact_outcome(expected, verified) == ("succeeded", None)
+
+
+def test_read_only_run_passes_without_deployment_evidence():
+    expected = resolve_execution_contract(
+        "Read-only audit. Do not create a branch, commit, or PR.",
+        explicit={"execution_mode": "read_only", "read_only": True},
+    )
+    assert expected["deployment_required"] is False
+    assert artifact_outcome(expected, _verified()) == ("succeeded", None)
+    assert artifact_requirement_states(expected, _verified())["deployment"] == (
+        ARTIFACT_STATE_NOT_REQUIRED
+    )
+
+
+def test_mutating_diagnostic_without_commit_or_deploy_passes():
+    prompt = (
+        "ONLY workflow_dispatch operator-service.yml operation=diagnose — "
+        "no code/commit/PR/merge/deploy/coding agent/config/lock release."
+    )
+    expected = resolve_execution_contract(
+        prompt,
+        explicit={
+            "execution_mode": "mutating",
+            "read_only": False,
+            "mutation_required": True,
+            "operator_execution_required": True,
+            "commit_required": False,
+            "pr_required": False,
+            "merge_required": False,
+            "deployment_required": False,
+            "production_regression_required": False,
+        },
+    )
+    assert expected["execution_mode"] == "mutating"
+    assert expected["read_only"] is False
+    assert expected["mutation_required"] is True
+    assert expected["operator_execution_required"] is True
+    assert expected["commit_required"] is False
+    assert expected["deployment_required"] is False
+    assert artifact_outcome(expected, _verified()) == ("succeeded", None)
+    states = artifact_requirement_states(expected, _verified())
+    assert states["deployment"] == ARTIFACT_STATE_NOT_REQUIRED
+    assert states["commit"] == ARTIFACT_STATE_NOT_REQUIRED
+
+
+def test_explicit_false_overrides_prompt_deploy_inference():
+    expected = resolve_execution_contract(
+        "Please deploy production after the diagnose workflow_dispatch.",
+        explicit={
+            "execution_mode": "mutating",
+            "read_only": False,
+            "mutation_required": True,
+            "operator_execution_required": True,
+            "commit_required": False,
+            "deployment_required": False,
+            "pr_required": False,
+            "merge_required": False,
+        },
+    )
+    assert expected["deployment_required"] is False
+    assert expected["commit_required"] is False
+
+
+def test_deployment_required_without_evidence_is_blocked():
+    expected = resolve_execution_contract(
+        "Deploy production",
+        explicit={"deployment_required": True, "mutation_required": True, "execution_mode": "mutating"},
+    )
+    assert expected["deployment_required"] is True
+    assert artifact_outcome(expected, _verified(commit_exists=True, head_sha_verified=True)) == (
+        "needs_attention",
+        "expected_deployment_missing",
+    )
+    assert (
+        artifact_requirement_states(
+            expected, _verified(commit_exists=True, head_sha_verified=True)
+        )["deployment"]
+        == ARTIFACT_STATE_MISSING
+    )
+
+
+def test_deployment_required_with_matching_sha_passes():
+    expected = {
+        "deployment_required": True,
+        "commit_required": True,
+        "mutation_required": True,
+        "execution_mode": "mutating",
+    }
+    verified = _verified(
+        deployment_verified=True,
+        commit_exists=True,
+        head_sha_verified=True,
+    )
+    assert artifact_outcome(expected, verified) == ("succeeded", None)
+    assert artifact_requirement_states(expected, verified)["deployment"] == ARTIFACT_STATE_PRESENT
+
+
+def test_sha_matches_normalizes_short_and_full():
+    full = "8cc466b382e827e84cff3e158c379cef46052cd7"
+    assert sha_matches(full, full[:12]) is True
+    assert sha_matches(full[:10], full) is True
+    assert sha_matches(full, "deadbeef" + full[8:]) is False
+    assert sha_matches(full[:6], full) is False
+
+
+def test_unlinked_deployment_evidence_is_inconsistent():
+    expected = {"deployment_required": True, "commit_required": True, "mutation_required": True}
+    verified = _verified(deployment_verified=True, commit_exists=True, head_sha_verified=True)
+    states = artifact_requirement_states(expected, verified, linked={"deployment": False})
+    assert states["deployment"] == "inconsistent"
+
+
+def test_backfill_incomplete_contract_is_auditable():
+    contract, meta = backfill_execution_contract(
+        {"mutation_required": True, "execution_mode": "mutating"},
+        source="unit_test",
+        reason="normalize_incomplete_expected_artifacts",
+    )
+    assert contract["deployment_required"] is False
+    assert meta["source"] == "unit_test"
+    assert meta["version"]
+    with pytest.raises(ValueError, match="invalid_execution_contract"):
+        backfill_execution_contract(
+            {"read_only": True, "deployment_required": True},
+            source="unit_test",
+            reason="contradiction",
+        )
+
+
+def test_artifact_gate_canary_probe_passes_without_deployment():
+    probe = artifact_gate_canary_probe()
+    assert probe["status"] == "PASS"
+    assert probe["reason_code"] is None
+    assert probe["contract"]["deployment_required"] is False
+    assert probe["artifact_states"]["deployment"] == ARTIFACT_STATE_NOT_REQUIRED
+
+
+def test_commit_false_with_deployment_true_is_invalid():
+    with pytest.raises(ValueError, match="invalid_execution_contract"):
+        resolve_execution_contract(
+            "deploy",
+            explicit={
+                "execution_mode": "mutating",
+                "deployment_required": True,
+                "commit_required": False,
+            },
+        )
+
+
+def test_mutating_diagnostic_dispatch_persists_contract(dispatch_client):
+    client, db = dispatch_client
+    prompt = (
+        "ONLY workflow_dispatch operator-service.yml operation=diagnose — "
+        "no code/commit/PR/merge/deploy."
+    )
+    res = client.post(
+        "/api/internal/agent-dispatch/runs",
+        headers=_auth(),
+        json=_create_payload(
+            prompt=prompt,
+            idempotency_key="mutating-diagnostic-no-deploy",
+            execution_mode="mutating",
+            read_only=False,
+            mutation_required=True,
+            operator_execution_required=True,
+            commit_required=False,
+            pr_required=False,
+            merge_required=False,
+            deployment_required=False,
+            production_regression_required=False,
+        ),
+    )
+    assert res.status_code == 201
+    body = res.json()
+    assert body["execution_mode"] == "mutating"
+    assert body["read_only"] is False
+    from app.database.models import AgentDispatchRun
+
+    run = db.get(AgentDispatchRun, body["id"])
+    expected = json.loads(run.expected_artifacts_json)
+    assert expected["deployment_required"] is False
+    assert expected["commit_required"] is False
+    assert expected["mutation_required"] is True
+    assert artifact_outcome(expected, json.loads(run.verified_artifacts_json)) == (
+        "succeeded",
+        None,
+    )
 
 
 def test_mutating_requirement_wins_over_incidental_read_only_scope():
@@ -1487,6 +1682,73 @@ def test_deployment_requires_all_configured_production_environments(
     )
     assert enrichment.verified_artifacts["deployment_verified"] is False
     assert enrichment.attention_reason == "expected_deployment_missing"
+
+
+def test_railway_and_vercel_production_environments_are_verified(
+    dispatch_client, monkeypatch
+):
+    monkeypatch.setenv(
+        "AGENT_DISPATCH_PRODUCTION_ENVIRONMENTS",
+        "railway / production,vercel / production",
+    )
+    monkeypatch.setenv("AGENT_DISPATCH_GITHUB_TOKEN", "test-github-token")
+    get_settings.cache_clear()
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        path = request.url.path
+        if path.endswith("/pulls/42"):
+            return httpx.Response(
+                200,
+                json={
+                    "number": 42,
+                    "html_url": "https://github.com/CzechowskiT/twin/pull/42",
+                    "state": "closed",
+                    "merged": True,
+                    "merge_commit_sha": "b" * 40,
+                    "base": {"ref": "cursor/phase1-monorepo-scaffold"},
+                    "head": {"sha": "a" * 40, "ref": "feat/artifacts"},
+                },
+            )
+        if path.endswith("/commits/" + "b" * 40):
+            return httpx.Response(200, json={"sha": "b" * 40})
+        if path.endswith("/deployments"):
+            return httpx.Response(
+                200,
+                json=[
+                    {"id": 11, "environment": "railway / production"},
+                    {"id": 12, "environment": "vercel / production"},
+                ],
+            )
+        if "/deployments/" in path and path.endswith("/statuses"):
+            return httpx.Response(200, json=[{"state": "success"}])
+        if path.endswith("/status"):
+            return httpx.Response(200, json={"state": "success", "statuses": []})
+        if path.endswith("/check-runs"):
+            return httpx.Response(200, json={"check_runs": []})
+        return httpx.Response(404, json={"message": "not found"})
+
+    enrichment = GitHubEnricher(
+        get_settings(), transport=httpx.MockTransport(handler)
+    ).enrich(
+        repository_url="https://github.com/CzechowskiT/twin",
+        branch_name="feat/artifacts",
+        pr_url="https://github.com/CzechowskiT/twin/pull/42",
+        expected_artifacts=_expected("Merge and deploy to production"),
+        expected_base_branch="cursor/phase1-monorepo-scaffold",
+    )
+    assert enrichment.verified_artifacts["deployment_verified"] is True
+    assert enrichment.deployment_sha in {"a" * 40, "b" * 40}
+    assert set(enrichment.deployment_ids) == {11, 12}
+
+
+def test_deployment_sha_mismatch_blocks_via_sha_matches():
+    full = "8cc466b382e827e84cff3e158c379cef46052cd7"
+    other = "deadbeef382e827e84cff3e158c379cef46052cd7"
+    assert sha_matches(full, other) is False
+    assert artifact_outcome(
+        {"deployment_required": True, "commit_required": True, "mutation_required": True},
+        _verified(deployment_verified=False, commit_exists=True, head_sha_verified=True),
+    ) == ("needs_attention", "expected_deployment_missing")
 
 
 def test_missing_pr_never_succeeds(dispatch_client, monkeypatch):
