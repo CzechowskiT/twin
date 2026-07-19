@@ -20,6 +20,8 @@ test("founder command EN/PL keys match", () => {
   assert.deepEqual(plKeys, enKeys);
   assert.ok(FOUNDER_COMMAND_MESSAGES_EN.title.length > 3);
   assert.ok(FOUNDER_COMMAND_MESSAGES_PL.title.length > 3);
+  assert.match(FOUNDER_COMMAND_MESSAGES_EN.operatorHint, /TWIN Product Operator.*Actions.*fallback dashboard/i);
+  assert.match(FOUNDER_COMMAND_MESSAGES_PL.operatorHint, /TWIN Product Operator.*Actions.*panel zapasowy/i);
 });
 
 test("founder command copy has no manual token field", () => {
@@ -38,6 +40,8 @@ test("FCC UI never references FOUNDER_COMMAND_TOKEN or token paste field", () =>
   assert.doesNotMatch(ui, /tokenLabel|STORAGE_KEY|twin_founder_command_token/);
   assert.match(ui, /\/api\/founder-command/);
   assert.match(ui, /data-fcc-start/);
+  assert.match(ui, /data-fcc-operator-hint/);
+  assert.match(ui, /t\("founderCommand\.operatorHint"\)/);
   assert.match(ui, /LOGIN_NEXT|\/login\?next=/);
 });
 
