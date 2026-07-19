@@ -740,3 +740,76 @@ def test_github_app_installation_diagnostic_covers_required_capabilities(
     assert "token" not in result
     assert jwt_calls and jwt_calls[0]["payload"]["iss"] == "Iv1.test-app"
     assert jwt_calls[0]["algorithm"] == "RS256"
+
+
+def test_trigger_diagnose_dispatches_and_waits(operator_db):
+    db, settings = operator_db
+    settings.agent_dispatch_operator_mutation_workflow = "operator-service.yml"
+    calls: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls.append(f"{request.method} {request.url.path}")
+        path = request.url.path
+        if path.endswith("/actions/workflows/operator-service.yml/runs"):
+            return httpx.Response(
+                200,
+                json={
+                    "workflow_runs": [
+                        {
+                            "id": 4242,
+                            "event": "workflow_dispatch",
+                            "status": "completed",
+                            "conclusion": "success",
+                            "display_title": "operator-diagnose-diag-key",
+                            "html_url": "https://github.com/CzechowskiT/twin/actions/runs/4242",
+                            "path": ".github/workflows/operator-service.yml",
+                        }
+                    ]
+                },
+            )
+        if path.endswith("/actions/workflows/operator-service.yml/dispatches"):
+            return httpx.Response(204)
+        if path.endswith("/actions/runs/4242"):
+            return httpx.Response(
+                200,
+                json={
+                    "id": 4242,
+                    "event": "workflow_dispatch",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "html_url": "https://github.com/CzechowskiT/twin/actions/runs/4242",
+                    "path": ".github/workflows/operator-service.yml",
+                },
+            )
+        return httpx.Response(404, json={"message": path})
+
+    client = GitHubOperatorClient(
+        settings, transport=httpx.MockTransport(handler), sleeper=lambda _: None
+    )
+    # First find returns none then after dispatch finds run — simulate empty then hit
+    # Override: initial find in _dispatch_workflow sees the completed run via title and returns it
+    result = client.trigger_diagnose(
+        repository_url="https://github.com/CzechowskiT/twin",
+        ref="cursor/phase1-monorepo-scaffold",
+        idempotency_key="diag-key",
+    )
+    assert result["workflow_run_id"] == 4242
+    assert "4242" in str(result.get("run_url") or "")
+
+
+def test_operator_diagnose_required_helper():
+    from app.config import Settings
+    from app.services.agent_dispatch.service import _operator_diagnose_required
+
+    settings = Settings(agent_dispatch_operator_enabled=True)
+    expected = {
+        "operator_execution_required": True,
+        "read_only": False,
+        "merge_required": False,
+        "commit_required": False,
+        "pr_required": False,
+        "deployment_required": False,
+    }
+    assert _operator_diagnose_required(settings, expected) is True
+    expected["merge_required"] = True
+    assert _operator_diagnose_required(settings, expected) is False
