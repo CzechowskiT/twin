@@ -25,7 +25,11 @@ class GitHubEnrichment:
     pr_number: int | None
     pr_url: str | None
     head_sha: str | None
+    merge_sha: str | None
+    deployment_sha: str | None
+    deployment_ids: tuple[int, ...]
     ci_status: str | None
+    regression_status: str | None
     verified_artifacts: dict[str, bool]
     ok: bool
     attention_reason: str | None
@@ -57,6 +61,16 @@ class GitHubEnricher:
     def __init__(self, settings: Settings, *, transport: httpx.BaseTransport | None = None):
         self._token = (settings.agent_dispatch_github_token or "").strip()
         self._transport = transport
+        self._production_environments = {
+            value.strip().lower()
+            for value in (settings.agent_dispatch_production_environments or "").split(",")
+            if value.strip()
+        }
+        self._regression_checks = {
+            value.strip().lower()
+            for value in (settings.agent_dispatch_regression_check_names or "").split(",")
+            if value.strip()
+        }
 
     def enrich(
         self,
@@ -162,7 +176,11 @@ class GitHubEnricher:
             pr_number=pr_number,
             pr_url=pr_url,
             head_sha=head_sha,
+            merge_sha=merge_sha,
+            deployment_sha=raw.get("deployment_sha"),
+            deployment_ids=tuple(raw.get("deployment_ids") or ()),
             ci_status=ci_status,
+            regression_status=raw.get("regression_status"),
             expected=expected,
             verified=verified,
             raw=raw,
@@ -198,7 +216,18 @@ class GitHubEnricher:
                     verified["pr_exists"] = True
                     head_sha = head.get("sha")
                     branch_name = branch_name or head.get("ref")
-                    verified["merge_verified"] = bool(body.get("merged_at"))
+                    merged_by = body.get("merged_by") or {}
+                    merge_actor = str(merged_by.get("login") or "")
+                    actor_type = str(merged_by.get("type") or "")
+                    merge_is_manual = bool(merge_actor) and actor_type.lower() != "bot"
+                    merge_is_manual &= not merge_actor.lower().endswith("[bot]")
+                    merge_is_manual &= not bool(body.get("auto_merge"))
+                    raw["merge_actor"] = merge_actor or None
+                    raw["merged_at"] = body.get("merged_at")
+                    raw["merge_manual_verified"] = merge_is_manual
+                    verified["merge_verified"] = bool(
+                        body.get("merged_at") and merge_is_manual
+                    )
                     merge_sha = (
                         body.get("merge_commit_sha")
                         if verified["merge_verified"]
@@ -278,12 +307,14 @@ class GitHubEnricher:
         regression = [
             run
             for run in regression_runs
-            if "regression" in str(run.get("name", "")).lower()
+            if str(run.get("name", "")).strip().lower() in self._regression_checks
         ]
         verified["regression_passed"] = bool(regression) and all(
             run.get("status") == "completed" and run.get("conclusion") == "success"
             for run in regression
         )
+        raw["regression_check_names"] = [run.get("name") for run in regression]
+        raw["regression_status"] = self._check_group_status(regression)
         raw["combined_status"] = state
         raw["check_run_count"] = len(ci_runs)
         return "success" if verified["ci_passed"] else state
@@ -297,6 +328,18 @@ class GitHubEnricher:
         )
 
     @staticmethod
+    def _check_group_status(runs: list[dict[str, Any]]) -> str:
+        if not runs:
+            return "missing"
+        if any(run.get("status") != "completed" for run in runs):
+            return "pending"
+        return (
+            "success"
+            if all(run.get("conclusion") == "success" for run in runs)
+            else "failure"
+        )
+
+    @staticmethod
     def _list_check_runs(
         client: httpx.Client,
         owner: str,
@@ -305,14 +348,22 @@ class GitHubEnricher:
         raw: dict[str, Any],
         label: str,
     ) -> list[dict[str, Any]]:
-        response = client.get(
-            f"https://api.github.com/repos/{owner}/{repo}/commits/{sha}/check-runs"
-        )
-        GitHubEnricher._raise_unexpected(response, {200})
-        raw[f"{label}_check_runs_status_code"] = response.status_code
-        if response.status_code != 200:
-            return []
-        return response.json().get("check_runs", [])
+        runs: list[dict[str, Any]] = []
+        page = 1
+        while True:
+            response = client.get(
+                f"https://api.github.com/repos/{owner}/{repo}/commits/{sha}/check-runs",
+                params={"per_page": 100, "page": page},
+            )
+            GitHubEnricher._raise_unexpected(response, {200})
+            raw[f"{label}_check_runs_status_code"] = response.status_code
+            batch = response.json().get("check_runs", [])
+            runs.extend(batch)
+            if len(batch) < 100:
+                break
+            page += 1
+        raw[f"{label}_check_run_pages"] = page
+        return runs
 
     def _fetch_deployment(
         self,
@@ -328,23 +379,58 @@ class GitHubEnricher:
             return
         response = client.get(
             f"https://api.github.com/repos/{owner}/{repo}/deployments",
-            params={"sha": sha, "environment": "production", "per_page": 10},
+            params={"sha": sha, "per_page": 100},
         )
         self._raise_unexpected(response, {200})
         raw["deployments_status_code"] = response.status_code
         deployments = response.json() if response.status_code == 200 else []
+        by_environment: dict[str, list[dict[str, Any]]] = {}
         for deployment in deployments:
-            statuses = client.get(
-                f"https://api.github.com/repos/{owner}/{repo}/deployments/"
-                f"{deployment['id']}/statuses",
-                params={"per_page": 1},
+            environment = str(deployment.get("environment") or "").strip().lower()
+            if environment in self._production_environments:
+                by_environment.setdefault(environment, []).append(deployment)
+        successful_ids: list[int] = []
+        states: dict[str, str] = {}
+        for environment in sorted(self._production_environments):
+            candidates = by_environment.get(environment) or []
+            if not candidates:
+                states[environment] = "missing"
+                continue
+            deployment = candidates[0]
+            state = self._deployment_state(
+                client,
+                owner,
+                repo,
+                int(deployment["id"]),
             )
-            self._raise_unexpected(statuses, {200})
-            if statuses.status_code == 200 and statuses.json():
-                if statuses.json()[0].get("state") == "success":
-                    verified["deployment_verified"] = True
-                    raw["deployment_id"] = deployment["id"]
-                    return
+            states[environment] = state
+            if state == "success":
+                successful_ids.append(int(deployment["id"]))
+        verified["deployment_verified"] = bool(self._production_environments) and all(
+            states.get(environment) == "success"
+            for environment in self._production_environments
+        )
+        raw["deployment_environments"] = states
+        raw["deployment_ids"] = successful_ids
+        if verified["deployment_verified"]:
+            raw["deployment_sha"] = sha
+
+    @staticmethod
+    def _deployment_state(
+        client: httpx.Client,
+        owner: str,
+        repo: str,
+        deployment_id: int,
+    ) -> str:
+        statuses = client.get(
+            f"https://api.github.com/repos/{owner}/{repo}/deployments/"
+            f"{deployment_id}/statuses",
+            params={"per_page": 1},
+        )
+        GitHubEnricher._raise_unexpected(statuses, {200})
+        if statuses.status_code != 200 or not statuses.json():
+            return "missing"
+        return str(statuses.json()[0].get("state") or "unknown")
 
     @staticmethod
     def _raise_unexpected(response: httpx.Response, allowed: set[int]) -> None:
@@ -378,7 +464,11 @@ class GitHubEnricher:
         raw: dict[str, Any],
         pr_number: int | None = None,
         head_sha: str | None = None,
+        merge_sha: str | None = None,
+        deployment_sha: str | None = None,
+        deployment_ids: tuple[int, ...] = (),
         ci_status: str = "skipped",
+        regression_status: str | None = None,
         verified: dict[str, bool] | None = None,
         verification_error: bool = False,
     ) -> GitHubEnrichment:
@@ -391,7 +481,11 @@ class GitHubEnricher:
             pr_number=pr_number,
             pr_url=pr_url,
             head_sha=head_sha,
+            merge_sha=merge_sha,
+            deployment_sha=deployment_sha,
+            deployment_ids=deployment_ids,
             ci_status=ci_status,
+            regression_status=regression_status,
             verified_artifacts=artifacts,
             ok=reason is None and not verification_error,
             attention_reason="reconcile_failed" if verification_error else reason,

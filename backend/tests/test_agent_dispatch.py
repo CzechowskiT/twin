@@ -19,7 +19,11 @@ from app.database.models import Base
 from app.database.session import get_db
 from app.main import app
 from app.services.agent_dispatch.constants import CURSOR_CONTRACT_DOC_DATE, CURSOR_CONTRACT_VERSION
-from app.services.agent_dispatch.artifacts import infer_expected_artifacts, missing_reason
+from app.services.agent_dispatch.artifacts import (
+    artifact_outcome,
+    infer_expected_artifacts,
+    missing_reason,
+)
 from app.services.agent_dispatch.cursor_client import CursorApiError, CursorRunSnapshot
 from app.services.agent_dispatch.github_enricher import GitHubEnricher, GitHubEnrichment
 from app.services.agent_dispatch.prompt_envelope import build_prompt_envelope, redact_secrets
@@ -640,6 +644,11 @@ def test_health_exposes_mcp_without_secrets(dispatch_client):
     body = res.json()
     assert body["mcp_hosted"] is True
     assert body["mcp_healthy"] is True
+    assert body["artifact_gate_canary"] == {
+        "status": "needs_attention",
+        "reason_code": "expected_deployment_missing",
+        "missing_artifact": "deployment_verified",
+    }
     assert "dispatch_twin_agent" in body["mcp_tools"]
     assert "test-dispatch-token" not in res.text
     assert body["encryption_via"] == "SECRET_KEY+token_crypto"
@@ -927,6 +936,124 @@ def test_expected_artifact_inference_handles_negation(prompt, expected):
     assert {key: inferred[key] for key in expected} == expected
 
 
+def test_expected_artifact_inference_covers_full_delivery_chain():
+    inferred = infer_expected_artifacts(
+        "Create a PR, run CI, manually merge it, deploy production, and run regression."
+    )
+    assert inferred["pr_required"] is True
+    assert inferred["merge_required"] is True
+    assert inferred["deployment_required"] is True
+    assert inferred["ci_required"] is True
+    assert inferred["regression_required"] is True
+    assert inferred["production_regression_required"] is True
+    assert inferred["commit_required"] is True
+    assert inferred["read_only"] is False
+    assert inferred["execution_mode"] == "mutating"
+    assert inferred["mutation_required"] is True
+    assert inferred["operator_execution_required"] is True
+
+
+def test_read_only_inference_forbids_all_git_and_delivery_artifacts():
+    inferred = infer_expected_artifacts(
+        "Read-only review. Do not create a branch, commit, or PR."
+    )
+    assert all(
+        not value
+        for key, value in inferred.items()
+        if key not in {"read_only", "execution_mode"}
+    )
+    assert inferred["read_only"] is True
+    assert inferred["execution_mode"] == "read_only"
+
+
+@pytest.mark.parametrize(
+    "prompt",
+    [
+        (
+            "Verify the PR, perform a manual merge and deployment, then run a "
+            "production read-only regression test."
+        ),
+        (
+            "Zweryfikuj PR, wykonaj manual merge i deployment, a następnie "
+            "produkcyjny test regresyjny read-only."
+        ),
+    ],
+)
+def test_read_only_regression_scope_preserves_full_delivery_artifacts(prompt):
+    inferred = infer_expected_artifacts(prompt)
+    assert inferred["pr_required"] is True
+    assert inferred["merge_required"] is True
+    assert inferred["deployment_required"] is True
+    assert inferred["ci_required"] is True
+    assert inferred["regression_required"] is True
+    assert inferred["commit_required"] is True
+    assert inferred["read_only"] is False
+    assert inferred["execution_mode"] == "mutating"
+
+
+@pytest.mark.parametrize(
+    "prompt",
+    [
+        "Use a read-only workflow for repository inspection only.",
+        "Inspect the repository only, without changes.",
+    ],
+)
+def test_read_only_workflow_remains_read_only(prompt):
+    inferred = infer_expected_artifacts(prompt)
+    assert all(
+        not value
+        for key, value in inferred.items()
+        if key not in {"read_only", "execution_mode"}
+    )
+    assert inferred["read_only"] is True
+    assert inferred["execution_mode"] == "read_only"
+
+
+@pytest.mark.parametrize(
+    ("verified_key", "reason"),
+    [
+        ("pr_exists", "expected_pr_missing"),
+        ("merge_verified", "expected_merge_missing"),
+        ("deployment_verified", "expected_deployment_missing"),
+        ("commit_exists", "expected_commit_missing"),
+        ("head_sha_verified", "expected_commit_missing"),
+        ("ci_passed", "expected_ci_missing"),
+        ("regression_passed", "expected_regression_missing"),
+    ],
+)
+def test_full_delivery_never_succeeds_with_unverified_artifact(verified_key, reason):
+    expected = _expected(
+        "Create a PR, run CI, manually merge it, deploy production, and run regression."
+    )
+    verified = _verified(
+        pr_exists=True,
+        merge_verified=True,
+        deployment_verified=True,
+        commit_exists=True,
+        head_sha_verified=True,
+        ci_passed=True,
+        regression_passed=True,
+    )
+    verified[verified_key] = False
+    assert artifact_outcome(expected, verified) == ("needs_attention", reason)
+
+
+def test_full_delivery_succeeds_only_when_every_artifact_is_verified():
+    expected = _expected(
+        "Create a PR, run CI, manually merge it, deploy production, and run regression."
+    )
+    verified = _verified(
+        pr_exists=True,
+        merge_verified=True,
+        deployment_verified=True,
+        commit_exists=True,
+        head_sha_verified=True,
+        ci_passed=True,
+        regression_passed=True,
+    )
+    assert artifact_outcome(expected, verified) == ("succeeded", None)
+
+
 def test_mutating_requirement_wins_over_incidental_read_only_scope():
     inferred = infer_expected_artifacts(
         "Fix and commit the classifier. Perform a read-only investigation first."
@@ -1074,7 +1201,11 @@ def _enrichment(
         pr_number=42 if pr_url else None,
         pr_url=pr_url,
         head_sha="a" * 40 if verified["commit_exists"] else None,
+        merge_sha="b" * 40 if verified["merge_verified"] else None,
+        deployment_sha="b" * 40 if verified["deployment_verified"] else None,
+        deployment_ids=(7, 8) if verified["deployment_verified"] else (),
         ci_status="success" if verified["ci_passed"] else "pending",
+        regression_status="success" if verified["regression_passed"] else "missing",
         verified_artifacts=verified,
         ok=reason is None and not verification_error,
         attention_reason=reason,
@@ -1088,6 +1219,7 @@ def _github_handler(
     merged: bool = False,
     ci: str = "success",
     deployment: bool = False,
+    partial_deployment: bool = False,
     regression: bool = False,
     pr_exists: bool = True,
     base_branch: str = "cursor/phase1-monorepo-scaffold",
@@ -1105,6 +1237,10 @@ def _github_handler(
                     "base": {"ref": base_branch},
                     "merged_at": "2026-07-18T12:00:00Z" if merged else None,
                     "merge_commit_sha": "merge-sha" if merged else None,
+                    "merged_by": (
+                        {"login": "human-reviewer", "type": "User"} if merged else None
+                    ),
+                    "auto_merge": None,
                 },
             )
         if path.endswith("/commits/head-sha"):
@@ -1123,8 +1259,17 @@ def _github_handler(
                 )
             return httpx.Response(200, json={"check_runs": runs})
         if path.endswith("/deployments"):
-            return httpx.Response(200, json=[{"id": 7}] if deployment else [])
-        if path.endswith("/deployments/7/statuses"):
+            deployments = []
+            if deployment or partial_deployment:
+                deployments.append({"id": 7, "environment": "Production"})
+            if deployment:
+                deployments.append(
+                    {"id": 8, "environment": "responsible-success / production"}
+                )
+            return httpx.Response(200, json=deployments)
+        if path.endswith("/deployments/7/statuses") or path.endswith(
+            "/deployments/8/statuses"
+        ):
             return httpx.Response(200, json=[{"state": "success"}])
         return httpx.Response(404, json={"path": path})
 
@@ -1169,8 +1314,71 @@ def test_read_only_report_and_handoff_hide_git_artifacts(dispatch_client):
     assert handoff["result"]["branch"] is None
     assert handoff["result"]["head_sha"] is None
     assert handoff["result"]["pr"] is None
+    assert handoff["result"]["merge_sha"] is None
+    assert handoff["result"]["deployment_sha"] is None
+    assert handoff["result"]["deployment_ids"] == []
+    assert handoff["result"]["regression_status"] is None
     assert handoff["public_run"]["github_enrichment"] is None
+    assert handoff["public_run"]["result_merge_sha"] is None
+    assert handoff["public_run"]["result_deployment_sha"] is None
     assert report["expected_artifacts"]["read_only"] is True
+
+
+def test_read_only_run_can_succeed_without_git_artifacts(dispatch_client):
+    client, db = dispatch_client
+    created = client.post(
+        "/api/internal/agent-dispatch/runs",
+        headers=_auth(),
+        json=_create_payload(
+            prompt="Read-only audit. Do not create a branch, commit, or PR.",
+            idempotency_key="read-only-success",
+        ),
+    ).json()
+    from app.services.agent_dispatch.service import finalize_with_github
+
+    run = finalize_with_github(db, get_settings(), created["id"])
+    assert run.status == "succeeded"
+    assert run.result_branch is None
+    assert run.result_head_sha is None
+    assert run.result_pr_url is None
+
+
+def test_legacy_run_without_expected_contract_never_succeeds(dispatch_client):
+    client, db = dispatch_client
+    created = client.post(
+        "/api/internal/agent-dispatch/runs",
+        headers=_auth(),
+        json=_create_payload(prompt="Read-only audit", idempotency_key="legacy-contract"),
+    ).json()
+    from app.database.models import AgentDispatchRun
+    from app.services.agent_dispatch.service import finalize_with_github
+
+    run = db.get(AgentDispatchRun, created["id"])
+    run.expected_artifacts_json = None
+    db.commit()
+    result = finalize_with_github(db, get_settings(), run.id)
+    assert result.status == "needs_attention"
+    assert result.error_code == "reconcile_failed"
+
+
+def test_partial_expected_contract_never_succeeds(dispatch_client):
+    client, db = dispatch_client
+    created = client.post(
+        "/api/internal/agent-dispatch/runs",
+        headers=_auth(),
+        json=_create_payload(prompt="Read-only audit", idempotency_key="partial-contract"),
+    ).json()
+    from app.database.models import AgentDispatchRun
+    from app.services.agent_dispatch.service import finalize_with_github
+
+    run = db.get(AgentDispatchRun, created["id"])
+    run.expected_artifacts_json = json.dumps(
+        {"pr_required": False, "ci_required": False}
+    )
+    db.commit()
+    result = finalize_with_github(db, get_settings(), run.id)
+    assert result.status == "needs_attention"
+    assert result.error_code == "reconcile_failed"
 
 
 def test_pr_artifact_is_verified(dispatch_client, monkeypatch):
@@ -1213,6 +1421,43 @@ def test_merge_artifact_is_verified(dispatch_client, monkeypatch):
     assert enrichment.verified_artifacts["merge_verified"] is True
 
 
+def test_bot_merge_is_not_verified(dispatch_client, monkeypatch):
+    def handler(request: httpx.Request) -> httpx.Response:
+        path = request.url.path
+        if path.endswith("/pulls/42"):
+            return httpx.Response(
+                200,
+                json={
+                    "head": {"sha": "head-sha", "ref": "feat/artifacts"},
+                    "base": {"ref": "cursor/phase1-monorepo-scaffold"},
+                    "merged_at": "2026-07-18T12:00:00Z",
+                    "merge_commit_sha": "merge-sha",
+                    "merged_by": {"login": "merge-bot[bot]", "type": "Bot"},
+                },
+            )
+        if path.endswith("/commits/head-sha"):
+            return httpx.Response(200, json={"sha": "head-sha"})
+        if path.endswith("/status"):
+            return httpx.Response(200, json={"state": "success", "total_count": 0})
+        if path.endswith("/check-runs"):
+            return httpx.Response(200, json={"check_runs": []})
+        return httpx.Response(404)
+
+    monkeypatch.setenv("AGENT_DISPATCH_GITHUB_TOKEN", "test-github-token")
+    get_settings.cache_clear()
+    enrichment = GitHubEnricher(
+        get_settings(), transport=httpx.MockTransport(handler)
+    ).enrich(
+        repository_url="https://github.com/CzechowskiT/twin",
+        branch_name="feat/artifacts",
+        pr_url="https://github.com/CzechowskiT/twin/pull/42",
+        expected_artifacts=_expected("Create and merge the PR"),
+        expected_base_branch="cursor/phase1-monorepo-scaffold",
+    )
+    assert enrichment.verified_artifacts["merge_verified"] is False
+    assert enrichment.attention_reason == "expected_merge_missing"
+
+
 def test_deployment_artifact_is_verified(dispatch_client, monkeypatch):
     enrichment = _github_enricher(
         dispatch_client, monkeypatch, merged=True, deployment=True
@@ -1224,6 +1469,24 @@ def test_deployment_artifact_is_verified(dispatch_client, monkeypatch):
     )
     assert enrichment.ok is True
     assert enrichment.verified_artifacts["deployment_verified"] is True
+
+
+def test_deployment_requires_all_configured_production_environments(
+    dispatch_client, monkeypatch
+):
+    enrichment = _github_enricher(
+        dispatch_client,
+        monkeypatch,
+        merged=True,
+        partial_deployment=True,
+    ).enrich(
+        repository_url="https://github.com/CzechowskiT/twin",
+        branch_name="feat/artifacts",
+        pr_url="https://github.com/CzechowskiT/twin/pull/42",
+        expected_artifacts=_expected("Merge and deploy to production"),
+    )
+    assert enrichment.verified_artifacts["deployment_verified"] is False
+    assert enrichment.attention_reason == "expected_deployment_missing"
 
 
 def test_missing_pr_never_succeeds(dispatch_client, monkeypatch):
@@ -1314,6 +1577,63 @@ def test_skipped_ci_never_succeeds(dispatch_client, monkeypatch):
     assert enrichment.attention_reason == "expected_ci_missing"
 
 
+def test_ci_verification_reads_all_check_run_pages(dispatch_client, monkeypatch):
+    def handler(request: httpx.Request) -> httpx.Response:
+        path = request.url.path
+        if path.endswith("/pulls/42"):
+            return httpx.Response(
+                200,
+                json={
+                    "head": {"sha": "head-sha", "ref": "feat/artifacts"},
+                    "base": {"ref": "cursor/phase1-monorepo-scaffold"},
+                    "merged_at": None,
+                },
+            )
+        if path.endswith("/commits/head-sha"):
+            return httpx.Response(200, json={"sha": "head-sha"})
+        if path.endswith("/status"):
+            return httpx.Response(
+                200, json={"state": "success", "total_count": 1}
+            )
+        if path.endswith("/check-runs"):
+            page = int(request.url.params.get("page", "1"))
+            runs = (
+                [
+                    {
+                        "name": f"check-{index}",
+                        "status": "completed",
+                        "conclusion": "success",
+                    }
+                    for index in range(100)
+                ]
+                if page == 1
+                else [
+                    {
+                        "name": "late-failure",
+                        "status": "completed",
+                        "conclusion": "failure",
+                    }
+                ]
+            )
+            return httpx.Response(200, json={"check_runs": runs})
+        return httpx.Response(404)
+
+    monkeypatch.setenv("AGENT_DISPATCH_GITHUB_TOKEN", "test-github-token")
+    get_settings.cache_clear()
+    enrichment = GitHubEnricher(
+        get_settings(), transport=httpx.MockTransport(handler)
+    ).enrich(
+        repository_url="https://github.com/CzechowskiT/twin",
+        branch_name="feat/artifacts",
+        pr_url="https://github.com/CzechowskiT/twin/pull/42",
+        expected_artifacts=_expected("Create a PR and run CI"),
+        expected_base_branch="cursor/phase1-monorepo-scaffold",
+    )
+    assert enrichment.verified_artifacts["ci_passed"] is False
+    assert enrichment.attention_reason == "expected_ci_missing"
+    assert enrichment.raw["ci_check_run_pages"] == 2
+
+
 def test_github_api_error_is_reconcile_failed(dispatch_client, monkeypatch):
     monkeypatch.setenv("AGENT_DISPATCH_GITHUB_TOKEN", "test-github-token")
     get_settings.cache_clear()
@@ -1355,6 +1675,70 @@ def test_regression_artifact_is_verified(dispatch_client, monkeypatch):
     )
     assert enrichment.ok is True
     assert enrichment.verified_artifacts["regression_passed"] is True
+
+
+def test_missing_production_regression_never_succeeds(dispatch_client, monkeypatch):
+    enrichment = _github_enricher(dispatch_client, monkeypatch, ci="success").enrich(
+        repository_url="https://github.com/CzechowskiT/twin",
+        branch_name="feat/artifacts",
+        pr_url="https://github.com/CzechowskiT/twin/pull/42",
+        expected_artifacts=_expected("Create a PR, run CI and a regression test"),
+    )
+    assert enrichment.verified_artifacts["regression_passed"] is False
+    assert enrichment.attention_reason == "expected_regression_missing"
+
+
+def test_full_success_report_contains_verified_delivery_evidence(
+    dispatch_client, monkeypatch
+):
+    client, db = dispatch_client
+    created = client.post(
+        "/api/internal/agent-dispatch/runs",
+        headers=_auth(),
+        json=_create_payload(
+            prompt=(
+                "Create a PR, run CI, manually merge it, deploy production, "
+                "and run regression."
+            ),
+            idempotency_key="full-artifact-success",
+        ),
+    ).json()
+    from app.database.models import AgentDispatchRun
+    from app.services.agent_dispatch import service as svc
+
+    run = db.get(AgentDispatchRun, created["id"])
+    run.result_branch = "feat/artifacts"
+    run.result_pr_url = "https://github.com/CzechowskiT/twin/pull/42"
+    db.commit()
+    complete = _verified(
+        pr_exists=True,
+        merge_verified=True,
+        deployment_verified=True,
+        ci_passed=True,
+        regression_passed=True,
+        commit_exists=True,
+        head_sha_verified=True,
+    )
+
+    class CompleteGitHub:
+        def __init__(self, settings):
+            pass
+
+        def enrich(self, **kwargs):
+            return _enrichment(complete, reason=None)
+
+    monkeypatch.setattr(svc, "GitHubEnricher", CompleteGitHub)
+    result = svc.finalize_with_github(db, get_settings(), run.id)
+    report = svc.run_report_dict(db, run.id)["report"]
+    handoff = svc.get_run_handoff(db, run.id)
+    assert result.status == report["final_status"] == "succeeded"
+    assert report["merge_sha"] == "b" * 40
+    assert report["deployment_sha"] == "b" * 40
+    assert report["deployment_ids"] == [7, 8]
+    assert report["regression_status"] == "success"
+    assert all(report["verified_artifacts"].values())
+    assert handoff["final_status"] == "succeeded"
+    assert handoff["result"]["deployment_id"] == 7
 
 
 def test_reconcile_error_returns_reason_code(dispatch_client, monkeypatch):

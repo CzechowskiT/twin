@@ -28,6 +28,7 @@ from app.services.agent_dispatch.auth import (
     require_scope,
     resolve_principal,
 )
+from app.services.agent_dispatch.artifacts import artifact_outcome
 from app.services.agent_dispatch.constants import (
     AGENT_DISPATCH_SCOPE_ADMIN,
     AGENT_DISPATCH_SCOPE_CANCEL,
@@ -72,6 +73,32 @@ def _secret_fp(value: str) -> str | None:
     if not raw:
         return None
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:12]
+
+
+def _artifact_gate_canary() -> dict[str, str | None]:
+    expected = {
+        "pr_required": True,
+        "merge_required": True,
+        "deployment_required": True,
+        "ci_required": True,
+        "regression_required": True,
+        "commit_required": True,
+    }
+    verified = {
+        "pr_exists": True,
+        "merge_verified": True,
+        "deployment_verified": False,
+        "ci_passed": True,
+        "regression_passed": True,
+        "commit_exists": True,
+        "head_sha_verified": True,
+    }
+    status_value, reason = artifact_outcome(expected, verified)
+    return {
+        "status": status_value,
+        "reason_code": reason,
+        "missing_artifact": "deployment_verified",
+    }
 
 
 @router.get("/health")
@@ -129,6 +156,7 @@ def dispatcher_health(
         "base_branch_allowlist_configured": bool(
             (settings.agent_dispatch_base_branch_allowlist or "").strip()
         ),
+        "artifact_gate_canary": _artifact_gate_canary(),
     }
 
 
