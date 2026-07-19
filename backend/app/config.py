@@ -485,6 +485,17 @@ class Settings(BaseSettings):
     founder_command_default_autonomy_level: int = 3
     founder_command_poll_interval_seconds: int = 20
 
+    # Custom GPT Actions — TWIN Product Operator (Railway-only secret; never frontend/Vercel)
+    chatgpt_twin_actions_api_key: str = ""
+    chatgpt_twin_actions_api_keys: str = ""  # optional comma-separated rotatable keys
+    chatgpt_twin_actions_enabled: bool = True
+    chatgpt_twin_actions_min_key_bytes: int = 32  # ≥256-bit
+    chatgpt_twin_default_autonomy_level: int = 3
+    chatgpt_twin_default_max_batches: int = 5
+    chatgpt_twin_default_max_runtime_minutes: int = 360
+    chatgpt_twin_default_approval_policy: str = "founder_decisions_and_high_risk_only"
+    chatgpt_twin_privacy_policy_url: str = "https://twin-sooty.vercel.app/privacy#custom-gpt-actions"
+
 
     @property
     def cors_origin_list(self) -> list[str]:

@@ -57,3 +57,9 @@ We use **strictly necessary** storage for authentication, security, and language
 ## Contact
 
 Use the contact method shown on the website for privacy requests.
+
+---
+
+## Custom GPT Actions (founder / operator) {#custom-gpt-actions}
+
+TWIN may expose a **private Custom GPT** (“TWIN Product Operator”) that calls our HTTPS Actions API with a long-lived **API key** stored only in the operator’s ChatGPT GPT configuration and in our backend secret store (Railway). This is **not** a public GPT Store app and is **not** an MCP connector. Action responses omit secrets, full Product Agent prompts, and raw logs. Rotate the Railway key to revoke access.
