@@ -7,7 +7,7 @@ import json
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.config import get_settings
@@ -67,6 +67,18 @@ def _csrf(client: TestClient) -> dict[str, str]:
     assert r.status_code == 200
     token = r.json()["csrf_token"]
     return {**_auth(), "X-CSRF-Token": token, "Content-Type": "application/json"}
+
+
+def _keep_founder_command_queued(
+    session: Session,
+    _settings: object,
+    command_id: str,
+    **_kwargs: object,
+) -> None:
+    command = session.get(FounderCommand, command_id)
+    command.status = "queued"
+    command.current_stage = "resolve_state"
+    session.flush()
 
 
 def test_planner_analysis_preserves_false_flags():
@@ -334,7 +346,7 @@ def test_ci_gated_deploy_command_does_not_wait_for_approval(founder_client, monk
     client, db = founder_client
     monkeypatch.setattr(
         "app.services.founder_command.service.tick_command",
-        lambda *_args, **_kwargs: None,
+        _keep_founder_command_queued,
     )
     monkeypatch.setattr(
         "app.tasks.founder_command_tasks.tick_founder_command.delay",
