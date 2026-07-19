@@ -2,8 +2,11 @@
 export const FOUNDER_COMMAND_MESSAGES_EN = {
   title: "Founder Command Center",
   subtitle: "Set direction. Approve decisions. Read short summaries with links — no copy-paste.",
-  tokenLabel: "Founder token",
-  tokenHint: "Uses FOUNDER_COMMAND_TOKEN or OPS_ADMIN_TOKEN. Stored only in this browser session.",
+  sessionReady: "Signed in as founder — Start is ready.",
+  sessionChecking: "Checking founder session…",
+  redirectingLogin: "Redirecting to login…",
+  forbidden:
+    "This account is not on the founder allowlist. Sign in with a founder account or ask ops to update FOUNDER_COMMAND_ALLOWLIST.",
   directionLabel: "Direction",
   directionPlaceholder:
     "e.g. Run a safe diagnostic batch and continue until full PASS — preserve Gate F and Launch GO.",
@@ -41,20 +44,25 @@ export const FOUNDER_COMMAND_MESSAGES_EN = {
   cursorAgent: "Cursor Agent",
   pullRequest: "Pull request",
   dispatchRun: "Dispatch run",
+  commandId: "Command ID",
   loading: "Loading…",
-  errorAuth: "Auth failed — check founder token.",
+  starting: "Starting command…",
+  successStarted: "Command started.",
+  errorAuth: "Session expired or not authorized — sign in again.",
+  errorForbidden: "Forbidden — founder allowlist required.",
   errorGeneric: "Request failed.",
-  csrfReady: "CSRF ready",
-  saved: "Session token saved",
+  errorApi: "API error",
 } as const;
 
 export const FOUNDER_COMMAND_MESSAGES_PL = {
   title: "Centrum Dowodzenia Foundera",
   subtitle:
     "Ustaw kierunek. Akceptuj decyzje. Czytaj krótkie podsumowania z linkami — bez kopiowania promptów.",
-  tokenLabel: "Token foundera",
-  tokenHint:
-    "Używa FOUNDER_COMMAND_TOKEN albo OPS_ADMIN_TOKEN. Zapisywany tylko w sesji tej przeglądarki.",
+  sessionReady: "Zalogowano jako founder — Start jest gotowy.",
+  sessionChecking: "Sprawdzanie sesji foundera…",
+  redirectingLogin: "Przekierowanie do logowania…",
+  forbidden:
+    "To konto nie jest na liście founderów. Zaloguj się kontem foundera albo poproś ops o aktualizację FOUNDER_COMMAND_ALLOWLIST.",
   directionLabel: "Kierunek",
   directionPlaceholder:
     "np. Wykonaj bezpieczny diagnostyczny batch i kontynuuj do pełnego PASS — zachowaj Gate F i Launch GO.",
@@ -92,9 +100,12 @@ export const FOUNDER_COMMAND_MESSAGES_PL = {
   cursorAgent: "Cursor Agent",
   pullRequest: "Pull request",
   dispatchRun: "Dispatch run",
+  commandId: "ID polecenia",
   loading: "Ładowanie…",
-  errorAuth: "Błąd autoryzacji — sprawdź token foundera.",
+  starting: "Uruchamianie polecenia…",
+  successStarted: "Polecenie uruchomione.",
+  errorAuth: "Sesja wygasła lub brak autoryzacji — zaloguj się ponownie.",
+  errorForbidden: "Brak dostępu — wymagana lista founderów.",
   errorGeneric: "Żądanie nie powiodło się.",
-  csrfReady: "CSRF gotowy",
-  saved: "Token sesji zapisany",
+  errorApi: "Błąd API",
 } as const;
