@@ -297,7 +297,9 @@ def build_funnel_snapshot(
     }
 
 
-def build_cohort_retention(db: Session, *, weeks: int = 8) -> dict[str, Any]:
+def build_cohort_retention(
+    db: Session, *, weeks: int = 8, include_test_accounts: bool = False
+) -> dict[str, Any]:
     """Signup-week cohorts with D7/D30 activity readiness from funnel events + proxies.
 
     D7 retained = user emitted any funnel event (excl. signup) within 7 days of signup,
@@ -305,11 +307,12 @@ def build_cohort_retention(db: Session, *, weeks: int = 8) -> dict[str, Any]:
     """
     now = datetime.utcnow()
     cutoff = now - timedelta(weeks=max(1, min(weeks, 26)))
-    users = (
-        db.query(User.id, User.created_at, User.onboarding_completed_at)
-        .filter(User.created_at >= cutoff)
-        .all()
+    q = db.query(User.id, User.created_at, User.onboarding_completed_at).filter(
+        User.created_at >= cutoff
     )
+    if not include_test_accounts:
+        q = q.filter(User.exclude_from_product_metrics.is_(False))
+    users = q.all()
     cohorts: dict[str, dict[str, Any]] = {}
     for uid, created, onboarded_at in users:
         key = _signup_week(created) or "unknown"
@@ -368,6 +371,7 @@ def build_cohort_retention(db: Session, *, weeks: int = 8) -> dict[str, Any]:
     return {
         "cohorts": rows,
         "weeks_requested": weeks,
+        "test_accounts_excluded": not include_test_accounts,
         "definition": {
             "d7": "Any non-signup funnel event or onboarding_completed within 7 days of signup",
             "d30": "Same within 30 days of signup",
