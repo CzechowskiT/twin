@@ -20,7 +20,7 @@ DEFAULT_MAX_ACTIVE_RUNS = 1
 GATE_F_STATUS = "PENDING"
 LAUNCH_STANCE = "NO-GO"
 # Aligned public-health after #526 cohort readiness (update on each aligned deploy).
-KNOWN_PROD_SHA_HINT = "f9b792fd5f23474f1231c27ba7743c7250a4a47f"
+KNOWN_PROD_SHA_HINT = "42c3ace5253e435a2b7a1301c09b8905672e2853"
 
 
 class AutonomyLevel(int, Enum):

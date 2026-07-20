@@ -6,11 +6,11 @@
 | Field | Value |
 |-------|-------|
 | Date | 2026-07-20 |
-| repo_head | (update after Wave 0 merge) |
-| prod_frontend_commit | `f9b792fd…` (#526 aligned — re-verify after Wave 0 deploy) |
-| prod_api_commit | `f9b792fd…` (#526 aligned — re-verify after Wave 0 deploy) |
-| alignment_status | **ALIGNED** at #526; Wave 0 pending this PR |
-| docs_only_drift | false at baseline `f9b792fd`; expect brief drift during Wave 0 roll |
+| repo_head | `42c3ace5253e435a2b7a1301c09b8905672e2853` (Wave 0 #527) |
+| prod_frontend_commit | `42c3ace5…` (public-health aligned) |
+| prod_api_commit | `42c3ace5…` (public-health aligned) |
+| alignment_status | **ALIGNED** |
+| docs_only_drift | false |
 | Pilot | **BLOCKED_BY_FOUNDER** |
 | Gate F | **PENDING** |
 | Launch | **NO-GO** |
@@ -22,6 +22,7 @@
 | Funnel | PR **#523** LIVE |
 | Activation TTV | PR **#524** LIVE (flag-gated UX) |
 | Activation cohort registry | #526 / Alembic **086** — infra only; **no real invites** |
+| Platform foundations | Wave 0 #527 / Alembic **087** — INTERNAL (no product LIVE claim) |
 | Productionization plan | [`FULL_PRODUCT_PRODUCTIONIZATION_PLAN.md`](./FULL_PRODUCT_PRODUCTIONIZATION_PLAN.md) |
 | Hard LIVE | [`HARD_LIVE_DEFINITION_30.md`](./HARD_LIVE_DEFINITION_30.md) |
 | Pilot decision | [`PILOT_FOUNDER_BLOCK_DECISION_2026-07-20.md`](./PILOT_FOUNDER_BLOCK_DECISION_2026-07-20.md) |

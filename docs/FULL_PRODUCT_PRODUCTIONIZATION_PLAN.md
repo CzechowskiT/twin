@@ -161,7 +161,7 @@ Monetization/Stripe public and ATS live-sync remain **outside** waves until expl
 - [x] Capability map / unicorn / flag registry / decision record aligned
 - [x] Non-LIVE production actions gated (preview/demo/flag)
 - [x] Platform foundations migration + API + tests
-- [ ] PR CI green + merge + prod smoke + map recalibration (evidence in PR)
+- [x] PR #527 CI green + merge `42c3ace5` + Railway BE+worker + Vercel + public-health smoke + enrollment-gate
 
 ## 10. Next batch after Wave 0
 
