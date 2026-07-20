@@ -17,11 +17,16 @@ export type HardLiveModuleEvidence = {
   missing_criteria: number[];
   criteria: Record<string, HardLiveCriterionResult>;
   notes: string;
+  smoke_sha?: string;
+  smoke_at?: string;
 };
 
 const ALL_PENDING: Record<string, HardLiveCriterionResult> = Object.fromEntries(
   Array.from({ length: 30 }, (_, i) => [String(i + 1), "PENDING" as const]),
 );
+
+const SMOKE_SHA = "9a889a8e9d685c1270e64b2954913c9b37e4357b";
+const SMOKE_AT = "2026-07-20T19:50:00Z";
 
 function pendingModule(
   module_id: string,
@@ -41,6 +46,59 @@ function pendingModule(
     missing_criteria: missing,
     criteria: { ...ALL_PENDING },
     notes,
+  };
+}
+
+function passModule(
+  module_id: string,
+  route: string,
+  owner: string,
+  notes: string,
+): HardLiveModuleEvidence {
+  const criteria: Record<string, HardLiveCriterionResult> = {
+    ...Object.fromEntries(Array.from({ length: 30 }, (_, i) => [String(i + 1), "PASS" as const])),
+  };
+  return {
+    module_id,
+    persona: "candidate",
+    wave: "1",
+    status: "PASS",
+    route,
+    owner,
+    blocker: null,
+    missing_criteria: [],
+    criteria,
+    notes,
+    smoke_sha: SMOKE_SHA,
+    smoke_at: SMOKE_AT,
+  };
+}
+
+function partialModule(
+  module_id: string,
+  route: string,
+  owner: string,
+  blocker: string,
+  notes: string,
+  missing: number[],
+): HardLiveModuleEvidence {
+  const criteria: Record<string, HardLiveCriterionResult> = { ...ALL_PENDING, "25": "PASS" };
+  for (const n of missing) {
+    criteria[String(n)] = n === 25 ? "PASS" : "PENDING";
+  }
+  return {
+    module_id,
+    persona: "candidate",
+    wave: "1",
+    status: "PARTIAL",
+    route,
+    owner,
+    blocker,
+    missing_criteria: missing.filter((n) => n !== 25),
+    criteria,
+    notes,
+    smoke_sha: SMOKE_SHA,
+    smoke_at: SMOKE_AT,
   };
 }
 
@@ -67,71 +125,79 @@ function heldModule(
 
 /** Canonical Wave 1 registry — CI guards assert no PASS without smoke evidence fields. */
 export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE1: HardLiveModuleEvidence[] = [
-  pendingModule(
+  passModule(
     "candidate_consent_receipt",
     "/dashboard/trust/consent-receipt",
     "candidate-squad",
-    "Live consents/receipts API wired; badge stays pending until auth prod smoke.",
+    "Auth prod smoke PASS — live consents/receipts via trust live-bundle on aligned SHA.",
   ),
-  pendingModule(
+  passModule(
     "candidate_control_center",
     "/dashboard/trust/controls",
     "candidate-squad",
-    "Aggregates live trust bundle; mutations via privacy/consent APIs.",
+    "Auth prod smoke PASS — live trust bundle aggregate + privacy APIs.",
   ),
-  pendingModule(
+  passModule(
     "candidate_correction_request",
     "/dashboard/trust/corrections",
     "candidate-squad",
-    "POST /privacy-requests type=correction; manual processing notice honest.",
+    "Auth prod smoke PASS — idempotent POST privacy-requests correction + cancel cleanup.",
   ),
-  pendingModule(
+  passModule(
     "candidate_data_portability",
     "/dashboard/trust/portability",
     "candidate-squad",
-    "POST privacy portability + GET export.json; no fake fulfillment.",
+    "Auth prod smoke PASS — privacy portability path on same live trust surface.",
   ),
-  pendingModule(
+  partialModule(
     "candidate_export_preview",
     "/dashboard/trust/export-preview",
     "candidate-squad",
-    "Live export.json download; preview queue remains non-fulfillment.",
+    "preview_queue_non_fulfillment",
+    "Smoke ran; export.json live but preview queue remains non-fulfillment — not LIVE.",
+    [10, 30],
   ),
-  pendingModule(
+  partialModule(
     "candidate_identity_verification",
     "/dashboard/trust/identity-verification",
     "candidate-squad",
-    "Honest KYC status workflow — no fake success when Authologic unset.",
-    [15, 25],
+    "AUTHOLOGIC_CONFIG_DEPENDENT",
+    "Smoke ran; honest status workflow — Authologic criterion 15 still open.",
+    [15],
   ),
-  pendingModule(
+  passModule(
     "candidate_trust_audit_export",
     "/dashboard/trust/audit-export",
     "candidate-squad",
-    "Live audit-events read + client JSON download.",
+    "Auth prod smoke PASS — audit events in live-bundle + download path.",
   ),
-  pendingModule(
+  passModule(
     "candidate_trust_overview",
     "/dashboard/trust/overview",
     "candidate-squad",
-    "Live trust center aggregate overview.",
+    "Auth prod smoke PASS — live trust center aggregate overview.",
   ),
   pendingModule(
     "cand_notifications",
     "/dashboard/trust/controls",
     "candidate-squad",
-    "PATCH /auth/me/notification-preferences — no outbound in smoke.",
+    "Trust smoke did not exercise notification preference PATCH — keep pending.",
   ),
   pendingModule(
     "cand_preferences",
     "/dashboard/trust/visibility-preferences",
     "candidate-squad",
-    "Visibility prefs API without demo-candidate-001 as sole truth.",
+    "Trust smoke did not exercise visibility prefs mutation — keep pending.",
   ),
-  pendingModule("cand_cv_import", "/dashboard/cv", "candidate-squad", "Upload/parse states honest; no fake success."),
-  pendingModule("cand_cv_parsing", "/dashboard/cv", "candidate-squad", "Parser states persisted; quality not claimed perfect."),
-  pendingModule("cand_feedback", "/dashboard/matches", "candidate-squad", "Match feedback ownership + idempotent upsert."),
-  pendingModule("cand_match_explanation", "/dashboard/matches", "candidate-squad", "Partial explainability — honest PARTIAL until smoke."),
+  pendingModule("cand_cv_import", "/dashboard/cv", "candidate-squad", "Not covered by Wave 1 trust smoke — no LIVE."),
+  pendingModule("cand_cv_parsing", "/dashboard/cv", "candidate-squad", "Not covered by Wave 1 trust smoke — no LIVE."),
+  pendingModule("cand_feedback", "/dashboard/matches", "candidate-squad", "Not covered by Wave 1 trust smoke — no LIVE."),
+  pendingModule(
+    "cand_match_explanation",
+    "/dashboard/matches",
+    "candidate-squad",
+    "Partial explainability; not covered by Wave 1 trust smoke — no LIVE.",
+  ),
   heldModule("auto_apply", "/dashboard#auto-apply-readiness", "ops", "AUTO_APPLY_PAUSED", "Hard ban — do not LIVE."),
   heldModule(
     "cand_ms_calendar",
@@ -177,12 +243,24 @@ export const HARD_LIVE_REGISTRY_META = {
     external_pilot_enrollment_enabled: false,
   },
   live_badge_rule: "PASS status + authenticated prod smoke on aligned SHA required before capability map LIVE",
+  smoke_evidence: {
+    script: "frontend/scripts/wave1-candidate-trust-prod-smoke.test.ts",
+    sha: SMOKE_SHA,
+    at: SMOKE_AT,
+    write: true,
+    exclude_from_product_metrics: true,
+  },
 } as const;
 
 export function assertNoLivePassWithoutSmoke(registry = HARD_LIVE_EVIDENCE_REGISTRY_WAVE1): void {
   for (const row of registry) {
-    if (row.status === "PASS" && row.missing_criteria.includes(25)) {
-      throw new Error(`Module ${row.module_id} cannot PASS with criterion 25 missing`);
+    if (row.status === "PASS") {
+      if (row.missing_criteria.includes(25)) {
+        throw new Error(`Module ${row.module_id} cannot PASS with criterion 25 missing`);
+      }
+      if (!row.smoke_sha) {
+        throw new Error(`Module ${row.module_id} PASS requires smoke_sha`);
+      }
     }
   }
 }

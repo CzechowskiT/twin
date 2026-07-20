@@ -22,7 +22,7 @@
 | Activation TTV proof | **LIVE** (flag-gated) — PR [#524](https://github.com/CzechowskiT/twin/pull/524) |
 | Activation cohort registry | **LIVE infra** (#526 / Alembic 086) — **no real invites** |
 | Deploy alignment (baseline) | **ALIGNED** @ `9a889a8e…` (Wave 1 #528; public-health) |
-| Candidate Wave 1 | **PARTIAL** — live trust path + Hard LIVE registry; LIVE badges deferred (auth smoke pending JWT) |
+| Candidate Wave 1 | **PARTIAL→DONE trust LIVE** — auth smoke PASS; **6** trust modules **LIVE**; export/identity **PARTIAL**; cand_* still pending; policy holds unchanged |
 | Productionization | [`FULL_PRODUCT_PRODUCTIONIZATION_PLAN.md`](./FULL_PRODUCT_PRODUCTIONIZATION_PLAN.md) · Hard LIVE [`HARD_LIVE_DEFINITION_30.md`](./HARD_LIVE_DEFINITION_30.md) |
 
 **This roadmap does not flip Gate F / Launch / Phase 3B / Pilot enrollment.**
@@ -31,7 +31,7 @@
 
 TWIN has a real MVP surface (candidate matches + applications + Google calendar + recruiter inbox) plus **LIVE** funnel/activation instrumentation (#523/#524/#526 registry). **Founder hard block:** external pilot is **BLOCKED_BY_FOUNDER** until **all user-facing modules** meet Hard LIVE 30 — do **not** recruit real users, do **not** recommend Gate F PASS, do **not** declare PMF. Moat candidates remain: acceptance-ready calendar loop + placement verification state machine. Enterprise Deal Intelligence (Karwatka) stays **P2–P3**.
 
-**Dates for all required user-facing modules LIVE** (velocity model in productionization plan; Wave 1 PARTIAL 2026-07-20): optimistic **2026-10-19** · realistic **2027-01-19** · conservative **2027-07-05**.
+**Dates for all required user-facing modules LIVE** (velocity model in productionization plan; Wave 1 trust LIVE slice 2026-07-20): optimistic **2026-10-19** · realistic **2027-01-19** · conservative **2027-07-05**.
 
 **Sole prioritized roadmap:** this file. `docs/PRODUCT_ROADMAP.md` is historical context only.
 
