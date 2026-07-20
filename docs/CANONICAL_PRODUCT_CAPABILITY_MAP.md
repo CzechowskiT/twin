@@ -6,9 +6,9 @@
 | Field | Value |
 |-------|-------|
 | Date | 2026-07-20 |
-| repo_head | `42c3ace5253e435a2b7a1301c09b8905672e2853` (Wave 0 #527) |
-| prod_frontend_commit | `42c3ace5…` (public-health aligned) |
-| prod_api_commit | `42c3ace5…` (public-health aligned) |
+| repo_head | `9a889a8e9d685c1270e64b2954913c9b37e4357b` (Wave 1 #528) |
+| prod_frontend_commit | `9a889a8e…` (public-health aligned) |
+| prod_api_commit | `9a889a8e…` (public-health aligned) |
 | alignment_status | **ALIGNED** |
 | docs_only_drift | false |
 | Pilot | **BLOCKED_BY_FOUNDER** |
@@ -23,7 +23,7 @@
 | Activation TTV | PR **#524** LIVE (flag-gated UX) |
 | Activation cohort registry | #526 / Alembic **086** — infra only; **no real invites** |
 | Platform foundations | Wave 0 #527 / Alembic **087** — INTERNAL (no product LIVE claim) |
-| Candidate Wave 1 | Live trust path + Hard LIVE registry + Alembic **088** — **PARTIAL**; capability LIVE badges **deferred** until authenticated prod smoke PASS |
+| Candidate Wave 1 | #528 / Alembic **088** — **PARTIAL**; live trust path deployed; LIVE badges **deferred** (auth smoke JWT unset) |
 | Hard LIVE evidence | [`HARD_LIVE_EVIDENCE_REGISTRY.json`](./HARD_LIVE_EVIDENCE_REGISTRY.json) · TS `hard-live-evidence-registry.ts` |
 | Productionization plan | [`FULL_PRODUCT_PRODUCTIONIZATION_PLAN.md`](./FULL_PRODUCT_PRODUCTIONIZATION_PLAN.md) |
 | Hard LIVE | [`HARD_LIVE_DEFINITION_30.md`](./HARD_LIVE_DEFINITION_30.md) |

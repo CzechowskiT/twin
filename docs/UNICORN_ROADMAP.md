@@ -21,7 +21,8 @@
 | Funnel instrumentation | **LIVE** — PR [#523](https://github.com/CzechowskiT/twin/pull/523) |
 | Activation TTV proof | **LIVE** (flag-gated) — PR [#524](https://github.com/CzechowskiT/twin/pull/524) |
 | Activation cohort registry | **LIVE infra** (#526 / Alembic 086) — **no real invites** |
-| Deploy alignment (baseline) | **ALIGNED** @ `42c3ace5…` (Wave 0 #527; public-health) |
+| Deploy alignment (baseline) | **ALIGNED** @ `9a889a8e…` (Wave 1 #528; public-health) |
+| Candidate Wave 1 | **PARTIAL** — live trust path + Hard LIVE registry; LIVE badges deferred (auth smoke pending JWT) |
 | Productionization | [`FULL_PRODUCT_PRODUCTIONIZATION_PLAN.md`](./FULL_PRODUCT_PRODUCTIONIZATION_PLAN.md) · Hard LIVE [`HARD_LIVE_DEFINITION_30.md`](./HARD_LIVE_DEFINITION_30.md) |
 
 **This roadmap does not flip Gate F / Launch / Phase 3B / Pilot enrollment.**
