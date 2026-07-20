@@ -1,9 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { CandidateTrustRequestStatusLoader } from "@/components/candidate/candidate-trust-request-status-loader";
+import { CandidateTrustLivePrivacyForm } from "@/components/candidate/candidate-trust-live-privacy-form";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
@@ -17,9 +20,14 @@ import {
 } from "@/lib/candidate-data-portability";
 import { candidateConsentReceiptHref } from "@/lib/candidate-consent-receipt";
 import { candidateTrustAuditExportHref } from "@/lib/candidate-trust-audit-export";
+import { fetchTrustLiveBundle, isDemoFixtureCandidateId, MY_DATA_EXPORT_JSON_PATH } from "@/lib/candidate-trust-live";
+import { apiFetch } from "@/lib/api";
+import { getToken } from "@/lib/auth";
+import { saveBlobAsFile } from "@/lib/api";
 import type { TranslationKey } from "@/lib/i18n";
 import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 import { NonLiveMutationBanner } from "@/components/workspace/non-live-mutation-banner";
+import { isDemoOrDevSurface } from "@/lib/production-action-gates";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -75,8 +83,22 @@ function DataPortabilityNotFound() {
   );
 }
 
-function DataPortabilityContent({ record }: { record: CandidateDataPortabilityRecord }) {
+function DataPortabilityContent({
+  record,
+  livePath,
+}: {
+  record: CandidateDataPortabilityRecord;
+  livePath: boolean;
+}) {
   const { t } = useTranslation();
+
+  const downloadMyData = async () => {
+    const token = getToken();
+    if (!token) return;
+    const data = await apiFetch<Record<string, unknown>>(MY_DATA_EXPORT_JSON_PATH, {}, token);
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json;charset=utf-8" });
+    saveBlobAsFile(blob, "twin-my-data.json");
+  };
 
   return (
     <Shell wide rail>
@@ -116,7 +138,23 @@ function DataPortabilityContent({ record }: { record: CandidateDataPortabilityRe
               </span>
             </div>
           </div>
-          <NonLiveMutationBanner kind="sample_only" />
+          {livePath ? null : <NonLiveMutationBanner kind="sample_only" />}
+          {livePath ? (
+            <div className="space-y-3">
+              <CandidateTrustLivePrivacyForm
+                requestType="portability"
+                testId="candidate-portability-live-form"
+              />
+              <button
+                type="button"
+                className="twin-btn-secondary twin-touch-target"
+                data-testid="candidate-portability-download-json"
+                onClick={() => void downloadMyData()}
+              >
+                {t("candidateTrustLive.downloadMyData")}
+              </button>
+            </div>
+          ) : null}
           <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
             <Link
               href={CANDIDATE_DATA_PORTABILITY_SAFE_LINKS.trustCenter}
@@ -360,7 +398,80 @@ type CandidateDataPortabilityWorkspaceProps = {
 };
 
 export function CandidateDataPortabilityWorkspace({ candidateId }: CandidateDataPortabilityWorkspaceProps) {
-  const record = resolveCandidateDataPortability(candidateId);
-  if (!record) return <DataPortabilityNotFound />;
-  return <DataPortabilityContent record={record} />;
+  const router = useRouter();
+  const { t } = useTranslation();
+  const [loading, setLoading] = useState(true);
+  const [livePath, setLivePath] = useState(false);
+  const [record, setRecord] = useState<CandidateDataPortabilityRecord | null>(null);
+
+  const load = useCallback(async () => {
+    if (isDemoFixtureCandidateId(candidateId) && isDemoOrDevSurface()) {
+      setRecord(resolveCandidateDataPortability(candidateId));
+      setLivePath(false);
+      setLoading(false);
+      return;
+    }
+    const token = getToken();
+    if (!token) {
+      router.replace("/login/candidate");
+      return;
+    }
+    setLoading(true);
+    try {
+      const bundle = await fetchTrustLiveBundle(token);
+      const base = resolveCandidateDataPortability() ?? resolveCandidateDataPortability("demo-candidate-001");
+      if (!base) {
+        setRecord(null);
+      } else {
+        setRecord({
+          ...base,
+          id: String(bundle.candidate_id),
+          display_name: bundle.display_name,
+          headline: bundle.trust.twin_knows_summary,
+          last_reviewed_at: bundle.generated_at,
+          portability_label: "LIVE_PATH",
+        });
+      }
+      setLivePath(true);
+    } catch {
+      if (isDemoOrDevSurface()) {
+        setRecord(resolveCandidateDataPortability(candidateId));
+        setLivePath(false);
+      } else {
+        setRecord(null);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [candidateId, router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  if (loading) {
+    return (
+      <Shell wide rail>
+        <div data-testid="candidate-portability-loading" className="space-y-4 p-6">
+          <div className="h-8 w-48 animate-pulse rounded bg-[var(--twin-border)]/60" />
+          <div className="h-32 animate-pulse rounded bg-[var(--twin-border)]/40" />
+        </div>
+      </Shell>
+    );
+  }
+
+  if (!record) {
+    return (
+      <Shell wide rail>
+        <div className="space-y-4 p-6">
+          <p className="text-sm text-[var(--twin-muted-strong)]">{t("candidateDataPortability.notFoundMessage")}</p>
+          <button type="button" className="twin-btn-secondary twin-touch-target" onClick={() => void load()}>
+            {t("candidateDataPortability.notFoundCta")}
+          </button>
+        </div>
+      </Shell>
+    );
+  }
+
+  return <DataPortabilityContent record={record} livePath={livePath} />;
 }

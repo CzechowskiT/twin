@@ -96,6 +96,7 @@ from app.services.candidate_privacy_request_service import (
 from app.services.candidate_account_deletion import execute_candidate_account_deletion
 from app.services.candidate_trust_audit_service import list_trust_audit_events
 from app.services.candidate_trust_center_service import build_trust_center
+from app.services import candidate_wave1 as wave1
 from app.schemas.acceptance_queue import AcceptanceQueueOut, AcceptanceRespondIn
 from app.schemas.job_match_feedback import (
     JobMatchFeedbackIn,
@@ -1063,6 +1064,30 @@ def get_trust_audit_events(
     return TrustAuditEventListOut.model_validate(
         list_trust_audit_events(db, candidate_id=candidate.id, limit=limit, offset=offset)
     )
+
+
+@router.get("/me/trust/activity-timeline")
+def get_trust_activity_timeline(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+    limit: int = Query(default=50, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+) -> dict:
+    """Honest alias — same persistence as audit-events (Wave 1 path fix)."""
+    candidate = _get_candidate_or_404(db, user.id)
+    return wave1.build_activity_timeline(db, candidate_id=candidate.id, limit=limit, offset=offset)
+
+
+@router.get("/me/trust/live-bundle")
+def get_trust_live_bundle(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    """Wave 1 aggregated live trust payload — no demo fixtures."""
+    candidate = _get_candidate_or_404(db, user.id)
+    row = db.query(User).filter(User.id == user.id).first()
+    assert row is not None
+    return wave1.build_live_trust_bundle(db, candidate=candidate, user=row)
 
 
 @router.get("/referrals/resolve", response_model=CandidateReferralResolveOut)

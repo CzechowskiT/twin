@@ -2117,3 +2117,26 @@ class CommunicationOutbox(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     sent_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
+
+class HardLiveEvidenceRecord(Base):
+    """Machine-readable Hard LIVE 30 evidence per module — Wave 1+."""
+
+    __tablename__ = "hard_live_evidence_records"
+    __table_args__ = (UniqueConstraint("module_id", name="uq_hard_live_evidence_module"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    module_id: Mapped[str] = mapped_column(String(128), index=True)
+    persona: Mapped[str] = mapped_column(String(32), default="candidate", index=True)
+    wave: Mapped[str] = mapped_column(String(16), default="1", index=True)
+    status: Mapped[str] = mapped_column(String(32), default="PENDING", index=True)
+    criteria_json: Mapped[str] = mapped_column(Text, default="{}")
+    blocker: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    owner: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    smoke_sha: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    smoke_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+

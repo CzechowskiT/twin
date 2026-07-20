@@ -105,9 +105,17 @@ def create_visibility_preference(
     return _serialize(row)
 
 
-def list_visibility_preferences(db: Session, *, candidate_id: str | None = None, limit: int = 50) -> dict[str, Any]:
+def list_visibility_preferences(
+    db: Session,
+    *,
+    candidate_id: str | None = None,
+    user_id: int | None = None,
+    limit: int = 50,
+) -> dict[str, Any]:
     cap = max(1, min(limit, 100))
     query = db.query(CandidateVisibilityPreference)
+    if user_id is not None:
+        query = query.filter(CandidateVisibilityPreference.created_by_user_id == user_id)
     if candidate_id:
         query = query.filter(CandidateVisibilityPreference.candidate_id == candidate_id.strip()[:64])
     rows = query.order_by(CandidateVisibilityPreference.updated_at.desc()).limit(cap).all()

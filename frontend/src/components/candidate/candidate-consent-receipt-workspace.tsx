@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { CandidateTrustRequestStatusLoader } from "@/components/candidate/candidate-trust-request-status-loader";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
@@ -19,15 +20,19 @@ import {
   CANDIDATE_CONSENT_RECEIPT_SAFE_LINKS,
   resolveCandidateConsentReceipt,
 } from "@/lib/candidate-consent-receipt";
+import { liveBundleToConsentReceiptRecord } from "@/lib/candidate-consent-receipt-live";
 import { candidateCorrectionRequestHref } from "@/lib/candidate-correction-request";
 import { candidateDataPortabilityHref } from "@/lib/candidate-data-portability";
 import { candidateExportPreviewHref } from "@/lib/candidate-export-preview";
 import { candidateIdentityVerificationHref } from "@/lib/candidate-identity-verification";
 import { candidateRevokeDeleteHref } from "@/lib/candidate-revoke-delete";
 import { candidateTrustAuditExportHref } from "@/lib/candidate-trust-audit-export";
+import { fetchTrustLiveBundle, isDemoFixtureCandidateId } from "@/lib/candidate-trust-live";
+import { getToken } from "@/lib/auth";
 import type { TranslationKey } from "@/lib/i18n";
 import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 import { NonLiveMutationBanner } from "@/components/workspace/non-live-mutation-banner";
+import { isDemoOrDevSurface } from "@/lib/production-action-gates";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -77,7 +82,13 @@ function ConsentReceiptNotFound() {
   );
 }
 
-function ConsentReceiptContent({ record }: { record: CandidateConsentReceiptRecord }) {
+function ConsentReceiptContent({
+  record,
+  livePath,
+}: {
+  record: CandidateConsentReceiptRecord;
+  livePath: boolean;
+}) {
   const { t } = useTranslation();
   const jsonFull = useMemo(() => JSON.stringify(record.bundle, null, 2), [record.bundle]);
 
@@ -141,7 +152,7 @@ function ConsentReceiptContent({ record }: { record: CandidateConsentReceiptReco
               </span>
             </div>
           </div>
-          <NonLiveMutationBanner kind="sample_only" />
+          {livePath ? null : <NonLiveMutationBanner kind="sample_only" />}
           <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
             <Link
               href={CANDIDATE_CONSENT_RECEIPT_SAFE_LINKS.trustCenter}
@@ -387,10 +398,74 @@ function ConsentReceiptContent({ record }: { record: CandidateConsentReceiptReco
   );
 }
 
-export function CandidateConsentReceiptWorkspace() {
-  const record = resolveCandidateConsentReceipt();
-  if (!record) {
-    return <ConsentReceiptNotFound />;
+type CandidateConsentReceiptWorkspaceProps = {
+  candidateId?: string;
+};
+
+export function CandidateConsentReceiptWorkspace({ candidateId }: CandidateConsentReceiptWorkspaceProps) {
+  const router = useRouter();
+  const { t } = useTranslation();
+  const [loading, setLoading] = useState(true);
+  const [livePath, setLivePath] = useState(false);
+  const [record, setRecord] = useState<CandidateConsentReceiptRecord | null>(null);
+
+  const load = useCallback(async () => {
+    if (isDemoFixtureCandidateId(candidateId) && isDemoOrDevSurface()) {
+      setRecord(resolveCandidateConsentReceipt(candidateId));
+      setLivePath(false);
+      setLoading(false);
+      return;
+    }
+    const token = getToken();
+    if (!token) {
+      router.replace("/login/candidate");
+      return;
+    }
+    setLoading(true);
+    try {
+      const bundle = await fetchTrustLiveBundle(token);
+      setRecord(liveBundleToConsentReceiptRecord(bundle));
+      setLivePath(true);
+    } catch {
+      if (isDemoOrDevSurface()) {
+        setRecord(resolveCandidateConsentReceipt(candidateId));
+        setLivePath(false);
+      } else {
+        setRecord(null);
+        setLivePath(false);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [candidateId, router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  if (loading) {
+    return (
+      <Shell wide rail>
+        <div data-testid="candidate-consent-receipt-loading" className="space-y-4 p-6">
+          <div className="h-8 w-48 animate-pulse rounded bg-[var(--twin-border)]/60" />
+          <div className="h-32 animate-pulse rounded bg-[var(--twin-border)]/40" />
+        </div>
+      </Shell>
+    );
   }
-  return <ConsentReceiptContent record={record} />;
+
+  if (!record) {
+    return (
+      <Shell wide rail>
+        <div data-testid="candidate-consent-receipt-error" className="space-y-4 p-6">
+          <p className="text-sm text-[var(--twin-muted-strong)]">{t("candidateConsentReceipt.notFoundMessage")}</p>
+          <button type="button" className="twin-btn-secondary twin-touch-target" onClick={() => void load()}>
+            {t("candidateConsentReceipt.notFoundCta")}
+          </button>
+        </div>
+      </Shell>
+    );
+  }
+
+  return <ConsentReceiptContent record={record} livePath={livePath} />;
 }

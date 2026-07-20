@@ -43,8 +43,9 @@ def get_preferences(
     candidate_id: Annotated[str | None, Query()] = None,
     limit: Annotated[int, Query(ge=1, le=100)] = 50,
 ) -> dict:
-    _ = user
-    return list_visibility_preferences(db, candidate_id=candidate_id, limit=limit)
+    return list_visibility_preferences(
+        db, candidate_id=candidate_id, user_id=user.id, limit=limit
+    )
 
 
 @router.post("", status_code=201)
