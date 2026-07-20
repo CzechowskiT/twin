@@ -151,6 +151,19 @@ def declare_placement_intent(
     )
     db.commit()
     db.refresh(app)
+    try:
+        from app.services.product_funnel import emit_funnel_event
+
+        emit_funnel_event(
+            db,
+            event_name="placement_declared",
+            user_id=user.id,
+            properties={"application_id": app.id},
+            once=False,
+            commit=True,
+        )
+    except Exception:
+        pass
     return app
 
 
@@ -478,4 +491,19 @@ def confirm_placement_token(db: Session, raw_token: str) -> tuple[bool, str]:
         from_magic_link=True,
     )
     db.commit()
+    try:
+        from app.services.product_funnel import emit_funnel_event
+
+        cand = db.query(Candidate).filter(Candidate.id == app.candidate_id).first()
+        if cand:
+            emit_funnel_event(
+                db,
+                event_name="placement_verified",
+                user_id=cand.user_id,
+                properties={"application_id": app.id, "source": "magic_link"},
+                once=False,
+                commit=True,
+            )
+    except Exception:
+        pass
     return True, "Placement verified. Thank you."

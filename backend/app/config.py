@@ -485,6 +485,11 @@ class Settings(BaseSettings):
     founder_command_default_autonomy_level: int = 3
     founder_command_poll_interval_seconds: int = 20
 
+    # Product funnel instrumentation (server-side events → /admin/funnel + /admin/retention).
+    # Set PRODUCT_FUNNEL_EVENTS_ENABLED=false for instant rollback without migration reverse.
+    product_funnel_events_enabled: bool = True
+
+
     # Custom GPT Actions — TWIN Product Operator (Railway-only secret; never frontend/Vercel)
     chatgpt_twin_actions_api_key: str = ""
     chatgpt_twin_actions_api_keys: str = ""  # optional comma-separated rotatable keys

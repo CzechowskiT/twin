@@ -13,6 +13,9 @@
 | `RECRUITER_C5_SHIP_STATUS` | `seven-day-c5-activity-timeline.ts` | PILOT | Pilot |
 | `CANDIDATE_TIMELINE_SHIP_STATUS` | `all-modules-green-wave-candidate-activity-timeline.ts` | PILOT | Pilot |
 | `LAUNCH_STANCE` | `investor-metrics-reality.ts` | `noGo` | Public launch blocked |
+| `PRODUCT_FUNNEL_EVENTS_ENABLED` | backend `config.py` | `true` | Server funnel writes; set `false` to stop |
+| `NEXT_PUBLIC_TTV_MATCHES_REDIRECT` | `features.ts` | on unless `false` | Activation experiment → matches |
+| `NEXT_PUBLIC_PRODUCT_FUNNEL_CLIENT` | `features.ts` | on unless `false` | Consent-gated client dual-write |
 
 ## Hard-ban flags (must remain true / blocked)
 

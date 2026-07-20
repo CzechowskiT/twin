@@ -318,6 +318,18 @@ def google_calendar_callback(
         db.add(new_row)
         db.commit()
         store_google_tokens_from_exchange(db, new_row, access_token=exchanged.access_token, expires_in=exchanged.expires_in, refresh_token=None)
+    try:
+        from app.services.product_funnel import emit_funnel_event
+
+        emit_funnel_event(
+            db,
+            event_name="calendar_connected",
+            user_id=user_id,
+            properties={"provider": "google"},
+            commit=True,
+        )
+    except Exception:
+        pass
     return RedirectResponse(_frontend_calendar_redirect(calendar_connected="1"), status_code=302)
 
 
@@ -800,6 +812,19 @@ def google_calendar_schedule_interview(
     db.add(row)
     db.commit()
     db.refresh(row)
+    try:
+        from app.services.product_funnel import emit_funnel_event
+
+        emit_funnel_event(
+            db,
+            event_name="interview_scheduled",
+            user_id=current_user.id,
+            properties={"provider": "google", "application_id": body.application_id},
+            once=False,
+            commit=True,
+        )
+    except Exception:
+        pass
     return row
 
 

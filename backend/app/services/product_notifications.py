@@ -76,6 +76,14 @@ def send_first_match_email(db: Session, user: User, *, match_count: int) -> bool
 
 
 def maybe_send_first_match_after_match(db: Session, *, candidate_id: int, user_id: int) -> None:
+    try:
+        from app.services.product_funnel import emit_first_match_if_needed
+
+        emit_first_match_if_needed(db, user_id=user_id, candidate_id=candidate_id)
+        db.commit()
+    except Exception:
+        pass
+
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         return

@@ -472,6 +472,26 @@ def create_application(
             record_user_pipeline_status(app, ApplicationStatus.APPLIED)
     db.commit()
     db.refresh(app)
+    try:
+        from app.services.product_funnel import emit_funnel_event
+
+        emit_funnel_event(
+            db,
+            event_name="application_created",
+            user_id=user.id,
+            properties={"job_id": body.job_id, "application_id": app.id},
+            once=False,
+            commit=False,
+        )
+        emit_funnel_event(
+            db,
+            event_name="first_application",
+            user_id=user.id,
+            properties={"application_id": app.id},
+            commit=True,
+        )
+    except Exception:
+        pass
     out = _to_out(app, job)
     _maybe_store_application_create_idem(
         db,

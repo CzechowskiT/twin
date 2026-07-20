@@ -269,6 +269,18 @@ def register(request: Request, body: UserRegister, db: Session = Depends(get_db)
     db.commit()
     db.refresh(user)
     try:
+        from app.services.product_funnel import emit_funnel_event
+
+        emit_funnel_event(
+            db,
+            event_name="signup_completed",
+            user_id=user.id,
+            properties={"source": "register"},
+            commit=True,
+        )
+    except Exception:
+        pass
+    try:
         from app.tasks.notification_tasks import send_welcome_email_task
 
         send_welcome_email_task.delay(user.id)
@@ -539,6 +551,18 @@ def complete_onboarding(
         db.add(user)
         db.commit()
         db.refresh(user)
+        try:
+            from app.services.product_funnel import emit_funnel_event
+
+            emit_funnel_event(
+                db,
+                event_name="onboarding_completed",
+                user_id=user.id,
+                properties={"source": "api"},
+                commit=True,
+            )
+        except Exception:
+            pass
     return UserOut.from_user(user)
 
 

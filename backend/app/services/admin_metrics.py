@@ -1,4 +1,4 @@
-"""Product ops metrics: signups, pipeline volume, feedback sentiment."""
+"""Product ops metrics: signups, pipeline volume, feedback sentiment, funnel north star."""
 
 from datetime import datetime, timedelta
 
@@ -6,6 +6,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.database.models import Application, JobMatch, ProductFeedback, User
+from app.services.product_funnel import build_funnel_snapshot
 
 
 def build_admin_metrics(db: Session) -> dict:
@@ -34,6 +35,10 @@ def build_admin_metrics(db: Session) -> dict:
     ):
         if 1 <= rating <= 5:
             rating_histogram[rating] = count
+
+    funnel = build_funnel_snapshot(db, days=30)
+    north = funnel.get("north_star") or {}
+
     return {
         "users_total": users_total,
         "signups_last_7_days": signups_7d,
@@ -47,5 +52,9 @@ def build_admin_metrics(db: Session) -> dict:
         "feedback_count": feedback_count,
         "feedback_avg_rating": round(float(avg_rating), 2) if avg_rating is not None else None,
         "feedback_rating_histogram": rating_histogram,
+        "north_star_name": north.get("name"),
+        "north_star_value_7d": north.get("value_7d"),
+        "funnel_conversion": funnel.get("conversion"),
+        "funnel_instrumentation_enabled": funnel.get("instrumentation_enabled"),
         "generated_at": now.isoformat() + "Z",
     }
