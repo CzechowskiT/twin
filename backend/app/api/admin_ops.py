@@ -513,9 +513,21 @@ def admin_add_participant(
     settings: Settings = Depends(get_settings),
     authorization: str | None = Header(default=None, alias="Authorization"),
 ) -> dict:
+    from app.services import platform_foundations as foundations
     from app.services.activation_cohorts import add_participant, participant_to_dict
 
     _require_ops_admin(settings, authorization)
+    foundations.seed_system_roles(db)
+    # Allow metrics-excluded smoke/demo participants for internal testing only.
+    smoke_ok = bool(body.exclude_from_product_metrics)
+    if not foundations.is_external_pilot_enrollment_enabled(db) and not smoke_ok:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN,
+            detail=(
+                "EXTERNAL_PILOT_ENROLLMENT_ENABLED is false — Pilot BLOCKED_BY_FOUNDER. "
+                "Do not add real participants. Smoke-only adds require exclude_from_product_metrics=true."
+            ),
+        )
     try:
         part = add_participant(
             db,

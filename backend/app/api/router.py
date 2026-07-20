@@ -41,6 +41,7 @@ from app.api import (
     partner,
     placement,
     placement_events,
+    platform_foundations,
     profile_import,
     public,
     recruiter,
@@ -54,6 +55,11 @@ from app.api import (
 api_router = APIRouter()
 api_router.include_router(health.router, tags=["Health"])
 api_router.include_router(audit_events.router, prefix="/audit-events", tags=["Audit events"])
+api_router.include_router(
+    platform_foundations.router,
+    prefix="/platform/foundations",
+    tags=["Platform foundations"],
+)
 api_router.include_router(work_items.router, prefix="/work-items", tags=["Work items"])
 api_router.include_router(
     candidate_role_status.router,

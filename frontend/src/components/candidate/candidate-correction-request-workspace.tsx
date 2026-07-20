@@ -25,6 +25,7 @@ import { candidateConsentReceiptHref } from "@/lib/candidate-consent-receipt";
 import { candidateTrustAuditExportHref } from "@/lib/candidate-trust-audit-export";
 import type { TranslationKey } from "@/lib/i18n";
 import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
+import { NonLiveMutationBanner } from "@/components/workspace/non-live-mutation-banner";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -131,6 +132,7 @@ function CorrectionRequestContent({ record }: { record: CandidateCorrectionReque
               </span>
             </div>
           </div>
+          <NonLiveMutationBanner kind="sample_only" />
           <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
             <Link
               href={CANDIDATE_CORRECTION_REQUEST_SAFE_LINKS.trustCenter}

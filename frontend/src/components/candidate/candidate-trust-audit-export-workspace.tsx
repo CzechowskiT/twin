@@ -26,6 +26,7 @@ import { candidateExportPreviewHref } from "@/lib/candidate-export-preview";
 import { candidateRevokeDeleteHref } from "@/lib/candidate-revoke-delete";
 import type { TranslationKey } from "@/lib/i18n";
 import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
+import { NonLiveMutationBanner } from "@/components/workspace/non-live-mutation-banner";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -124,6 +125,7 @@ function TrustAuditExportContent({ record }: { record: CandidateTrustAuditExport
               </span>
             </div>
           </div>
+          <NonLiveMutationBanner kind="sample_only" />
           <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
             <Link
               href={CANDIDATE_TRUST_AUDIT_EXPORT_SAFE_LINKS.trustCenter}
