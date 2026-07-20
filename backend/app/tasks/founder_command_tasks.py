@@ -30,6 +30,7 @@ def tick_founder_command(command_id: str) -> str:
         if cmd.status in ACTIVE_COMMAND_STATUSES - {
             CommandStatus.PAUSED.value,
             CommandStatus.AWAITING_APPROVAL.value,
+            CommandStatus.NEEDS_FOUNDER.value,
         }:
             # Avoid recursive explosion under CELERY_TASK_ALWAYS_EAGER.
             if not getattr(celery_app.conf, "task_always_eager", False):

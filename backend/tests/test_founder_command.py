@@ -628,3 +628,311 @@ def test_e2e_diagnostic_batch_auto_prompt_counters(founder_client, monkeypatch):
     # Manual copy counters — product contract: prompt not in UI payload
     assert out["plan"]["product_agent_prompt_present"] is True
     assert "product_agent_prompt" not in out["plan"]
+
+
+def _seed_running_command(db, **overrides) -> FounderCommand:
+    from datetime import datetime
+    import uuid
+
+    row = FounderCommand(
+        id=str(uuid.uuid4()),
+        status="running",
+        current_stage="report_handoff",
+        direction="Hard limit regression fixture",
+        autonomy_level=3,
+        batch_index=0,
+        max_batches=5,
+        max_runtime_minutes=60,
+        max_consecutive_failures=2,
+        consecutive_failures=0,
+        plan_json=json.dumps(
+            {
+                "execution_mode": "build",
+                "batch_objective": "fixture",
+                "product_agent_prompt": "x",
+            }
+        ),
+        started_at=datetime.utcnow(),
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow(),
+    )
+    for key, value in overrides.items():
+        setattr(row, key, value)
+    db.add(row)
+    db.commit()
+    db.refresh(row)
+    return row
+
+
+def _timeline_messages(db, command_id: str) -> list[str]:
+    from sqlalchemy import select
+    from app.database.models import FounderCommandTimelineEvent
+
+    return list(
+        db.execute(
+            select(FounderCommandTimelineEvent.message)
+            .where(FounderCommandTimelineEvent.command_id == command_id)
+            .order_by(FounderCommandTimelineEvent.created_at.asc())
+        )
+        .scalars()
+        .all()
+    )
+
+
+def test_max_consecutive_failures_without_active_run_fails(founder_client):
+    client, db = founder_client
+    from app.services.founder_command.execution_loop import tick_command
+    from app.services.founder_command.state_resolver import resolve_project_state
+
+    cmd = _seed_running_command(
+        db,
+        consecutive_failures=2,
+        max_consecutive_failures=2,
+        dispatch_run_id=None,
+        current_stage="report_handoff",
+    )
+    settings = get_settings()
+    before = resolve_project_state(db, settings)["counters"]["active_commands"]
+    out = tick_command(db, settings, cmd.id, actor_fingerprint="test")
+    db.refresh(cmd)
+    assert out.status == "failed"
+    assert cmd.status == "failed"
+    assert cmd.error_code == "max_consecutive_failures"
+    assert cmd.finished_at is not None
+    assert cmd.live_summary == "Stopped by hard limit: max_consecutive_failures"
+    assert "needs_founder" not in {cmd.status}
+    after = resolve_project_state(db, settings)["counters"]["active_commands"]
+    assert after == before - 1
+    msgs = _timeline_messages(db, cmd.id)
+    assert msgs.count("Stopped by hard limit: max_consecutive_failures") == 1
+
+
+def test_max_consecutive_failures_after_needs_attention(founder_client, monkeypatch):
+    client, db = founder_client
+    from datetime import datetime
+    from app.database.models import AgentDispatchRun
+    from app.services.founder_command.execution_loop import tick_command
+
+    run = AgentDispatchRun(
+        id="dispatch-needs-attention-hl",
+        status="needs_attention",
+        task_name="hl-needs-attention",
+        repository_url="https://github.com/CzechowskiT/twin",
+        base_branch="cursor/phase1-monorepo-scaffold",
+        prompt_envelope_version="v1",
+        prompt_hash="abc",
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow(),
+    )
+    db.add(run)
+    db.commit()
+    monkeypatch.setattr(
+        "app.services.founder_command.execution_loop.reconcile_run",
+        lambda *a, **k: run,
+    )
+    cmd = _seed_running_command(
+        db,
+        consecutive_failures=1,
+        max_consecutive_failures=2,
+        dispatch_run_id=run.id,
+        current_stage="await_agent",
+    )
+    settings = get_settings()
+    tick_command(db, settings, cmd.id, actor_fingerprint="test")
+    db.refresh(cmd)
+    assert cmd.consecutive_failures == 2
+    assert cmd.current_stage == "report_handoff"
+    tick_command(db, settings, cmd.id, actor_fingerprint="test")
+    db.refresh(cmd)
+    assert cmd.status == "failed"
+    assert cmd.error_code == "max_consecutive_failures"
+    assert cmd.finished_at is not None
+
+
+def test_max_consecutive_failures_after_cursor_error(founder_client, monkeypatch):
+    client, db = founder_client
+    from datetime import datetime
+    from app.database.models import AgentDispatchRun
+    from app.services.founder_command.execution_loop import tick_command
+
+    run = AgentDispatchRun(
+        id="dispatch-cursor-error-hl",
+        status="failed",
+        error_code="cursor_error",
+        task_name="hl-cursor-error",
+        repository_url="https://github.com/CzechowskiT/twin",
+        base_branch="cursor/phase1-monorepo-scaffold",
+        prompt_envelope_version="v1",
+        prompt_hash="abc",
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow(),
+    )
+    db.add(run)
+    db.commit()
+    monkeypatch.setattr(
+        "app.services.founder_command.execution_loop.reconcile_run",
+        lambda *a, **k: run,
+    )
+    cmd = _seed_running_command(
+        db,
+        consecutive_failures=1,
+        max_consecutive_failures=2,
+        dispatch_run_id=run.id,
+        current_stage="await_agent",
+    )
+    settings = get_settings()
+    tick_command(db, settings, cmd.id, actor_fingerprint="test")
+    tick_command(db, settings, cmd.id, actor_fingerprint="test")
+    db.refresh(cmd)
+    assert cmd.status == "failed"
+    assert cmd.error_code == "max_consecutive_failures"
+    assert cmd.finished_at is not None
+
+
+def test_max_runtime_minutes_fails_never_needs_founder(founder_client):
+    client, db = founder_client
+    from datetime import datetime, timedelta
+    from app.services.founder_command.execution_loop import tick_command
+
+    cmd = _seed_running_command(
+        db,
+        max_runtime_minutes=30,
+        started_at=datetime.utcnow() - timedelta(minutes=45),
+        consecutive_failures=0,
+        current_stage="await_agent",
+    )
+    settings = get_settings()
+    tick_command(db, settings, cmd.id, actor_fingerprint="test")
+    db.refresh(cmd)
+    assert cmd.status == "failed"
+    assert cmd.error_code == "max_runtime_minutes"
+    assert cmd.finished_at is not None
+    assert cmd.status != "needs_founder"
+    assert "Stopped by hard limit: max_runtime_minutes" in (cmd.live_summary or "")
+
+
+def test_hard_limit_pending_decisions_zero_and_no_timeline_dupes(founder_client):
+    client, db = founder_client
+    from app.services.founder_command.execution_loop import tick_command
+    from app.services.founder_command.state_resolver import resolve_project_state
+
+    cmd = _seed_running_command(
+        db,
+        consecutive_failures=5,
+        max_consecutive_failures=2,
+    )
+    settings = get_settings()
+    tick_command(db, settings, cmd.id, actor_fingerprint="test")
+    tick_command(db, settings, cmd.id, actor_fingerprint="test")
+    tick_command(db, settings, cmd.id, actor_fingerprint="test")
+    db.refresh(cmd)
+    state = resolve_project_state(db, settings)
+    assert state["counters"]["pending_decisions"] == 0
+    assert cmd.status == "failed"
+    msgs = _timeline_messages(db, cmd.id)
+    assert msgs.count("Stopped by hard limit: max_consecutive_failures") == 1
+
+
+def test_re_reconcile_terminal_hard_limit_is_idempotent(founder_client):
+    client, db = founder_client
+    from datetime import datetime
+    from app.services.founder_command.execution_loop import tick_command
+
+    cmd = _seed_running_command(
+        db,
+        consecutive_failures=3,
+        max_consecutive_failures=2,
+    )
+    settings = get_settings()
+    tick_command(db, settings, cmd.id, actor_fingerprint="test")
+    db.refresh(cmd)
+    finished = cmd.finished_at
+    failures = cmd.consecutive_failures
+    msgs_before = _timeline_messages(db, cmd.id)
+    assert finished is not None
+
+    tick_command(db, settings, cmd.id, actor_fingerprint="test")
+    tick_command(db, settings, cmd.id, actor_fingerprint="test")
+    db.refresh(cmd)
+    assert cmd.status == "failed"
+    assert cmd.finished_at == finished
+    assert cmd.consecutive_failures == failures
+    assert _timeline_messages(db, cmd.id) == msgs_before
+
+
+def test_needs_founder_only_with_real_pending_decision(founder_client):
+    client, db = founder_client
+    from datetime import datetime, timedelta
+    import uuid
+    from app.database.models import FounderDecision
+    from app.services.founder_command.execution_loop import tick_command
+
+    settings = get_settings()
+    # Hard limit must never land in needs_founder.
+    limited = _seed_running_command(
+        db,
+        consecutive_failures=2,
+        max_consecutive_failures=2,
+    )
+    tick_command(db, settings, limited.id, actor_fingerprint="test")
+    db.refresh(limited)
+    assert limited.status == "failed"
+    assert limited.error_code == "max_consecutive_failures"
+
+    # Real pending decision keeps needs_founder and does not terminalize.
+    cmd = _seed_running_command(
+        db,
+        status="needs_founder",
+        current_stage="approval_policy",
+        consecutive_failures=0,
+        live_summary="Waiting for founder decision",
+    )
+    db.add(
+        FounderDecision(
+            id=str(uuid.uuid4()),
+            command_id=cmd.id,
+            operation="force_unlock",
+            title="Needs founder",
+            risk="critical",
+            status="pending",
+            evidence_json="{}",
+            expires_at=datetime.utcnow() + timedelta(hours=1),
+            created_at=datetime.utcnow(),
+        )
+    )
+    db.commit()
+    tick_command(db, settings, cmd.id, actor_fingerprint="test")
+    db.refresh(cmd)
+    assert cmd.status == "needs_founder"
+    assert cmd.finished_at is None
+    assert cmd.error_code is None
+
+
+def test_heal_legacy_needs_founder_hard_limit_residual(founder_client):
+    """Prod residual pattern: needs_founder + hard-limit headline + pending=0."""
+    client, db = founder_client
+    from app.services.founder_command.execution_loop import tick_command
+    from app.services.founder_command.state_resolver import resolve_project_state
+
+    cmd = _seed_running_command(
+        db,
+        status="needs_founder",
+        current_stage="report_handoff",
+        live_summary="Stopped by hard limit: max_runtime_minutes",
+        consecutive_failures=0,
+        finished_at=None,
+        error_code=None,
+    )
+    settings = get_settings()
+    before = resolve_project_state(db, settings)["counters"]["active_commands"]
+    tick_command(db, settings, cmd.id, actor_fingerprint="celery-beat")
+    db.refresh(cmd)
+    assert cmd.status == "failed"
+    assert cmd.error_code == "max_runtime_minutes"
+    assert cmd.finished_at is not None
+    after = resolve_project_state(db, settings)["counters"]["active_commands"]
+    assert after == before - 1
+    # Re-tick must stay idempotent
+    msgs = _timeline_messages(db, cmd.id)
+    tick_command(db, settings, cmd.id, actor_fingerprint="celery-beat")
+    assert _timeline_messages(db, cmd.id) == msgs

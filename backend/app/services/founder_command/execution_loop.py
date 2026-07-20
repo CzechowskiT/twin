@@ -18,6 +18,7 @@ from app.services.founder_command.approval_policy import command_has_blocking_pe
 from app.services.founder_command.audit import write_founder_audit
 from app.services.founder_command.constants import (
     ACTIVE_COMMAND_STATUSES,
+    COMMAND_TERMINAL,
     CommandStage,
     CommandStatus,
     DEFAULT_MAX_ACTIVE_RUNS,
@@ -99,6 +100,94 @@ def _limits_ok(command: FounderCommand, state: dict[str, Any]) -> tuple[bool, st
     return True, None
 
 
+def _hard_limit_reason_from_summary(summary: str | None) -> str | None:
+    """Parse 'Stopped by hard limit: <code>' left by older buggy ticks."""
+    text = (summary or "").strip()
+    prefix = "Stopped by hard limit:"
+    if not text.startswith(prefix):
+        return None
+    reason = text[len(prefix) :].strip()
+    return reason or None
+
+
+def _timeline_has_hard_limit(
+    db: Session, command_id: str, *, reason: str, message: str
+) -> bool:
+    from sqlalchemy import select
+
+    from app.database.models import FounderCommandTimelineEvent
+
+    rows = db.execute(
+        select(FounderCommandTimelineEvent.message, FounderCommandTimelineEvent.detail_json).where(
+            FounderCommandTimelineEvent.command_id == command_id
+        )
+    ).all()
+    for msg, detail_json in rows:
+        if msg == message:
+            return True
+        if not detail_json:
+            continue
+        try:
+            detail = json.loads(detail_json)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(detail, dict) and detail.get("error_code") == reason and detail.get(
+            "hard_limit"
+        ):
+            return True
+    return False
+
+
+def _terminalize_hard_limit(
+    db: Session,
+    command: FounderCommand,
+    reason: str,
+    *,
+    actor_fingerprint: str = "system",
+) -> FounderCommand:
+    """Fail immediately on hard limit. Idempotent for terminal / re-reconcile."""
+    if command.status in COMMAND_TERMINAL:
+        return command
+
+    message = f"Stopped by hard limit: {reason}"
+    already_recorded = _timeline_has_hard_limit(
+        db, command.id, reason=reason, message=message
+    )
+    finished_at = command.finished_at or datetime.utcnow()
+    command.status = CommandStatus.FAILED.value
+    command.error_code = reason
+    command.error_message = message[:512]
+    command.live_summary = message
+    command.final_summary = message
+    command.finished_at = finished_at
+
+    if not already_recorded:
+        _append_timeline(
+            db,
+            command,
+            stage=command.current_stage or "limit",
+            message=message,
+            detail={"error_code": reason, "hard_limit": True},
+        )
+        write_founder_audit(
+            db,
+            command_id=command.id,
+            event_type="hard_limit_reached",
+            actor_fingerprint=actor_fingerprint,
+            detail={"error_code": reason, "status": command.status},
+        )
+        notify_founder(
+            db,
+            command_id=command.id,
+            kind="limit",
+            title="Hard limit reached",
+            body=message,
+            links=_links(command),
+        )
+    db.commit()
+    return command
+
+
 def _dispatch_principal(fingerprint: str) -> AgentDispatchPrincipal:
     from app.services.agent_dispatch.constants import ALL_DISPATCH_SCOPES
 
@@ -119,35 +208,44 @@ def tick_command(
     command = db.get(FounderCommand, command_id)
     if not command:
         raise LookupError("command_not_found")
-    if command.status in {
-        CommandStatus.PAUSED.value,
-        CommandStatus.CANCELLED.value,
-        CommandStatus.SUCCEEDED.value,
-        CommandStatus.FAILED.value,
-    }:
+    if command.status in COMMAND_TERMINAL or command.status == CommandStatus.PAUSED.value:
         return command
+
     if command.status == CommandStatus.AWAITING_APPROVAL.value:
         if command_has_blocking_pending(db, command.id):
             return command
         command.status = CommandStatus.QUEUED.value
         command.current_stage = CommandStage.DISPATCH.value
 
+    # needs_founder is reserved for a real pending founder decision that can resume.
+    if command.status == CommandStatus.NEEDS_FOUNDER.value:
+        if command_has_blocking_pending(db, command.id):
+            return command
+        # Heal residuals left by older hard-limit ticks (needs_founder + no decisions).
+        healed = _hard_limit_reason_from_summary(command.live_summary) or (
+            command.error_code
+            if command.error_code
+            in {
+                "max_batches",
+                "max_runtime_minutes",
+                "max_consecutive_failures",
+                "max_open_prs",
+                "max_active_runs",
+            }
+            else None
+        )
+        if healed:
+            return _terminalize_hard_limit(
+                db, command, healed, actor_fingerprint=actor_fingerprint
+            )
+        return command
+
     state = resolve_project_state(db, settings)
     ok, reason = _limits_ok(command, state)
-    if not ok:
-        command.status = CommandStatus.NEEDS_FOUNDER.value
-        command.live_summary = f"Stopped by hard limit: {reason}"
-        _append_timeline(db, command, stage=command.current_stage or "limit", message=command.live_summary)
-        notify_founder(
-            db,
-            command_id=command.id,
-            kind="limit",
-            title="Hard limit reached",
-            body=command.live_summary,
-            links=_links(command),
+    if not ok and reason:
+        return _terminalize_hard_limit(
+            db, command, reason, actor_fingerprint=actor_fingerprint
         )
-        db.commit()
-        return command
 
     stage = command.current_stage or CommandStage.RESOLVE_STATE.value
     plan = _plan(command)
@@ -170,8 +268,9 @@ def tick_command(
 
     if stage == CommandStage.APPROVAL_POLICY.value:
         if command_has_blocking_pending(db, command.id):
-            command.status = CommandStatus.AWAITING_APPROVAL.value
-            command.live_summary = "Waiting for founder approval"
+            # Real founder decision pending — resumable after approve/reject.
+            command.status = CommandStatus.NEEDS_FOUNDER.value
+            command.live_summary = "Waiting for founder decision"
             db.commit()
             return command
         command.status = CommandStatus.RUNNING.value
@@ -461,10 +560,11 @@ def _stage_continue(
         return command
 
     command.current_stage = CommandStage.FINALIZE.value
-    if not ok:
-        command.live_summary = f"Finalize after limit: {reason}"
-    else:
-        command.live_summary = "Finalize — no further auto batches"
+    if not ok and reason:
+        return _terminalize_hard_limit(
+            db, command, reason, actor_fingerprint="system"
+        )
+    command.live_summary = "Finalize — no further auto batches"
     db.commit()
     return command
 
