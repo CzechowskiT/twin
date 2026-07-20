@@ -129,6 +129,8 @@ class User(Base):
         DateTime, nullable=True
     )
     onboarding_completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    # Ops/smoke accounts — excluded from North Star and business funnel aggregates by default.
+    exclude_from_product_metrics: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
     email_verified_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     welcome_email_sent_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     first_match_email_sent_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
@@ -1888,4 +1890,33 @@ class ProductFunnelEvent(Base):
     signup_week: Mapped[str | None] = mapped_column(String(10), nullable=True, index=True)
     properties_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     occurred_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+
+
+class ActivationMatchingJob(Base):
+    """Idempotent activation matching dispatch (one active job per user+profile_version)."""
+
+    __tablename__ = "activation_matching_jobs"
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id",
+            "profile_version",
+            name="uq_activation_matching_user_profile_version",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    candidate_id: Mapped[int] = mapped_column(ForeignKey("candidates.id", ondelete="CASCADE"))
+    profile_version: Mapped[str] = mapped_column(String(64))
+    correlation_id: Mapped[str] = mapped_column(String(36), index=True)
+    status: Mapped[str] = mapped_column(String(32), default="pending", index=True)
+    failure_category: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    match_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    retry_count: Mapped[int] = mapped_column(Integer, default=0)
+    celery_task_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    dispatched_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 

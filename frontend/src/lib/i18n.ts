@@ -200,6 +200,7 @@ export type TranslationKey =
   | `homepageCandidateStory.${keyof typeof en.homepageCandidateStory}`
   | `founderLedDemo.${keyof typeof en.founderLedDemo}`
   | `candidateMatchesPage.${keyof typeof en.candidateMatchesPage}`
+  | `activationMatching.${keyof typeof en.activationMatching}`
   | `candidateOffersPage.${keyof typeof en.candidateOffersPage}`
   | `candidateProfile360.${keyof typeof en.candidateProfile360}`
   | `jobPipeline.${keyof typeof en.jobPipeline}`
@@ -5344,6 +5345,23 @@ eyebrow: "Product roadmap",
     emptyStep3: "Give feedback so the next batch respects your threshold.",
     emptyCtaProfile: "Open profile",
     ctaOffers: "Browse offers",
+  },
+  activationMatching: {
+    pendingTitle: "Finding your matches",
+    pendingBody: "We are ranking roles for your profile. This usually takes a moment — stay on this page.",
+    readyTitle: "Your matches are ready",
+    readyBody: "Review the ranked roles below. You decide what to save or prepare — nothing is auto-applied.",
+    emptyTitle: "No strong matches yet",
+    emptyBody: "Your profile is ready, but we could not find a strong fit right now. Tune skills or titles and check back.",
+    failedTitle: "Matching could not start",
+    failedBody: "Something went wrong starting matching. You can try again, or update your profile and return here.",
+    incompleteTitle: "Finish your profile first",
+    incompleteBody: "Add skills or target titles plus CV or experience so we can rank roles for you.",
+    workerTitle: "Matching is temporarily unavailable",
+    workerBody: "Our matching worker is busy or offline. Retry in a moment — your profile is saved.",
+    retryCta: "Try matching again",
+    retryUnavailable: "Retry is not available until the profile is complete.",
+    profileCta: "Complete profile",
   },
   candidateProfile360: {
     pageEyebrow: "Candidate Profile 360",
@@ -13789,6 +13807,23 @@ const pl: MessageTree = {
     emptyStep3: "Daj feedback, żeby kolejna partia szanowała Twój próg.",
     emptyCtaProfile: "Otwórz profil",
     ctaOffers: "Przeglądaj oferty",
+  },
+  activationMatching: {
+    pendingTitle: "Szukamy dopasowań",
+    pendingBody: "Rankingujemy role pod Twój profil. To zwykle chwilę trwa — zostań na tej stronie.",
+    readyTitle: "Dopasowania gotowe",
+    readyBody: "Przejrzyj ranking poniżej. Ty decydujesz o zapisie i przygotowaniu — nic nie jest auto-aplikowane.",
+    emptyTitle: "Brak mocnych dopasowań",
+    emptyBody: "Profil jest gotowy, ale teraz nie znaleźliśmy mocnego fit. Dostosuj umiejętności lub stanowiska i wróć.",
+    failedTitle: "Nie udało się uruchomić dopasowań",
+    failedBody: "Uruchomienie dopasowań nie powiodło się. Spróbuj ponownie albo uzupełnij profil i wróć tutaj.",
+    incompleteTitle: "Najpierw uzupełnij profil",
+    incompleteBody: "Dodaj umiejętności lub docelowe stanowiska oraz CV albo doświadczenie, żebyśmy mogli rankować role.",
+    workerTitle: "Dopasowania chwilowo niedostępne",
+    workerBody: "Worker dopasowań jest zajęty lub offline. Spróbuj za chwilę — profil jest zapisany.",
+    retryCta: "Spróbuj ponownie",
+    retryUnavailable: "Ponowienie niedostępne, dopóki profil nie jest kompletny.",
+    profileCta: "Uzupełnij profil",
   },
   candidateProfile360: {
     pageEyebrow: "Profil kandydata 360",

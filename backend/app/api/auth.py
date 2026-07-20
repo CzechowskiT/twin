@@ -546,7 +546,8 @@ def complete_onboarding(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> UserOut:
-    if user.onboarding_completed_at is None:
+    first_completion = user.onboarding_completed_at is None
+    if first_completion:
         user.onboarding_completed_at = datetime.now(timezone.utc)
         db.add(user)
         db.commit()
@@ -562,6 +563,13 @@ def complete_onboarding(
                 commit=True,
             )
         except Exception:
+            pass
+        try:
+            from app.services.activation_matching import maybe_dispatch_after_onboarding
+
+            maybe_dispatch_after_onboarding(db, user, trigger="onboarding_complete")
+        except Exception:
+            # Activation must never break onboarding completion
             pass
     return UserOut.from_user(user)
 

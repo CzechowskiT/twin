@@ -1,7 +1,7 @@
 # Product metrics — taxonomy, north star, collection
 
 **Status:** LIVE instrumentation (server-side) as of unicorn batch 2026-07-20  
-**Rollback:** set `PRODUCT_FUNNEL_EVENTS_ENABLED=false` on Railway API (+ worker if shared env). No data loss; writes stop immediately. FE activation experiment: `NEXT_PUBLIC_TTV_MATCHES_REDIRECT=false` and redeploy Vercel.
+**Rollback:** set `PRODUCT_FUNNEL_EVENTS_ENABLED=false` on Railway API (+ worker if shared env). No data loss; writes stop immediately. FE activation experiment: `NEXT_PUBLIC_TTV_MATCHES_REDIRECT=false` and redeploy Vercel. Activation auto-match / TTV metrics / alerts / status banner: see `docs/ACTIVATION_TTV_OPS_ROLLBACK_2026-07-20.md`.
 
 ## North Star
 
@@ -30,7 +30,8 @@
 | `interview_scheduled` | no | (wire on schedule create — ready) | — |
 | `placement_declared` | no | (wire on declare — ready) | — |
 | `placement_verified` | no | (wire on verify — ready) | — |
-| `activation_ttv_matches_view` | no | FE onboarding → matches (client) | `surface` |
+| `activation_ttv_matches_view` | yes (server once) | POST `/candidates/me/activation-ttv-view` + optional FE | `surface`, `correlation_id` |
+| `activation_matching_*` | mixed | activation matching service / worker | `trigger`, `profile_version`, `correlation_id`, buckets |
 
 Client dual-write is **optional** (`NEXT_PUBLIC_PRODUCT_FUNNEL_CLIENT`, consent-gated via `analytics.ts`). **Server events are source of truth.**
 
@@ -61,7 +62,7 @@ Client dual-write is **optional** (`NEXT_PUBLIC_PRODUCT_FUNNEL_CLIENT`, consent-
 | Match quality | Feedback + scores | matching-quality admin | LIVE | — | admin | median rising | Matching | weekly |
 | Acceptance | Interview holds | scheduled_interviews + events | PARTIAL | emit on create | NS | — | Product | weekly |
 | Placement | Verified placements | placement_events | PARTIAL | funnel emit | placement svc | — | Ops | weekly |
-| TTV | Signup → first match / interview | funnel timestamps | PARTIAL | p50 latency API | cohort + funnel | <24h first match | Product | weekly |
+| TTV | Signup → first match / interview | funnel timestamps | LIVE | — | cohort + funnel activation.ttv_latencies | <24h first match | Product | weekly |
 | CAC/LTV/payback | Unit economics | — | NOT READY | attribution + Stripe cohorts | — | after monetization | Finance | monthly |
 | Gross margin | After AI/scrape cost | — | NOT READY | cost allocation | — | — | Finance | quarterly |
 | NRR | Expansion − churn | — | NOT READY | paid base | — | — | Finance | quarterly |

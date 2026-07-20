@@ -39,6 +39,13 @@ FUNNEL_EVENTS = frozenset(
         "placement_declared",
         "placement_verified",
         "activation_ttv_matches_view",
+        "activation_matching_eligible",
+        "activation_matching_not_eligible",
+        "activation_matching_dispatched",
+        "activation_matching_started",
+        "activation_matching_completed",
+        "activation_matching_failed",
+        "activation_first_match_created",
     }
 )
 
@@ -49,6 +56,10 @@ ONCE_PER_USER = frozenset(
         "first_match",
         "first_application",
         "calendar_connected",
+        "activation_ttv_matches_view",
+        "activation_matching_eligible",
+        "activation_matching_not_eligible",
+        "activation_first_match_created",
     }
 )
 
@@ -147,32 +158,62 @@ def emit_first_match_if_needed(db: Session, *, user_id: int, candidate_id: int) 
     )
 
 
-def build_funnel_snapshot(db: Session, *, days: int = 30) -> dict[str, Any]:
+def _metrics_excluded_user_ids(db: Session) -> set[int]:
+    rows = (
+        db.query(User.id)
+        .filter(User.exclude_from_product_metrics.is_(True))
+        .all()
+    )
+    return {int(r[0]) for r in rows}
+
+
+def build_funnel_snapshot(
+    db: Session,
+    *,
+    days: int = 30,
+    date_from: datetime | None = None,
+    date_to: datetime | None = None,
+    persona: str | None = None,
+    include_test_accounts: bool = False,
+    cohort: str | None = None,
+    environment: str | None = None,
+) -> dict[str, Any]:
     """Funnel counts for the admin dashboard (last N days + all-time unique users)."""
     now = datetime.utcnow()
-    since = now - timedelta(days=max(1, min(days, 365)))
+    since = date_from or (now - timedelta(days=max(1, min(days, 365))))
+    until = date_to or now
+    excluded = set() if include_test_accounts else _metrics_excluded_user_ids(db)
     window_counts: dict[str, int] = {}
     unique_users: dict[str, int] = {}
     for name in sorted(FUNNEL_EVENTS):
-        window_counts[name] = int(
-            db.query(func.count(ProductFunnelEvent.id))
-            .filter(ProductFunnelEvent.event_name == name, ProductFunnelEvent.occurred_at >= since)
-            .scalar()
-            or 0
+        wq = db.query(func.count(ProductFunnelEvent.id)).filter(
+            ProductFunnelEvent.event_name == name,
+            ProductFunnelEvent.occurred_at >= since,
+            ProductFunnelEvent.occurred_at <= until,
         )
-        unique_users[name] = int(
-            db.query(func.count(func.distinct(ProductFunnelEvent.user_id)))
-            .filter(
-                ProductFunnelEvent.event_name == name,
-                ProductFunnelEvent.user_id.isnot(None),
+        uq = db.query(func.count(func.distinct(ProductFunnelEvent.user_id))).filter(
+            ProductFunnelEvent.event_name == name,
+            ProductFunnelEvent.user_id.isnot(None),
+        )
+        if persona:
+            wq = wq.filter(ProductFunnelEvent.persona == persona)
+            uq = uq.filter(ProductFunnelEvent.persona == persona)
+        if cohort:
+            wq = wq.filter(ProductFunnelEvent.signup_week == cohort)
+            uq = uq.filter(ProductFunnelEvent.signup_week == cohort)
+        if excluded:
+            wq = wq.filter(
+                (ProductFunnelEvent.user_id.is_(None))
+                | (~ProductFunnelEvent.user_id.in_(tuple(excluded)))
             )
-            .scalar()
-            or 0
-        )
+            uq = uq.filter(~ProductFunnelEvent.user_id.in_(tuple(excluded)))
+        window_counts[name] = int(wq.scalar() or 0)
+        unique_users[name] = int(uq.scalar() or 0)
 
-    signups = unique_users.get("signup_completed", 0) or (
-        db.query(func.count(User.id)).scalar() or 0
-    )
+    users_q = db.query(func.count(User.id))
+    if not include_test_accounts:
+        users_q = users_q.filter(User.exclude_from_product_metrics.is_(False))
+    signups = unique_users.get("signup_completed", 0) or (users_q.scalar() or 0)
     onboarded = unique_users.get("onboarding_completed", 0)
     first_match = unique_users.get("first_match", 0)
     first_app = unique_users.get("first_application", 0)
@@ -182,27 +223,50 @@ def build_funnel_snapshot(db: Session, *, days: int = 30) -> dict[str, Any]:
     def rate(num: int, den: int) -> float:
         return round(100.0 * num / den, 1) if den else 0.0
 
-    north_star_7d = int(
-        db.query(func.count(func.distinct(ProductFunnelEvent.user_id)))
-        .filter(
-            ProductFunnelEvent.event_name.in_(tuple(NORTH_STAR_EVENTS)),
-            ProductFunnelEvent.occurred_at >= now - timedelta(days=7),
-            ProductFunnelEvent.user_id.isnot(None),
-        )
-        .scalar()
-        or 0
+    ns_q = db.query(func.count(func.distinct(ProductFunnelEvent.user_id))).filter(
+        ProductFunnelEvent.event_name.in_(tuple(NORTH_STAR_EVENTS)),
+        ProductFunnelEvent.occurred_at >= now - timedelta(days=7),
+        ProductFunnelEvent.user_id.isnot(None),
     )
+    if excluded:
+        ns_q = ns_q.filter(~ProductFunnelEvent.user_id.in_(tuple(excluded)))
+    north_star_7d = int(ns_q.scalar() or 0)
+
+    activation = None
+    if get_settings().activation_ttv_metrics_enabled:
+        from app.services.activation_ttv_metrics import build_activation_funnel_extension
+
+        activation = build_activation_funnel_extension(
+            db,
+            days=days,
+            date_from=since,
+            date_to=until,
+            persona=persona or "candidate",
+            include_test_accounts=include_test_accounts,
+            cohort=cohort,
+            environment=environment,
+        )
 
     return {
         "north_star": {
             "name": "weekly_acceptance_ready_users",
             "definition": (
-                "Distinct users with interview_scheduled or placement_verified in the last 7 days"
+                "Distinct users with interview_scheduled or placement_verified in the last 7 days "
+                "(excludes exclude_from_product_metrics unless include_test_accounts=true)"
             ),
             "value_7d": north_star_7d,
             "target_range": "pilot 5–25 / week; growth 200+ / week",
+            "test_accounts_excluded": not include_test_accounts,
         },
         "window_days": days,
+        "date_from": since.isoformat() + "Z",
+        "date_to": until.isoformat() + "Z",
+        "filters": {
+            "persona": persona,
+            "cohort": cohort,
+            "include_test_accounts": include_test_accounts,
+            "environment": environment,
+        },
         "event_counts_window": window_counts,
         "unique_users_all_time": unique_users,
         "conversion": {
@@ -227,6 +291,7 @@ def build_funnel_snapshot(db: Session, *, days: int = 30) -> dict[str, Any]:
             ),
             "scheduled_interviews": int(db.query(func.count(ScheduledInterview.id)).scalar() or 0),
         },
+        "activation": activation,
         "instrumentation_enabled": funnel_enabled(),
         "generated_at": now.isoformat() + "Z",
     }

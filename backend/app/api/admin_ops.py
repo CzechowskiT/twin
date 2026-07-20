@@ -108,13 +108,39 @@ def admin_metrics(
 @router.get("/funnel")
 def admin_funnel(
     days: int = 30,
+    date_from: str | None = None,
+    date_to: str | None = None,
+    cohort: str | None = None,
+    persona: str | None = None,
+    environment: str | None = None,
+    include_test_accounts: bool = False,
     db: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
     authorization: str | None = Header(default=None, alias="Authorization"),
 ) -> dict:
-    """Product funnel snapshot — north star + conversion rates (ops admin)."""
+    """Product funnel snapshot — north star + conversion + activation TTV (ops admin)."""
     _require_ops_admin(settings, authorization)
-    return build_funnel_snapshot(db, days=days)
+    from datetime import datetime
+
+    def _parse(ts: str | None) -> datetime | None:
+        if not ts:
+            return None
+        raw = ts.strip().replace("Z", "")
+        try:
+            return datetime.fromisoformat(raw)
+        except ValueError:
+            return None
+
+    return build_funnel_snapshot(
+        db,
+        days=days,
+        date_from=_parse(date_from),
+        date_to=_parse(date_to),
+        persona=persona,
+        include_test_accounts=include_test_accounts,
+        cohort=cohort,
+        environment=environment,
+    )
 
 
 @router.get("/retention")
