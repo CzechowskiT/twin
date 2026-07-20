@@ -8,7 +8,13 @@ export type ConsentPurpose =
 
 export type ConsentStatus = "active" | "withdrawn" | "not_granted" | "review_required";
 
-export type PrivacyRequestType = "correction" | "export" | "portability" | "withdrawal" | "deletion";
+export type PrivacyRequestType =
+  | "correction"
+  | "export"
+  | "portability"
+  | "withdrawal"
+  | "deletion"
+  | "identity_review";
 
 export type PrivacyRequestStatus = "open" | "processing" | "completed" | "cancelled";
 

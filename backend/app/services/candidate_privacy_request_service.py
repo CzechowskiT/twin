@@ -11,12 +11,23 @@ from sqlalchemy.orm import Session
 from app.database.models import CandidatePrivacyRequest
 from app.services.candidate_trust_audit_service import record_trust_audit_event
 
-ALLOWED_REQUEST_TYPES = frozenset({"correction", "export", "portability", "withdrawal", "deletion"})
+ALLOWED_REQUEST_TYPES = frozenset(
+    {
+        "correction",
+        "export",
+        "portability",
+        "withdrawal",
+        "deletion",
+        "identity_review",
+    }
+)
 ALLOWED_STATUSES = frozenset({"open", "processing", "completed", "cancelled"})
 CANDIDATE_MUTABLE_STATUSES = frozenset({"open", "cancelled"})
 MANUAL_PROCESSING_NOTICE = (
     "Privacy requests are reviewed manually. TWIN does not auto-complete "
-    "correction, export, portability, withdrawal, or deletion without human review."
+    "correction, export, portability, withdrawal, deletion, or identity_review "
+    "without human review. Self-serve GET /candidates/me/export.json is separate "
+    "from ops DSR fulfillment."
 )
 
 

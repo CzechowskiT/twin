@@ -47,6 +47,16 @@ export type TrustLiveBundle = {
     identity_verified_at: string | null;
     fake_kyc_forbidden: true;
     workflow: string;
+    provider_module?: string;
+    provider_held?: boolean;
+    manual_review_request_type?: string;
+  };
+  export_lifecycle?: {
+    self_serve_path: string;
+    intake_request_type: string;
+    ops_fulfillment_auto: false;
+    deletion_held: boolean;
+    preview_demo_forbidden_as_live: boolean;
   };
   calendar: {
     google_path_approved: true;

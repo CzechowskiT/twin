@@ -176,6 +176,12 @@ Monetization/Stripe public and ATS live-sync remain **outside** waves until expl
 
 **Exit status:** Trust LIVE slice **DONE** (6 LIVE). Wave 1 overall still **PARTIAL** until remaining PENDING_SMOKE / PARTIAL candidate modules clear — no Gate F / Launch / enrollment flip.
 
-## 11. Next batch after Wave 1
+### Gap-close batch (in flight / this PR)
 
-**Wave 2 Recruiter complete** — see consolidated report “Next recommended batch” prompt.
+- [x] Per-module smoke harness (`WAVE1_SMOKE_MODULES`, fail-closed without JWT)
+- [x] Export preview live lifecycle (export.json + privacy export intake + ops queue row)
+- [x] Identity = manual review status + KYC read; Authologic provider remains HELD
+- [ ] Authenticated per-module prod smoke PASS → then registry LIVE badges
+- [ ] Capability map LIVE updates only post-smoke
+
+**Next after gap-close DONE_WITH_POLICY_HOLDS:** Wave 2 Recruiter — see consolidated report.

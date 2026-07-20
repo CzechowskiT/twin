@@ -72,7 +72,7 @@
       "wave": "1",
       "status": "PARTIAL",
       "route": "/dashboard/trust/export-preview",
-      "blocker": "preview_queue_non_fulfillment",
+      "blocker": "awaiting_module_smoke",
       "owner": "candidate-squad",
       "smoke_sha": "9a889a8e9d685c1270e64b2954913c9b37e4357b",
       "smoke_at": "2026-07-20T19:50:00Z"
@@ -83,7 +83,7 @@
       "wave": "1",
       "status": "PARTIAL",
       "route": "/dashboard/trust/identity-verification",
-      "blocker": "AUTHOLOGIC_CONFIG_DEPENDENT",
+      "blocker": "awaiting_module_smoke",
       "owner": "candidate-squad",
       "smoke_sha": "9a889a8e9d685c1270e64b2954913c9b37e4357b",
       "smoke_at": "2026-07-20T19:50:00Z"
