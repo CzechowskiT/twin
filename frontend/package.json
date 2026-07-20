@@ -167,6 +167,7 @@
     "test:all-modules-green-wave-c5-activity-timeline-guard": "npx --yes tsx scripts/all-modules-green-wave-c5-activity-timeline-guard.test.ts",
     "test:all-modules-green-wave-candidate-activity-timeline-guard": "npx --yes tsx scripts/all-modules-green-wave-candidate-activity-timeline-guard.test.ts",
     "test:hardening-feature-flag-audit-guard": "npx --yes tsx scripts/hardening-feature-flag-audit-guard.test.ts",
+    "test:production-action-gates-guard": "npx --yes tsx --test scripts/production-action-gates-guard.test.ts",
     "test:hardening-retention-preview-guard": "npx --yes tsx scripts/hardening-retention-preview-guard.test.ts",
     "test:hardening-pilot-readiness-dashboard-guard": "npx --yes tsx scripts/hardening-pilot-readiness-dashboard-guard.test.ts",
     "test:hardening-workspace-suspension-guard": "npx --yes tsx scripts/hardening-workspace-suspension-guard.test.ts",

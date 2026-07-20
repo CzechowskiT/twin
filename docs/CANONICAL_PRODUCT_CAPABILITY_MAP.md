@@ -6,27 +6,35 @@
 | Field | Value |
 |-------|-------|
 | Date | 2026-07-20 |
-| repo_head | `0c1284962f7bf8375571202e336f777eca09a500` (pre-cohort-fill; update after merge) |
-| prod_frontend_commit | `0c128496…` (public-health) |
-| prod_api_commit | `0976bf04…` (public-health; #524) |
-| alignment_status | **PARTIAL** — FE ahead of API (docs #525); cohort-fill PR pending deploy |
-| docs_only_drift | true until Railway catches cohort registry |
+| repo_head | (update after Wave 0 merge) |
+| prod_frontend_commit | `f9b792fd…` (#526 aligned — re-verify after Wave 0 deploy) |
+| prod_api_commit | `f9b792fd…` (#526 aligned — re-verify after Wave 0 deploy) |
+| alignment_status | **ALIGNED** at #526; Wave 0 pending this PR |
+| docs_only_drift | false at baseline `f9b792fd`; expect brief drift during Wave 0 roll |
+| Pilot | **BLOCKED_BY_FOUNDER** |
 | Gate F | **PENDING** |
 | Launch | **NO-GO** |
-| Phase 3B | Gate E historical **PASS 20/20**; ops policy **BLOCKED** for unauth re-runs — **not flipped** |
+| PMF evidence | **INSUFFICIENT_DATA** |
+| real_candidate_enrollment | **NOT_STARTED** |
+| real_recruiter_enrollment | **NOT_STARTED** |
+| Phase 3B | Gate E historical **PASS 20/20**; ops policy **BLOCKED** — **not flipped** |
 | P0 | **CLOSED** |
 | Funnel | PR **#523** LIVE |
 | Activation TTV | PR **#524** LIVE (flag-gated UX) |
-| Activation cohort registry | readiness batch (Alembic 086) — recruitment FOUNDERS_ACTION_REQUIRED |
+| Activation cohort registry | #526 / Alembic **086** — infra only; **no real invites** |
+| Productionization plan | [`FULL_PRODUCT_PRODUCTIONIZATION_PLAN.md`](./FULL_PRODUCT_PRODUCTIONIZATION_PLAN.md) |
+| Hard LIVE | [`HARD_LIVE_DEFINITION_30.md`](./HARD_LIVE_DEFINITION_30.md) |
+| Pilot decision | [`PILOT_FOUNDER_BLOCK_DECISION_2026-07-20.md`](./PILOT_FOUNDER_BLOCK_DECISION_2026-07-20.md) |
 | Source principles | [Karwatka — Enterprise Deals](https://tomaszkarwatka.substack.com/p/enterprise-deals-every-one-we-lost) |
 
 ## Hard rules
 
-1. Do **not** mark LIVE without production evidence (aligned deploy + smoke or public-health proof).
+1. Do **not** mark LIVE without production evidence (aligned deploy + smoke or public-health proof). See Hard LIVE 30.
 2. Do **not** claim competitive moat without mechanism + proprietary data loop + hard-to-copy barrier.
-3. Do **not** flip Gate F / Launch / Phase 3B in this document without formal criteria.
+3. Do **not** flip Gate F / Launch / Phase 3B / Pilot enrollment without Founder criteria.
 4. Every non-LIVE module must appear on `UNICORN_ROADMAP.md` **or** be REJECTED/DEPRECATED here with owner + stop rule.
 5. Status vocabulary is exactly: LIVE | LIVE_BEHIND_FLAG | PILOT | PARTIAL | INTERNAL_ONLY | DEMO_ONLY | PAUSED | BLOCKED | DEPRECATED | NOT_BUILT | REJECTED.
+6. External pilot enrollment remains **OFF** (`EXTERNAL_PILOT_ENROLLMENT_ENABLED=false`) while Pilot=BLOCKED_BY_FOUNDER.
 
 ## 1. Personas (repo-verified)
 
@@ -358,8 +366,23 @@ Fields per §4. Evidence for LIVE modules: matrix smoke + current aligned prod S
 ## 8. Related registries
 
 - `frontend/src/lib/all-workspace-modules-activation.ts`
+- `frontend/src/lib/production-action-gates.ts`
 - `docs/PRODUCT_LIVE_MATRIX_2026-07-14.md`
 - `docs/FEATURE_FLAG_REGISTRY_2026-07-13.md`
+- `docs/FULL_PRODUCT_PRODUCTIONIZATION_PLAN.md`
+- `docs/HARD_LIVE_DEFINITION_30.md`
+- `docs/PILOT_FOUNDER_BLOCK_DECISION_2026-07-20.md`
 - `docs/PRODUCT_METRICS.md`
 - `docs/PLACEMENT_VERIFICATION.md`
 - `docs/UNICORN_ROADMAP.md`
+
+### Wave 0 foundations (Alembic 087)
+
+| Pillar | Status | LIVE claim |
+|--------|--------|------------|
+| Tenancy / memberships / RBAC tables | Schema + seed | **INTERNAL** — not product LIVE |
+| Audit events (060) + domain events (087) | Present | **INTERNAL** |
+| Feature flag states + enrollment gate | Present · enrollment OFF | **INTERNAL** |
+| Privacy ops cases + export_requests | Present | **PARTIAL / PILOT** trust UIs |
+| Communication outbox | Draft-only | **INTERNAL** |
+| Observability | structured logs on foundation writes | **INTERNAL** |

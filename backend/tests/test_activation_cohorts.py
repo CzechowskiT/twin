@@ -125,6 +125,25 @@ def test_cohort_crud_and_evidence_exclusion(monkeypatch) -> None:
         assert create.status_code == 200, create.text
         cohort_id = create.json()["id"]
 
+        blocked = client.post(
+            f"/api/v1/admin/cohorts/{cohort_id}/participants",
+            headers=headers,
+            json={"email": "real-pilot@firma.pl", "role": "candidate", "status": "joined"},
+        )
+        assert blocked.status_code == 403, blocked.text
+
+        from app.database.models import FeatureFlagState
+        from app.services import platform_foundations as foundations
+
+        foundations.seed_system_roles(db)
+        flag = (
+            db.query(FeatureFlagState)
+            .filter(FeatureFlagState.flag_key == "EXTERNAL_PILOT_ENROLLMENT_ENABLED")
+            .one()
+        )
+        flag.enabled = True
+        db.commit()
+
         add_real = client.post(
             f"/api/v1/admin/cohorts/{cohort_id}/participants",
             headers=headers,
@@ -134,7 +153,12 @@ def test_cohort_crud_and_evidence_exclusion(monkeypatch) -> None:
         add_smoke = client.post(
             f"/api/v1/admin/cohorts/{cohort_id}/participants",
             headers=headers,
-            json={"email": "smoke-exclude-ns@firma.pl", "role": "candidate", "status": "joined"},
+            json={
+                "email": "smoke-exclude-ns@firma.pl",
+                "role": "candidate",
+                "status": "joined",
+                "exclude_from_product_metrics": True,
+            },
         )
         assert add_smoke.status_code == 200, add_smoke.text
 
@@ -166,6 +190,7 @@ def test_cohort_crud_and_evidence_exclusion(monkeypatch) -> None:
         assert body["north_star_excluding_test"] >= 1
         assert body["north_star_including_test_labeled"]["value"] >= 1
         assert "FOUNDERS_ACTION_REQUIRED_recruit_users" in body["blockers"]
+        assert "PILOT_BLOCKED_BY_FOUNDER" in body["blockers"]
         assert body["gates"]["gate_f"] == "PENDING"
         assert body["gates"]["launch"] == "NO-GO"
 

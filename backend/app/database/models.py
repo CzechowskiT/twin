@@ -1973,3 +1973,147 @@ class ActivationCohortParticipant(Base):
 
     cohort: Mapped["ActivationCohort"] = relationship(back_populates="participants")
 
+
+class OrganizationTenant(Base):
+    """Wave 0 tenancy foundation — company/agency/internal orgs (no marketplace yet)."""
+
+    __tablename__ = "organization_tenants"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    slug: Mapped[str] = mapped_column(String(80), unique=True, index=True)
+    display_name: Mapped[str] = mapped_column(String(200))
+    tenant_type: Mapped[str] = mapped_column(String(32), default="company", index=True)
+    status: Mapped[str] = mapped_column(String(32), default="active", index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class RoleDefinition(Base):
+    """System role keys for RBAC foundation (invites still gated)."""
+
+    __tablename__ = "role_definitions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    key: Mapped[str] = mapped_column(String(64), unique=True)
+    persona: Mapped[str] = mapped_column(String(32), index=True)
+    label: Mapped[str] = mapped_column(String(120))
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    is_system: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class TenantMembership(Base):
+    """User membership in a tenant with a role_key — foundation only."""
+
+    __tablename__ = "tenant_memberships"
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "user_id", "role_key", name="uq_tenant_membership"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    tenant_id: Mapped[int] = mapped_column(
+        ForeignKey("organization_tenants.id", ondelete="CASCADE"), index=True
+    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    role_key: Mapped[str] = mapped_column(String(64), index=True)
+    status: Mapped[str] = mapped_column(String(32), default="active")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class PermissionGrant(Base):
+    """Permission keys granted to role_key — enforce gradually in later waves."""
+
+    __tablename__ = "permission_grants"
+    __table_args__ = (
+        UniqueConstraint("role_key", "permission_key", name="uq_permission_grant"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    role_key: Mapped[str] = mapped_column(String(64), index=True)
+    permission_key: Mapped[str] = mapped_column(String(128))
+    effect: Mapped[str] = mapped_column(String(16), default="allow")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class FeatureFlagState(Base):
+    """Runtime feature flag overrides (default source of truth remains code/env registry)."""
+
+    __tablename__ = "feature_flag_states"
+    __table_args__ = (
+        UniqueConstraint("flag_key", "scope", "tenant_id", name="uq_feature_flag_state"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    flag_key: Mapped[str] = mapped_column(String(128), index=True)
+    enabled: Mapped[bool] = mapped_column(Boolean, default=False)
+    scope: Mapped[str] = mapped_column(String(32), default="global")
+    tenant_id: Mapped[int | None] = mapped_column(
+        ForeignKey("organization_tenants.id", ondelete="SET NULL"), nullable=True
+    )
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class PlatformDomainEvent(Base):
+    """Append-only domain event model (complements audit_events)."""
+
+    __tablename__ = "platform_domain_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    event_name: Mapped[str] = mapped_column(String(128), index=True)
+    aggregate_type: Mapped[str] = mapped_column(String(64))
+    aggregate_id: Mapped[str] = mapped_column(String(128))
+    actor_user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
+    tenant_id: Mapped[int | None] = mapped_column(
+        ForeignKey("organization_tenants.id", ondelete="SET NULL"), nullable=True
+    )
+    payload_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    source: Mapped[str] = mapped_column(String(32), default="twin_internal")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+
+
+class PrivacyOpsCase(Base):
+    """Unified privacy ops case (export / deletion / correction) — foundation queue."""
+
+    __tablename__ = "privacy_ops_cases"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    case_type: Mapped[str] = mapped_column(String(32), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    status: Mapped[str] = mapped_column(String(32), default="open", index=True)
+    legal_basis_note: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    payload_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    source: Mapped[str] = mapped_column(String(32), default="twin_internal")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CommunicationOutbox(Base):
+    """Shared transactional communication outbox — draft only until workers send."""
+
+    __tablename__ = "communication_outbox"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    channel: Mapped[str] = mapped_column(String(32), default="email")
+    template_key: Mapped[str] = mapped_column(String(128), index=True)
+    recipient_user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
+    recipient_email_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="draft", index=True)
+    payload_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    dedupe_key: Mapped[str | None] = mapped_column(String(128), unique=True, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    sent_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+

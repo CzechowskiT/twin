@@ -14,17 +14,23 @@
 | Phase 3B ops re-runs | **BLOCKED** without founder auth — **not flipped** |
 | Gate F | **PENDING** |
 | Launch | **NO-GO** |
+| Pilot | **BLOCKED_BY_FOUNDER** |
+| PMF evidence | **INSUFFICIENT_DATA** |
+| real_candidate_enrollment | **NOT_STARTED** |
+| real_recruiter_enrollment | **NOT_STARTED** |
 | Funnel instrumentation | **LIVE** — PR [#523](https://github.com/CzechowskiT/twin/pull/523) |
-| Activation TTV proof | **LIVE** (flag-gated) — PR [#524](https://github.com/CzechowskiT/twin/pull/524) @ `0976bf04…` |
-| Deploy alignment | **ALIGNED** — public-health FE=API=`0976bf04…` |
+| Activation TTV proof | **LIVE** (flag-gated) — PR [#524](https://github.com/CzechowskiT/twin/pull/524) |
+| Activation cohort registry | **LIVE infra** (#526 / Alembic 086) — **no real invites** |
+| Deploy alignment (baseline) | **ALIGNED** @ `f9b792fd…` (re-verify after Wave 0) |
+| Productionization | [`FULL_PRODUCT_PRODUCTIONIZATION_PLAN.md`](./FULL_PRODUCT_PRODUCTIONIZATION_PLAN.md) · Hard LIVE [`HARD_LIVE_DEFINITION_30.md`](./HARD_LIVE_DEFINITION_30.md) |
 
-**This roadmap does not flip Gate F / Launch / Phase 3B.**
+**This roadmap does not flip Gate F / Launch / Phase 3B / Pilot enrollment.**
 
 ## Executive posture
 
-TWIN has a real MVP surface (candidate matches + applications + Google calendar + recruiter inbox pilot) plus **LIVE** funnel/activation instrumentation (#523/#524). Moat candidates remain: acceptance-ready calendar loop + placement verification state machine — **not** scraper volume, **not** “AI moat” without proprietary labeled deal/hiring data. Biggest risk: empty cohorts → no PMF learning. Shortest PMF path: **fill activation cohort** while keeping Gate F PENDING. Enterprise Deal Intelligence (Karwatka) is a **P2–P3 epic** — first experiment is process discipline (EB + rival + next paid commitment), not a platform rewrite.
+TWIN has a real MVP surface (candidate matches + applications + Google calendar + recruiter inbox) plus **LIVE** funnel/activation instrumentation (#523/#524/#526 registry). **Founder hard block:** external pilot is **BLOCKED_BY_FOUNDER** until **all user-facing modules** meet Hard LIVE 30 — do **not** recruit real users, do **not** recommend Gate F PASS, do **not** declare PMF. Moat candidates remain: acceptance-ready calendar loop + placement verification state machine. Enterprise Deal Intelligence (Karwatka) stays **P2–P3**.
 
-Realistic path to $1B: **low single-digit probability this decade** without dual-side liquidity + verified placement economics + enterprise trust; treat as multi-year category play.
+**Dates for all required user-facing modules LIVE** (velocity model in productionization plan): optimistic **2026-10-19** · realistic **2027-01-12** · conservative **2027-07-05**.
 
 **Sole prioritized roadmap:** this file. `docs/PRODUCT_ROADMAP.md` is historical context only.
 
@@ -59,7 +65,7 @@ Realistic path to $1B: **low single-digit probability this decade** without dual
 
 | Item | Pri | Impact | Cost | Risk | Deps | Measurable result | LIVE / exit criteria | Owner | Continue/stop |
 |------|-----|--------|------|------|------|-------------------|----------------------|-------|---------------|
-| **Activation Cohort Fill** (20–50 PL desk candidates + 3–5 recruiters) | **P1** | High | M | Trust/PII | #523/#524 LIVE | ≥20 signups with `onboarding_completed`; ≥10 `first_match`; weekly active acceptance actions | Cohort report non-empty; no PII incident | Founder + growth | **Continue** if TTV p50 improves; **stop invites** on PII or match-empty >40% — **readiness LIVE** (registry `086`, ops pack); recruitment = FOUNDERS_ACTION_REQUIRED |
+| **Activation Cohort Fill** (20–50 PL desk candidates + 3–5 recruiters) | **P1** | High | M | Trust/PII | #523/#524/#526 LIVE infra | ≥20 signups with `onboarding_completed`; ≥10 `first_match` | **HOLD** — Pilot **BLOCKED_BY_FOUNDER**; registry only | Founder + growth | **Stop invites** until all user-facing modules LIVE per productionization plan |
 | Founder Gate F decision record | P0 | High | Docs | Org | Evidence pack | Gate F YES/NO signed | Decision file updated | Founder | Stop public growth marketing if NO |
 | Wire interview/placement funnel emits | P1 | High | S | Low | schedule/verify APIs | Events on real interview/placement | Staging events visible | Product | Continue |
 | Trust PILOT → smoke (export, corrections, identity verification, portability, consent receipt, control center, overview, audit export) | P1 | Med | M | Privacy | Wave B | Founder mutation smoke PASS on non-demo account | Each module → LIVE or stay PILOT with date | candidate-squad | Stop if DSR gaps |

@@ -395,6 +395,9 @@ def build_cohort_evidence(db: Session, cohort_id: int) -> dict[str, Any]:
         blockers.append("onboarded_without_first_match")
     if cohort.status in {"draft", "recruiting"} and len(parts) < cohort.target_count:
         blockers.append("below_target_count")
+    blockers.append("PILOT_BLOCKED_BY_FOUNDER")
+    blockers.append("EXTERNAL_ENROLLMENT_NOT_STARTED")
+    # Legacy alias kept for older dashboards
     blockers.append("FOUNDERS_ACTION_REQUIRED_recruit_users")
 
     return {

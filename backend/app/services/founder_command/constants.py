@@ -17,9 +17,10 @@ DEFAULT_MAX_RETRIES_PER_STAGE = 3
 DEFAULT_MAX_OPEN_PRS = 3
 DEFAULT_MAX_ACTIVE_RUNS = 1
 
-GATE_F_STATUS = "PASS"
-LAUNCH_STANCE = "GO"
-KNOWN_PROD_SHA_HINT = "2cf36c27f3b942bfa9c7bfd5787139e06a998465"
+GATE_F_STATUS = "PENDING"
+LAUNCH_STANCE = "NO-GO"
+# Aligned public-health after #526 cohort readiness (update on each aligned deploy).
+KNOWN_PROD_SHA_HINT = "f9b792fd5f23474f1231c27ba7743c7250a4a47f"
 
 
 class AutonomyLevel(int, Enum):

@@ -3,7 +3,13 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
+import {
+  PILOT_STANCE,
+  shouldBlockExternalPilotEnrollment,
+} from "@/lib/production-action-gates";
+
 const STORAGE_KEY = "twin_ops_admin_token";
+const ENROLLMENT_BLOCKED = shouldBlockExternalPilotEnrollment();
 
 type Cohort = {
   id: number;
@@ -87,7 +93,9 @@ export default function AdminCohortsPage() {
         headers: headers(),
       });
       if (!res.ok) throw new Error(await res.text());
-      setMsg("PL pilot cohort ensured. FOUNDERS_ACTION_REQUIRED: invite real users (ops pack).");
+      setMsg(
+        "PL pilot cohort registry ensured (infra only). Pilot BLOCKED_BY_FOUNDER — do NOT invite real users.",
+      );
       await load();
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Ensure failed");
@@ -114,6 +122,12 @@ export default function AdminCohortsPage() {
   );
 
   const addParticipant = useCallback(async () => {
+    if (ENROLLMENT_BLOCKED) {
+      setErr(
+        "External pilot enrollment is BLOCKED_BY_FOUNDER — real participant adds are disabled.",
+      );
+      return;
+    }
     if (!selectedId || !email.trim()) return;
     setMsg(null);
     setErr(null);
@@ -143,8 +157,16 @@ export default function AdminCohortsPage() {
         </Link>
       </p>
       <h1 className="mb-2 text-2xl font-semibold">Activation cohorts</h1>
-      <p className="twin-muted mb-6 text-sm">
-        Pilot registry only. Does not recruit users. Gate F stays PENDING until Founder fills N≥20.
+      <p className="twin-muted mb-2 text-sm">
+        Registry/analytics only (Alembic 086). Does not recruit users.
+      </p>
+      <p
+        className="mb-6 rounded border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100"
+        data-pilot-stance={PILOT_STANCE}
+        data-enrollment-blocked={ENROLLMENT_BLOCKED ? "1" : "0"}
+      >
+        Pilot {PILOT_STANCE}. real_candidate_enrollment=NOT_STARTED · real_recruiter_enrollment=NOT_STARTED ·
+        Gate F=PENDING · Launch=NO-GO. No real invites.
       </p>
       <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end">
         <input
@@ -206,11 +228,22 @@ export default function AdminCohortsPage() {
           <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end">
             <input
               className="twin-input min-w-0 flex-1"
-              placeholder="Add participant by email (must already exist)"
+              placeholder={
+                ENROLLMENT_BLOCKED
+                  ? "Enrollment blocked — no real participants"
+                  : "Add participant by email (must already exist)"
+              }
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={ENROLLMENT_BLOCKED}
             />
-            <button type="button" className="twin-btn-solid" onClick={() => void addParticipant()}>
+            <button
+              type="button"
+              className="twin-btn-solid"
+              onClick={() => void addParticipant()}
+              disabled={ENROLLMENT_BLOCKED}
+              title={ENROLLMENT_BLOCKED ? "BLOCKED_BY_FOUNDER" : undefined}
+            >
               Add participant
             </button>
           </div>

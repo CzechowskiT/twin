@@ -104,10 +104,17 @@ export const GREEN_WORKING_MODULE_IDS = new Set([
   "investor_workspace_hub",
 ]);
 
-/** Extended live surfaces — visible, functional previews beyond core green set. */
+/** Extended live surfaces — visible functional modules beyond core green (NOT demo fixtures). */
 const EXTENDED_MODULE_IDS = new Set([
   "candidate_career_compass",
   "career_compass",
+  "candidate_referrals",
+  "referrals",
+  "company_candidate_trust_summary",
+]);
+
+/** Demo / sample journeys — never claim LIVE; stay pilot_preview. */
+export const DEMO_SAMPLE_MODULE_IDS = new Set([
   "recruiter_demo_pipeline",
   "recruiter_demo_profile_360",
   "recruiter_demo_collaboration",
@@ -122,7 +129,6 @@ const EXTENDED_MODULE_IDS = new Set([
   "company_demo_team",
   "company_demo_communication",
   "company_demo_decision_memory",
-  "company_candidate_trust_summary",
   "investor_demo",
   "investor_sor_proof_pipeline",
   "investor_sor_proof_collaboration",
@@ -539,6 +545,7 @@ function defaultHubSection(
   activationStatus: WorkspaceModuleActivationStatus,
 ): WorkspaceModuleHubSection {
   if (INTERNAL_MODULE_IDS.has(id) || activationStatus === "INTERNAL") return "internal";
+  if (DEMO_SAMPLE_MODULE_IDS.has(id)) return "pilot_preview";
   if (activationStatus === "COMING_SOON" || activationStatus === "PAUSED") return "coming_soon_paused";
   if (activationStatus === "PILOT" || activationStatus === "PREVIEW") return "pilot_preview";
   if (EXTENDED_MODULE_IDS.has(id)) return "extended";
@@ -560,6 +567,9 @@ function buildEntryFromRoute(
   }
   if (INTERNAL_MODULE_IDS.has(id)) {
     activationStatus = "INTERNAL";
+  }
+  if (DEMO_SAMPLE_MODULE_IDS.has(id) && activationStatus === "LIVE") {
+    activationStatus = "PREVIEW";
   }
   const hubSection = override?.hubSection ?? defaultHubSection(id, activationStatus);
   const visible = activationStatus !== "INTERNAL" && !INTERNAL_MODULE_IDS.has(id);

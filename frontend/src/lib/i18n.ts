@@ -4311,6 +4311,12 @@ eyebrow: "Product roadmap",
   },
   productPolish: {
     pilotPreviewBanner: "Pilot preview — not part of public launch.",
+    nonLiveMutationBanner:
+      "Preview / sample only — not production LIVE. Submits do not create real trust, consent, or team changes.",
+    nonLiveMutationDisabled: "Production mutations are disabled until this module meets Hard LIVE criteria.",
+    nonLiveMutationDevOnly: "Dev/demo mode: local preview mutations only — never claim LIVE.",
+    externalEnrollmentBlocked:
+      "External pilot enrollment is BLOCKED_BY_FOUNDER — no real candidate or recruiter invites.",
     comingSoonLead: "This section is not part of the limited launch yet.",
     comingSoonBody:
       "We are keeping the route live with an honest placeholder — no empty subsection cards or fake content. Reach out if you need partners, careers, or media updates before public launch.",
@@ -12766,6 +12772,13 @@ const pl: MessageTree = {
   },
   productPolish: {
     pilotPreviewBanner: "Podgląd pilota — poza publicznym launch.",
+    nonLiveMutationBanner:
+      "Tylko podgląd / sample — nie jest to produkcyjne LIVE. Submit nie tworzy prawdziwych zmian trust, consent ani team.",
+    nonLiveMutationDisabled:
+      "Mutacje produkcyjne są wyłączone, dopóki moduł nie spełni kryteriów Hard LIVE.",
+    nonLiveMutationDevOnly: "Tryb dev/demo: tylko lokalne mutacje podglądu — nigdy nie oznaczaj LIVE.",
+    externalEnrollmentBlocked:
+      "Zewnętrzna rekrutacja do pilota jest BLOCKED_BY_FOUNDER — bez prawdziwych zaproszeń kandydatów i rekruterów.",
     comingSoonLead: "Ta sekcja nie jest jeszcze częścią ograniczonego launchu.",
     comingSoonBody:
       "Trzymamy trasę na żywo z uczciwym placeholderem — bez pustych kart i fikcyjnej treści. Napisz, jeśli potrzebujesz aktualizacji partners/careers/media przed launch.",
