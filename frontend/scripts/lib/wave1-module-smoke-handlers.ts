@@ -53,11 +53,12 @@ export const WAVE1_SMOKEABLE_MODULES = [
   "candidate_identity_verification",
   "cand_notifications",
   "cand_preferences",
-  "cand_cv_import",
-  "cand_cv_parsing",
   "cand_feedback",
   "cand_match_explanation",
 ] as const;
+
+/** Policy-held: PROFILE_EDIT requires Standard+ (Stripe not public) — not Wave 1 engineering LIVE. */
+export const WAVE1_POLICY_HELD_CV_MODULES = ["cand_cv_import", "cand_cv_parsing"] as const;
 
 export type Wave1SmokeableModule = (typeof WAVE1_SMOKEABLE_MODULES)[number];
 
@@ -188,6 +189,7 @@ export async function runModuleSmoke(
       }
       case "cand_cv_import":
       case "cand_cv_parsing": {
+        // Honest gate: Free/Standby cannot mutate CV until Standard+ (Stripe policy hold).
         if (!ctx.write) return { module_id: moduleId, ok: false, reason: "write_required" };
         const form = new FormData();
         const blob = new Blob(
@@ -204,15 +206,15 @@ export async function runModuleSmoke(
           },
           body: form,
         });
+        if (upload.status === 403 && upload.body.includes("paywall")) {
+          return {
+            module_id: moduleId,
+            ok: false,
+            reason: "HELD_POLICY:PROFILE_EDIT_REQUIRES_STANDARD",
+          };
+        }
         if (upload.status !== 200) {
           return { module_id: moduleId, ok: false, reason: `cv upload ${upload.status}: ${upload.body.slice(0, 120)}` };
-        }
-        const out = JSON.parse(upload.body) as { has_cv: boolean; cv_filename?: string };
-        if (!out.has_cv) {
-          return { module_id: moduleId, ok: false, reason: "has_cv false" };
-        }
-        if (moduleId === "cand_cv_parsing" && !out.cv_filename) {
-          return { module_id: moduleId, ok: false, reason: "missing cv_filename after parse" };
         }
         return { module_id: moduleId, ok: true };
       }

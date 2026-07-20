@@ -46,8 +46,6 @@ WAVE1_CANDIDATE_MODULES: tuple[dict[str, str], ...] = (
     {"module_id": "candidate_trust_overview", "owner": "candidate-squad"},
     {"module_id": "cand_notifications", "owner": "candidate-squad"},
     {"module_id": "cand_preferences", "owner": "candidate-squad"},
-    {"module_id": "cand_cv_import", "owner": "candidate-squad"},
-    {"module_id": "cand_cv_parsing", "owner": "candidate-squad"},
     {"module_id": "cand_feedback", "owner": "candidate-squad"},
     {"module_id": "cand_match_explanation", "owner": "candidate-squad"},
 )
@@ -59,6 +57,16 @@ WAVE1_HELD_MODULES: tuple[dict[str, str], ...] = (
     {"module_id": "plat_identity_kyc", "blocker": "AUTHOLOGIC_CONFIG_DEPENDENT", "owner": "candidate-squad"},
     {"module_id": "candidate_plan", "blocker": "STRIPE_NOT_PUBLIC", "owner": "candidate-squad"},
     {"module_id": "plan_payments", "blocker": "STRIPE_NOT_PUBLIC", "owner": "candidate-squad"},
+    {
+        "module_id": "cand_cv_import",
+        "blocker": "PROFILE_EDIT_REQUIRES_STANDARD",
+        "owner": "candidate-squad",
+    },
+    {
+        "module_id": "cand_cv_parsing",
+        "blocker": "PROFILE_EDIT_REQUIRES_STANDARD",
+        "owner": "candidate-squad",
+    },
     {"module_id": "cand_account_deletion", "blocker": "INTERNAL_DSR_PATH", "owner": "privacy"},
     {"module_id": "candidate_revoke_delete", "blocker": "INTERNAL_MODULE", "owner": "privacy"},
 )

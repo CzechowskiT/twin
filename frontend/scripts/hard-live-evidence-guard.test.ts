@@ -26,7 +26,7 @@ test("stance remains Founder-blocked", () => {
 test("no PASS rows with missing criterion 25 or without smoke_sha", () => {
   assert.doesNotThrow(() => assertNoLivePassWithoutSmoke());
   const passed = HARD_LIVE_EVIDENCE_REGISTRY_WAVE1.filter((r) => r.status === "PASS");
-  assert.equal(passed.length, 6);
+  assert.equal(passed.length, 12);
   for (const row of passed) {
     assert.ok(!row.missing_criteria.includes(25), row.module_id);
     assert.ok(row.smoke_sha, row.module_id);
@@ -49,6 +49,7 @@ test("wave1 trust modules present and held policy modules blocked", () => {
   const held = HARD_LIVE_EVIDENCE_REGISTRY_WAVE1.filter((r) => r.status === "HELD_POLICY");
   assert.ok(held.some((r) => r.module_id === "auto_apply"));
   assert.ok(held.some((r) => r.module_id === "cand_ms_calendar"));
+  assert.ok(held.some((r) => r.module_id === "cand_cv_import"));
   assert.ok(held.every((r) => r.blocker));
 });
 
@@ -67,11 +68,11 @@ test("docs registry JSON mirrors TS module ids and PASS smoke fields", () => {
   assert.equal(doc.stance.pilot, "BLOCKED_BY_FOUNDER");
   assert.equal(doc.stance.external_pilot_enrollment_enabled, false);
   const passDocs = doc.modules.filter((m) => m.status === "PASS");
-  assert.equal(passDocs.length, 6);
+  assert.equal(passDocs.length, 12);
   for (const m of passDocs) {
     assert.ok(m.smoke_sha, m.module_id);
   }
-  assert.match(raw, /PENDING_SMOKE/);
+  assert.doesNotMatch(raw, /PENDING_SMOKE/);
   assert.match(raw, /HELD_POLICY/);
 });
 

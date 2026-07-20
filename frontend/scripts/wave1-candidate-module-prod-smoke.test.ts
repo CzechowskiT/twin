@@ -39,7 +39,7 @@ async function fetchApi(path: string, init?: RequestInit): Promise<{ status: num
 }
 
 test("0 harness artifacts + fail-closed without JWT documented", () => {
-  assert.ok(WAVE1_SMOKEABLE_MODULES.length >= 8);
+  assert.ok(WAVE1_SMOKEABLE_MODULES.length >= 6);
   assert.match(
     readFileSync(join(repoRoot, "frontend/package.json"), "utf8"),
     /test:wave1-candidate-module-prod-smoke/,

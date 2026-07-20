@@ -12,10 +12,10 @@
   },
   "live_badge_rule": "PASS + authenticated prod smoke on aligned SHA required before capability map LIVE",
   "smoke_evidence": {
-    "script": "frontend/scripts/wave1-candidate-trust-prod-smoke.test.ts",
-    "sha": "9a889a8e9d685c1270e64b2954913c9b37e4357b",
-    "at": "2026-07-20T19:50:00Z",
-    "result": "PASS 4/4",
+    "script": "frontend/scripts/wave1-candidate-module-prod-smoke.test.ts",
+    "sha": "cf773744c92c7ccfae408175b27c30f498d5361f",
+    "at": "2026-07-20T20:25:00Z",
+    "result": "PASS 4/4 modules 6/6",
     "write": true,
     "exclude_from_product_metrics": true,
     "jwt_source": "approved_smoke_register_path",
@@ -30,8 +30,8 @@
       "route": "/dashboard/trust/consent-receipt",
       "blocker": null,
       "owner": "candidate-squad",
-      "smoke_sha": "9a889a8e9d685c1270e64b2954913c9b37e4357b",
-      "smoke_at": "2026-07-20T19:50:00Z"
+      "smoke_sha": "cf773744c92c7ccfae408175b27c30f498d5361f",
+      "smoke_at": "2026-07-20T20:25:00Z"
     },
     {
       "module_id": "candidate_control_center",
@@ -41,8 +41,8 @@
       "route": "/dashboard/trust/controls",
       "blocker": null,
       "owner": "candidate-squad",
-      "smoke_sha": "9a889a8e9d685c1270e64b2954913c9b37e4357b",
-      "smoke_at": "2026-07-20T19:50:00Z"
+      "smoke_sha": "cf773744c92c7ccfae408175b27c30f498d5361f",
+      "smoke_at": "2026-07-20T20:25:00Z"
     },
     {
       "module_id": "candidate_correction_request",
@@ -52,8 +52,8 @@
       "route": "/dashboard/trust/corrections",
       "blocker": null,
       "owner": "candidate-squad",
-      "smoke_sha": "9a889a8e9d685c1270e64b2954913c9b37e4357b",
-      "smoke_at": "2026-07-20T19:50:00Z"
+      "smoke_sha": "cf773744c92c7ccfae408175b27c30f498d5361f",
+      "smoke_at": "2026-07-20T20:25:00Z"
     },
     {
       "module_id": "candidate_data_portability",
@@ -63,30 +63,30 @@
       "route": "/dashboard/trust/portability",
       "blocker": null,
       "owner": "candidate-squad",
-      "smoke_sha": "9a889a8e9d685c1270e64b2954913c9b37e4357b",
-      "smoke_at": "2026-07-20T19:50:00Z"
+      "smoke_sha": "cf773744c92c7ccfae408175b27c30f498d5361f",
+      "smoke_at": "2026-07-20T20:25:00Z"
     },
     {
       "module_id": "candidate_export_preview",
       "persona": "candidate",
       "wave": "1",
-      "status": "PARTIAL",
+      "status": "PASS",
       "route": "/dashboard/trust/export-preview",
-      "blocker": "awaiting_module_smoke",
+      "blocker": null,
       "owner": "candidate-squad",
-      "smoke_sha": "9a889a8e9d685c1270e64b2954913c9b37e4357b",
-      "smoke_at": "2026-07-20T19:50:00Z"
+      "smoke_sha": "cf773744c92c7ccfae408175b27c30f498d5361f",
+      "smoke_at": "2026-07-20T20:25:00Z"
     },
     {
       "module_id": "candidate_identity_verification",
       "persona": "candidate",
       "wave": "1",
-      "status": "PARTIAL",
+      "status": "PASS",
       "route": "/dashboard/trust/identity-verification",
-      "blocker": "awaiting_module_smoke",
+      "blocker": null,
       "owner": "candidate-squad",
-      "smoke_sha": "9a889a8e9d685c1270e64b2954913c9b37e4357b",
-      "smoke_at": "2026-07-20T19:50:00Z"
+      "smoke_sha": "cf773744c92c7ccfae408175b27c30f498d5361f",
+      "smoke_at": "2026-07-20T20:25:00Z"
     },
     {
       "module_id": "candidate_trust_audit_export",
@@ -96,8 +96,8 @@
       "route": "/dashboard/trust/audit-export",
       "blocker": null,
       "owner": "candidate-squad",
-      "smoke_sha": "9a889a8e9d685c1270e64b2954913c9b37e4357b",
-      "smoke_at": "2026-07-20T19:50:00Z"
+      "smoke_sha": "cf773744c92c7ccfae408175b27c30f498d5361f",
+      "smoke_at": "2026-07-20T20:25:00Z"
     },
     {
       "module_id": "candidate_trust_overview",
@@ -107,62 +107,70 @@
       "route": "/dashboard/trust/overview",
       "blocker": null,
       "owner": "candidate-squad",
-      "smoke_sha": "9a889a8e9d685c1270e64b2954913c9b37e4357b",
-      "smoke_at": "2026-07-20T19:50:00Z"
+      "smoke_sha": "cf773744c92c7ccfae408175b27c30f498d5361f",
+      "smoke_at": "2026-07-20T20:25:00Z"
     },
     {
       "module_id": "cand_notifications",
       "persona": "candidate",
       "wave": "1",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/trust/controls",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "candidate-squad"
+      "blocker": null,
+      "owner": "candidate-squad",
+      "smoke_sha": "cf773744c92c7ccfae408175b27c30f498d5361f",
+      "smoke_at": "2026-07-20T20:25:00Z"
     },
     {
       "module_id": "cand_preferences",
       "persona": "candidate",
       "wave": "1",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/trust/visibility-preferences",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "candidate-squad"
+      "blocker": null,
+      "owner": "candidate-squad",
+      "smoke_sha": "cf773744c92c7ccfae408175b27c30f498d5361f",
+      "smoke_at": "2026-07-20T20:25:00Z"
     },
     {
       "module_id": "cand_cv_import",
       "persona": "candidate",
       "wave": "1",
-      "status": "PENDING_SMOKE",
+      "status": "HELD_POLICY",
       "route": "/dashboard/cv",
-      "blocker": "authenticated_prod_smoke_required",
+      "blocker": "PROFILE_EDIT_REQUIRES_STANDARD",
       "owner": "candidate-squad"
     },
     {
       "module_id": "cand_cv_parsing",
       "persona": "candidate",
       "wave": "1",
-      "status": "PENDING_SMOKE",
+      "status": "HELD_POLICY",
       "route": "/dashboard/cv",
-      "blocker": "authenticated_prod_smoke_required",
+      "blocker": "PROFILE_EDIT_REQUIRES_STANDARD",
       "owner": "candidate-squad"
     },
     {
       "module_id": "cand_feedback",
       "persona": "candidate",
       "wave": "1",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/matches",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "candidate-squad"
+      "blocker": null,
+      "owner": "candidate-squad",
+      "smoke_sha": "cf773744c92c7ccfae408175b27c30f498d5361f",
+      "smoke_at": "2026-07-20T20:25:00Z"
     },
     {
       "module_id": "cand_match_explanation",
       "persona": "candidate",
       "wave": "1",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/matches",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "candidate-squad"
+      "blocker": null,
+      "owner": "candidate-squad",
+      "smoke_sha": "cf773744c92c7ccfae408175b27c30f498d5361f",
+      "smoke_at": "2026-07-20T20:25:00Z"
     },
     {
       "module_id": "auto_apply",

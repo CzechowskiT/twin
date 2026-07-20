@@ -174,14 +174,14 @@ Monetization/Stripe public and ATS live-sync remain **outside** waves until expl
 - [x] Capability map LIVE for 6 trust modules; export/identity PARTIAL; cand_* not faked LIVE
 - [x] Policy-held modules remain HELD (auto-apply, MS write, Stripe, KYC vendor, INTERNAL delete)
 
-**Exit status:** Trust LIVE slice **DONE** (6 LIVE). Wave 1 overall still **PARTIAL** until remaining PENDING_SMOKE / PARTIAL candidate modules clear — no Gate F / Launch / enrollment flip.
+**Exit status:** Trust LIVE slice **DONE** (6 LIVE). Wave 1 overall **DONE_WITH_POLICY_HOLDS** after gap-close module smoke (12 Hard LIVE PASS; CV/Stripe/KYC/MS/auto-apply/delete HELD).
 
-### Gap-close batch (in flight / this PR)
+### Gap-close batch
 
 - [x] Per-module smoke harness (`WAVE1_SMOKE_MODULES`, fail-closed without JWT)
 - [x] Export preview live lifecycle (export.json + privacy export intake + ops queue row)
 - [x] Identity = manual review status + KYC read; Authologic provider remains HELD
-- [ ] Authenticated per-module prod smoke PASS → then registry LIVE badges
-- [ ] Capability map LIVE updates only post-smoke
+- [x] Authenticated per-module prod smoke PASS 6/6 @ `cf773744`
+- [x] Capability map LIVE updates post-smoke; CV modules honest HELD_POLICY
 
-**Next after gap-close DONE_WITH_POLICY_HOLDS:** Wave 2 Recruiter — see consolidated report.
+**Next:** Wave 2 Recruiter complete — see consolidated report.
