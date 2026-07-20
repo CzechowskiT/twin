@@ -25,6 +25,7 @@ celery_app.conf.update(
         "app.tasks.nightly_auto_apply",
         "app.tasks.agent_dispatch_tasks",
         "app.tasks.founder_command_tasks",
+        "app.tasks.activation_matching_tasks",
     ),
 )
 

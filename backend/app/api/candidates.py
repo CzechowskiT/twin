@@ -664,6 +664,42 @@ def get_my_matches(
     return JobMatchListOut(items=items, total=len(items))
 
 
+@router.get("/me/activation-status")
+def get_my_activation_status(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict[str, Any]:
+    """Non-PII activation matching UX state for post-onboarding matches page."""
+    from app.services.activation_matching import get_activation_status
+
+    return get_activation_status(db, user)
+
+
+@router.post("/me/activation-matching/retry")
+@limiter.limit("10/minute", key_func=user_or_ip_key)
+def retry_my_activation_matching(
+    request: Request,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict[str, Any]:
+    from app.services.activation_matching import retry_activation_matching
+
+    return retry_activation_matching(db, user)
+
+
+@router.post("/me/activation-ttv-view")
+@limiter.limit("30/minute", key_func=user_or_ip_key)
+def record_my_activation_ttv_view(
+    request: Request,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict[str, Any]:
+    """Server-side activation_ttv_matches_view (once per user; refresh-safe)."""
+    from app.services.activation_matching import record_activation_ttv_view
+
+    return record_activation_ttv_view(db, user, surface="matches_activated")
+
+
 @router.get("/me/match-feedback", response_model=JobMatchFeedbackListOut)
 def list_my_match_feedback(
     db: Session = Depends(get_db),

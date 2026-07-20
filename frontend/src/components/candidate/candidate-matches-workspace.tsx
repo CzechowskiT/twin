@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
+import { ActivationMatchingStatus } from "@/components/candidate/activation-matching-status";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { useTranslation } from "@/components/language-provider";
 import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
@@ -23,9 +25,12 @@ import { dashboardMatchesQuery } from "@/lib/matching-quality";
 
 export function CandidateMatchesWorkspace() {
   const { t } = useTranslation();
+  const searchParams = useSearchParams();
+  const activated = searchParams.get("activated") === "1";
   const [matches, setMatches] = useState<DashboardMatchList | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activationPending, setActivationPending] = useState(false);
 
   const loadMatches = useCallback(async () => {
     const token = getToken();
@@ -47,9 +52,19 @@ export function CandidateMatchesWorkspace() {
     void loadMatches();
   }, [loadMatches]);
 
+  // Re-fetch matches when activation matching completes
+  useEffect(() => {
+    if (!activated || !activationPending) return;
+    const id = window.setInterval(() => {
+      void loadMatches();
+    }, 3000);
+    return () => window.clearInterval(id);
+  }, [activated, activationPending, loadMatches]);
+
   const liveItems = matches?.items ?? [];
-  const showPilot = !loading && liveItems.length === 0;
-  const displayItems = showPilot ? CANDIDATE_MATCHES_PILOT_ITEMS : liveItems;
+  // During activation path, activation banner owns empty/pending UX (no pilot sample cards).
+  const showPilotCards = !loading && liveItems.length === 0 && !activated;
+  const displayItems = showPilotCards ? CANDIDATE_MATCHES_PILOT_ITEMS : liveItems;
 
   const pageTitle = useMemo(() => t("candidateMatchesPage.pageTitle"), [t]);
 
@@ -70,10 +85,21 @@ export function CandidateMatchesWorkspace() {
         <CandidateWorkspaceSubnav ariaLabel={pageTitle} />
         <WorkspaceFlowSteps current="matches" className="mb-2" />
 
+        <ActivationMatchingStatus
+          activated={activated}
+          matchCount={liveItems.length}
+          onStatusChange={(s) => {
+            setActivationPending(s?.ux_state === "matching_in_progress");
+            if (s && (s.ux_state === "matches_ready" || s.match_count > 0)) {
+              void loadMatches();
+            }
+          }}
+        />
+
         {error ? <p className="text-sm text-red-500">{error}</p> : null}
         {loading ? <p className="twin-muted text-sm">{t("dashboard.matchesLoading")}</p> : null}
 
-        {showPilot ? (
+        {showPilotCards ? (
           <Card variant="soft" className="border border-[var(--twin-border)]/80 p-4 text-sm">
             <DemoJourneyPilotStatus className="items-start" />
             <p className="mt-3 text-[var(--twin-muted-strong)]">{t("candidateMatchesPage.pilotLead")}</p>
@@ -85,14 +111,14 @@ export function CandidateMatchesWorkspace() {
           </Card>
         ) : null}
 
-        {!loading && displayItems.length > 0 ? (
+        {!loading && displayItems.length > 0 && !showPilotCards ? (
           <Card variant="soft" className="p-5 sm:p-6">
             <JobList items={displayItems} showScore />
             <p className="twin-muted mt-4 text-xs leading-relaxed">{t("candidateMatchesPage.decisionBoundary")}</p>
           </Card>
         ) : null}
 
-        {!loading && !showPilot && displayItems.length === 0 ? (
+        {!loading && !showPilotCards && displayItems.length === 0 && !activated ? (
           <GuidedEmptyState
             title={t("candidateMatchesPage.emptyTitle")}
             message={t("candidateMatchesPage.emptyMessage")}

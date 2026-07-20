@@ -11,6 +11,13 @@ export const PRODUCT_FUNNEL_EVENTS = [
   "placement_declared",
   "placement_verified",
   "activation_ttv_matches_view",
+  "activation_matching_eligible",
+  "activation_matching_not_eligible",
+  "activation_matching_dispatched",
+  "activation_matching_started",
+  "activation_matching_completed",
+  "activation_matching_failed",
+  "activation_first_match_created",
 ] as const;
 
 export type ProductFunnelEventName = (typeof PRODUCT_FUNNEL_EVENTS)[number];

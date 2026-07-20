@@ -16,6 +16,10 @@
 | `PRODUCT_FUNNEL_EVENTS_ENABLED` | backend `config.py` | `true` | Server funnel writes; set `false` to stop |
 | `NEXT_PUBLIC_TTV_MATCHES_REDIRECT` | `features.ts` | on unless `false` | Activation experiment → matches |
 | `NEXT_PUBLIC_PRODUCT_FUNNEL_CLIENT` | `features.ts` | on unless `false` | Consent-gated client dual-write |
+| `ACTIVATION_AUTO_MATCHING_ENABLED` | backend `config.py` | `true` | Auto-match after onboarding |
+| `ACTIVATION_TTV_METRICS_ENABLED` | backend `config.py` | `true` | Funnel TTV percentiles block |
+| `ACTIVATION_TTV_ALERTS_ENABLED` | backend `config.py` | `true` | Activation quality alerts |
+| `NEXT_PUBLIC_ACTIVATION_MATCHING_STATUS_ENABLED` | `features.ts` | on unless `false` | Matches page activation banner |
 
 ## Hard-ban flags (must remain true / blocked)
 

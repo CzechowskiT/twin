@@ -489,6 +489,15 @@ class Settings(BaseSettings):
     # Set PRODUCT_FUNNEL_EVENTS_ENABLED=false for instant rollback without migration reverse.
     product_funnel_events_enabled: bool = True
 
+    # Activation TTV — independent kill switches (rollback without data loss / destructive migration).
+    activation_auto_matching_enabled: bool = True
+    activation_ttv_metrics_enabled: bool = True
+    activation_ttv_alerts_enabled: bool = True
+    activation_first_match_min_rate: float = 0.80
+    activation_first_match_p90_max_seconds: int = 3600
+    activation_matching_failure_rate_max: float = 0.10
+    activation_stuck_max_age_seconds: int = 7200
+    activation_alerts_min_sample_size: int = 10
 
     # Custom GPT Actions — TWIN Product Operator (Railway-only secret; never frontend/Vercel)
     chatgpt_twin_actions_api_key: str = ""
