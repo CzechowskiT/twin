@@ -25,29 +25,8 @@ const ALL_PENDING: Record<string, HardLiveCriterionResult> = Object.fromEntries(
   Array.from({ length: 30 }, (_, i) => [String(i + 1), "PENDING" as const]),
 );
 
-const SMOKE_SHA = "9a889a8e9d685c1270e64b2954913c9b37e4357b";
-const SMOKE_AT = "2026-07-20T19:50:00Z";
-
-function pendingModule(
-  module_id: string,
-  route: string,
-  owner: string,
-  notes: string,
-  missing: number[] = [25],
-): HardLiveModuleEvidence {
-  return {
-    module_id,
-    persona: "candidate",
-    wave: "1",
-    status: "PENDING_SMOKE",
-    route,
-    owner,
-    blocker: "authenticated_prod_smoke_required",
-    missing_criteria: missing,
-    criteria: { ...ALL_PENDING },
-    notes,
-  };
-}
+const SMOKE_SHA = "cf773744c92c7ccfae408175b27c30f498d5361f";
+const SMOKE_AT = "2026-07-20T20:25:00Z";
 
 function passModule(
   module_id: string,
@@ -67,34 +46,6 @@ function passModule(
     owner,
     blocker: null,
     missing_criteria: [],
-    criteria,
-    notes,
-    smoke_sha: SMOKE_SHA,
-    smoke_at: SMOKE_AT,
-  };
-}
-
-function partialModule(
-  module_id: string,
-  route: string,
-  owner: string,
-  blocker: string,
-  notes: string,
-  missing: number[],
-): HardLiveModuleEvidence {
-  const criteria: Record<string, HardLiveCriterionResult> = { ...ALL_PENDING, "25": "PASS" };
-  for (const n of missing) {
-    criteria[String(n)] = n === 25 ? "PASS" : "PENDING";
-  }
-  return {
-    module_id,
-    persona: "candidate",
-    wave: "1",
-    status: "PARTIAL",
-    route,
-    owner,
-    blocker,
-    missing_criteria: missing.filter((n) => n !== 25),
     criteria,
     notes,
     smoke_sha: SMOKE_SHA,
@@ -149,21 +100,17 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE1: HardLiveModuleEvidence[] = [
     "candidate-squad",
     "Auth prod smoke PASS — privacy portability path on same live trust surface.",
   ),
-  partialModule(
+  passModule(
     "candidate_export_preview",
     "/dashboard/trust/export-preview",
     "candidate-squad",
-    "awaiting_module_smoke",
-    "Live path wired: export.json + privacy export intake + export-requests queued_for_ops_intake — PASS only after per-module smoke.",
-    [25, 30],
+    "Module smoke PASS — self-serve export.json + export intake + ops queue (non-fulfillment).",
   ),
-  partialModule(
+  passModule(
     "candidate_identity_verification",
     "/dashboard/trust/identity-verification",
     "candidate-squad",
-    "awaiting_module_smoke",
-    "Manual identity review status wired (KYC status read + identity_review intake). Authologic start stays plat_identity_kyc HELD — PASS after module smoke.",
-    [25],
+    "Module smoke PASS — manual identity review status + KYC read; Authologic start stays HELD.",
   ),
   passModule(
     "candidate_trust_audit_export",
@@ -177,26 +124,43 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE1: HardLiveModuleEvidence[] = [
     "candidate-squad",
     "Auth prod smoke PASS — live trust center aggregate overview.",
   ),
-  pendingModule(
+  passModule(
     "cand_notifications",
     "/dashboard/trust/controls",
     "candidate-squad",
-    "Trust smoke did not exercise notification preference PATCH — keep pending.",
+    "Module smoke PASS — PATCH notification-preferences toggle + restore.",
   ),
-  pendingModule(
+  passModule(
     "cand_preferences",
     "/dashboard/trust/visibility-preferences",
     "candidate-squad",
-    "Trust smoke did not exercise visibility prefs mutation — keep pending.",
+    "Module smoke PASS — visibility preferences POST/PATCH persistence.",
   ),
-  pendingModule("cand_cv_import", "/dashboard/cv", "candidate-squad", "Not covered by Wave 1 trust smoke — no LIVE."),
-  pendingModule("cand_cv_parsing", "/dashboard/cv", "candidate-squad", "Not covered by Wave 1 trust smoke — no LIVE."),
-  pendingModule("cand_feedback", "/dashboard/matches", "candidate-squad", "Not covered by Wave 1 trust smoke — no LIVE."),
-  pendingModule(
+  heldModule(
+    "cand_cv_import",
+    "/dashboard/cv",
+    "candidate-squad",
+    "PROFILE_EDIT_REQUIRES_STANDARD",
+    "CV upload gated by PROFILE_EDIT → Standard+; Stripe public not LIVE — policy hold.",
+  ),
+  heldModule(
+    "cand_cv_parsing",
+    "/dashboard/cv",
+    "candidate-squad",
+    "PROFILE_EDIT_REQUIRES_STANDARD",
+    "CV parse path shares PROFILE_EDIT Standard+ gate — policy hold with Stripe/plan.",
+  ),
+  passModule(
+    "cand_feedback",
+    "/dashboard/matches",
+    "candidate-squad",
+    "Module smoke PASS — match-feedback list/POST (or empty matches read path).",
+  ),
+  passModule(
     "cand_match_explanation",
     "/dashboard/matches",
     "candidate-squad",
-    "Partial explainability; not covered by Wave 1 trust smoke — no LIVE.",
+    "Module smoke PASS — matches API exposes score/match_reason schema fields.",
   ),
   heldModule("auto_apply", "/dashboard#auto-apply-readiness", "ops", "AUTO_APPLY_PAUSED", "Hard ban — do not LIVE."),
   heldModule(
@@ -244,7 +208,7 @@ export const HARD_LIVE_REGISTRY_META = {
   },
   live_badge_rule: "PASS status + authenticated prod smoke on aligned SHA required before capability map LIVE",
   smoke_evidence: {
-    script: "frontend/scripts/wave1-candidate-trust-prod-smoke.test.ts",
+    script: "frontend/scripts/wave1-candidate-module-prod-smoke.test.ts",
     sha: SMOKE_SHA,
     at: SMOKE_AT,
     write: true,

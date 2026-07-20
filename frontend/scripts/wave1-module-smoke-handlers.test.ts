@@ -22,9 +22,9 @@ test("parseModuleSelection accepts comma list", () => {
   ]);
 });
 
-test("smokeable set covers export + identity + six cand_*", () => {
+test("smokeable set covers export + identity + four cand_* (CV held)", () => {
   assert.ok(WAVE1_SMOKEABLE_MODULES.includes("candidate_export_preview"));
   assert.ok(WAVE1_SMOKEABLE_MODULES.includes("candidate_identity_verification"));
-  assert.ok(WAVE1_SMOKEABLE_MODULES.includes("cand_cv_import"));
-  assert.equal(WAVE1_SMOKEABLE_MODULES.length, 8);
+  assert.ok(!WAVE1_SMOKEABLE_MODULES.includes("cand_cv_import"));
+  assert.equal(WAVE1_SMOKEABLE_MODULES.length, 6);
 });

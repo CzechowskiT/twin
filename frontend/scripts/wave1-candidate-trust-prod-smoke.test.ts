@@ -29,7 +29,7 @@ async function fetchApi(path: string, init?: RequestInit): Promise<{ status: num
 }
 
 test("1 wave1 smoke artifacts exist", () => {
-  assert.ok(readFileSync(join(repoRoot, "docs/HARD_LIVE_EVIDENCE_REGISTRY.json"), "utf8").includes("PENDING_SMOKE"));
+  assert.ok(readFileSync(join(repoRoot, "docs/HARD_LIVE_EVIDENCE_REGISTRY.json"), "utf8").includes("HELD_POLICY"));
   assert.match(
     readFileSync(join(repoRoot, "frontend/package.json"), "utf8"),
     /test:wave1-candidate-trust-prod-smoke/,
