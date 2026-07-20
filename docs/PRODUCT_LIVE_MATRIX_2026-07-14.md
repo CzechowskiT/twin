@@ -1,18 +1,20 @@
 # PRODUCT LIVE MATRIX — 2026-07-14
 
-> **Canonical.** Supersedes `PUBLIC_LAUNCH_FUNCTIONALITY_INVENTORY_2026-07-13.md` for module status tracking.
-> **Stance:** Launch NO-GO · Gate F PENDING · P0 CLOSED
+> **Workspace smoke catalog** (activation registry). For **company/product capability status truth**, priorities, Karwatka/EDI, and non-LIVE roadmap coverage, use **`docs/CANONICAL_PRODUCT_CAPABILITY_MAP.md`** + **`docs/UNICORN_ROADMAP.md`** (2026-07-20).
+> Supersedes `PUBLIC_LAUNCH_FUNCTIONALITY_INVENTORY_2026-07-13.md` for hub module rows.
+> **Stance (locked):** Launch **NO-GO** · Gate F **PENDING** · P0 **CLOSED** · Phase 3B not flipped
 
 ## Deploy alignment
 
 | Field | Value |
 |-------|-------|
-| repo_head | 9cb96e30 |
-| prod_frontend_commit | 9cb96e30 |
-| prod_api_commit | ae14bfb5 |
-| db_revision | 077 |
-| alignment_status | ALIGNED |
+| repo_head (matrix generation) | 9cb96e30 |
+| prod_frontend_commit (matrix generation) | 9cb96e30 |
+| prod_api_commit (matrix generation) | ae14bfb5 |
+| db_revision (matrix generation) | 077 |
+| alignment_status (at generation) | ALIGNED |
 | generated_utc | 2026-07-14T06:29:05.197Z |
+| **current prod note (2026-07-20)** | public-health FE=API=`0976bf04…` **ALIGNED**; regenerate matrix in a later batch if hub statuses change — do not treat this deploy table as current SHA |
 
 ## Product live summary
 
