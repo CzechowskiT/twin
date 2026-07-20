@@ -87,18 +87,18 @@ Observed recent cadence on this monorepo (Cursor agents + 1 founder reviewer):
 | Realistic | **4** | 1 primary agent + intermittent review |
 | Conservative | **2** | Smoke/review bottleneck + policy waits |
 
-**~100 in-scope modules × calendar:**
+**~100 in-scope modules × calendar (updated after Wave 1 PARTIAL — trust live-path shipped, LIVE badges deferred):**
 
 | Scenario | Weeks | Calendar from 2026-07-20 |
 |----------|------:|--------------------------|
-| Optimistic | ~13 | **~2026-10-19** |
-| Realistic | ~25 | **~2027-01-12** |
+| Optimistic | ~13 | **~2026-10-19** (if auth smoke unblocks Wave 1 LIVE within days) |
+| Realistic | ~26 | **~2027-01-19** |
 | Conservative | ~50 + policy buffer | **~2027-07-05** |
 
 Policy blockers (Stripe public, ATS live-sync, auto-apply reopen, MS calendar write) can slip conservative further until Founder GO.
 
 **Founder condition met earliest (all required user-facing LIVE):**  
-optimistic **2026-10-19** · realistic **2027-01-12** · conservative **2027-07-05**.
+optimistic **2026-10-19** · realistic **2027-01-19** · conservative **2027-07-05**.
 
 ## 4. Critical path
 
@@ -163,6 +163,19 @@ Monetization/Stripe public and ATS live-sync remain **outside** waves until expl
 - [x] Platform foundations migration + API + tests
 - [x] PR #527 CI green + merge `42c3ace5` + Railway BE+worker + Vercel + public-health smoke + enrollment-gate
 
-## 10. Next batch after Wave 0
+## 10. Wave 1 Candidate Complete (this batch — PARTIAL until auth smoke)
 
-**Wave 1 Candidate complete** — see consolidated report “Next recommended batch” prompt.
+- [x] Candidate surface inventory + Hard LIVE evidence registry (JSON + TS + CI guard)
+- [x] Trust PILOT UIs wired to live APIs (`/trust/live-bundle`, privacy requests, consents, export.json)
+- [x] Activity-timeline API alias honesty; visibility prefs ownership filter
+- [x] Migration `088_candidate_wave1_hard_live` + wave1 flags + evidence seed
+- [x] Backend/frontend guards + unauth prod smoke paths
+- [ ] Authenticated prod smoke PASS with `TWIN_PROD_TEST_JWT` + `TWIN_PROD_SMOKE_WRITE=1` on excluded metrics account
+- [ ] Capability map / activation LIVE badges (blocked until smoke PASS — keep PILOT / PENDING_SMOKE)
+- [ ] Policy-held modules remain HELD (auto-apply, MS write, Stripe, KYC vendor, INTERNAL delete)
+
+**Exit status:** PARTIAL — engineering live-path shipped; LIVE badge promotions deferred to post-smoke docs commit.
+
+## 11. Next batch after Wave 1
+
+**Wave 2 Recruiter complete** — see consolidated report “Next recommended batch” prompt.

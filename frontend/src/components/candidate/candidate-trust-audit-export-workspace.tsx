@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { CandidateTrustRequestStatusLoader } from "@/components/candidate/candidate-trust-request-status-loader";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
@@ -24,9 +25,13 @@ import { candidateCorrectionRequestHref } from "@/lib/candidate-correction-reque
 import { candidateDataPortabilityHref } from "@/lib/candidate-data-portability";
 import { candidateExportPreviewHref } from "@/lib/candidate-export-preview";
 import { candidateRevokeDeleteHref } from "@/lib/candidate-revoke-delete";
+import { fetchTrustLiveBundle, isDemoFixtureCandidateId } from "@/lib/candidate-trust-live";
+import { getToken } from "@/lib/auth";
+import { saveBlobAsFile } from "@/lib/api";
 import type { TranslationKey } from "@/lib/i18n";
 import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 import { NonLiveMutationBanner } from "@/components/workspace/non-live-mutation-banner";
+import { isDemoOrDevSurface } from "@/lib/production-action-gates";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -74,7 +79,13 @@ function TrustAuditExportNotFound() {
   );
 }
 
-function TrustAuditExportContent({ record }: { record: CandidateTrustAuditExportRecord }) {
+function TrustAuditExportContent({
+  record,
+  livePath,
+}: {
+  record: CandidateTrustAuditExportRecord;
+  livePath: boolean;
+}) {
   const { t } = useTranslation();
   const jsonFull = useMemo(() => JSON.stringify(record.bundle, null, 2), [record.bundle]);
 
@@ -125,7 +136,22 @@ function TrustAuditExportContent({ record }: { record: CandidateTrustAuditExport
               </span>
             </div>
           </div>
-          <NonLiveMutationBanner kind="sample_only" />
+          {livePath ? null : <NonLiveMutationBanner kind="sample_only" />}
+          {livePath ? (
+            <button
+              type="button"
+              className="twin-btn-secondary twin-touch-target"
+              data-testid="candidate-audit-export-live-download"
+              onClick={() => {
+                const blob = new Blob([JSON.stringify(record.bundle, null, 2)], {
+                  type: "application/json;charset=utf-8",
+                });
+                saveBlobAsFile(blob, "twin-trust-audit-live.json");
+              }}
+            >
+              {t("candidateTrustLive.downloadMyData")}
+            </button>
+          ) : null}
           <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
             <Link
               href={CANDIDATE_TRUST_AUDIT_EXPORT_SAFE_LINKS.trustCenter}
@@ -358,7 +384,92 @@ type CandidateTrustAuditExportWorkspaceProps = {
 };
 
 export function CandidateTrustAuditExportWorkspace({ candidateId }: CandidateTrustAuditExportWorkspaceProps) {
-  const record = resolveCandidateTrustAuditExport(candidateId);
-  if (!record) return <TrustAuditExportNotFound />;
-  return <TrustAuditExportContent record={record} />;
+  const router = useRouter();
+  const { t } = useTranslation();
+  const [loading, setLoading] = useState(true);
+  const [livePath, setLivePath] = useState(false);
+  const [record, setRecord] = useState<CandidateTrustAuditExportRecord | null>(null);
+
+  const load = useCallback(async () => {
+    if (isDemoFixtureCandidateId(candidateId) && isDemoOrDevSurface()) {
+      setRecord(resolveCandidateTrustAuditExport(candidateId));
+      setLivePath(false);
+      setLoading(false);
+      return;
+    }
+    const token = getToken();
+    if (!token) {
+      router.replace("/login/candidate");
+      return;
+    }
+    setLoading(true);
+    try {
+      const bundle = await fetchTrustLiveBundle(token);
+      const base = resolveCandidateTrustAuditExport() ?? resolveCandidateTrustAuditExport("demo-candidate-001");
+      if (!base) {
+        setRecord(null);
+      } else {
+        const liveEvents = (bundle.audit_events.items ?? []).map((ev) => ({
+          id: String(ev.id),
+          workflow: "trust_center",
+          type: ev.event_type,
+          at: typeof ev.created_at === "string" ? ev.created_at : String(ev.created_at),
+          summary: ev.summary,
+          backend_write: false as const,
+        }));
+        setRecord({
+          ...base,
+          id: String(bundle.candidate_id),
+          display_name: bundle.display_name,
+          headline: bundle.trust.twin_knows_summary,
+          last_reviewed_at: bundle.generated_at,
+          export_label: "LIVE_PATH",
+          bundle: {
+            ...base.bundle,
+            trust_center_events: liveEvents,
+          },
+        });
+      }
+      setLivePath(true);
+    } catch {
+      if (isDemoOrDevSurface()) {
+        setRecord(resolveCandidateTrustAuditExport(candidateId));
+        setLivePath(false);
+      } else {
+        setRecord(null);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [candidateId, router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  if (loading) {
+    return (
+      <Shell wide rail>
+        <div data-testid="candidate-audit-export-loading" className="space-y-4 p-6">
+          <div className="h-8 w-48 animate-pulse rounded bg-[var(--twin-border)]/60" />
+          <div className="h-32 animate-pulse rounded bg-[var(--twin-border)]/40" />
+        </div>
+      </Shell>
+    );
+  }
+
+  if (!record) {
+    return (
+      <Shell wide rail>
+        <div className="space-y-4 p-6">
+          <p className="text-sm text-[var(--twin-muted-strong)]">{t("candidateTrustAuditExport.notFoundMessage")}</p>
+          <button type="button" className="twin-btn-secondary twin-touch-target" onClick={() => void load()}>
+            {t("candidateTrustAuditExport.notFoundCta")}
+          </button>
+        </div>
+      </Shell>
+    );
+  }
+
+  return <TrustAuditExportContent record={record} livePath={livePath} />;
 }

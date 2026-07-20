@@ -25,6 +25,7 @@ from app.api import (
     candidates,
     candidate_role_status,
     candidate_visibility_preferences,
+    candidate_wave1,
     company,
     career_assistant,
     curated_careers,
@@ -59,6 +60,11 @@ api_router.include_router(
     platform_foundations.router,
     prefix="/platform/foundations",
     tags=["Platform foundations"],
+)
+api_router.include_router(
+    candidate_wave1.router,
+    prefix="/platform/wave1",
+    tags=["Candidate Wave 1"],
 )
 api_router.include_router(work_items.router, prefix="/work-items", tags=["Work items"])
 api_router.include_router(

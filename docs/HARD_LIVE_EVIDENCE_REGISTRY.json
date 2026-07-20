@@ -1,0 +1,205 @@
+{
+  "definition": "docs/HARD_LIVE_DEFINITION_30.md",
+  "wave": "1",
+  "updated": "2026-07-20",
+  "stance": {
+    "pilot": "BLOCKED_BY_FOUNDER",
+    "gate_f": "PENDING",
+    "launch": "NO-GO",
+    "pmf": "INSUFFICIENT_DATA",
+    "real_candidate_enrollment": "NOT_STARTED",
+    "external_pilot_enrollment_enabled": false
+  },
+  "live_badge_rule": "PASS + authenticated prod smoke on aligned SHA required before capability map LIVE",
+  "modules": [
+    {
+      "module_id": "candidate_consent_receipt",
+      "persona": "candidate",
+      "wave": "1",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/trust/consent-receipt",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "candidate-squad"
+    },
+    {
+      "module_id": "candidate_control_center",
+      "persona": "candidate",
+      "wave": "1",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/trust/controls",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "candidate-squad"
+    },
+    {
+      "module_id": "candidate_correction_request",
+      "persona": "candidate",
+      "wave": "1",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/trust/corrections",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "candidate-squad"
+    },
+    {
+      "module_id": "candidate_data_portability",
+      "persona": "candidate",
+      "wave": "1",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/trust/portability",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "candidate-squad"
+    },
+    {
+      "module_id": "candidate_export_preview",
+      "persona": "candidate",
+      "wave": "1",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/trust/export-preview",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "candidate-squad"
+    },
+    {
+      "module_id": "candidate_identity_verification",
+      "persona": "candidate",
+      "wave": "1",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/trust/identity-verification",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "candidate-squad"
+    },
+    {
+      "module_id": "candidate_trust_audit_export",
+      "persona": "candidate",
+      "wave": "1",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/trust/audit-export",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "candidate-squad"
+    },
+    {
+      "module_id": "candidate_trust_overview",
+      "persona": "candidate",
+      "wave": "1",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/trust/overview",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "candidate-squad"
+    },
+    {
+      "module_id": "cand_notifications",
+      "persona": "candidate",
+      "wave": "1",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/trust/controls",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "candidate-squad"
+    },
+    {
+      "module_id": "cand_preferences",
+      "persona": "candidate",
+      "wave": "1",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/trust/visibility-preferences",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "candidate-squad"
+    },
+    {
+      "module_id": "cand_cv_import",
+      "persona": "candidate",
+      "wave": "1",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/cv",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "candidate-squad"
+    },
+    {
+      "module_id": "cand_cv_parsing",
+      "persona": "candidate",
+      "wave": "1",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/cv",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "candidate-squad"
+    },
+    {
+      "module_id": "cand_feedback",
+      "persona": "candidate",
+      "wave": "1",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/matches",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "candidate-squad"
+    },
+    {
+      "module_id": "cand_match_explanation",
+      "persona": "candidate",
+      "wave": "1",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/matches",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "candidate-squad"
+    },
+    {
+      "module_id": "auto_apply",
+      "persona": "candidate",
+      "wave": "1",
+      "status": "HELD_POLICY",
+      "route": "/dashboard#auto-apply-readiness",
+      "blocker": "AUTO_APPLY_PAUSED",
+      "owner": "ops"
+    },
+    {
+      "module_id": "cand_ms_calendar",
+      "persona": "candidate",
+      "wave": "1",
+      "status": "HELD_POLICY",
+      "route": "/dashboard/calendar",
+      "blocker": "MICROSOFT_WRITE_BLOCKED",
+      "owner": "platform"
+    },
+    {
+      "module_id": "plat_identity_kyc",
+      "persona": "candidate",
+      "wave": "1",
+      "status": "HELD_POLICY",
+      "route": "/kyc",
+      "blocker": "AUTHOLOGIC_CONFIG_DEPENDENT",
+      "owner": "platform"
+    },
+    {
+      "module_id": "candidate_plan",
+      "persona": "candidate",
+      "wave": "1",
+      "status": "HELD_POLICY",
+      "route": "/dashboard/plan",
+      "blocker": "STRIPE_NOT_PUBLIC",
+      "owner": "candidate-squad"
+    },
+    {
+      "module_id": "plan_payments",
+      "persona": "candidate",
+      "wave": "1",
+      "status": "HELD_POLICY",
+      "route": "/dashboard/billing",
+      "blocker": "STRIPE_NOT_PUBLIC",
+      "owner": "candidate-squad"
+    },
+    {
+      "module_id": "cand_account_deletion",
+      "persona": "candidate",
+      "wave": "1",
+      "status": "HELD_POLICY",
+      "route": "/dashboard/trust/revoke-delete",
+      "blocker": "INTERNAL_DSR_PATH",
+      "owner": "privacy"
+    },
+    {
+      "module_id": "candidate_revoke_delete",
+      "persona": "candidate",
+      "wave": "1",
+      "status": "HELD_POLICY",
+      "route": "/dashboard/trust/revoke-delete",
+      "blocker": "INTERNAL_MODULE",
+      "owner": "privacy"
+    }
+  ]
+}

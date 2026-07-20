@@ -1,9 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { CandidateTrustRequestStatusLoader } from "@/components/candidate/candidate-trust-request-status-loader";
+import { CandidateTrustLivePrivacyForm } from "@/components/candidate/candidate-trust-live-privacy-form";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { CorrectionCategoryLabel } from "@/components/candidate/correction-request-panel";
 import { useTranslation } from "@/components/language-provider";
@@ -23,9 +26,12 @@ import { candidateDataPortabilityHref } from "@/lib/candidate-data-portability";
 import { candidateRevokeDeleteHref } from "@/lib/candidate-revoke-delete";
 import { candidateConsentReceiptHref } from "@/lib/candidate-consent-receipt";
 import { candidateTrustAuditExportHref } from "@/lib/candidate-trust-audit-export";
+import { fetchTrustLiveBundle, isDemoFixtureCandidateId } from "@/lib/candidate-trust-live";
+import { getToken } from "@/lib/auth";
 import type { TranslationKey } from "@/lib/i18n";
 import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 import { NonLiveMutationBanner } from "@/components/workspace/non-live-mutation-banner";
+import { isDemoOrDevSurface } from "@/lib/production-action-gates";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -91,7 +97,13 @@ function CorrectionRequestNotFound() {
   );
 }
 
-function CorrectionRequestContent({ record }: { record: CandidateCorrectionRequestRecord }) {
+function CorrectionRequestContent({
+  record,
+  livePath,
+}: {
+  record: CandidateCorrectionRequestRecord;
+  livePath: boolean;
+}) {
   const { t } = useTranslation();
 
   return (
@@ -132,7 +144,13 @@ function CorrectionRequestContent({ record }: { record: CandidateCorrectionReque
               </span>
             </div>
           </div>
-          <NonLiveMutationBanner kind="sample_only" />
+          {livePath ? null : <NonLiveMutationBanner kind="sample_only" />}
+          {livePath ? (
+            <CandidateTrustLivePrivacyForm
+              requestType="correction"
+              testId="candidate-correction-live-form"
+            />
+          ) : null}
           <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
             <Link
               href={CANDIDATE_CORRECTION_REQUEST_SAFE_LINKS.trustCenter}
@@ -374,7 +392,80 @@ type CandidateCorrectionRequestWorkspaceProps = {
 };
 
 export function CandidateCorrectionRequestWorkspace({ candidateId }: CandidateCorrectionRequestWorkspaceProps) {
-  const record = resolveCandidateCorrectionRequest(candidateId);
-  if (!record) return <CorrectionRequestNotFound />;
-  return <CorrectionRequestContent record={record} />;
+  const router = useRouter();
+  const { t } = useTranslation();
+  const [loading, setLoading] = useState(true);
+  const [livePath, setLivePath] = useState(false);
+  const [record, setRecord] = useState<CandidateCorrectionRequestRecord | null>(null);
+
+  const load = useCallback(async () => {
+    if (isDemoFixtureCandidateId(candidateId) && isDemoOrDevSurface()) {
+      setRecord(resolveCandidateCorrectionRequest(candidateId));
+      setLivePath(false);
+      setLoading(false);
+      return;
+    }
+    const token = getToken();
+    if (!token) {
+      router.replace("/login/candidate");
+      return;
+    }
+    setLoading(true);
+    try {
+      const bundle = await fetchTrustLiveBundle(token);
+      const base = resolveCandidateCorrectionRequest() ?? resolveCandidateCorrectionRequest("demo-candidate-001");
+      if (!base) {
+        setRecord(null);
+      } else {
+        setRecord({
+          ...base,
+          id: String(bundle.candidate_id),
+          display_name: bundle.display_name,
+          headline: bundle.trust.twin_knows_summary,
+          last_reviewed_at: bundle.generated_at,
+          correction_label: "LIVE_PATH",
+        });
+      }
+      setLivePath(true);
+    } catch {
+      if (isDemoOrDevSurface()) {
+        setRecord(resolveCandidateCorrectionRequest(candidateId));
+        setLivePath(false);
+      } else {
+        setRecord(null);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [candidateId, router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  if (loading) {
+    return (
+      <Shell wide rail>
+        <div data-testid="candidate-correction-loading" className="space-y-4 p-6">
+          <div className="h-8 w-48 animate-pulse rounded bg-[var(--twin-border)]/60" />
+          <div className="h-32 animate-pulse rounded bg-[var(--twin-border)]/40" />
+        </div>
+      </Shell>
+    );
+  }
+
+  if (!record) {
+    return (
+      <Shell wide rail>
+        <div className="space-y-4 p-6">
+          <p className="text-sm text-[var(--twin-muted-strong)]">{t("candidateCorrectionRequest.notFoundMessage")}</p>
+          <button type="button" className="twin-btn-secondary twin-touch-target" onClick={() => void load()}>
+            {t("candidateCorrectionRequest.notFoundCta")}
+          </button>
+        </div>
+      </Shell>
+    );
+  }
+
+  return <CorrectionRequestContent record={record} livePath={livePath} />;
 }

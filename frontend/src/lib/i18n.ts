@@ -218,6 +218,7 @@ export type TranslationKey =
   | `candidateRevokeDelete.${keyof typeof en.candidateRevokeDelete}`
   | `candidateTrustAuditExport.${keyof typeof en.candidateTrustAuditExport}`
   | `candidateConsentReceipt.${keyof typeof en.candidateConsentReceipt}`
+  | `candidateTrustLive.${keyof typeof en.candidateTrustLive}`
   | `candidateTrustOverview.${keyof typeof en.candidateTrustOverview}`
   | `candidatePlacementVerification.${keyof typeof en.candidatePlacementVerification}`
   | `candidateCalendarReadiness.${keyof typeof en.candidateCalendarReadiness}`
@@ -6210,6 +6211,23 @@ eyebrow: "Product roadmap",
     notFoundCta: "Back to control center",
     demoJourneyTitle: "Candidate trust audit export",
     demoJourneyDesc: "Six-workflow audit timeline, evidence references, included/excluded scope — client-side JSON download.",
+  },
+  candidateTrustLive: {
+    privacyFormLead:
+      "Submit a real privacy request for your account. Manual review applies — no auto-fulfillment and no outbound email from this form.",
+    privacyNoteLabel: "Optional note",
+    privacyNotePlaceholder: "What should we correct or include?",
+    submitting: "Submitting…",
+    submitPrivacyRequest: "Submit privacy request",
+    submitError: "Could not submit. Sign in again or retry.",
+    submitSuccess: "Request recorded",
+    livePathBadge: "LIVE PATH · smoke-gated badge",
+    downloadMyData: "Download my data (JSON)",
+    identityNotConfigured:
+      "Identity provider is not configured on this server. No fake KYC success is shown.",
+    identityVerified: "Identity verified at",
+    identityNotStarted: "Identity verification not started",
+    prefsSaved: "Communication preferences saved (no outbound in smoke).",
   },
   candidateConsentReceipt: {
     pageEyebrow: "Trust consent receipt bundle",
@@ -14679,6 +14697,23 @@ const pl: MessageTree = {
     notFoundCta: "Wróć do centrum kontroli",
     demoJourneyTitle: "Eksport audytu zaufania kandydata",
     demoJourneyDesc: "Oś czasu sześciu workflowów, odniesienia dowodowe, zakres uwzględniony/wykluczony — pobieranie JSON po stronie klienta.",
+  },
+  candidateTrustLive: {
+    privacyFormLead:
+      "Wyślij realne żądanie prywatności dla swojego konta. Obowiązuje ręczna weryfikacja — bez auto-fulfillment i bez maili wychodzących z tego formularza.",
+    privacyNoteLabel: "Opcjonalna notatka",
+    privacyNotePlaceholder: "Co mamy poprawić lub uwzględnić?",
+    submitting: "Wysyłanie…",
+    submitPrivacyRequest: "Wyślij żądanie prywatności",
+    submitError: "Nie udało się wysłać. Zaloguj się ponownie lub spróbuj jeszcze raz.",
+    submitSuccess: "Żądanie zapisane",
+    livePathBadge: "ŚCIEŻKA LIVE · odznaka po smoke",
+    downloadMyData: "Pobierz moje dane (JSON)",
+    identityNotConfigured:
+      "Dostawca tożsamości nie jest skonfigurowany na tym serwerze. Nie pokazujemy fałszywego sukcesu KYC.",
+    identityVerified: "Tożsamość zweryfikowana o",
+    identityNotStarted: "Weryfikacja tożsamości nie rozpoczęta",
+    prefsSaved: "Preferencje komunikacji zapisane (bez outbounds w smoke).",
   },
   candidateConsentReceipt: {
     pageEyebrow: "Paczka potwierdzenia zgody zaufania",
