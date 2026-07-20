@@ -269,7 +269,7 @@ def create_command(
         )
     )
     if approval["blocked"]:
-        command.status = CommandStatus.AWAITING_APPROVAL.value
+        command.status = CommandStatus.NEEDS_FOUNDER.value
         command.current_stage = CommandStage.APPROVAL_POLICY.value
         command.live_summary = "Founder approval required before dispatch"
         notify_founder(
@@ -524,7 +524,10 @@ def approve_decision(
     )
     if approve and row.command_id:
         cmd = db.get(FounderCommand, row.command_id)
-        if cmd and cmd.status == CommandStatus.AWAITING_APPROVAL.value:
+        if cmd and cmd.status in {
+            CommandStatus.AWAITING_APPROVAL.value,
+            CommandStatus.NEEDS_FOUNDER.value,
+        }:
             # If no more pending, resume
             from app.services.founder_command.approval_policy import command_has_blocking_pending
 
