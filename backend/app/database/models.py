@@ -1871,3 +1871,21 @@ class FounderCommandAuditEvent(Base):
     detail_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
+
+class ProductFunnelEvent(Base):
+    """Append-only product funnel milestones (non-PII props) for north-star metrics."""
+
+    __tablename__ = "product_funnel_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=True,
+        index=True,
+    )
+    persona: Mapped[str] = mapped_column(String(32), default="candidate")
+    event_name: Mapped[str] = mapped_column(String(64), index=True)
+    signup_week: Mapped[str | None] = mapped_column(String(10), nullable=True, index=True)
+    properties_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    occurred_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+

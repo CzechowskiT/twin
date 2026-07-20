@@ -10,3 +10,14 @@ export const MICROSOFT_BUSY_READ_ENABLED =
 /** Microsoft OAuth connect UI for busy-read — default off (no-op connect). */
 export const MICROSOFT_OAUTH_CONNECT_GATE_ENABLED =
   process.env.NEXT_PUBLIC_MICROSOFT_OAUTH_CONNECT_GATE_ENABLED === "true";
+
+/**
+ * Activation experiment: after onboarding, send candidates to matches (TTV)
+ * instead of the generic dashboard. Default ON; set NEXT_PUBLIC_TTV_MATCHES_REDIRECT=false to roll back.
+ */
+export const TTV_MATCHES_REDIRECT_ENABLED =
+  process.env.NEXT_PUBLIC_TTV_MATCHES_REDIRECT !== "false";
+
+/** Optional client dual-write of funnel events via analytics.ts (consent-gated). */
+export const PRODUCT_FUNNEL_CLIENT_ENABLED =
+  process.env.NEXT_PUBLIC_PRODUCT_FUNNEL_CLIENT !== "false";

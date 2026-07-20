@@ -16,6 +16,7 @@ from app.services.admin_placement_queue import build_placement_dispute_queue
 from app.services.data_quality_metrics import build_data_quality_report
 from app.services.partner_auth import mint_partner_api_key, revoke_partner_api_key
 from app.services.placement_verification import ops_resolve_placement_dispute
+from app.services.product_funnel import build_cohort_retention, build_funnel_snapshot
 from app.services.recruiter_company_auth import mint_recruiter_company_token, revoke_recruiter_company_token
 
 router = APIRouter()
@@ -102,6 +103,30 @@ def admin_metrics(
 ) -> dict:
     _require_ops_admin(settings, authorization)
     return build_admin_metrics(db)
+
+
+@router.get("/funnel")
+def admin_funnel(
+    days: int = 30,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None, alias="Authorization"),
+) -> dict:
+    """Product funnel snapshot — north star + conversion rates (ops admin)."""
+    _require_ops_admin(settings, authorization)
+    return build_funnel_snapshot(db, days=days)
+
+
+@router.get("/retention")
+def admin_retention(
+    weeks: int = 8,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None, alias="Authorization"),
+) -> dict:
+    """Signup-week cohort retention (D7/D30) for growth readiness."""
+    _require_ops_admin(settings, authorization)
+    return build_cohort_retention(db, weeks=weeks)
 
 
 @router.get("/market-coverage-status")

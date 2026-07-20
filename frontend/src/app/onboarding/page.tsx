@@ -12,6 +12,8 @@ import { Card, Shell } from "@/components/ui";
 import { ProfileImport } from "@/components/onboarding/ProfileImport";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
+import { trackEvent } from "@/lib/analytics";
+import { PRODUCT_FUNNEL_CLIENT_ENABLED, TTV_MATCHES_REDIRECT_ENABLED } from "@/lib/features";
 
 const STEPS = ["welcome", "profile", "skills", "preferences", "cv"] as const;
 const STORAGE_KEY = "twin_onboarding_step_v1";
@@ -23,6 +25,13 @@ function readStoredStep(): number {
   const raw = window.localStorage.getItem(STORAGE_KEY);
   const n = raw ? Number.parseInt(raw, 10) : 0;
   return Number.isFinite(n) && n >= 0 && n < STEPS.length ? n : 0;
+}
+
+function postOnboardingPath(): string {
+  if (TTV_MATCHES_REDIRECT_ENABLED) {
+    return "/dashboard/matches?activated=1";
+  }
+  return "/dashboard";
 }
 
 export default function OnboardingPage() {
@@ -40,26 +49,39 @@ export default function OnboardingPage() {
     if (typeof window !== "undefined") window.localStorage.setItem(STORAGE_KEY, String(step));
   }, [step]);
 
-  const completeOnboarding = useCallback(async (opts?: { celebrate?: boolean }) => {
-    const token = getToken();
-    if (!token) {
-      router.replace("/login/candidate");
-      return false;
-    }
-    await apiFetch("/api/v1/auth/onboarding/complete", { method: "POST" }, token);
-    if (typeof window !== "undefined") window.localStorage.removeItem(STORAGE_KEY);
-    if (opts?.celebrate) {
-      confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
-      toast.success(t("onboardingFlow.doneToast"));
-    }
-    return true;
-  }, [router, t]);
+  const completeOnboarding = useCallback(
+    async (opts?: { celebrate?: boolean }) => {
+      const token = getToken();
+      if (!token) {
+        router.replace("/login/candidate");
+        return false;
+      }
+      await apiFetch("/api/v1/auth/onboarding/complete", { method: "POST" }, token);
+      if (typeof window !== "undefined") window.localStorage.removeItem(STORAGE_KEY);
+      if (PRODUCT_FUNNEL_CLIENT_ENABLED) {
+        trackEvent("onboarding_completed", {
+          surface: "onboarding",
+          ttv_matches_redirect: TTV_MATCHES_REDIRECT_ENABLED,
+        });
+      }
+      if (opts?.celebrate) {
+        confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
+        toast.success(t("onboardingFlow.doneToast"));
+      }
+      return true;
+    },
+    [router, t],
+  );
 
   const finish = useCallback(async () => {
     setFinishing(true);
     try {
       await completeOnboarding({ celebrate: true });
-      router.push("/dashboard");
+      const path = postOnboardingPath();
+      if (PRODUCT_FUNNEL_CLIENT_ENABLED && TTV_MATCHES_REDIRECT_ENABLED) {
+        trackEvent("activation_ttv_matches_view", { surface: "onboarding_finish" });
+      }
+      router.push(path);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t("onboardingFlow.failed"));
     } finally {
@@ -71,7 +93,11 @@ export default function OnboardingPage() {
     setFinishing(true);
     try {
       await completeOnboarding();
-      router.push("/dashboard");
+      const path = postOnboardingPath();
+      if (PRODUCT_FUNNEL_CLIENT_ENABLED && TTV_MATCHES_REDIRECT_ENABLED) {
+        trackEvent("activation_ttv_matches_view", { surface: "onboarding_skip" });
+      }
+      router.push(path);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t("onboardingFlow.failed"));
     } finally {
@@ -138,7 +164,9 @@ export default function OnboardingPage() {
                   disabled={finishing}
                   onClick={() => void finish()}
                 >
-                  {t("onboardingFlow.finish")}
+                  {TTV_MATCHES_REDIRECT_ENABLED
+                    ? t("onboardingFlow.finishSeeMatches")
+                    : t("onboardingFlow.finish")}
                 </button>
               )}
               {step > 0 ? (

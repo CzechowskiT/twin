@@ -1833,7 +1833,8 @@ const en = {
     back: "Back",
     skip: "Skip for now",
     finish: "Finish onboarding",
-    doneToast: "Onboarding complete",
+    finishSeeMatches: "See my matches",
+    doneToast: "Onboarding complete — opening your ranked matches",
     failed: "Could not save onboarding status",
   },
   help: {
@@ -10262,7 +10263,8 @@ const pl: MessageTree = {
     back: "Wstecz",
     skip: "Pomiń na razie",
     finish: "Zakończ onboarding",
-    doneToast: "Onboarding ukończony",
+    finishSeeMatches: "Zobacz dopasowania",
+    doneToast: "Onboarding ukończony — otwieramy ranking dopasowań",
     failed: "Nie udało się zapisać statusu",
   },
   help: {
