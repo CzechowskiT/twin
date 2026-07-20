@@ -27,7 +27,7 @@
 | `application_created` | no | `POST /applications/` | `job_id`, `application_id` |
 | `first_application` | yes | same | `application_id` |
 | `calendar_connected` | yes | Google calendar OAuth callback | `provider` |
-| `interview_scheduled` | no | (wire on schedule create — ready) | — |
+| `interview_scheduled` | no | Google calendar create + recruiter manual schedule | `provider`, `application_id` |
 | `placement_declared` | no | (wire on declare — ready) | — |
 | `placement_verified` | no | (wire on verify — ready) | — |
 | `activation_ttv_matches_view` | yes (server once) | POST `/candidates/me/activation-ttv-view` + optional FE | `surface`, `correlation_id` |
@@ -41,9 +41,13 @@ Client dual-write is **optional** (`NEXT_PUBLIC_PRODUCT_FUNNEL_CLIENT`, consent-
 |------|------|---------|
 | `GET /api/v1/admin/metrics` | ops Bearer | Headline KPIs + north star + conversion |
 | `GET /api/v1/admin/funnel?days=30` | ops Bearer | Full funnel snapshot |
-| `GET /api/v1/admin/retention?weeks=8` | ops Bearer | Signup-week D7/D30 cohorts |
-| FE `/admin/metrics` | same token via BFF | Dashboard UI |
-| FE `/api/ops-admin/funnel` · `/retention` | BFF proxy | Same |
+| `GET /api/v1/admin/retention?weeks=8` | ops Bearer | Signup-week D7/D30 cohorts (excludes test by default) |
+| `GET/POST /api/v1/admin/cohorts` | ops Bearer | Activation pilot cohort registry |
+| `GET /api/v1/admin/cohorts/{id}/evidence` | ops Bearer | Cohort step counts + NS excl/incl test |
+| FE `/admin/metrics` · `/admin/cohorts` | same token via BFF | Dashboard UI |
+| FE `/api/ops-admin/funnel` · `/retention` · `/cohorts` | BFF proxy | Same |
+
+**Pilot invites / exclusion:** see [`ACTIVATION_COHORT_OPS_PACK_2026-07-20.md`](./ACTIVATION_COHORT_OPS_PACK_2026-07-20.md).
 
 ## Metrics tree (implementation state)
 

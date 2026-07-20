@@ -59,7 +59,7 @@ Realistic path to $1B: **low single-digit probability this decade** without dual
 
 | Item | Pri | Impact | Cost | Risk | Deps | Measurable result | LIVE / exit criteria | Owner | Continue/stop |
 |------|-----|--------|------|------|------|-------------------|----------------------|-------|---------------|
-| **Activation Cohort Fill** (20–50 PL desk candidates + 3–5 recruiters) | **P1** | High | M | Trust/PII | #523/#524 LIVE | ≥20 signups with `onboarding_completed`; ≥10 `first_match`; weekly active acceptance actions | Cohort report non-empty; no PII incident | Founder + growth | **Continue** if TTV p50 improves; **stop invites** on PII or match-empty >40% |
+| **Activation Cohort Fill** (20–50 PL desk candidates + 3–5 recruiters) | **P1** | High | M | Trust/PII | #523/#524 LIVE | ≥20 signups with `onboarding_completed`; ≥10 `first_match`; weekly active acceptance actions | Cohort report non-empty; no PII incident | Founder + growth | **Continue** if TTV p50 improves; **stop invites** on PII or match-empty >40% — **readiness LIVE** (registry `086`, ops pack); recruitment = FOUNDERS_ACTION_REQUIRED |
 | Founder Gate F decision record | P0 | High | Docs | Org | Evidence pack | Gate F YES/NO signed | Decision file updated | Founder | Stop public growth marketing if NO |
 | Wire interview/placement funnel emits | P1 | High | S | Low | schedule/verify APIs | Events on real interview/placement | Staging events visible | Product | Continue |
 | Trust PILOT → smoke (export, corrections, identity verification, portability, consent receipt, control center, overview, audit export) | P1 | Med | M | Privacy | Wave B | Founder mutation smoke PASS on non-demo account | Each module → LIVE or stay PILOT with date | candidate-squad | Stop if DSR gaps |

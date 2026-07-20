@@ -243,6 +243,12 @@ def register(request: Request, body: UserRegister, db: Session = Depends(get_db)
         signup_utm_campaign=normalize_utm_field(body.utm_campaign),
         signup_utm_content=normalize_utm_field(body.utm_content) or normalize_utm_field(body.ref),
     )
+    try:
+        from app.services.metrics_exclusion import apply_metrics_exclusion_to_user
+
+        apply_metrics_exclusion_to_user(user)
+    except Exception:
+        pass
     db.add(user)
     db.flush()
     ensure_user_referral_public_token(db, user)
@@ -393,6 +399,13 @@ def _authenticate(email: str, password: str, db: Session) -> Token:
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Privacy and consent setup incomplete — finish the consent flow in the app.",
         )
+    try:
+        from app.services.metrics_exclusion import apply_metrics_exclusion_to_user
+
+        if apply_metrics_exclusion_to_user(user, db=db, commit=True):
+            pass
+    except Exception:
+        pass
     token = create_access_token(user.email)
     return Token(access_token=token)
 

@@ -1920,3 +1920,56 @@ class ActivationMatchingJob(Base):
     started_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
+
+class ActivationCohort(Base):
+    """Pilot activation cohort registry (candidates / recruiters / employers)."""
+
+    __tablename__ = "activation_cohorts"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(200))
+    cohort_type: Mapped[str] = mapped_column(String(32), index=True)  # candidate|recruiter|employer|mixed
+    market: Mapped[str] = mapped_column(String(64), default="PL", index=True)
+    language: Mapped[str] = mapped_column(String(16), default="pl")
+    starts_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    ends_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    target_count: Mapped[int] = mapped_column(Integer, default=50)
+    status: Mapped[str] = mapped_column(String(32), default="draft", index=True)
+    owner: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    source: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    campaign: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    participants: Mapped[list["ActivationCohortParticipant"]] = relationship(
+        back_populates="cohort",
+        cascade="all, delete-orphan",
+    )
+
+
+class ActivationCohortParticipant(Base):
+    """User membership in an activation cohort — never mix synthetic smoke into NS."""
+
+    __tablename__ = "activation_cohort_participants"
+    __table_args__ = (
+        UniqueConstraint("cohort_id", "user_id", name="uq_activation_cohort_user"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    cohort_id: Mapped[int] = mapped_column(
+        ForeignKey("activation_cohorts.id", ondelete="CASCADE"),
+        index=True,
+    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    role: Mapped[str] = mapped_column(String(32))  # candidate|recruiter|employer
+    joined_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    source: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="invited", index=True)
+    exclude_from_product_metrics: Mapped[bool] = mapped_column(Boolean, default=False)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    cohort: Mapped["ActivationCohort"] = relationship(back_populates="participants")
+

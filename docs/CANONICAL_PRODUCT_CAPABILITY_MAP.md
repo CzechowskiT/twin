@@ -6,17 +6,18 @@
 | Field | Value |
 |-------|-------|
 | Date | 2026-07-20 |
-| repo_head | `0976bf04ef143c7de47f8d056858ca242871cdaf` |
-| prod_frontend_commit | `0976bf04…` (public-health) |
-| prod_api_commit | `0976bf04…` (public-health) |
-| alignment_status | **ALIGNED** |
-| docs_only_drift | false at map authoring (prod=scaffold HEAD) |
+| repo_head | `0c1284962f7bf8375571202e336f777eca09a500` (pre-cohort-fill; update after merge) |
+| prod_frontend_commit | `0c128496…` (public-health) |
+| prod_api_commit | `0976bf04…` (public-health; #524) |
+| alignment_status | **PARTIAL** — FE ahead of API (docs #525); cohort-fill PR pending deploy |
+| docs_only_drift | true until Railway catches cohort registry |
 | Gate F | **PENDING** |
 | Launch | **NO-GO** |
 | Phase 3B | Gate E historical **PASS 20/20**; ops policy **BLOCKED** for unauth re-runs — **not flipped** |
 | P0 | **CLOSED** |
 | Funnel | PR **#523** LIVE |
 | Activation TTV | PR **#524** LIVE (flag-gated UX) |
+| Activation cohort registry | readiness batch (Alembic 086) — recruitment FOUNDERS_ACTION_REQUIRED |
 | Source principles | [Karwatka — Enterprise Deals](https://tomaszkarwatka.substack.com/p/enterprise-deals-every-one-we-lost) |
 
 ## Hard rules

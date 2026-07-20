@@ -112,8 +112,13 @@ export default function AdminMetricsPage() {
   return (
     <main className="twin-shell twin-shell--wide py-10">
       <h1 className="mb-2 text-2xl font-semibold">Product metrics</h1>
-      <p className="twin-muted mb-6 text-sm">
+      <p className="twin-muted mb-2 text-sm">
         North star + funnel KPIs. Server-side events are source of truth when instrumentation is enabled.
+      </p>
+      <p className="mb-6 text-sm">
+        <Link href="/admin/cohorts" className="underline">
+          Activation cohorts →
+        </Link>
       </p>
       <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end">
         <input
