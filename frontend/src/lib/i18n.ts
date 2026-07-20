@@ -200,6 +200,7 @@ export type TranslationKey =
   | `homepageCandidateStory.${keyof typeof en.homepageCandidateStory}`
   | `founderLedDemo.${keyof typeof en.founderLedDemo}`
   | `candidateMatchesPage.${keyof typeof en.candidateMatchesPage}`
+  | `activationMatching.${keyof typeof en.activationMatching}`
   | `candidateOffersPage.${keyof typeof en.candidateOffersPage}`
   | `candidateProfile360.${keyof typeof en.candidateProfile360}`
   | `jobPipeline.${keyof typeof en.jobPipeline}`

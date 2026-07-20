@@ -10,8 +10,8 @@ import test from "node:test";
 import {
   ACTIVATION_MATCHING_STATUS_ENABLED,
   TTV_MATCHES_REDIRECT_ENABLED,
-} from "../src/lib/features.ts";
-import { PRODUCT_FUNNEL_EVENTS } from "../src/lib/product-funnel-events.ts";
+} from "../src/lib/features";
+import { PRODUCT_FUNNEL_EVENTS } from "../src/lib/product-funnel-events";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
