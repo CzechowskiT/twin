@@ -24,7 +24,7 @@
 | `NEXT_PUBLIC_ACTIVATION_MATCHING_STATUS_ENABLED` | `features.ts` | on unless `false` | Matches page activation banner |
 | `PLATFORM_FOUNDATIONS_WAVE0` | DB seed via `platform_foundations` | `true` | Schema present — not product LIVE claim |
 | `CANDIDATE_WAVE1_TRUST_LIVE_PATH` | DB seed via `candidate_wave1` | `true` | Trust UIs use real APIs — LIVE badge still smoke-gated |
-| `CANDIDATE_WAVE1_HARD_LIVE_REGISTRY` | DB seed via `candidate_wave1` | `true` | Hard LIVE evidence rows seeded PENDING_SMOKE / HELD_POLICY |
+| `CANDIDATE_WAVE1_HARD_LIVE_REGISTRY` | DB seed via `candidate_wave1` | `true` | Hard LIVE evidence rows — 6 PASS / 2 PARTIAL after auth smoke 2026-07-20 |
 | `MICROSOFT_CALENDAR_WRITE_ENABLED` | DB seed via `candidate_wave1` | `false` | Hard ban — MS write blocked |
 
 ## Hard-ban flags (must remain true / blocked)

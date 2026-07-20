@@ -163,18 +163,18 @@ Monetization/Stripe public and ATS live-sync remain **outside** waves until expl
 - [x] Platform foundations migration + API + tests
 - [x] PR #527 CI green + merge `42c3ace5` + Railway BE+worker + Vercel + public-health smoke + enrollment-gate
 
-## 10. Wave 1 Candidate Complete (this batch — PARTIAL until auth smoke)
+## 10. Wave 1 Candidate Complete (this batch — trust LIVE slice DONE; overall PARTIAL)
 
 - [x] Candidate surface inventory + Hard LIVE evidence registry (JSON + TS + CI guard)
 - [x] Trust PILOT UIs wired to live APIs (`/trust/live-bundle`, privacy requests, consents, export.json)
 - [x] Activity-timeline API alias honesty; visibility prefs ownership filter
 - [x] Migration `088_candidate_wave1_hard_live` + wave1 flags + evidence seed
 - [x] Backend/frontend guards + unauth prod smoke paths
-- [ ] Authenticated prod smoke PASS with `TWIN_PROD_TEST_JWT` + `TWIN_PROD_SMOKE_WRITE=1` on excluded metrics account
-- [ ] Capability map / activation LIVE badges (blocked until smoke PASS — keep PILOT / PENDING_SMOKE)
-- [ ] Policy-held modules remain HELD (auto-apply, MS write, Stripe, KYC vendor, INTERNAL delete)
+- [x] Authenticated prod smoke PASS with excluded metrics account + `TWIN_PROD_SMOKE_WRITE=1` (2026-07-20)
+- [x] Capability map LIVE for 6 trust modules; export/identity PARTIAL; cand_* not faked LIVE
+- [x] Policy-held modules remain HELD (auto-apply, MS write, Stripe, KYC vendor, INTERNAL delete)
 
-**Exit status:** PARTIAL — engineering live-path shipped; LIVE badge promotions deferred to post-smoke docs commit.
+**Exit status:** Trust LIVE slice **DONE** (6 LIVE). Wave 1 overall still **PARTIAL** until remaining PENDING_SMOKE / PARTIAL candidate modules clear — no Gate F / Launch / enrollment flip.
 
 ## 11. Next batch after Wave 1
 

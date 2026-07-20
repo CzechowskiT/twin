@@ -11,78 +11,104 @@
     "external_pilot_enrollment_enabled": false
   },
   "live_badge_rule": "PASS + authenticated prod smoke on aligned SHA required before capability map LIVE",
+  "smoke_evidence": {
+    "script": "frontend/scripts/wave1-candidate-trust-prod-smoke.test.ts",
+    "sha": "9a889a8e9d685c1270e64b2954913c9b37e4357b",
+    "at": "2026-07-20T19:50:00Z",
+    "result": "PASS 4/4",
+    "write": true,
+    "exclude_from_product_metrics": true,
+    "jwt_source": "approved_smoke_register_path",
+    "jwt_never_committed": true
+  },
   "modules": [
     {
       "module_id": "candidate_consent_receipt",
       "persona": "candidate",
       "wave": "1",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/trust/consent-receipt",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "candidate-squad"
+      "blocker": null,
+      "owner": "candidate-squad",
+      "smoke_sha": "9a889a8e9d685c1270e64b2954913c9b37e4357b",
+      "smoke_at": "2026-07-20T19:50:00Z"
     },
     {
       "module_id": "candidate_control_center",
       "persona": "candidate",
       "wave": "1",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/trust/controls",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "candidate-squad"
+      "blocker": null,
+      "owner": "candidate-squad",
+      "smoke_sha": "9a889a8e9d685c1270e64b2954913c9b37e4357b",
+      "smoke_at": "2026-07-20T19:50:00Z"
     },
     {
       "module_id": "candidate_correction_request",
       "persona": "candidate",
       "wave": "1",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/trust/corrections",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "candidate-squad"
+      "blocker": null,
+      "owner": "candidate-squad",
+      "smoke_sha": "9a889a8e9d685c1270e64b2954913c9b37e4357b",
+      "smoke_at": "2026-07-20T19:50:00Z"
     },
     {
       "module_id": "candidate_data_portability",
       "persona": "candidate",
       "wave": "1",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/trust/portability",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "candidate-squad"
+      "blocker": null,
+      "owner": "candidate-squad",
+      "smoke_sha": "9a889a8e9d685c1270e64b2954913c9b37e4357b",
+      "smoke_at": "2026-07-20T19:50:00Z"
     },
     {
       "module_id": "candidate_export_preview",
       "persona": "candidate",
       "wave": "1",
-      "status": "PENDING_SMOKE",
+      "status": "PARTIAL",
       "route": "/dashboard/trust/export-preview",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "candidate-squad"
+      "blocker": "preview_queue_non_fulfillment",
+      "owner": "candidate-squad",
+      "smoke_sha": "9a889a8e9d685c1270e64b2954913c9b37e4357b",
+      "smoke_at": "2026-07-20T19:50:00Z"
     },
     {
       "module_id": "candidate_identity_verification",
       "persona": "candidate",
       "wave": "1",
-      "status": "PENDING_SMOKE",
+      "status": "PARTIAL",
       "route": "/dashboard/trust/identity-verification",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "candidate-squad"
+      "blocker": "AUTHOLOGIC_CONFIG_DEPENDENT",
+      "owner": "candidate-squad",
+      "smoke_sha": "9a889a8e9d685c1270e64b2954913c9b37e4357b",
+      "smoke_at": "2026-07-20T19:50:00Z"
     },
     {
       "module_id": "candidate_trust_audit_export",
       "persona": "candidate",
       "wave": "1",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/trust/audit-export",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "candidate-squad"
+      "blocker": null,
+      "owner": "candidate-squad",
+      "smoke_sha": "9a889a8e9d685c1270e64b2954913c9b37e4357b",
+      "smoke_at": "2026-07-20T19:50:00Z"
     },
     {
       "module_id": "candidate_trust_overview",
       "persona": "candidate",
       "wave": "1",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/trust/overview",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "candidate-squad"
+      "blocker": null,
+      "owner": "candidate-squad",
+      "smoke_sha": "9a889a8e9d685c1270e64b2954913c9b37e4357b",
+      "smoke_at": "2026-07-20T19:50:00Z"
     },
     {
       "module_id": "cand_notifications",
