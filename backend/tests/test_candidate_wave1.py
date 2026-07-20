@@ -101,6 +101,11 @@ def test_live_bundle_and_timeline_no_demo(wave1_client: tuple[TestClient, Sessio
     assert data["live_claim"] is False
     assert "consent_receipts" in data
     assert data["calendar"]["microsoft_write_blocked"] is True
+    assert data["identity"]["workflow"] == "manual_identity_review_status"
+    assert data["identity"]["fake_kyc_forbidden"] is True
+    assert data["identity"]["provider_held"] is True
+    assert data["export_lifecycle"]["ops_fulfillment_auto"] is False
+    assert data["export_lifecycle"]["self_serve_path"].endswith("/export.json")
     assert "demo-candidate-001" not in str(data)
 
     timeline = client.get("/api/v1/candidates/me/trust/activity-timeline", headers=headers)

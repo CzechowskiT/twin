@@ -6228,6 +6228,15 @@ eyebrow: "Product roadmap",
     identityVerified: "Identity verified at",
     identityNotStarted: "Identity verification not started",
     prefsSaved: "Communication preferences saved (no outbound in smoke).",
+    exportLifecycleLead:
+      "Self-serve JSON export is live. Submitting an export request queues ops intake only — not automatic legal fulfillment. Deletion remains policy-held.",
+    manualIdentityReviewLead:
+      "Manual identity review status is live. Provider Authologic start stays policy-held — we never fake KYC success.",
+    identityProviderConfiguredHeld:
+      "Provider is configured but product LIVE for Authologic start remains held until Founder policy GO.",
+    providerHeldNotice: "plat_identity_kyc = HELD_POLICY · no auto Authologic KYC in this wave.",
+    identityReviewNotePlaceholder: "What should reviewers check about your identity status?",
+    openProviderIdentityPage: "Open provider identity page (start remains gated)",
   },
   candidateConsentReceipt: {
     pageEyebrow: "Trust consent receipt bundle",
@@ -14714,6 +14723,15 @@ const pl: MessageTree = {
     identityVerified: "Tożsamość zweryfikowana o",
     identityNotStarted: "Weryfikacja tożsamości nie rozpoczęta",
     prefsSaved: "Preferencje komunikacji zapisane (bez outbounds w smoke).",
+    exportLifecycleLead:
+      "Self-serve eksport JSON jest live. Wysłanie żądania eksportu tylko kolejkuje intake ops — bez automatycznego fulfillment prawnego. Usunięcie konta pozostaje w holdzie polityki.",
+    manualIdentityReviewLead:
+      "Status ręcznego przeglądu tożsamości jest live. Start Authologic pozostaje w holdzie polityki — nigdy nie fake’ujemy sukcesu KYC.",
+    identityProviderConfiguredHeld:
+      "Dostawca jest skonfigurowany, ale LIVE startu Authologic nadal w holdzie do decyzji Foundera.",
+    providerHeldNotice: "plat_identity_kyc = HELD_POLICY · bez auto Authologic KYC w tej fali.",
+    identityReviewNotePlaceholder: "Co recenzenci mają sprawdzić w statusie tożsamości?",
+    openProviderIdentityPage: "Otwórz stronę tożsamości dostawcy (start nadal gated)",
   },
   candidateConsentReceipt: {
     pageEyebrow: "Paczka potwierdzenia zgody zaufania",

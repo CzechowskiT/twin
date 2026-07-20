@@ -25,6 +25,8 @@
 | `PLATFORM_FOUNDATIONS_WAVE0` | DB seed via `platform_foundations` | `true` | Schema present — not product LIVE claim |
 | `CANDIDATE_WAVE1_TRUST_LIVE_PATH` | DB seed via `candidate_wave1` | `true` | Trust UIs use real APIs — LIVE badge still smoke-gated |
 | `CANDIDATE_WAVE1_HARD_LIVE_REGISTRY` | DB seed via `candidate_wave1` | `true` | Hard LIVE evidence rows — 6 PASS / 2 PARTIAL after auth smoke 2026-07-20 |
+| `CANDIDATE_WAVE1_EXPORT_LIFECYCLE` | DB seed via `candidate_wave1` | `true` | Export preview = self-serve export.json + intake (ops fulfillment separate) |
+| `CANDIDATE_WAVE1_MANUAL_IDENTITY_REVIEW` | DB seed via `candidate_wave1` | `true` | Trust identity = manual review status; Authologic start remains HELD |
 | `MICROSOFT_CALENDAR_WRITE_ENABLED` | DB seed via `candidate_wave1` | `false` | Hard ban — MS write blocked |
 
 ## Hard-ban flags (must remain true / blocked)

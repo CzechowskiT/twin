@@ -21,6 +21,16 @@ logger = logging.getLogger(__name__)
 WAVE1_FLAG_DEFAULTS: tuple[tuple[str, bool, str], ...] = (
     ("CANDIDATE_WAVE1_TRUST_LIVE_PATH", True, "Wave 1 trust UIs use real APIs (LIVE badge still smoke-gated)"),
     ("CANDIDATE_WAVE1_HARD_LIVE_REGISTRY", True, "Hard LIVE evidence registry table seeded"),
+    (
+        "CANDIDATE_WAVE1_EXPORT_LIFECYCLE",
+        True,
+        "Export preview uses self-serve export.json + privacy-request intake (ops fulfillment separate)",
+    ),
+    (
+        "CANDIDATE_WAVE1_MANUAL_IDENTITY_REVIEW",
+        True,
+        "Trust identity page = manual review status + KYC configured read; Authologic start stays policy-held",
+    ),
     ("MICROSOFT_CALENDAR_WRITE_ENABLED", False, "Hard ban — MS write blocked"),
 )
 
@@ -162,7 +172,17 @@ def build_live_trust_bundle(db: Session, *, candidate: Candidate, user: User) ->
         "identity": {
             "identity_verified_at": _iso(user.identity_verified_at),
             "fake_kyc_forbidden": True,
-            "workflow": "status_only_without_configured_provider",
+            "workflow": "manual_identity_review_status",
+            "provider_module": "plat_identity_kyc",
+            "provider_held": True,
+            "manual_review_request_type": "identity_review",
+        },
+        "export_lifecycle": {
+            "self_serve_path": "/api/v1/candidates/me/export.json",
+            "intake_request_type": "export",
+            "ops_fulfillment_auto": False,
+            "deletion_held": True,
+            "preview_demo_forbidden_as_live": True,
         },
         "calendar": {
             "google_path_approved": True,

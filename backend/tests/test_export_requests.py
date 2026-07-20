@@ -49,6 +49,22 @@ def test_post_export_request(er_client):
     assert r.json()["legal_claim"] is False
 
 
+def test_post_export_intake_queued(er_client):
+    c, db = er_client
+    r = c.post(
+        "/api/v1/export-requests",
+        json={
+            "request_type": "candidate_export_intake",
+            "candidate_id": "smoke-candidate",
+            "status": "queued_for_ops_intake",
+        },
+        headers=_h(db),
+    )
+    assert r.status_code == 201
+    assert r.json()["status"] == "queued_for_ops_intake"
+    assert r.json()["legal_claim"] is False
+
+
 def test_reject_forbidden_status(er_client):
     c, db = er_client
     r = c.post(

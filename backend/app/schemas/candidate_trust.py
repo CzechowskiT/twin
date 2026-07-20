@@ -14,7 +14,14 @@ ConsentPurpose = Literal[
     "profile_documents",
 ]
 ConsentStatus = Literal["active", "withdrawn", "not_granted", "review_required"]
-PrivacyRequestType = Literal["correction", "export", "portability", "withdrawal", "deletion"]
+PrivacyRequestType = Literal[
+    "correction",
+    "export",
+    "portability",
+    "withdrawal",
+    "deletion",
+    "identity_review",
+]
 PrivacyRequestStatus = Literal["open", "processing", "completed", "cancelled"]
 
 

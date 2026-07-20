@@ -11,9 +11,17 @@ from app.database.models import ExportRequest
 from app.services.audit_events import create_audit_event
 
 ALLOWED_TYPES = frozenset(
-    {"candidate_export_preview", "trust_audit_preview", "consent_receipt_preview"}
+    {
+        "candidate_export_preview",
+        "trust_audit_preview",
+        "consent_receipt_preview",
+        "candidate_export_intake",
+    }
 )
-ALLOWED_STATUSES = frozenset({"draft", "preview_created", "awaiting_human_review"})
+# Intake / preview only — never claim legal DSR fulfillment via this table.
+ALLOWED_STATUSES = frozenset(
+    {"draft", "preview_created", "awaiting_human_review", "queued_for_ops_intake"}
+)
 FORBIDDEN_STATUSES = frozenset({"fulfilled", "sent", "completed", "legally_processed"})
 
 
