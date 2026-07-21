@@ -29,7 +29,7 @@ test("stance remains Founder-blocked", () => {
 test("no PASS rows with missing criterion 25 or without smoke_sha", () => {
   assert.doesNotThrow(() => assertNoLivePassWithoutSmoke());
   const passed = HARD_LIVE_EVIDENCE_REGISTRY.filter((r) => r.status === "PASS");
-  assert.equal(passed.length, 12);
+  assert.equal(passed.length, 32); // 12 wave1 + 20 wave2
   for (const row of passed) {
     assert.ok(!row.missing_criteria.includes(25), row.module_id);
     assert.ok(row.smoke_sha, row.module_id);
@@ -56,26 +56,21 @@ test("wave1 trust modules present and held policy modules blocked", () => {
   assert.ok(held.every((r) => r.blocker));
 });
 
-test("wave2 recruiter modules seeded with pending/held/demo isolation", () => {
+test("wave2 recruiter modules PASS after smoke with held/demo isolation", () => {
   assert.ok(HARD_LIVE_EVIDENCE_REGISTRY_WAVE2.length >= 30);
-  const pending = wave2PendingSmokeIds();
-  assert.ok(pending.includes("recruiter_talent_radar"));
-  assert.ok(pending.includes("rec_notes"));
-  assert.ok(pending.includes("rec_scorecards"));
+  assert.equal(wave2PendingSmokeIds().length, 0);
+  const passed = HARD_LIVE_EVIDENCE_REGISTRY_WAVE2.filter((r) => r.status === "PASS");
+  assert.equal(passed.length, 20);
+  assert.ok(passed.every((r) => r.smoke_sha === "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55"));
   const held = HARD_LIVE_EVIDENCE_REGISTRY_WAVE2.filter((r) => r.status === "HELD_POLICY");
   assert.ok(held.some((r) => r.module_id === "recruiter_calendar"));
   assert.ok(held.some((r) => r.module_id === "recruiter_integrations"));
   const demo = HARD_LIVE_EVIDENCE_REGISTRY_WAVE2.filter((r) => r.status === "DEMO_ONLY");
   assert.ok(demo.some((r) => r.module_id === "recruiter_demo_pipeline"));
   assert.ok(demo.every((r) => r.blocker === "DEMO_JOURNEY_ISOLATION"));
-  // No Wave 2 PASS until smoke SHA filled.
-  assert.equal(
-    HARD_LIVE_EVIDENCE_REGISTRY_WAVE2.filter((r) => r.status === "PASS").length,
-    0,
-  );
 });
 
-test("docs registry JSON mirrors TS module ids and Wave 1 PASS smoke fields", () => {
+test("docs registry JSON mirrors TS module ids and PASS smoke fields", () => {
   const jsonPath = join(root, "docs/HARD_LIVE_EVIDENCE_REGISTRY.json");
   const raw = readFileSync(jsonPath, "utf8");
   const doc = JSON.parse(raw) as {
@@ -92,13 +87,13 @@ test("docs registry JSON mirrors TS module ids and Wave 1 PASS smoke fields", ()
   assert.equal(doc.stance.external_pilot_enrollment_enabled, false);
   assert.equal(doc.wave, "2");
   const passDocs = doc.modules.filter((m) => m.status === "PASS");
-  assert.equal(passDocs.length, 12);
+  assert.equal(passDocs.length, 32);
   for (const m of passDocs) {
     assert.ok(m.smoke_sha, m.module_id);
   }
   assert.match(raw, /HELD_POLICY/);
   assert.match(raw, /DEMO_ONLY/);
-  assert.match(raw, /PENDING_SMOKE/);
+  assert.doesNotMatch(raw, /PENDING_SMOKE/);
   assert.match(raw, /recruiter_talent_radar/);
 });
 

@@ -24,9 +24,9 @@
     },
     "wave2": {
       "script": "frontend/scripts/wave2-recruiter-module-prod-smoke.test.ts",
-      "sha": null,
-      "at": null,
-      "result": "PENDING_SMOKE",
+      "sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+      "at": "2026-07-21T04:12:00Z",
+      "result": "PASS 4/4 modules 20/20",
       "write": true,
       "exclude_from_product_metrics": true,
       "jwt_never_committed": true
@@ -250,181 +250,221 @@
       "module_id": "recruiter_talent_radar",
       "persona": "recruiter",
       "wave": "2",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/recruiter/talent-radar",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "recruiter-squad"
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+      "smoke_at": "2026-07-21T04:12:00Z"
     },
     {
       "module_id": "recruiter_talent_radar_digest",
       "persona": "recruiter",
       "wave": "2",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/recruiter/talent-radar/digest",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "recruiter-squad"
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+      "smoke_at": "2026-07-21T04:12:00Z"
     },
     {
       "module_id": "recruiter_talent_pool_import",
       "persona": "recruiter",
       "wave": "2",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/recruiter/talent-pool/import",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "recruiter-squad"
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+      "smoke_at": "2026-07-21T04:12:00Z"
     },
     {
       "module_id": "rec_scorecards",
       "persona": "recruiter",
       "wave": "2",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/recruiter/inbox",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "recruiter-squad"
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+      "smoke_at": "2026-07-21T04:12:00Z"
     },
     {
       "module_id": "rec_notes",
       "persona": "recruiter",
       "wave": "2",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/recruiter/inbox",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "recruiter-squad"
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+      "smoke_at": "2026-07-21T04:12:00Z"
     },
     {
       "module_id": "rec_matching",
       "persona": "recruiter",
       "wave": "2",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/recruiter/search",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "recruiter-squad"
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+      "smoke_at": "2026-07-21T04:12:00Z"
     },
     {
       "module_id": "rec_hiring_funnel_analytics",
       "persona": "recruiter",
       "wave": "2",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/recruiter/analytics",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "recruiter-squad"
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+      "smoke_at": "2026-07-21T04:12:00Z"
     },
     {
       "module_id": "recruiter_jobs",
       "persona": "recruiter",
       "wave": "2",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/recruiter/jobs",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "recruiter-squad"
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+      "smoke_at": "2026-07-21T04:12:00Z"
     },
     {
       "module_id": "recruiter_inbox",
       "persona": "recruiter",
       "wave": "2",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/recruiter/inbox",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "recruiter-squad"
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+      "smoke_at": "2026-07-21T04:12:00Z"
     },
     {
       "module_id": "recruiter_pipeline",
       "persona": "recruiter",
       "wave": "2",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/recruiter/pipeline",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "recruiter-squad"
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+      "smoke_at": "2026-07-21T04:12:00Z"
     },
     {
       "module_id": "recruiter_search",
       "persona": "recruiter",
       "wave": "2",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/recruiter/search",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "recruiter-squad"
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+      "smoke_at": "2026-07-21T04:12:00Z"
     },
     {
       "module_id": "recruiter_talent_pool",
       "persona": "recruiter",
       "wave": "2",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/recruiter/talent-pool",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "recruiter-squad"
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+      "smoke_at": "2026-07-21T04:12:00Z"
     },
     {
       "module_id": "recruiter_analytics",
       "persona": "recruiter",
       "wave": "2",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/recruiter/analytics",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "recruiter-squad"
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+      "smoke_at": "2026-07-21T04:12:00Z"
     },
     {
       "module_id": "recruiter_notification_preferences",
       "persona": "recruiter",
       "wave": "2",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/recruiter/notification-preferences",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "recruiter-squad"
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+      "smoke_at": "2026-07-21T04:12:00Z"
     },
     {
       "module_id": "recruiter_activity_timeline",
       "persona": "recruiter",
       "wave": "2",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/recruiter/activity-timeline",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "recruiter-squad"
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+      "smoke_at": "2026-07-21T04:12:00Z"
     },
     {
       "module_id": "recruiter_trust_review_queue",
       "persona": "recruiter",
       "wave": "2",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/recruiter/trust-review-queue",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "recruiter-squad"
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+      "smoke_at": "2026-07-21T04:12:00Z"
     },
     {
       "module_id": "recruiter_saved_views",
       "persona": "recruiter",
       "wave": "2",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/recruiter/inbox",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "recruiter-squad"
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+      "smoke_at": "2026-07-21T04:12:00Z"
     },
     {
       "module_id": "rec_decisioning",
       "persona": "recruiter",
       "wave": "2",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/recruiter/inbox",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "recruiter-squad"
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+      "smoke_at": "2026-07-21T04:12:00Z"
     },
     {
       "module_id": "rec_shortlist",
       "persona": "recruiter",
       "wave": "2",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/recruiter/inbox",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "recruiter-squad"
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+      "smoke_at": "2026-07-21T04:12:00Z"
     },
     {
       "module_id": "recruiter_daily_cockpit",
       "persona": "recruiter",
       "wave": "2",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/recruiter/daily-cockpit",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "recruiter-squad"
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+      "smoke_at": "2026-07-21T04:12:00Z"
     },
     {
       "module_id": "rec_interview_scheduling",
