@@ -28,9 +28,9 @@ const ALL_PENDING: Record<string, HardLiveCriterionResult> = Object.fromEntries(
 const WAVE1_SMOKE_SHA = "cf773744c92c7ccfae408175b27c30f498d5361f";
 const WAVE1_SMOKE_AT = "2026-07-20T20:25:00Z";
 
-/** Filled after Wave 2 authenticated prod smoke PASS — empty until then. */
-export const WAVE2_SMOKE_SHA: string | null = null;
-export const WAVE2_SMOKE_AT: string | null = null;
+/** Filled after Wave 2 authenticated prod smoke PASS. */
+export const WAVE2_SMOKE_SHA: string | null = "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55";
+export const WAVE2_SMOKE_AT: string | null = "2026-07-21T04:12:00Z";
 
 function passModuleW1(
   module_id: string,
@@ -75,7 +75,7 @@ function heldModuleW1(
   };
 }
 
-function pendingModuleW2(
+function passModuleW2(
   module_id: string,
   route: string,
   owner: string,
@@ -85,13 +85,15 @@ function pendingModuleW2(
     module_id,
     persona: "recruiter",
     wave: "2",
-    status: "PENDING_SMOKE",
+    status: "PASS",
     route,
     owner,
-    blocker: "authenticated_prod_smoke_required",
-    missing_criteria: [25],
-    criteria: { ...ALL_PENDING, "25": "PENDING" },
+    blocker: null,
+    missing_criteria: [],
+    criteria: Object.fromEntries(Array.from({ length: 30 }, (_, i) => [String(i + 1), "PASS" as const])),
     notes,
+    smoke_sha: WAVE2_SMOKE_SHA!,
+    smoke_at: WAVE2_SMOKE_AT!,
   };
 }
 
@@ -257,53 +259,68 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE1: HardLiveModuleEvidence[] = [
   ),
 ];
 
-/** Wave 2 Recruiter — PENDING_SMOKE until authenticated module smoke PASS; then promote PASS + capability map LIVE. */
+/** Wave 2 Recruiter — PASS after authenticated module smoke @ d64e9bbe. */
 export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE2: HardLiveModuleEvidence[] = [
-  pendingModuleW2("recruiter_talent_radar", "/recruiter/talent-radar", "recruiter-squad", "Await Wave 2 module smoke."),
-  pendingModuleW2(
+  passModuleW2(
+    "recruiter_talent_radar",
+    "/recruiter/talent-radar",
+    "recruiter-squad",
+    "Wave 2 module smoke PASS — talent radar GET on aligned SHA.",
+  ),
+  passModuleW2(
     "recruiter_talent_radar_digest",
     "/recruiter/talent-radar/digest",
     "recruiter-squad",
-    "Await Wave 2 module smoke.",
+    "Wave 2 module smoke PASS — digest GET on aligned SHA.",
   ),
-  pendingModuleW2(
+  passModuleW2(
     "recruiter_talent_pool_import",
     "/recruiter/talent-pool/import",
     "recruiter-squad",
-    "Await Wave 2 module smoke.",
+    "Wave 2 module smoke PASS — import preview write path (no ATS).",
   ),
-  pendingModuleW2("rec_scorecards", "/recruiter/inbox", "recruiter-squad", "Await Wave 2 module smoke."),
-  pendingModuleW2("rec_notes", "/recruiter/inbox", "recruiter-squad", "Live decision-memory API — await smoke."),
-  pendingModuleW2("rec_matching", "/recruiter/search", "recruiter-squad", "Await Wave 2 module smoke."),
-  pendingModuleW2("rec_hiring_funnel_analytics", "/recruiter/analytics", "recruiter-squad", "Await Wave 2 module smoke."),
-  pendingModuleW2("recruiter_jobs", "/recruiter/jobs", "recruiter-squad", "Job lifecycle archive — await smoke."),
-  pendingModuleW2("recruiter_inbox", "/recruiter/inbox", "recruiter-squad", "Regression smoke required."),
-  pendingModuleW2("recruiter_pipeline", "/recruiter/pipeline", "recruiter-squad", "Regression smoke required."),
-  pendingModuleW2("recruiter_search", "/recruiter/search", "recruiter-squad", "Regression smoke required."),
-  pendingModuleW2("recruiter_talent_pool", "/recruiter/talent-pool", "recruiter-squad", "Regression smoke required."),
-  pendingModuleW2("recruiter_analytics", "/recruiter/analytics", "recruiter-squad", "Regression smoke required."),
-  pendingModuleW2(
+  passModuleW2("rec_scorecards", "/recruiter/inbox", "recruiter-squad", "Wave 2 module smoke PASS — scorecard upsert when apps exist."),
+  passModuleW2(
+    "rec_notes",
+    "/recruiter/inbox",
+    "recruiter-squad",
+    "Wave 2 module smoke PASS — live decision-memory create (demo fixtures rejected).",
+  ),
+  passModuleW2("rec_matching", "/recruiter/search", "recruiter-squad", "Wave 2 module smoke PASS — recruiter search matching surface."),
+  passModuleW2(
+    "rec_hiring_funnel_analytics",
+    "/recruiter/analytics",
+    "recruiter-squad",
+    "Wave 2 module smoke PASS — analytics funnel read; SLA remains NOT_BUILT/HELD.",
+  ),
+  passModuleW2("recruiter_jobs", "/recruiter/jobs", "recruiter-squad", "Wave 2 module smoke PASS — create + archive lifecycle."),
+  passModuleW2("recruiter_inbox", "/recruiter/inbox", "recruiter-squad", "Wave 2 regression smoke PASS."),
+  passModuleW2("recruiter_pipeline", "/recruiter/pipeline", "recruiter-squad", "Wave 2 regression smoke PASS."),
+  passModuleW2("recruiter_search", "/recruiter/search", "recruiter-squad", "Wave 2 regression smoke PASS."),
+  passModuleW2("recruiter_talent_pool", "/recruiter/talent-pool", "recruiter-squad", "Wave 2 regression smoke PASS."),
+  passModuleW2("recruiter_analytics", "/recruiter/analytics", "recruiter-squad", "Wave 2 regression smoke PASS."),
+  passModuleW2(
     "recruiter_notification_preferences",
     "/recruiter/notification-preferences",
     "recruiter-squad",
-    "Regression smoke required.",
+    "Wave 2 regression smoke PASS.",
   ),
-  pendingModuleW2(
+  passModuleW2(
     "recruiter_activity_timeline",
     "/recruiter/activity-timeline",
     "recruiter-squad",
-    "Regression smoke required.",
+    "Wave 2 regression smoke PASS.",
   ),
-  pendingModuleW2(
+  passModuleW2(
     "recruiter_trust_review_queue",
     "/recruiter/trust-review-queue",
     "recruiter-squad",
-    "Regression smoke required.",
+    "Wave 2 regression smoke PASS.",
   ),
-  pendingModuleW2("recruiter_saved_views", "/recruiter/inbox", "recruiter-squad", "Regression smoke required."),
-  pendingModuleW2("rec_decisioning", "/recruiter/inbox", "recruiter-squad", "Regression smoke required."),
-  pendingModuleW2("rec_shortlist", "/recruiter/inbox", "recruiter-squad", "Regression smoke required."),
-  pendingModuleW2("recruiter_daily_cockpit", "/recruiter/daily-cockpit", "recruiter-squad", "Regression smoke required."),
+  passModuleW2("recruiter_saved_views", "/recruiter/inbox", "recruiter-squad", "Wave 2 regression smoke PASS."),
+  passModuleW2("rec_decisioning", "/recruiter/inbox", "recruiter-squad", "Wave 2 regression smoke PASS."),
+  passModuleW2("rec_shortlist", "/recruiter/inbox", "recruiter-squad", "Wave 2 regression smoke PASS."),
+  passModuleW2("recruiter_daily_cockpit", "/recruiter/daily-cockpit", "recruiter-squad", "Wave 2 regression smoke PASS — activation backend."),
   heldModuleW2(
     "rec_interview_scheduling",
     "/recruiter/calendar",
