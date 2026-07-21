@@ -46,6 +46,7 @@ from app.api import (
     profile_import,
     public,
     recruiter,
+    recruiter_wave2,
     referrals,
     request_intake,
     review_queue,
@@ -65,6 +66,11 @@ api_router.include_router(
     candidate_wave1.router,
     prefix="/platform/wave1",
     tags=["Candidate Wave 1"],
+)
+api_router.include_router(
+    recruiter_wave2.router,
+    prefix="/platform/wave2",
+    tags=["Recruiter Wave 2"],
 )
 api_router.include_router(work_items.router, prefix="/work-items", tags=["Work items"])
 api_router.include_router(

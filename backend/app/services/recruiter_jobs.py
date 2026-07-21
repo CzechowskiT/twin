@@ -49,12 +49,72 @@ def create_company_job(
         salary_min=salary_min,
         salary_max=salary_max,
         is_validated=True,
+        role_status="published",
         scraped_at=datetime.now(timezone.utc),
     )
     db.add(row)
     db.commit()
     db.refresh(row)
     return _job_row(row)
+
+
+def _job_for_company(db: Session, *, job_id: int, company_slug: str) -> Job:
+    slug = _require_company_slug(company_slug)
+    job = db.query(Job).filter(Job.id == job_id, Job.job_board == "employer").one_or_none()
+    if job is None:
+        raise ValueError("Job not found.")
+    if not (job.external_id or "").startswith(f"{slug}-"):
+        raise ValueError("Job does not belong to this company.")
+    return job
+
+
+def update_company_job(
+    db: Session,
+    *,
+    company_slug: str,
+    job_id: int,
+    title: str | None = None,
+    location: str | None = None,
+    description: str | None = None,
+    salary_min: int | None = None,
+    salary_max: int | None = None,
+    role_status: str | None = None,
+) -> dict:
+    job = _job_for_company(db, job_id=job_id, company_slug=company_slug)
+    if title is not None:
+        clean = title.strip()
+        if len(clean) < 2:
+            raise ValueError("title is required.")
+        job.title = clean[:300]
+    if location is not None:
+        job.location = location.strip()[:200] or None
+    if description is not None:
+        job.description = description.strip()[:20_000] or None
+    if salary_min is not None:
+        job.salary_min = salary_min
+    if salary_max is not None:
+        job.salary_max = salary_max
+    if role_status is not None:
+        status = role_status.strip().lower()
+        if status not in {"draft", "published", "archived", "closed"}:
+            raise ValueError("role_status must be draft|published|archived|closed.")
+        job.role_status = status
+        if status in {"archived", "closed"}:
+            job.is_validated = False
+        elif status == "published":
+            job.is_validated = True
+    db.commit()
+    db.refresh(job)
+    return _job_row(job)
+
+
+def archive_company_job(db: Session, *, company_slug: str, job_id: int) -> dict:
+    return update_company_job(
+        db,
+        company_slug=company_slug,
+        job_id=job_id,
+        role_status="archived",
+    )
 
 
 def _job_row(job: Job) -> dict:
@@ -67,5 +127,6 @@ def _job_row(job: Job) -> dict:
         "salary_min": job.salary_min,
         "salary_max": job.salary_max,
         "is_validated": job.is_validated,
+        "role_status": job.role_status or "draft",
         "created_at": job.scraped_at.isoformat() if job.scraped_at else None,
     }

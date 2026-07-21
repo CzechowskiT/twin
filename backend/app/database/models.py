@@ -1026,6 +1026,34 @@ class RecruiterApplicationScorecard(Base):
     )
 
 
+class RecruiterDecisionMemoryEntry(Base):
+    """Live recruiter decision memory — never demo-candidate fixtures as production truth."""
+
+    __tablename__ = "recruiter_decision_memory_entries"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    company_slug: Mapped[str] = mapped_column(String(80), index=True)
+    subject_type: Mapped[str] = mapped_column(String(32))
+    subject_id: Mapped[str] = mapped_column(String(64))
+    application_id: Mapped[int | None] = mapped_column(
+        ForeignKey("applications.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+    decision_code: Mapped[str] = mapped_column(String(64))
+    summary: Mapped[str] = mapped_column(String(500))
+    rationale_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    source: Mapped[str] = mapped_column(String(32), default="live")
+    demo_fixture: Mapped[bool] = mapped_column(Boolean, default=False)
+    meta_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
+
+
 class RecruiterTalentPoolImport(Base):
     """Batch import of structured internal talent pool records (CSV paste MVP)."""
 

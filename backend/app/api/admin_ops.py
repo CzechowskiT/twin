@@ -30,7 +30,7 @@ def _require_ops_admin(settings: Settings, authorization: str | None) -> None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid admin token")
 
 
-EXPECTED_ALEMBIC_HEAD = "088_candidate_wave1_hard_live"
+EXPECTED_ALEMBIC_HEAD = "089_recruiter_wave2_hard_live"
 
 
 def _read_alembic_current(db: Session) -> str | None:

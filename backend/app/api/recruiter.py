@@ -80,8 +80,14 @@ from app.services.recruiter_inbox import (
 from app.services.recruiter_pipeline import build_recruiter_pipeline, transition_recruiter_pipeline
 from app.services.recruiter_scorecards import get_recruiter_scorecard, upsert_recruiter_scorecard
 from app.services.recruiter_scheduling import save_recruiter_manual_schedule
-from app.services.recruiter_jobs import create_company_job, list_company_jobs
+from app.services.recruiter_jobs import (
+    archive_company_job,
+    create_company_job,
+    list_company_jobs,
+    update_company_job,
+)
 from app.services.request_locale import locale_from_request
+from app.services import recruiter_wave2 as wave2
 
 router = APIRouter()
 
@@ -168,6 +174,36 @@ class RecruiterJobCreateIn(BaseModel):
     url: str | None = Field(None, max_length=500)
     salary_min: int | None = Field(None, ge=0)
     salary_max: int | None = Field(None, ge=0)
+
+
+class RecruiterJobUpdateIn(BaseModel):
+    title: str | None = Field(None, min_length=2, max_length=300)
+    location: str | None = Field(None, max_length=200)
+    description: str | None = Field(None, max_length=20_000)
+    salary_min: int | None = Field(None, ge=0)
+    salary_max: int | None = Field(None, ge=0)
+    role_status: str | None = Field(None, description="draft | published | archived | closed")
+
+
+class RecruiterDecisionMemoryIn(BaseModel):
+    subject_type: str = Field("candidate", min_length=2, max_length=32)
+    subject_id: str = Field(..., min_length=1, max_length=64)
+    decision_code: str = Field(..., min_length=2, max_length=64)
+    summary: str = Field(..., min_length=2, max_length=500)
+    rationale_code: str | None = Field(None, max_length=64)
+    application_id: int | None = None
+
+
+class RecruiterTeamInviteDryRunIn(BaseModel):
+    invitee_email: str = Field(..., min_length=5, max_length=254)
+    role_key: str = Field("recruiter", min_length=2, max_length=64)
+
+
+class RecruiterCommsDraftIn(BaseModel):
+    template_key: str = Field("recruiter.candidate_note", min_length=2, max_length=128)
+    subject_id: str = Field(..., min_length=1, max_length=64)
+    body_preview: str = Field(..., min_length=1, max_length=500)
+    send: bool = Field(False, description="Must stay false — real outbound forbidden in Wave 2 smoke")
 
 
 @router.get("/activation", response_model=RecruiterActivationOut)
@@ -782,6 +818,180 @@ def recruiter_jobs_create(
             url=body.url,
             salary_min=body.salary_min,
             salary_max=body.salary_max,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.patch("/jobs/{job_id}")
+def recruiter_jobs_update(
+    job_id: int,
+    body: RecruiterJobUpdateIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
+    try:
+        return update_company_job(
+            db,
+            company_slug=slug,
+            job_id=job_id,
+            title=body.title,
+            location=body.location,
+            description=body.description,
+            salary_min=body.salary_min,
+            salary_max=body.salary_max,
+            role_status=body.role_status,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/jobs/{job_id}/archive")
+def recruiter_jobs_archive(
+    job_id: int,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
+    try:
+        return archive_company_job(db, company_slug=slug, job_id=job_id)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.get("/decision-memory")
+def recruiter_decision_memory_list(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    company_slug: str | None = Query(None, max_length=80),
+    subject_type: str | None = Query(None, max_length=32),
+    subject_id: str | None = Query(None, max_length=64),
+    limit: int = Query(50, ge=1, le=100),
+) -> dict:
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
+    try:
+        return wave2.list_decision_memory(
+            db,
+            company_slug=slug,
+            subject_type=subject_type,
+            subject_id=subject_id,
+            limit=limit,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/decision-memory", status_code=status.HTTP_201_CREATED)
+def recruiter_decision_memory_create(
+    body: RecruiterDecisionMemoryIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
+    try:
+        return wave2.create_decision_memory(
+            db,
+            company_slug=slug,
+            subject_type=body.subject_type,
+            subject_id=body.subject_id,
+            decision_code=body.decision_code,
+            summary=body.summary,
+            rationale_code=body.rationale_code,
+            application_id=body.application_id,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/team/invites/dry-run", status_code=status.HTTP_201_CREATED)
+def recruiter_team_invite_dry_run(
+    body: RecruiterTeamInviteDryRunIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    """Invite smoke without real email — outbox draft only; enrollment stays OFF."""
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
+    try:
+        return wave2.dry_run_team_invite(
+            db,
+            company_slug=slug,
+            invitee_email=body.invitee_email,
+            role_key=body.role_key,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/communications/draft", status_code=status.HTTP_201_CREATED)
+def recruiter_communications_draft(
+    body: RecruiterCommsDraftIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    """Explicit-send communications path — draft only; send=true rejected."""
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
+    try:
+        return wave2.draft_candidate_communication(
+            db,
+            company_slug=slug,
+            template_key=body.template_key,
+            subject_id=body.subject_id,
+            body_preview=body.body_preview,
+            send=body.send,
         )
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc

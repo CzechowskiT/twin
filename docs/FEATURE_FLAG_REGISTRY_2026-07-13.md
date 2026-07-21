@@ -27,7 +27,12 @@
 | `CANDIDATE_WAVE1_HARD_LIVE_REGISTRY` | DB seed via `candidate_wave1` | `true` | Hard LIVE evidence rows — 6 PASS / 2 PARTIAL after auth smoke 2026-07-20 |
 | `CANDIDATE_WAVE1_EXPORT_LIFECYCLE` | DB seed via `candidate_wave1` | `true` | Export preview = self-serve export.json + intake (ops fulfillment separate) |
 | `CANDIDATE_WAVE1_MANUAL_IDENTITY_REVIEW` | DB seed via `candidate_wave1` | `true` | Trust identity = manual review status; Authologic start remains HELD |
-| `MICROSOFT_CALENDAR_WRITE_ENABLED` | DB seed via `candidate_wave1` | `false` | Hard ban — MS write blocked |
+| `MICROSOFT_CALENDAR_WRITE_ENABLED` | DB seed via `candidate_wave1` / `recruiter_wave2` | `false` | Hard ban — MS write blocked |
+| `RECRUITER_WAVE2_HARD_LIVE_REGISTRY` | DB seed via `recruiter_wave2` | `true` | Wave 2 Hard LIVE evidence rows |
+| `RECRUITER_WAVE2_DECISION_MEMORY_LIVE` | DB seed via `recruiter_wave2` | `true` | Live decision memory API (demo fixtures forbidden) |
+| `RECRUITER_WAVE2_TEAM_INVITE_DRY_RUN` | DB seed via `recruiter_wave2` | `true` | Team invite dry-run — no real email |
+| `RECRUITER_WAVE2_COMMS_DRAFT_ONLY` | DB seed via `recruiter_wave2` | `true` | Recruiter comms outbox draft only |
+| `RECRUITER_WAVE2_DEMO_ISOLATION` | DB seed via `recruiter_wave2` | `true` | Demo journeys forced DEMO_ONLY |
 
 ## Hard-ban flags (must remain true / blocked)
 
