@@ -1,25 +1,36 @@
 {
   "definition": "docs/HARD_LIVE_DEFINITION_30.md",
-  "wave": "1",
-  "updated": "2026-07-20",
+  "wave": "2",
+  "updated": "2026-07-21",
   "stance": {
     "pilot": "BLOCKED_BY_FOUNDER",
     "gate_f": "PENDING",
     "launch": "NO-GO",
     "pmf": "INSUFFICIENT_DATA",
     "real_candidate_enrollment": "NOT_STARTED",
+    "real_recruiter_enrollment": "NOT_STARTED",
     "external_pilot_enrollment_enabled": false
   },
-  "live_badge_rule": "PASS + authenticated prod smoke on aligned SHA required before capability map LIVE",
+  "live_badge_rule": "PASS status + authenticated prod smoke on aligned SHA required before capability map LIVE",
   "smoke_evidence": {
-    "script": "frontend/scripts/wave1-candidate-module-prod-smoke.test.ts",
-    "sha": "cf773744c92c7ccfae408175b27c30f498d5361f",
-    "at": "2026-07-20T20:25:00Z",
-    "result": "PASS 4/4 modules 6/6",
-    "write": true,
-    "exclude_from_product_metrics": true,
-    "jwt_source": "approved_smoke_register_path",
-    "jwt_never_committed": true
+    "wave1": {
+      "script": "frontend/scripts/wave1-candidate-module-prod-smoke.test.ts",
+      "sha": "cf773744c92c7ccfae408175b27c30f498d5361f",
+      "at": "2026-07-20T20:25:00Z",
+      "result": "PASS 4/4 modules 6/6",
+      "write": true,
+      "exclude_from_product_metrics": true,
+      "jwt_never_committed": true
+    },
+    "wave2": {
+      "script": "frontend/scripts/wave2-recruiter-module-prod-smoke.test.ts",
+      "sha": null,
+      "at": null,
+      "result": "PENDING_SMOKE",
+      "write": true,
+      "exclude_from_product_metrics": true,
+      "jwt_never_committed": true
+    }
   },
   "modules": [
     {
@@ -197,7 +208,7 @@
       "status": "HELD_POLICY",
       "route": "/kyc",
       "blocker": "AUTHOLOGIC_CONFIG_DEPENDENT",
-      "owner": "platform"
+      "owner": "candidate-squad"
     },
     {
       "module_id": "candidate_plan",
@@ -234,6 +245,339 @@
       "route": "/dashboard/trust/revoke-delete",
       "blocker": "INTERNAL_MODULE",
       "owner": "privacy"
+    },
+    {
+      "module_id": "recruiter_talent_radar",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "PENDING_SMOKE",
+      "route": "/recruiter/talent-radar",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "recruiter_talent_radar_digest",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "PENDING_SMOKE",
+      "route": "/recruiter/talent-radar/digest",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "recruiter_talent_pool_import",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "PENDING_SMOKE",
+      "route": "/recruiter/talent-pool/import",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "rec_scorecards",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "PENDING_SMOKE",
+      "route": "/recruiter/inbox",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "rec_notes",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "PENDING_SMOKE",
+      "route": "/recruiter/inbox",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "rec_matching",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "PENDING_SMOKE",
+      "route": "/recruiter/search",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "rec_hiring_funnel_analytics",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "PENDING_SMOKE",
+      "route": "/recruiter/analytics",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "recruiter_jobs",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "PENDING_SMOKE",
+      "route": "/recruiter/jobs",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "recruiter_inbox",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "PENDING_SMOKE",
+      "route": "/recruiter/inbox",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "recruiter_pipeline",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "PENDING_SMOKE",
+      "route": "/recruiter/pipeline",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "recruiter_search",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "PENDING_SMOKE",
+      "route": "/recruiter/search",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "recruiter_talent_pool",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "PENDING_SMOKE",
+      "route": "/recruiter/talent-pool",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "recruiter_analytics",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "PENDING_SMOKE",
+      "route": "/recruiter/analytics",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "recruiter_notification_preferences",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "PENDING_SMOKE",
+      "route": "/recruiter/notification-preferences",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "recruiter_activity_timeline",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "PENDING_SMOKE",
+      "route": "/recruiter/activity-timeline",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "recruiter_trust_review_queue",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "PENDING_SMOKE",
+      "route": "/recruiter/trust-review-queue",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "recruiter_saved_views",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "PENDING_SMOKE",
+      "route": "/recruiter/inbox",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "rec_decisioning",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "PENDING_SMOKE",
+      "route": "/recruiter/inbox",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "rec_shortlist",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "PENDING_SMOKE",
+      "route": "/recruiter/inbox",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "recruiter_daily_cockpit",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "PENDING_SMOKE",
+      "route": "/recruiter/daily-cockpit",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "rec_interview_scheduling",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "HELD_POLICY",
+      "route": "/recruiter/calendar",
+      "blocker": "RECRUITER_CALENDAR_BLOCKED",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "recruiter_calendar",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "HELD_POLICY",
+      "route": "/recruiter/calendar",
+      "blocker": "MICROSOFT_WRITE_BLOCKED",
+      "owner": "platform"
+    },
+    {
+      "module_id": "recruiter_integrations",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "HELD_POLICY",
+      "route": "/recruiter/integrations",
+      "blocker": "ATS_LIVE_SYNC_BLOCKED",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "investor_sor_proof_ats",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "HELD_POLICY",
+      "route": "/recruiter/integrations/ats/import-readiness",
+      "blocker": "ATS_LIVE_SYNC_BLOCKED",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "rec_recruiter_onboarding",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "HELD_POLICY",
+      "route": "/recruiter/inbox",
+      "blocker": "EXTERNAL_ENROLLMENT_OFF",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "rec_sla_tracking",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "HELD_POLICY",
+      "route": "/recruiter/analytics",
+      "blocker": "NOT_BUILT",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "rec_candidate_comms",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "DEMO_ONLY",
+      "route": "/recruiter/candidates/demo-candidate-001/communication",
+      "blocker": "DEMO_JOURNEY_ISOLATION",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "rec_collaboration",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "DEMO_ONLY",
+      "route": "/recruiter/candidates/demo-candidate-001/collaboration",
+      "blocker": "DEMO_JOURNEY_ISOLATION",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "recruiter_demo_collaboration",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "DEMO_ONLY",
+      "route": "/recruiter/candidates/demo-candidate-001/collaboration",
+      "blocker": "DEMO_JOURNEY_ISOLATION",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "recruiter_demo_communication",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "DEMO_ONLY",
+      "route": "/recruiter/candidates/demo-candidate-001/communication",
+      "blocker": "DEMO_JOURNEY_ISOLATION",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "recruiter_demo_decision_memory",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "DEMO_ONLY",
+      "route": "/recruiter/candidates/demo-candidate-001/decision-memory",
+      "blocker": "DEMO_JOURNEY_ISOLATION",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "recruiter_demo_pipeline",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "DEMO_ONLY",
+      "route": "/recruiter/jobs/demo-role-001/pipeline",
+      "blocker": "DEMO_JOURNEY_ISOLATION",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "recruiter_demo_profile_360",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "DEMO_ONLY",
+      "route": "/recruiter/candidates/demo-candidate-001",
+      "blocker": "DEMO_JOURNEY_ISOLATION",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "recruiter_demo_team",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "DEMO_ONLY",
+      "route": "/recruiter/candidates/demo-candidate-001/team",
+      "blocker": "DEMO_JOURNEY_ISOLATION",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "recruiter_demo_trust",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "DEMO_ONLY",
+      "route": "/recruiter/candidates/demo-candidate-001/trust",
+      "blocker": "DEMO_JOURNEY_ISOLATION",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "investor_sor_proof_collaboration",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "DEMO_ONLY",
+      "route": "/recruiter/candidates/demo-candidate-001/collaboration",
+      "blocker": "DEMO_JOURNEY_ISOLATION",
+      "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "investor_sor_proof_pipeline",
+      "persona": "recruiter",
+      "wave": "2",
+      "status": "DEMO_ONLY",
+      "route": "/recruiter/jobs/demo-role-001/pipeline",
+      "blocker": "DEMO_JOURNEY_ISOLATION",
+      "owner": "recruiter-squad"
     }
   ]
 }

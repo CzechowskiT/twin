@@ -1,5 +1,5 @@
 /**
- * Hard LIVE evidence registry CI guard — no PASS without criterion 25 + smoke_sha; stance frozen.
+ * Hard LIVE evidence registry CI guard — Wave 1+2; no PASS without criterion 25 + smoke_sha; stance frozen.
  */
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -8,10 +8,13 @@ import { fileURLToPath } from "node:url";
 import test from "node:test";
 
 import {
+  HARD_LIVE_EVIDENCE_REGISTRY,
   HARD_LIVE_EVIDENCE_REGISTRY_WAVE1,
+  HARD_LIVE_EVIDENCE_REGISTRY_WAVE2,
   HARD_LIVE_REGISTRY_META,
   assertNoLivePassWithoutSmoke,
   registryModuleIds,
+  wave2PendingSmokeIds,
 } from "../src/lib/hard-live-evidence-registry";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -25,7 +28,7 @@ test("stance remains Founder-blocked", () => {
 
 test("no PASS rows with missing criterion 25 or without smoke_sha", () => {
   assert.doesNotThrow(() => assertNoLivePassWithoutSmoke());
-  const passed = HARD_LIVE_EVIDENCE_REGISTRY_WAVE1.filter((r) => r.status === "PASS");
+  const passed = HARD_LIVE_EVIDENCE_REGISTRY.filter((r) => r.status === "PASS");
   assert.equal(passed.length, 12);
   for (const row of passed) {
     assert.ok(!row.missing_criteria.includes(25), row.module_id);
@@ -35,7 +38,7 @@ test("no PASS rows with missing criterion 25 or without smoke_sha", () => {
 });
 
 test("wave1 trust modules present and held policy modules blocked", () => {
-  const ids = new Set(registryModuleIds());
+  const ids = new Set(HARD_LIVE_EVIDENCE_REGISTRY_WAVE1.map((r) => r.module_id));
   for (const id of [
     "candidate_consent_receipt",
     "candidate_control_center",
@@ -53,27 +56,50 @@ test("wave1 trust modules present and held policy modules blocked", () => {
   assert.ok(held.every((r) => r.blocker));
 });
 
-test("docs registry JSON mirrors TS module ids and PASS smoke fields", () => {
+test("wave2 recruiter modules seeded with pending/held/demo isolation", () => {
+  assert.ok(HARD_LIVE_EVIDENCE_REGISTRY_WAVE2.length >= 30);
+  const pending = wave2PendingSmokeIds();
+  assert.ok(pending.includes("recruiter_talent_radar"));
+  assert.ok(pending.includes("rec_notes"));
+  assert.ok(pending.includes("rec_scorecards"));
+  const held = HARD_LIVE_EVIDENCE_REGISTRY_WAVE2.filter((r) => r.status === "HELD_POLICY");
+  assert.ok(held.some((r) => r.module_id === "recruiter_calendar"));
+  assert.ok(held.some((r) => r.module_id === "recruiter_integrations"));
+  const demo = HARD_LIVE_EVIDENCE_REGISTRY_WAVE2.filter((r) => r.status === "DEMO_ONLY");
+  assert.ok(demo.some((r) => r.module_id === "recruiter_demo_pipeline"));
+  assert.ok(demo.every((r) => r.blocker === "DEMO_JOURNEY_ISOLATION"));
+  // No Wave 2 PASS until smoke SHA filled.
+  assert.equal(
+    HARD_LIVE_EVIDENCE_REGISTRY_WAVE2.filter((r) => r.status === "PASS").length,
+    0,
+  );
+});
+
+test("docs registry JSON mirrors TS module ids and Wave 1 PASS smoke fields", () => {
   const jsonPath = join(root, "docs/HARD_LIVE_EVIDENCE_REGISTRY.json");
   const raw = readFileSync(jsonPath, "utf8");
   const doc = JSON.parse(raw) as {
-    modules: Array<{ module_id: string; status: string; smoke_sha?: string }>;
+    modules: Array<{ module_id: string; status: string; smoke_sha?: string; wave?: string }>;
     stance: { pilot: string; external_pilot_enrollment_enabled: boolean };
+    wave: string;
   };
-  assert.equal(doc.modules.length, HARD_LIVE_EVIDENCE_REGISTRY_WAVE1.length);
+  assert.equal(doc.modules.length, HARD_LIVE_EVIDENCE_REGISTRY.length);
   const docIds = new Set(doc.modules.map((m) => m.module_id));
   for (const id of registryModuleIds()) {
     assert.ok(docIds.has(id), id);
   }
   assert.equal(doc.stance.pilot, "BLOCKED_BY_FOUNDER");
   assert.equal(doc.stance.external_pilot_enrollment_enabled, false);
+  assert.equal(doc.wave, "2");
   const passDocs = doc.modules.filter((m) => m.status === "PASS");
   assert.equal(passDocs.length, 12);
   for (const m of passDocs) {
     assert.ok(m.smoke_sha, m.module_id);
   }
-  assert.doesNotMatch(raw, /PENDING_SMOKE/);
   assert.match(raw, /HELD_POLICY/);
+  assert.match(raw, /DEMO_ONLY/);
+  assert.match(raw, /PENDING_SMOKE/);
+  assert.match(raw, /recruiter_talent_radar/);
 });
 
 test("production action gates still block enrollment", () => {

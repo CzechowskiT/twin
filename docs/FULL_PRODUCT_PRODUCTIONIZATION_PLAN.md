@@ -185,3 +185,19 @@ Monetization/Stripe public and ATS live-sync remain **outside** waves until expl
 - [x] Capability map LIVE updates post-smoke; CV modules honest HELD_POLICY
 
 **Next:** Wave 2 Recruiter complete — see consolidated report.
+
+## 11. Wave 2 Recruiter Complete (this batch)
+
+- [x] Recruiter surface inventory + Hard LIVE evidence registry (Wave 2 modules)
+- [x] Decision memory live API (demo fixtures forbidden) + job lifecycle archive/update
+- [x] Team invite dry-run (outbox draft, no real email) + communications draft-only
+- [x] DEMO_ONLY isolation for demo/SoR journeys (capability map + registry)
+- [x] Migration `089_recruiter_wave2_hard_live` + wave2 flags + evidence seed
+- [x] `WAVE2_SMOKE_MODULES` fail-closed harness + CI guards
+- [x] Policy holds unchanged: ATS / MS write / auto-apply / Stripe / Authologic / enrollment OFF
+- [ ] Authenticated per-module prod smoke PASS on aligned SHA (post-merge)
+- [ ] Capability map LIVE promotions only after smoke PASS
+
+**Exit status (pre-smoke):** engineering slice **READY** — LIVE badges deferred until module smoke. Target exit: **DONE_WITH_POLICY_HOLDS** (calendar/ATS/enrollment held).
+
+**Next:** After smoke PASS → LIVE badge docs slice; else Wave 2 Recruiter Gap Close.
