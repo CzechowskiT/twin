@@ -111,15 +111,18 @@ test("4 thin marketing pages hidden from nav or coming-soon surface", () => {
   assert.match(cases, /MARK_ILLUSTRATIVE_SOCIAL_PROOF|site\.casesDisclaimer/);
 });
 
-test("5 logo disclaimer — subtle premium copy, no defensive not-all-customers text", () => {
-  assert.equal(SUBTLE_MARQUEE_LOGO_DISCLAIMER, true);
+test("5 logo disclaimer removed — no caption under logo strip", () => {
+  assert.equal(SUBTLE_MARQUEE_LOGO_DISCLAIMER, false);
   const marquee = read("src/components/site-top-marquee.tsx");
   const companyMarquee = read("src/components/marketing/company-logo-marquee.tsx");
-  assert.match(marquee, /site\.marqueeLogoDisclaimer/);
+  assert.doesNotMatch(marquee, /site\.marqueeLogoDisclaimer/);
+  assert.doesNotMatch(marquee, /marquee-logo-disclaimer/);
   assert.match(companyMarquee, /getPublicMarqueeLogos/);
-  assert.match(en.site.marqueeLogoDisclaimer ?? "", /Representative market context/i);
-  assert.match(dictionaries.pl.site.marqueeLogoDisclaimer ?? "", /kontekst rynkowy/i);
+  assert.equal(en.site.marqueeLogoDisclaimer, undefined);
+  assert.equal(dictionaries.pl.site.marqueeLogoDisclaimer, undefined);
   const repo = readRepo("frontend/src/lib/site-messages.ts");
+  assert.doesNotMatch(repo, /Representative market context/i);
+  assert.doesNotMatch(repo, /Reprezentatywny kontekst rynkowy/i);
   assert.doesNotMatch(repo, /not all customers/i);
   assert.doesNotMatch(repo, /nie wszyscy klienci/i);
 });

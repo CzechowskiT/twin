@@ -130,10 +130,10 @@ test("7 plan classification counts — 48 modules documented", () => {
   );
 });
 
-test("8 site chrome — marquee disclaimer and footer illustrative labels", () => {
+test("8 site chrome — marquee without disclaimer caption; footer illustrative labels", () => {
   const marquee = read("src/components/site-top-marquee.tsx");
-  assert.match(marquee, /data-testid="marquee-logo-disclaimer"/);
-  assert.match(marquee, /site\.marqueeLogoDisclaimer/);
+  assert.doesNotMatch(marquee, /data-testid="marquee-logo-disclaimer"/);
+  assert.doesNotMatch(marquee, /site\.marqueeLogoDisclaimer/);
   const footer = read("src/components/site-footer.tsx");
   assert.match(footer, /FOOTER_SOCIAL_PROOF_ILLUSTRATIVE_LABELS/);
 });

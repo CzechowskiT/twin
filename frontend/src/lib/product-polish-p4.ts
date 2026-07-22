@@ -15,5 +15,5 @@ export const MARK_ILLUSTRATIVE_SOCIAL_PROOF = true;
 /** Footer relabels social proof links with illustrative / founder-led honesty. */
 export const FOOTER_SOCIAL_PROOF_ILLUSTRATIVE_LABELS = true;
 
-/** Subtle premium marquee disclaimer — still mitigates logo overclaim. */
-export const SUBTLE_MARQUEE_LOGO_DISCLAIMER = true;
+/** Marquee logo caption removed — keep flag false so guards stay aligned. */
+export const SUBTLE_MARQUEE_LOGO_DISCLAIMER = false;

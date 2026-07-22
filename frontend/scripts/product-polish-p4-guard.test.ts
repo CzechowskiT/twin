@@ -67,14 +67,15 @@ test("3 illustrative social proof — pages, homepage, footer labels", () => {
   assert.match(en.site.casesDisclaimer ?? "", /Illustrative examples/i);
 });
 
-test("4 subtle marquee logo disclaimer — premium copy, i18n visible on chrome", () => {
-  assert.equal(SUBTLE_MARQUEE_LOGO_DISCLAIMER, true);
+test("4 marquee logo disclaimer removed — no caption under logo strip", () => {
+  assert.equal(SUBTLE_MARQUEE_LOGO_DISCLAIMER, false);
   const marquee = read("src/components/site-top-marquee.tsx");
   const companyMarquee = read("src/components/marketing/company-logo-marquee.tsx");
-  assert.match(marquee, /site\.marqueeLogoDisclaimer/);
+  assert.doesNotMatch(marquee, /site\.marqueeLogoDisclaimer/);
+  assert.doesNotMatch(marquee, /marquee-logo-disclaimer/);
   assert.match(companyMarquee, /getPublicMarqueeLogos/);
-  assert.match(en.site.marqueeLogoDisclaimer ?? "", /Representative market context/i);
-  assert.match(dictionaries.pl.site.marqueeLogoDisclaimer ?? "", /kontekst rynkowy/i);
+  assert.equal(en.site.marqueeLogoDisclaimer, undefined);
+  assert.equal(dictionaries.pl.site.marqueeLogoDisclaimer, undefined);
 });
 
 test("5 P4 slice doc exists with stance footer", () => {

@@ -101,12 +101,12 @@ test("5 homepage CTA fatigue reduced — primary waitlist, secondary text link",
   }
 });
 
-test("6 logo marquee disclaimer is i18n and visible on marketing chrome", () => {
+test("6 logo marquee disclaimer removed from marketing chrome", () => {
   const marquee = read("src/components/site-top-marquee.tsx");
-  assert.match(marquee, /marquee-logo-disclaimer/);
-  assert.match(marquee, /site\.marqueeLogoDisclaimer/);
-  assert.match(en.site.marqueeLogoDisclaimer ?? "", /Representative market context/i);
-  assert.match(dictionaries.pl.site.marqueeLogoDisclaimer ?? "", /kontekst rynkowy/i);
+  assert.doesNotMatch(marquee, /marquee-logo-disclaimer/);
+  assert.doesNotMatch(marquee, /site\.marqueeLogoDisclaimer/);
+  assert.equal(en.site.marqueeLogoDisclaimer, undefined);
+  assert.equal(dictionaries.pl.site.marqueeLogoDisclaimer, undefined);
 });
 
 test("7 slice doc states P0 CLOSED, Gate E PASS, Gate F PENDING, Launch NO-GO", () => {
