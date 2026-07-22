@@ -41,8 +41,8 @@ export const WAVE5_SMOKE_SHA: string | null = "b3e2adecb6ef09f1aaf1c6be19a12ac74
 export const WAVE5_SMOKE_AT: string | null = "2026-07-22T14:50:00Z";
 
 /** Filled after AI compliance authenticated prod smoke PASS — null until post-merge smoke. */
-export const AI_COMPLIANCE_SMOKE_SHA: string | null = null;
-export const AI_COMPLIANCE_SMOKE_AT: string | null = null;
+export const AI_COMPLIANCE_SMOKE_SHA: string | null = "9bc6428d81b5ac62069d39d5962553d64b213063";
+export const AI_COMPLIANCE_SMOKE_AT: string | null = "2026-07-22T16:16:30Z";
 
 
 function passModuleW1(
@@ -1069,6 +1069,31 @@ function pendingAiCompliance(
   };
 }
 
+function passAiCompliance(
+  module_id: string,
+  route: string,
+  owner: string,
+  notes: string,
+): HardLiveModuleEvidence {
+  const criteria: Record<string, HardLiveCriterionResult> = {
+    ...Object.fromEntries(Array.from({ length: 30 }, (_, i) => [String(i + 1), "PASS" as const])),
+  };
+  return {
+    module_id,
+    persona: "platform",
+    wave: "ai_compliance" as HardLiveModuleEvidence["wave"],
+    status: "PASS",
+    route,
+    owner,
+    blocker: null,
+    missing_criteria: [],
+    criteria,
+    notes,
+    smoke_sha: AI_COMPLIANCE_SMOKE_SHA!,
+    smoke_at: AI_COMPLIANCE_SMOKE_AT!,
+  };
+}
+
 function heldAiCompliance(
   module_id: string,
   route: string,
@@ -1091,34 +1116,34 @@ function heldAiCompliance(
 }
 
 export const HARD_LIVE_EVIDENCE_REGISTRY_AI_COMPLIANCE: HardLiveModuleEvidence[] = [
-  pendingAiCompliance("ai_claim_declared", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_claim_extracted", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_claim_inferred", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_claim_provenance", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_claim_human_confirm", "/recruiter/evidence/claims", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_claim_evidence_link", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_claim_evidence_backed", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_claim_dispute", "/dashboard/evidence/disputes", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_claim_dispute_resolve", "/recruiter/evidence/disputes", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_claim_supersede", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_claim_history", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_decision_log", "/dashboard/evidence/ai-runs", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_explainability", "/dashboard/evidence/ai-runs", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_human_override", "/recruiter/evidence/reviews", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_override_audit", "/company/evidence/audit", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_tenant_isolation_claim", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_tenant_isolation_evidence", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_prompt_injection_guard", "/dashboard/evidence/security", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_protected_attr_ban", "/dashboard/evidence/security", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_prohibited_use_guard", "/dashboard/evidence/security", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_registry", "/board/ai-compliance", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_prompt_registry", "/board/ai-compliance", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_model_rollback_audit", "/board/ai-compliance", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_compliance_status", "/board/ai-compliance", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_smoke_metrics_exclusion", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_no_outbound", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_consent_visibility", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
-  pendingAiCompliance("ai_claim_cleanup", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
+  passAiCompliance("ai_claim_declared", "/dashboard/evidence/claims", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_claim_extracted", "/dashboard/evidence/claims", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_claim_inferred", "/dashboard/evidence/claims", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_claim_provenance", "/dashboard/evidence/claims", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_claim_human_confirm", "/recruiter/evidence/claims", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_claim_evidence_link", "/dashboard/evidence/claims", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_claim_evidence_backed", "/dashboard/evidence/claims", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_claim_dispute", "/dashboard/evidence/disputes", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_claim_dispute_resolve", "/recruiter/evidence/disputes", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_claim_supersede", "/dashboard/evidence/claims", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_claim_history", "/dashboard/evidence/claims", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_decision_log", "/dashboard/evidence/ai-runs", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_explainability", "/dashboard/evidence/ai-runs", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_human_override", "/recruiter/evidence/reviews", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_override_audit", "/company/evidence/audit", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_tenant_isolation_claim", "/dashboard/evidence/claims", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_tenant_isolation_evidence", "/dashboard/evidence/claims", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_prompt_injection_guard", "/dashboard/evidence/security", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_protected_attr_ban", "/dashboard/evidence/security", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_prohibited_use_guard", "/dashboard/evidence/security", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_registry", "/board/ai-compliance", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_prompt_registry", "/board/ai-compliance", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_model_rollback_audit", "/board/ai-compliance", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_compliance_status", "/board/ai-compliance", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_smoke_metrics_exclusion", "/dashboard/evidence/claims", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_no_outbound", "/dashboard/evidence/claims", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_consent_visibility", "/dashboard/evidence/claims", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
+  passAiCompliance("ai_claim_cleanup", "/dashboard/evidence/claims", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
   heldAiCompliance("ai_external_verification", "/dashboard/evidence/claims", "platform", "EXTERNAL_VERIFICATION_OFF", "External verification default OFF."),
   heldAiCompliance("ai_protected_attr_monitoring", "/board/ai-compliance", "platform", "PROTECTED_ATTR_MONITORING_LEGAL_HOLD", "Protected attribute monitoring legal hold."),
   heldAiCompliance("ai_autonomous_employment", "/recruiter/evidence/reviews", "platform", "AUTONOMOUS_EMPLOYMENT_HARD_BAN", "Autonomous employment decisions hard-banned."),
