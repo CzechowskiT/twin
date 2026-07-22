@@ -1,15 +1,14 @@
 /**
- * Machine-readable Hard LIVE 30 evidence registry — Wave 1 Candidate + Wave 2 Recruiter + Wave 3 Company + Wave 5 Integrations.
+ * Machine-readable Hard LIVE 30 evidence registry — Waves 1–5 + Wave 4 Investor + AI compliance foundation.
  * LIVE badges in capability map / activation require status=PASS after authenticated prod smoke.
  * Stance: Pilot BLOCKED_BY_FOUNDER · Gate F PENDING · Launch NO-GO.
- * Note: Wave 4 Investor Complete was not shipped — Wave 5 proceeds on Wave 3 HEAD.
  */
 export type HardLiveCriterionResult = "PASS" | "FAIL" | "N/A" | "PENDING";
 
 export type HardLiveModuleEvidence = {
   module_id: string;
-  persona: "candidate" | "recruiter" | "company" | "platform";
-  wave: "1" | "2" | "3" | "5";
+  persona: "candidate" | "recruiter" | "company" | "platform" | "investor";
+  wave: "1" | "2" | "3" | "4" | "5" | "ai";
   /** Never claim product LIVE until PASS + docs update post-smoke. */
   status: "PENDING_SMOKE" | "PASS" | "FAIL" | "PARTIAL" | "HELD_POLICY" | "DEMO_ONLY";
   route: string;
@@ -40,6 +39,11 @@ export const WAVE3_SMOKE_AT: string | null = "2026-07-22T07:00:00Z";
 /** Filled after Wave 5 authenticated prod smoke PASS — null until post-merge smoke. */
 export const WAVE5_SMOKE_SHA: string | null = "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18";
 export const WAVE5_SMOKE_AT: string | null = "2026-07-22T14:50:00Z";
+
+/** Filled after AI compliance authenticated prod smoke PASS — null until post-merge smoke. */
+export const AI_COMPLIANCE_SMOKE_SHA: string | null = null;
+export const AI_COMPLIANCE_SMOKE_AT: string | null = null;
+
 
 function passModuleW1(
   module_id: string,
@@ -967,11 +971,90 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE5: HardLiveModuleEvidence[] = [
   ),
 ];
 
+
+function pendingAiCompliance(
+  module_id: string,
+  route: string,
+  owner: string,
+  notes: string,
+): HardLiveModuleEvidence {
+  return {
+    module_id,
+    persona: "platform",
+    wave: "ai_compliance" as HardLiveModuleEvidence["wave"],
+    status: "PENDING_SMOKE",
+    route,
+    owner,
+    blocker: "authenticated_prod_smoke_required",
+    missing_criteria: [25],
+    criteria: { ...ALL_PENDING },
+    notes,
+  };
+}
+
+function heldAiCompliance(
+  module_id: string,
+  route: string,
+  owner: string,
+  blocker: string,
+  notes: string,
+): HardLiveModuleEvidence {
+  return {
+    module_id,
+    persona: "platform",
+    wave: "ai_compliance" as HardLiveModuleEvidence["wave"],
+    status: "HELD_POLICY",
+    route,
+    owner,
+    blocker,
+    missing_criteria: [25],
+    criteria: { ...ALL_PENDING },
+    notes,
+  };
+}
+
+export const HARD_LIVE_EVIDENCE_REGISTRY_AI_COMPLIANCE: HardLiveModuleEvidence[] = [
+  pendingAiCompliance("ai_claim_declared", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_claim_extracted", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_claim_inferred", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_claim_provenance", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_claim_human_confirm", "/recruiter/evidence/claims", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_claim_evidence_link", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_claim_evidence_backed", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_claim_dispute", "/dashboard/evidence/disputes", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_claim_dispute_resolve", "/recruiter/evidence/disputes", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_claim_supersede", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_claim_history", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_decision_log", "/dashboard/evidence/ai-runs", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_explainability", "/dashboard/evidence/ai-runs", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_human_override", "/recruiter/evidence/reviews", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_override_audit", "/company/evidence/audit", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_tenant_isolation_claim", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_tenant_isolation_evidence", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_prompt_injection_guard", "/dashboard/evidence/security", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_protected_attr_ban", "/dashboard/evidence/security", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_prohibited_use_guard", "/dashboard/evidence/security", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_registry", "/board/ai-compliance", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_prompt_registry", "/board/ai-compliance", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_model_rollback_audit", "/board/ai-compliance", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_compliance_status", "/board/ai-compliance", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_smoke_metrics_exclusion", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_no_outbound", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_consent_visibility", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
+  pendingAiCompliance("ai_claim_cleanup", "/dashboard/evidence/claims", "platform", "Pending AI compliance smoke."),
+  heldAiCompliance("ai_external_verification", "/dashboard/evidence/claims", "platform", "EXTERNAL_VERIFICATION_OFF", "External verification default OFF."),
+  heldAiCompliance("ai_protected_attr_monitoring", "/board/ai-compliance", "platform", "PROTECTED_ATTR_MONITORING_LEGAL_HOLD", "Protected attribute monitoring legal hold."),
+  heldAiCompliance("ai_autonomous_employment", "/recruiter/evidence/reviews", "platform", "AUTONOMOUS_EMPLOYMENT_HARD_BAN", "Autonomous employment decisions hard-banned."),
+  heldAiCompliance("ai_act_certified_claim", "/board/ai-compliance", "platform", "NO_LEGAL_CERTIFICATION", "No AI Act certification claim."),
+  heldAiCompliance("ai_wave6_dsr_delete_export", "/dashboard/trust/revoke-delete", "privacy", "WAVE6_NOT_STARTED", "Full DSR is Wave 6 — not this batch."),
+];
+
 export const HARD_LIVE_EVIDENCE_REGISTRY: HardLiveModuleEvidence[] = [
   ...HARD_LIVE_EVIDENCE_REGISTRY_WAVE1,
   ...HARD_LIVE_EVIDENCE_REGISTRY_WAVE2,
   ...HARD_LIVE_EVIDENCE_REGISTRY_WAVE3,
   ...HARD_LIVE_EVIDENCE_REGISTRY_WAVE5,
+  ...HARD_LIVE_EVIDENCE_REGISTRY_AI_COMPLIANCE,
 ];
 
 export const HARD_LIVE_REGISTRY_META = {
@@ -999,6 +1082,9 @@ export const HARD_LIVE_REGISTRY_META = {
     wave5_script: "frontend/scripts/wave5-integrations-module-prod-smoke.test.ts",
     wave5_sha: WAVE5_SMOKE_SHA,
     wave5_at: WAVE5_SMOKE_AT,
+    ai_compliance_script: "frontend/scripts/ai-compliance-module-prod-smoke.test.ts",
+    ai_compliance_sha: AI_COMPLIANCE_SMOKE_SHA,
+    ai_compliance_at: AI_COMPLIANCE_SMOKE_AT,
     write: true,
     exclude_from_product_metrics: true,
   },
@@ -1040,4 +1126,12 @@ export function wave3PendingSmokeIds(): string[] {
 
 export function wave5PendingSmokeIds(): string[] {
   return HARD_LIVE_EVIDENCE_REGISTRY_WAVE5.filter((r) => r.status === "PENDING_SMOKE").map((r) => r.module_id);
+}
+
+export function wave4PendingSmokeIds(): string[] {
+  return [];
+}
+
+export function aiCompliancePendingSmokeIds(): string[] {
+  return HARD_LIVE_EVIDENCE_REGISTRY_AI_COMPLIANCE.filter((r) => r.status === "PENDING_SMOKE").map((r) => r.module_id);
 }

@@ -2254,3 +2254,359 @@ class CompanyScorecardEntry(Base):
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
 
+
+
+class CareerClaim(Base):
+    """Career Evidence Graph claim — never collapse to a single verified boolean."""
+
+    __tablename__ = "career_claims"
+    __table_args__ = (UniqueConstraint("claim_id", name="uq_career_claims_claim_id"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    claim_id: Mapped[str] = mapped_column(String(64), index=True)
+    tenant_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
+    subject_type: Mapped[str] = mapped_column(String(64))
+    subject_id: Mapped[str] = mapped_column(String(128))
+    claim_type: Mapped[str] = mapped_column(String(64))
+    claim_key: Mapped[str] = mapped_column(String(128))
+    claim_value: Mapped[str] = mapped_column(Text)
+    normalized_value: Mapped[str | None] = mapped_column(Text, nullable=True)
+    value_schema_version: Mapped[str] = mapped_column(String(32), default="1")
+    status: Mapped[str] = mapped_column(String(32), index=True)
+    confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
+    confidence_method: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    source_type: Mapped[str] = mapped_column(String(64))
+    source_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    source_uri_or_reference: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    source_hash: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    created_by_actor_type: Mapped[str] = mapped_column(String(32))
+    created_by_actor_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    valid_from: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    valid_until: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    verified_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    verified_by: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    disputed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    disputed_by: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    expired_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    superseded_by_claim_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    model_run_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    prompt_version_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    evidence_count: Mapped[int] = mapped_column(Integer, default=0)
+    human_confirmation_required: Mapped[bool] = mapped_column(Boolean, default=False)
+    human_confirmation_status: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    visibility_scope: Mapped[str] = mapped_column(String(64), default="subject")
+    retention_policy: Mapped[str] = mapped_column(String(64), default="standard")
+    legal_basis_reference: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    audit_correlation_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    owner_user_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CareerEvidenceObject(Base):
+    """Evidence object — has own verification status; never auto-truth."""
+
+    __tablename__ = "career_evidence_objects"
+    __table_args__ = (UniqueConstraint("evidence_id", name="uq_career_evidence_evidence_id"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    evidence_id: Mapped[str] = mapped_column(String(64), index=True)
+    tenant_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
+    evidence_type: Mapped[str] = mapped_column(String(64), index=True)
+    source_type: Mapped[str] = mapped_column(String(64))
+    source_reference: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    source_hash: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    issuer: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    issued_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    received_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    verification_method: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    verification_status: Mapped[str] = mapped_column(String(32), default="unverified")
+    verification_actor: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    verification_timestamp: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    document_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    structured_payload: Mapped[str | None] = mapped_column(Text, nullable=True)
+    redacted_payload: Mapped[str | None] = mapped_column(Text, nullable=True)
+    sensitivity: Mapped[str] = mapped_column(String(32), default="standard")
+    visibility_scope: Mapped[str] = mapped_column(String(64), default="subject")
+    retention_policy: Mapped[str] = mapped_column(String(64), default="standard")
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    revocation_reason: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    superseded_by: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    audit_correlation_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    owner_user_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class ClaimEvidenceLink(Base):
+    """Explicit many-to-many link between claims and evidence."""
+
+    __tablename__ = "claim_evidence_links"
+    __table_args__ = (
+        UniqueConstraint("claim_id", "evidence_id", name="uq_claim_evidence_link"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    claim_id: Mapped[str] = mapped_column(String(64), index=True)
+    evidence_id: Mapped[str] = mapped_column(String(64), index=True)
+    link_role: Mapped[str] = mapped_column(String(64), default="supports")
+    explicit_multi_link: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_by_actor_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class ClaimStatusHistory(Base):
+    """Append-only claim status transitions — immutable audit."""
+
+    __tablename__ = "claim_status_history"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    claim_id: Mapped[str] = mapped_column(String(64), index=True)
+    from_status: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    to_status: Mapped[str] = mapped_column(String(32))
+    actor_type: Mapped[str] = mapped_column(String(32))
+    actor_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    reason_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    notes: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    audit_correlation_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+
+
+class ClaimDispute(Base):
+    """Claim dispute / correction / appeal workflow."""
+
+    __tablename__ = "claim_disputes"
+    __table_args__ = (UniqueConstraint("dispute_id", name="uq_claim_disputes_dispute_id"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    dispute_id: Mapped[str] = mapped_column(String(64), index=True)
+    claim_id: Mapped[str] = mapped_column(String(64), index=True)
+    raised_by: Mapped[str] = mapped_column(String(128))
+    reason_code: Mapped[str] = mapped_column(String(64))
+    free_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    evidence_ids_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="OPEN", index=True)
+    assigned_to: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    resolution: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    resolution_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    resolved_by: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    appeal_status: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    appeal_deadline: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    audit_correlation_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    tenant_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class AiSystemRegistry(Base):
+    """Central AI system / model registry — readiness language, not legal certification."""
+
+    __tablename__ = "ai_system_registry"
+    __table_args__ = (UniqueConstraint("ai_system_id", name="uq_ai_system_registry_id"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    ai_system_id: Mapped[str] = mapped_column(String(64), index=True)
+    name: Mapped[str] = mapped_column(String(200))
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    use_case: Mapped[str] = mapped_column(String(128))
+    provider: Mapped[str] = mapped_column(String(64))
+    model_name: Mapped[str] = mapped_column(String(128))
+    model_version: Mapped[str] = mapped_column(String(64))
+    deployment_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    environment: Mapped[str] = mapped_column(String(32), default="production")
+    owner: Mapped[str] = mapped_column(String(64))
+    business_owner: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    technical_owner: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    risk_owner: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    status: Mapped[str] = mapped_column(String(32), index=True)
+    risk_classification: Mapped[str] = mapped_column(String(64), index=True)
+    high_risk_candidate: Mapped[bool] = mapped_column(Boolean, default=False)
+    decision_impact: Mapped[str] = mapped_column(String(64))
+    human_oversight_required: Mapped[bool] = mapped_column(Boolean, default=True)
+    allowed_personas_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    allowed_tenants_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    input_data_categories_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    output_data_categories_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    protected_attribute_policy: Mapped[str] = mapped_column(String(64), default="never_infer")
+    training_data_disclosure: Mapped[str | None] = mapped_column(Text, nullable=True)
+    fine_tuning_status: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    prompt_template_ids_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    evaluation_suite: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    baseline_metrics_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    known_limitations: Mapped[str | None] = mapped_column(Text, nullable=True)
+    prohibited_uses_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    rollout_strategy: Mapped[str | None] = mapped_column(Text, nullable=True)
+    rollback_strategy: Mapped[str | None] = mapped_column(Text, nullable=True)
+    monitoring_plan: Mapped[str | None] = mapped_column(Text, nullable=True)
+    retention_policy: Mapped[str] = mapped_column(String(64), default="ai_logs_90d")
+    introduced_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    last_reviewed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    retired_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class AiPromptTemplate(Base):
+    """Versioned prompt registry — hashes only, no secrets/PII."""
+
+    __tablename__ = "ai_prompt_templates"
+    __table_args__ = (
+        UniqueConstraint("prompt_template_id", "version", name="uq_ai_prompt_template_ver"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    prompt_template_id: Mapped[str] = mapped_column(String(64), index=True)
+    use_case: Mapped[str] = mapped_column(String(128), index=True)
+    version: Mapped[str] = mapped_column(String(32))
+    status: Mapped[str] = mapped_column(String(32), index=True)
+    owner: Mapped[str] = mapped_column(String(64))
+    system_prompt_hash: Mapped[str] = mapped_column(String(128))
+    user_prompt_schema: Mapped[str | None] = mapped_column(Text, nullable=True)
+    variables_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    expected_output_schema: Mapped[str | None] = mapped_column(Text, nullable=True)
+    safety_instructions: Mapped[str | None] = mapped_column(Text, nullable=True)
+    prohibited_behavior: Mapped[str | None] = mapped_column(Text, nullable=True)
+    human_review_requirement: Mapped[bool] = mapped_column(Boolean, default=True)
+    test_suite: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    evaluation_result: Mapped[str | None] = mapped_column(Text, nullable=True)
+    introduced_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    deprecated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    superseded_by: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    rollback_version: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class AiDecisionRun(Base):
+    """AI Decision Log — redacted payloads only."""
+
+    __tablename__ = "ai_decision_runs"
+    __table_args__ = (UniqueConstraint("ai_run_id", name="uq_ai_decision_runs_run_id"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    ai_run_id: Mapped[str] = mapped_column(String(64), index=True)
+    tenant_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
+    ai_system_id: Mapped[str] = mapped_column(String(64), index=True)
+    model_version: Mapped[str] = mapped_column(String(64))
+    deployment_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    prompt_template_id: Mapped[str] = mapped_column(String(64))
+    prompt_version: Mapped[str] = mapped_column(String(32))
+    input_reference: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    input_hash: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    input_data_categories_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    output_reference: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    output_hash: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    output_type: Mapped[str] = mapped_column(String(64))
+    redacted_input_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    redacted_output_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
+    confidence_method: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    latency_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    token_usage: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    cost_estimate: Mapped[float | None] = mapped_column(Float, nullable=True)
+    fallback_used: Mapped[bool] = mapped_column(Boolean, default=False)
+    safety_filter_triggered: Mapped[bool] = mapped_column(Boolean, default=False)
+    protected_attribute_used: Mapped[bool] = mapped_column(Boolean, default=False)
+    human_review_required: Mapped[bool] = mapped_column(Boolean, default=True)
+    human_review_status: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    human_reviewer: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    human_override: Mapped[bool] = mapped_column(Boolean, default=False)
+    override_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    accepted: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    rejected: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    escalated: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_claim_ids_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    affected_subject_ids_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    decision_impact: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    explanation_reference: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    retention_policy: Mapped[str] = mapped_column(String(64), default="ai_logs_90d")
+    audit_correlation_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    owner_user_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+
+
+class AiExplanation(Base):
+    """Explainability record tied to an AI run — PARTIAL when incomplete."""
+
+    __tablename__ = "ai_explanations"
+    __table_args__ = (UniqueConstraint("explanation_id", name="uq_ai_explanations_id"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    explanation_id: Mapped[str] = mapped_column(String(64), index=True)
+    ai_run_id: Mapped[str] = mapped_column(String(64), index=True)
+    why: Mapped[str] = mapped_column(Text)
+    based_on_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    data_used_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    data_not_used_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    key_factors_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    counterfactors_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    limitations: Mapped[str | None] = mapped_column(Text, nullable=True)
+    confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
+    uncertainty: Mapped[str | None] = mapped_column(Text, nullable=True)
+    human_action_required: Mapped[bool] = mapped_column(Boolean, default=True)
+    prohibited_interpretation: Mapped[str | None] = mapped_column(Text, nullable=True)
+    model_and_prompt_version: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    completeness: Mapped[str] = mapped_column(String(32), default="PARTIAL")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class AiHumanReview(Base):
+    """Human review / override of AI outputs — binding employment decisions require this."""
+
+    __tablename__ = "ai_human_reviews"
+    __table_args__ = (UniqueConstraint("review_id", name="uq_ai_human_reviews_id"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    review_id: Mapped[str] = mapped_column(String(64), index=True)
+    ai_run_id: Mapped[str] = mapped_column(String(64), index=True)
+    claim_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="PENDING", index=True)
+    actor: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    actor_role: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    original_output_ref: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    final_outcome: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    reason_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    justification: Mapped[str | None] = mapped_column(Text, nullable=True)
+    supporting_evidence_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    audit_correlation_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class AiProhibitedUse(Base):
+    """Machine-readable prohibited-use registry — block + audit + no provider call."""
+
+    __tablename__ = "ai_prohibited_uses"
+    __table_args__ = (UniqueConstraint("use_key", name="uq_ai_prohibited_use_key"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    use_key: Mapped[str] = mapped_column(String(128), index=True)
+    description: Mapped[str] = mapped_column(Text)
+    severity: Mapped[str] = mapped_column(String(32), default="PROHIBITED")
+    block_provider_call: Mapped[bool] = mapped_column(Boolean, default=True)
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class AiInAppNotification(Base):
+    """In-app only notifications for disputes/reviews — smoke never sends email."""
+
+    __tablename__ = "ai_in_app_notifications"
+    __table_args__ = (UniqueConstraint("notification_id", name="uq_ai_in_app_notifications_id"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    notification_id: Mapped[str] = mapped_column(String(64), index=True)
+    user_id: Mapped[int] = mapped_column(Integer, index=True)
+    kind: Mapped[str] = mapped_column(String(64))
+    payload_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    read_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
