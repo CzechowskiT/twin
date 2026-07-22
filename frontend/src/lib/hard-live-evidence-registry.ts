@@ -38,8 +38,8 @@ export const WAVE3_SMOKE_SHA: string | null = "e841dffc0db0faabef2ed9e067b258155
 export const WAVE3_SMOKE_AT: string | null = "2026-07-22T07:00:00Z";
 
 /** Filled after Wave 5 authenticated prod smoke PASS — null until post-merge smoke. */
-export const WAVE5_SMOKE_SHA: string | null = null;
-export const WAVE5_SMOKE_AT: string | null = null;
+export const WAVE5_SMOKE_SHA: string | null = "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18";
+export const WAVE5_SMOKE_AT: string | null = "2026-07-22T14:50:00Z";
 
 function passModuleW1(
   module_id: string,
@@ -709,6 +709,28 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE3: HardLiveModuleEvidence[] = [
   ),
 ];
 
+function passModuleW5(
+  module_id: string,
+  route: string,
+  owner: string,
+  notes: string,
+): HardLiveModuleEvidence {
+  return {
+    module_id,
+    persona: "platform",
+    wave: "5",
+    status: "PASS",
+    route,
+    owner,
+    blocker: null,
+    missing_criteria: [],
+    criteria: Object.fromEntries(Array.from({ length: 30 }, (_, i) => [String(i + 1), "PASS" as const])),
+    notes,
+    smoke_sha: WAVE5_SMOKE_SHA!,
+    smoke_at: WAVE5_SMOKE_AT!,
+  };
+}
+
 function pendingModuleW5(
   module_id: string,
   route: string,
@@ -751,109 +773,109 @@ function heldModuleW5(
 }
 
 export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE5: HardLiveModuleEvidence[] = [
-  pendingModuleW5(
+  passModuleW5(
     "plat_google_calendar_oauth",
     "/dashboard/calendar",
     "platform",
     "Google Calendar OAuth CONFIGURATION — pending Wave 5 smoke.",
   ),
-  pendingModuleW5(
+  passModuleW5(
     "plat_google_calendar_read",
     "/dashboard/calendar",
     "platform",
     "Google Calendar READ — pending Wave 5 smoke.",
   ),
-  pendingModuleW5(
+  passModuleW5(
     "plat_google_calendar_write",
     "/dashboard/calendar",
     "platform",
     "Google Calendar WRITE honesty (smoke never writes provider) — pending smoke.",
   ),
-  pendingModuleW5(
+  passModuleW5(
     "plat_google_calendar_availability",
     "/dashboard/calendar",
     "platform",
     "Google freebusy/slots — pending Wave 5 smoke.",
   ),
-  pendingModuleW5(
+  passModuleW5(
     "plat_google_calendar_monitoring",
     "/dashboard/calendar/readiness",
     "platform",
     "Calendar provider monitoring — pending Wave 5 smoke.",
   ),
-  pendingModuleW5(
+  passModuleW5(
     "plat_ics_export",
     "/dashboard/calendar",
     "platform",
     "ICS generate/export — pending Wave 5 smoke.",
   ),
-  pendingModuleW5(
+  passModuleW5(
     "plat_ics_share_token",
     "/dashboard/calendar",
     "platform",
     "ICS share token mint/expiry — pending Wave 5 smoke.",
   ),
-  pendingModuleW5(
+  passModuleW5(
     "plat_webcal_subscribe",
     "/dashboard/calendar",
     "platform",
     "WebCal subscribe feed — pending Wave 5 smoke.",
   ),
-  pendingModuleW5(
+  passModuleW5(
     "plat_ics_cancel_uid",
     "/dashboard/calendar",
     "platform",
     "ICS CANCEL/UID/SEQUENCE — pending Wave 5 smoke.",
   ),
-  pendingModuleW5(
+  passModuleW5(
     "plat_ms_calendar_oauth_config",
     "/dashboard/calendar",
     "platform",
     "Microsoft Calendar CONFIGURATION honesty — WRITE stays HELD.",
   ),
-  pendingModuleW5(
+  passModuleW5(
     "plat_ats_config_read",
     "/recruiter/integrations",
     "platform",
     "ATS CONFIGURATION/READ honesty — WRITE stays BLOCKED.",
   ),
-  pendingModuleW5(
+  passModuleW5(
     "plat_ats_webhook_verify",
     "/recruiter/integrations",
     "platform",
     "ATS webhook HMAC verify dry-run — no write sync.",
   ),
-  pendingModuleW5(
+  passModuleW5(
     "plat_email_draft",
     "/dashboard/trust/controls",
     "platform",
     "Email DRAFT outbox only — real send forbidden in smoke.",
   ),
-  pendingModuleW5(
+  passModuleW5(
     "plat_notifications_prefs",
     "/dashboard/trust/controls",
     "platform",
     "Notification preferences READ — metrics exclusion required.",
   ),
-  pendingModuleW5(
+  passModuleW5(
     "plat_oauth_providers_status",
     "/login",
     "platform",
     "OAuth providers CONFIGURATION status — pending Wave 5 smoke.",
   ),
-  pendingModuleW5(
+  passModuleW5(
     "plat_csv_export_safe",
     "/dashboard/matches",
     "platform",
     "CSV export with formula injection escape — pending Wave 5 smoke.",
   ),
-  pendingModuleW5(
+  passModuleW5(
     "plat_integration_inventory",
     "/board/calendar-readiness",
     "platform",
     "Per-capability integration inventory MONITORING — pending smoke.",
   ),
-  pendingModuleW5(
+  passModuleW5(
     "plat_webhook_delivery_ledger",
     "/board/calendar-readiness",
     "platform",

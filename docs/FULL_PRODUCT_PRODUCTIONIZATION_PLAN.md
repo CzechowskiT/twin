@@ -229,9 +229,9 @@ Monetization/Stripe public and ATS live-sync remain **outside** waves until expl
 - [x] Migration `091_integrations_wave5_hard_live` + wave5 flags + evidence seed
 - [x] `WAVE5_SMOKE_MODULES` fail-closed harness + CI guards
 - [x] Policy holds unchanged: ATS / MS write / auto-apply / Stripe / Authologic / enrollment OFF
-- [ ] Authenticated per-module prod smoke PASS on aligned SHA (post-merge)
-- [ ] Capability map LIVE promotions only after smoke PASS
+- [x] Authenticated per-module prod smoke PASS on aligned SHA (post-merge)
+- [x] Capability map LIVE promotions only after smoke PASS
 
-**Exit status (engineering ship):** pending post-merge smoke — LIVE badges deferred. Wave 4 noted as missing.
+**Exit status:** **DONE_WITH_POLICY_HOLDS** — 18 Hard LIVE PASS; MS write / ATS write-sync / Stripe / Authologic / enrollment / auto-apply held; Wave 4 noted as missing.
 
-**Next:** After Wave 5 smoke PASS → Wave 6 Privacy / DSR Complete (do not start in this batch).
+**Next:** Wave 6 Privacy / DSR Complete (do not start in this batch).

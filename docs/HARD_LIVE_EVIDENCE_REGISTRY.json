@@ -43,9 +43,9 @@
     },
     "wave5": {
       "script": "frontend/scripts/wave5-integrations-module-prod-smoke.test.ts",
-      "sha": null,
-      "at": null,
-      "result": "PENDING_SMOKE — badges deferred until post-merge PASS",
+      "sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
+      "at": "2026-07-22T14:50:00Z",
+      "result": "PASS 4/4 modules 18/18",
       "write": true,
       "exclude_from_product_metrics": true,
       "jwt_never_committed": true
@@ -971,235 +971,235 @@
       "module_id": "plat_google_calendar_oauth",
       "persona": "platform",
       "wave": "5",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/calendar",
       "owner": "platform",
-      "blocker": "authenticated_prod_smoke_required",
-      "missing_criteria": [
-        25
-      ],
-      "notes": "Google Calendar OAuth CONFIGURATION — pending Wave 5 smoke."
+      "blocker": null,
+      "missing_criteria": [],
+      "notes": "Google Calendar OAuth CONFIGURATION — Wave 5 smoke PASS.",
+      "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
+      "smoke_at": "2026-07-22T14:50:00Z"
     },
     {
       "module_id": "plat_google_calendar_read",
       "persona": "platform",
       "wave": "5",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/calendar",
       "owner": "platform",
-      "blocker": "authenticated_prod_smoke_required",
-      "missing_criteria": [
-        25
-      ],
-      "notes": "Google Calendar READ — pending Wave 5 smoke."
+      "blocker": null,
+      "missing_criteria": [],
+      "notes": "Google Calendar READ — Wave 5 smoke PASS.",
+      "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
+      "smoke_at": "2026-07-22T14:50:00Z"
     },
     {
       "module_id": "plat_google_calendar_write",
       "persona": "platform",
       "wave": "5",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/calendar",
       "owner": "platform",
-      "blocker": "authenticated_prod_smoke_required",
-      "missing_criteria": [
-        25
-      ],
-      "notes": "Google Calendar WRITE honesty (smoke never writes provider) — pending smoke."
+      "blocker": null,
+      "missing_criteria": [],
+      "notes": "Google Calendar WRITE honesty (smoke never writes provider) — Wave 5 smoke PASS.",
+      "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
+      "smoke_at": "2026-07-22T14:50:00Z"
     },
     {
       "module_id": "plat_google_calendar_availability",
       "persona": "platform",
       "wave": "5",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/calendar",
       "owner": "platform",
-      "blocker": "authenticated_prod_smoke_required",
-      "missing_criteria": [
-        25
-      ],
-      "notes": "Google freebusy/slots — pending Wave 5 smoke."
+      "blocker": null,
+      "missing_criteria": [],
+      "notes": "Google freebusy/slots — Wave 5 smoke PASS.",
+      "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
+      "smoke_at": "2026-07-22T14:50:00Z"
     },
     {
       "module_id": "plat_google_calendar_monitoring",
       "persona": "platform",
       "wave": "5",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/calendar/readiness",
       "owner": "platform",
-      "blocker": "authenticated_prod_smoke_required",
-      "missing_criteria": [
-        25
-      ],
-      "notes": "Calendar provider monitoring — pending Wave 5 smoke."
+      "blocker": null,
+      "missing_criteria": [],
+      "notes": "Calendar provider monitoring — Wave 5 smoke PASS.",
+      "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
+      "smoke_at": "2026-07-22T14:50:00Z"
     },
     {
       "module_id": "plat_ics_export",
       "persona": "platform",
       "wave": "5",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/calendar",
       "owner": "platform",
-      "blocker": "authenticated_prod_smoke_required",
-      "missing_criteria": [
-        25
-      ],
-      "notes": "ICS generate/export — pending Wave 5 smoke."
+      "blocker": null,
+      "missing_criteria": [],
+      "notes": "ICS generate/export — Wave 5 smoke PASS.",
+      "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
+      "smoke_at": "2026-07-22T14:50:00Z"
     },
     {
       "module_id": "plat_ics_share_token",
       "persona": "platform",
       "wave": "5",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/calendar",
       "owner": "platform",
-      "blocker": "authenticated_prod_smoke_required",
-      "missing_criteria": [
-        25
-      ],
-      "notes": "ICS share token mint/expiry — pending Wave 5 smoke."
+      "blocker": null,
+      "missing_criteria": [],
+      "notes": "ICS share token mint/expiry — Wave 5 smoke PASS.",
+      "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
+      "smoke_at": "2026-07-22T14:50:00Z"
     },
     {
       "module_id": "plat_webcal_subscribe",
       "persona": "platform",
       "wave": "5",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/calendar",
       "owner": "platform",
-      "blocker": "authenticated_prod_smoke_required",
-      "missing_criteria": [
-        25
-      ],
-      "notes": "WebCal subscribe feed — pending Wave 5 smoke."
+      "blocker": null,
+      "missing_criteria": [],
+      "notes": "WebCal subscribe feed — Wave 5 smoke PASS.",
+      "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
+      "smoke_at": "2026-07-22T14:50:00Z"
     },
     {
       "module_id": "plat_ics_cancel_uid",
       "persona": "platform",
       "wave": "5",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/calendar",
       "owner": "platform",
-      "blocker": "authenticated_prod_smoke_required",
-      "missing_criteria": [
-        25
-      ],
-      "notes": "ICS CANCEL/UID/SEQUENCE — pending Wave 5 smoke."
+      "blocker": null,
+      "missing_criteria": [],
+      "notes": "ICS CANCEL/UID/SEQUENCE — Wave 5 smoke PASS.",
+      "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
+      "smoke_at": "2026-07-22T14:50:00Z"
     },
     {
       "module_id": "plat_ms_calendar_oauth_config",
       "persona": "platform",
       "wave": "5",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/calendar",
       "owner": "platform",
-      "blocker": "authenticated_prod_smoke_required",
-      "missing_criteria": [
-        25
-      ],
-      "notes": "Microsoft Calendar CONFIGURATION honesty — WRITE stays HELD."
+      "blocker": null,
+      "missing_criteria": [],
+      "notes": "Microsoft Calendar CONFIGURATION honesty — WRITE stays HELD.",
+      "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
+      "smoke_at": "2026-07-22T14:50:00Z"
     },
     {
       "module_id": "plat_ats_config_read",
       "persona": "platform",
       "wave": "5",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/recruiter/integrations",
       "owner": "platform",
-      "blocker": "authenticated_prod_smoke_required",
-      "missing_criteria": [
-        25
-      ],
-      "notes": "ATS CONFIGURATION/READ honesty — WRITE stays BLOCKED."
+      "blocker": null,
+      "missing_criteria": [],
+      "notes": "ATS CONFIGURATION/READ honesty — WRITE stays BLOCKED.",
+      "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
+      "smoke_at": "2026-07-22T14:50:00Z"
     },
     {
       "module_id": "plat_ats_webhook_verify",
       "persona": "platform",
       "wave": "5",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/recruiter/integrations",
       "owner": "platform",
-      "blocker": "authenticated_prod_smoke_required",
-      "missing_criteria": [
-        25
-      ],
-      "notes": "ATS webhook HMAC verify dry-run — no write sync."
+      "blocker": null,
+      "missing_criteria": [],
+      "notes": "ATS webhook HMAC verify dry-run — no write sync.",
+      "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
+      "smoke_at": "2026-07-22T14:50:00Z"
     },
     {
       "module_id": "plat_email_draft",
       "persona": "platform",
       "wave": "5",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/trust/controls",
       "owner": "platform",
-      "blocker": "authenticated_prod_smoke_required",
-      "missing_criteria": [
-        25
-      ],
-      "notes": "Email DRAFT outbox only — real send forbidden in smoke."
+      "blocker": null,
+      "missing_criteria": [],
+      "notes": "Email DRAFT outbox only — real send forbidden in smoke.",
+      "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
+      "smoke_at": "2026-07-22T14:50:00Z"
     },
     {
       "module_id": "plat_notifications_prefs",
       "persona": "platform",
       "wave": "5",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/trust/controls",
       "owner": "platform",
-      "blocker": "authenticated_prod_smoke_required",
-      "missing_criteria": [
-        25
-      ],
-      "notes": "Notification preferences READ — metrics exclusion required."
+      "blocker": null,
+      "missing_criteria": [],
+      "notes": "Notification preferences READ — metrics exclusion required.",
+      "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
+      "smoke_at": "2026-07-22T14:50:00Z"
     },
     {
       "module_id": "plat_oauth_providers_status",
       "persona": "platform",
       "wave": "5",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/login",
       "owner": "platform",
-      "blocker": "authenticated_prod_smoke_required",
-      "missing_criteria": [
-        25
-      ],
-      "notes": "OAuth providers CONFIGURATION status — pending Wave 5 smoke."
+      "blocker": null,
+      "missing_criteria": [],
+      "notes": "OAuth providers CONFIGURATION status — Wave 5 smoke PASS.",
+      "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
+      "smoke_at": "2026-07-22T14:50:00Z"
     },
     {
       "module_id": "plat_csv_export_safe",
       "persona": "platform",
       "wave": "5",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/matches",
       "owner": "platform",
-      "blocker": "authenticated_prod_smoke_required",
-      "missing_criteria": [
-        25
-      ],
-      "notes": "CSV export with formula injection escape — pending Wave 5 smoke."
+      "blocker": null,
+      "missing_criteria": [],
+      "notes": "CSV export with formula injection escape — Wave 5 smoke PASS.",
+      "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
+      "smoke_at": "2026-07-22T14:50:00Z"
     },
     {
       "module_id": "plat_integration_inventory",
       "persona": "platform",
       "wave": "5",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/board/calendar-readiness",
       "owner": "platform",
-      "blocker": "authenticated_prod_smoke_required",
-      "missing_criteria": [
-        25
-      ],
-      "notes": "Per-capability integration inventory MONITORING — pending smoke."
+      "blocker": null,
+      "missing_criteria": [],
+      "notes": "Per-capability integration inventory MONITORING — Wave 5 smoke PASS.",
+      "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
+      "smoke_at": "2026-07-22T14:50:00Z"
     },
     {
       "module_id": "plat_webhook_delivery_ledger",
       "persona": "platform",
       "wave": "5",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/board/calendar-readiness",
       "owner": "platform",
-      "blocker": "authenticated_prod_smoke_required",
-      "missing_criteria": [
-        25
-      ],
-      "notes": "Webhook delivery attempt ledger MONITORING — pending smoke."
+      "blocker": null,
+      "missing_criteria": [],
+      "notes": "Webhook delivery attempt ledger MONITORING — Wave 5 smoke PASS.",
+      "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
+      "smoke_at": "2026-07-22T14:50:00Z"
     },
     {
       "module_id": "plat_ms_calendar_write",

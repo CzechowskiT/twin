@@ -6,10 +6,10 @@
 | Field | Value |
 |-------|-------|
 | Date | 2026-07-22 |
-| repo_head | Wave 5 engineering branch (prior Wave 3 #534 `e841dffc` / badges `bda5ad46`; Wave 4 **not shipped**) |
-| Alembic | **091** `integrations_wave5_hard_live` (prior prod head **090**) |
-| prod_frontend_commit | `e841dffc…` (public-health aligned) |
-| prod_api_commit | `e841dffc…` (public-health aligned) |
+| repo_head | `b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18` (Wave 5 #536 + LIVE badges) |
+| Alembic | **091** `integrations_wave5_hard_live` |
+| prod_frontend_commit | `b3e2adec…` (public-health aligned) |
+| prod_api_commit | `b3e2adec…` (public-health aligned) |
 | alignment_status | **ALIGNED** |
 | docs_only_drift | false |
 | Pilot | **BLOCKED_BY_FOUNDER** |
@@ -28,7 +28,7 @@
 | Candidate Wave 1 | #530 / Alembic **088** — module smoke **PASS 6/6**; **12** Hard LIVE PASS; CV/Stripe/KYC/MS/auto-apply/delete **HELD**; stance unchanged |
 | Recruiter Wave 2 | #532 / Alembic **089** — module smoke **PASS 20/20**; Hard LIVE PASS + DEMO_ONLY isolation; ATS/MS/enrollment **HELD**; stance unchanged |
 | Company Wave 3 | #534 / Alembic **090** — module smoke **PASS 16/16**; Hard LIVE PASS + DEMO_ONLY isolation; ATS/Stripe/MS/invites **HELD**; stance unchanged |
-| Integrations Wave 5 | Alembic **091** — capability-split inventory + ICS/WebCal + fail-closed smoke; **PENDING_SMOKE** (18 modules); MS write/ATS/Stripe/Authologic **HELD**; Wave 4 **not shipped** |
+| Integrations Wave 5 | #536 / Alembic **091** — module smoke **PASS 18/18**; Hard LIVE PASS + capability-split inventory; MS write/ATS/Stripe/Authologic **HELD**; Wave 4 **not shipped** |
 | Hard LIVE evidence | [`HARD_LIVE_EVIDENCE_REGISTRY.json`](./HARD_LIVE_EVIDENCE_REGISTRY.json) · TS `hard-live-evidence-registry.ts` |
 | Productionization plan | [`FULL_PRODUCT_PRODUCTIONIZATION_PLAN.md`](./FULL_PRODUCT_PRODUCTIONIZATION_PLAN.md) |
 | Hard LIVE | [`HARD_LIVE_DEFINITION_30.md`](./HARD_LIVE_DEFINITION_30.md) |
@@ -163,7 +163,7 @@ Fields per §4. Evidence for LIVE modules: matrix smoke + current aligned prod S
 | `cand_preferences` | candidate | Find acceptance-ready interviews without spam | Short calendar of worth-showing-up slots | **LIVE** | Module smoke PASS @ cf773744 — visibility preferences POST/PATCH | `/dashboard/trust/visibility-preferences` | — | regression only | — | low | PII | none claimed | high | med | high | Already LIVE — regression smoke; keep green | maintain | Matching quality | candidate-squad | NS/acceptance events |
 | `cand_signup` | candidate | Find acceptance-ready interviews without spam | Short calendar of worth-showing-up slots | **PARTIAL** | Auth signup exists; activation cohort fill pending | `/register/candidate` | PRODUCT_FUNNEL_EVENTS_ENABLED | See UNICORN_ROADMAP | see epic | overclaim | PII | none yet — no LIVE feedback loop | med | low | med | Founder authenticated prod smoke PASS + persistence proof + no hard-ban + aligned public-health SHA | B–C | Auth & activation | candidate-squad | NS/acceptance events |
 | `cand_verified_placement` | candidate | Find acceptance-ready interviews without spam | Short calendar of worth-showing-up slots | **PARTIAL** | Placement SM + events; not self-serve LIVE end-to-end | `/dashboard/placement-verification` | — | See UNICORN_ROADMAP | see epic | overclaim | PII | none yet — no LIVE feedback loop | med | high | med | Founder authenticated prod smoke PASS + persistence proof + no hard-ban + aligned public-health SHA | B–C | Placement verification economics | candidate-squad | NS/acceptance events |
-| `plat_ics_webcal` | candidate | Find acceptance-ready interviews without spam | Short calendar of worth-showing-up slots | **PARTIAL** | Wave 5 ICS/WebCal engineering + Hard LIVE PENDING_SMOKE (18 modules); LIVE badge deferred until auth smoke PASS | `ICS tokens / WebCal` | INTEGRATIONS_WAVE5_ICS_WEBCAL_LIVE | Wave 5 smoke then LIVE | see epic | overclaim | PII | none yet — no LIVE feedback loop | med | low | med | Founder authenticated prod smoke PASS + persistence proof + no hard-ban + aligned public-health SHA | Wave 5 post-smoke | Calendar north star | platform | NS/acceptance events |
+| `plat_ics_webcal` | candidate | Find acceptance-ready interviews without spam | Short calendar of worth-showing-up slots | **LIVE** | Wave 5 ICS/WebCal Hard LIVE PASS @ `b3e2adec` (18 modules); capability-split inventory; MS WRITE / ATS WRITE stay HELD/BLOCKED | `ICS tokens / WebCal` | INTEGRATIONS_WAVE5_ICS_WEBCAL_LIVE | regression only | — | low | PII | moat candidate only if acceptance+placement events compound | high | med | high | Already LIVE — regression smoke; keep green | maintain | Calendar north star | platform | NS/acceptance events |
 | `cand_premium` | candidate | Find acceptance-ready interviews without spam | Short calendar of worth-showing-up slots | **PAUSED** | Stripe not public launch | `/dashboard/plan` | STRIPE_NOT_PUBLIC_LAUNCH | See UNICORN_ROADMAP | see epic | policy | PII | none yet — no LIVE feedback loop | med | low | med | Founder authenticated prod smoke PASS + persistence proof + no hard-ban + aligned public-health SHA | until policy GO | Monetization | candidate-squad | NS/acceptance events |
 | `candidate_consent_receipt` | candidate | Find acceptance-ready interviews without spam | Short calendar of worth-showing-up slots | **LIVE** | Auth prod smoke PASS 2026-07-20 — live consents/receipts via trust live-bundle | `/dashboard/trust/consent-receipt` | CANDIDATE_WAVE1_TRUST_LIVE_PATH | Hard LIVE 30 PASS + smoke | see epic | overclaim | PII | live trust feedback loop | high | low | med | Already LIVE — regression smoke; keep green | maintain | Trust & GDPR completion | candidate-squad | NS/acceptance events |
 | `candidate_control_center` | candidate | Find acceptance-ready interviews without spam | Short calendar of worth-showing-up slots | **LIVE** | Auth prod smoke PASS — live trust bundle aggregate | `/dashboard/trust/controls` | CANDIDATE_WAVE1_TRUST_LIVE_PATH | Hard LIVE 30 PASS + smoke | see epic | overclaim | PII | live trust feedback loop | high | low | med | Already LIVE — regression smoke; keep green | maintain | Workspace activation waves | candidate-squad | NS/acceptance events |
