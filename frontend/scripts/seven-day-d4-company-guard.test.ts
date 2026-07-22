@@ -79,7 +79,8 @@ test("2 seven-day-d4 flags — hub next action, integrations roadmap, collapsed 
   assert.equal(COMPANY_HUB_NEXT_ACTION_HREF, "/company/roles");
   assert.equal(COMPANY_INTEGRATIONS_ROADMAP_STATUS, "coming_soon");
   assert.equal(HIDE_COMPANY_BILLING_FROM_NAV, true);
-  assert.equal(HIDE_COMPANY_INTEGRATIONS_FROM_NAV, true);
+  // Wave 1 / all-modules-visible supersedes D4 hide — integrations restored to extended nav.
+  assert.equal(HIDE_COMPANY_INTEGRATIONS_FROM_NAV, false);
   assert.equal(COMPANY_WORKSPACE_NAV_COLLAPSED_DEFAULT, true);
   assert.equal(COLLAPSE_COMPANY_DEMO_JOURNEYS, true);
   assert.equal(TALENT_POOL_LIMITED_PILOT, true);
@@ -98,19 +99,24 @@ test("3 workspace modules — integrations coming soon, billing not live, core l
   assert.equal(moduleStatus("team"), "pilot");
 });
 
-test("4 product surface — green-only roles/pipeline primary; non-green hidden", () => {
+test("4 product surface — live primary + pilot/coming_soon roadmap; billing not live", () => {
   const split = splitWorkspaceModules("company", COMPANY_WORKSPACE_MODULES);
   assert.ok(split.primary.some((m) => m.id === "roles"));
   assert.ok(split.primary.some((m) => m.id === "pipeline"));
-  assert.equal(split.roadmap.length, 0);
-  assert.ok(split.hidden.some((m) => m.id === "integrations"));
-  assert.ok(split.hidden.some((m) => m.id === "hiring_cockpit"));
-  assert.ok(split.hidden.some((m) => m.id === "billing"));
-  assert.equal(shouldHideFromDefaultHub("company", "billing"), true);
-  assert.equal(classifyProductSurfaceTier("company", "integrations", "coming_soon"), "INTERNAL");
+  assert.ok(split.roadmap.length >= 1, "pilot/coming_soon modules belong in roadmap");
+  assert.ok(split.roadmap.some((m) => m.id === "integrations"));
+  assert.ok(split.roadmap.some((m) => m.id === "hiring_cockpit") || split.primary.some((m) => m.id === "hiring_cockpit"));
+  // Billing stays nav-hidden; hub may show paused/not-live honesty (public Stripe OFF).
+  assert.ok(
+    split.roadmap.some((m) => m.id === "billing") || split.hidden.some((m) => m.id === "billing"),
+    "billing must not appear as live primary",
+  );
+  assert.ok(!split.primary.some((m) => m.id === "billing" && m.status === "live"));
+  assert.equal(shouldHideFromDefaultHub("company", "integrations"), false);
+  assert.equal(classifyProductSurfaceTier("company", "integrations", "coming_soon"), "COMING_SOON");
 });
 
-test("5 company workspace nav — primary three, billing hidden, collapsed extended", () => {
+test("5 company workspace nav — primary three, billing hidden, integrations in extended", () => {
   const nav = read("src/components/company/company-workspace-nav.tsx");
   assert.match(nav, /COMPANY_PRIMARY_NAV_HREFS/);
   assert.match(nav, /COMPANY_WORKSPACE_NAV_COLLAPSED_DEFAULT/);
@@ -118,7 +124,7 @@ test("5 company workspace nav — primary three, billing hidden, collapsed exten
   assert.match(nav, /HIDE_COMPANY_INTEGRATIONS_FROM_NAV/);
   assert.match(nav, /data-company-nav-primary/);
   const extendedBlock = nav.split("const EXTENDED_TABS")[1]?.split("function isPrimaryHref")[0] ?? "";
-  assert.doesNotMatch(extendedBlock, /\/company\/integrations/);
+  assert.match(extendedBlock, /COMPANY_INTEGRATIONS_ROUTE|\/company\/integrations/);
   assert.match(nav, /data-company-nav-extended-toggle/);
   const primaryBlock = nav.split("const EXTENDED_TABS")[0] ?? nav;
   assert.doesNotMatch(primaryBlock, /\/company\/billing/);

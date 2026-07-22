@@ -29,6 +29,7 @@ const EXTENDED_TABS: NavTab[] = [
   { href: "/recruiter/talent-radar", labelKey: "recruiterTalentRadar.navLink" },
   { href: "/recruiter/talent-pool", labelKey: "recruiterTalentPool.title" },
   { href: "/recruiter/talent-radar/digest", labelKey: "recruiterTalentRadarDigest.navLink" },
+  { href: "/recruiter/integrations", labelKey: "recruiterIntegrations.title" },
 ];
 
 function isPrimaryHref(href: string): boolean {

@@ -4,8 +4,8 @@
  */
 import {
   activationStatusToBadgeStatus,
-  getWorkspaceModuleActivationStatus,
-  isWorkspaceModuleVisible,
+  getWorkspaceModuleActivationStatusForPersona,
+  isWorkspaceModuleVisibleForPersona,
   splitByActivationHubSection,
   type ActivationHubSlice,
 } from "@/lib/all-workspace-modules-activation";
@@ -46,14 +46,22 @@ export const CONTROLLED_PILOT_PRIMARY_LIMITS: Readonly<Record<MarketingPersona, 
   investor: 99,
 };
 
+/** Full product surface — no green-only primary cap (WORKSPACE_GREEN_ONLY_MODE=false). */
+export const FULL_SURFACE_PRIMARY_LIMITS: Readonly<Record<MarketingPersona, number>> = {
+  candidate: 99,
+  recruiter: 99,
+  company: 99,
+  investor: 99,
+};
+
 function hrefIsBoardOrAdmin(href: string): boolean {
   return BOARD_OR_ADMIN_PREFIXES.some((prefix) => href.startsWith(prefix));
 }
 
 function isInternalModule(persona: MarketingPersona, moduleId: string, href?: string): boolean {
-  if (!isWorkspaceModuleVisible(moduleId)) return true;
+  if (!isWorkspaceModuleVisibleForPersona(persona, moduleId)) return true;
   if (href && hrefIsBoardOrAdmin(href) && persona !== "investor") return true;
-  return getWorkspaceModuleActivationStatus(moduleId) === "INTERNAL";
+  return getWorkspaceModuleActivationStatusForPersona(persona, moduleId) === "INTERNAL";
 }
 
 export function classifyProductSurfaceTier(
@@ -62,7 +70,7 @@ export function classifyProductSurfaceTier(
   _status?: WorkspaceModuleStatus,
 ): ProductSurfaceTier {
   if (isInternalModule(persona, moduleId)) return "INTERNAL";
-  return getWorkspaceModuleActivationStatus(moduleId);
+  return getWorkspaceModuleActivationStatusForPersona(persona, moduleId);
 }
 
 export function shouldHideFromDefaultHub(persona: MarketingPersona, moduleId: string): boolean {

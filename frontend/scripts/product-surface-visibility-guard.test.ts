@@ -120,16 +120,26 @@ test("9 recruiter operational work queue hidden from default hub", () => {
   assert.ok(split.hidden.some((r) => r.id === "recruiter_operational_work_queue"));
 });
 
-test("10 candidate trust visible in hub; revoke_delete stays internal", () => {
+test("10 candidate trust visible in hub; revoke_delete in pilot roadmap (DSR live path)", () => {
   const split = splitProductSurfaceRoutes("candidate", getSystemOfRecordRoutesForPersona("candidate"));
   const shown = [...split.primary, ...split.roadmap];
   assert.ok(shown.some((r) => r.id === "candidate_trust"));
-  assert.ok(split.hidden.some((r) => r.id === "candidate_revoke_delete"));
+  assert.ok(
+    shown.some((r) => r.id === "candidate_revoke_delete") ||
+      split.hidden.some((r) => r.id === "candidate_revoke_delete"),
+    "revoke_delete remains registered in surface inventory",
+  );
+  // Gap-close: DSR revoke/delete is a live smoke target — must not be silently dropped.
+  assert.ok(shown.some((r) => r.id === "candidate_revoke_delete"));
 });
 
-test("11 company workspace talent pool visible; billing internal", () => {
+test("11 company workspace talent pool + integrations visible; billing not live primary", () => {
   const split = splitWorkspaceModules("company", COMPANY_WORKSPACE_MODULES);
-  assert.ok(split.hidden.some((m) => m.id === "billing"));
+  assert.ok(
+    split.roadmap.some((m) => m.id === "billing") || split.hidden.some((m) => m.id === "billing"),
+    "billing must not be live primary while public Stripe is OFF",
+  );
+  assert.ok(!split.primary.some((m) => m.id === "billing" && m.status === "live"));
   const shown = [...split.primary, ...split.roadmap];
   assert.ok(shown.some((m) => m.id === "talent_pool"));
   assert.ok(shown.some((m) => m.id === "integrations"));

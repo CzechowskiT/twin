@@ -65,7 +65,8 @@ test("2 seven-day-d3 flags — analytics live, integrations roadmap, collapsed n
   assert.equal(RECRUITER_ANALYTICS_SHIP_STATUS, "live");
   assert.equal(RECRUITER_INTEGRATIONS_ROADMAP_STATUS, "coming_soon");
   assert.equal(HIDE_RECRUITER_CALENDAR_FROM_NAV, true);
-  assert.equal(HIDE_RECRUITER_INTEGRATIONS_FROM_NAV, true);
+  // Wave 1 / all-modules-visible supersedes D3 hide — integrations restored to extended nav.
+  assert.equal(HIDE_RECRUITER_INTEGRATIONS_FROM_NAV, false);
   assert.equal(RECRUITER_WORKSPACE_NAV_COLLAPSED_DEFAULT, true);
   assert.equal(COLLAPSE_RECRUITER_DEMO_JOURNEYS, true);
   assert.equal(TALENT_RADAR_LIMITED_PILOT, true);
@@ -86,21 +87,26 @@ test("3 workspace modules — analytics live, integrations coming soon, calendar
   assert.equal(moduleStatus("search"), "live");
 });
 
-test("4 product surface — green-only primary five; non-green hidden", () => {
+test("4 product surface — live primary + pilot/coming_soon roadmap; calendar paused", () => {
   const split = splitWorkspaceModules("recruiter", RECRUITER_WORKSPACE_MODULES);
   assert.ok(split.primary.some((m) => m.id === "inbox"));
   assert.ok(split.primary.some((m) => m.id === "analytics"));
-  assert.equal(split.primary.filter((m) => m.status === "live").length, 5);
-  assert.equal(split.roadmap.length, 0);
-  assert.ok(split.hidden.some((m) => m.id === "calendar"));
-  assert.ok(split.hidden.some((m) => m.id === "integrations"));
-  assert.equal(shouldHideFromDefaultHub("recruiter", "calendar"), true);
+  assert.ok(split.primary.filter((m) => m.status === "live").length >= 5);
+  assert.ok(split.roadmap.length >= 1, "pilot/coming_soon modules belong in roadmap");
+  assert.ok(split.roadmap.some((m) => m.id === "integrations"));
+  // Calendar stays nav-hidden; hub may show PAUSED roadmap honesty (not live primary).
+  assert.ok(
+    split.roadmap.some((m) => m.id === "calendar") || split.hidden.some((m) => m.id === "calendar"),
+    "calendar must not appear as live primary",
+  );
+  assert.ok(!split.primary.some((m) => m.id === "calendar" && m.status === "live"));
   assert.equal(shouldHideFromDefaultHub("recruiter", "analytics"), false);
+  assert.equal(shouldHideFromDefaultHub("recruiter", "integrations"), false);
   assert.equal(classifyProductSurfaceTier("recruiter", "analytics"), "LIVE");
-  assert.equal(classifyProductSurfaceTier("recruiter", "integrations", "coming_soon"), "INTERNAL");
+  assert.equal(classifyProductSurfaceTier("recruiter", "integrations", "coming_soon"), "COMING_SOON");
 });
 
-test("5 recruiter workspace nav — primary four, calendar hidden, collapsed extended", () => {
+test("5 recruiter workspace nav — primary five, calendar hidden, integrations in extended", () => {
   const nav = read("src/components/recruiter/recruiter-workspace-nav.tsx");
   assert.match(nav, /RECRUITER_PRIMARY_NAV_HREFS/);
   assert.match(nav, /RECRUITER_WORKSPACE_NAV_COLLAPSED_DEFAULT/);
@@ -108,8 +114,7 @@ test("5 recruiter workspace nav — primary four, calendar hidden, collapsed ext
   assert.match(nav, /HIDE_RECRUITER_INTEGRATIONS_FROM_NAV/);
   assert.match(nav, /data-recruiter-nav-primary/);
   const extendedBlock = nav.split("const EXTENDED_TABS")[1]?.split("function isPrimaryHref")[0] ?? "";
-  assert.doesNotMatch(extendedBlock, /\/recruiter\/integrations/);
-  assert.match(nav, /data-recruiter-nav-extended-toggle/);
+  assert.match(extendedBlock, /\/recruiter\/integrations/);
   assert.match(nav, /data-recruiter-nav-extended-toggle/);
   const primaryBlock = nav.split("const EXTENDED_TABS")[0] ?? nav;
   assert.doesNotMatch(primaryBlock, /\/recruiter\/calendar/);

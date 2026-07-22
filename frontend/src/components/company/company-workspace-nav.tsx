@@ -34,6 +34,7 @@ const EXTENDED_TABS: NavTab[] = [
   { href: COMPANY_HIRING_COCKPIT_ROUTE, labelKey: "companyHiringCockpit.navLink" },
   { href: COMPANY_HIRING_COMMAND_CENTER_ROUTE, labelKey: "companyHiringCommandCenter.navLink" },
   { href: COMPANY_TEAM_ROUTE, labelKey: "companyTeam.navTeam" },
+  { href: COMPANY_INTEGRATIONS_ROUTE, labelKey: "companyIntegrations.title" },
   { href: "/calculator/b2b", labelKey: "companyTeam.navCalculator" },
   { href: "/recruiter/inbox", labelKey: "companyJobs.navInbox" },
   { href: "/for-companies", labelKey: "companyJobs.navForCompanies" },

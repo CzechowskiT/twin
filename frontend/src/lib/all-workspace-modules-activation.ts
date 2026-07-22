@@ -86,7 +86,7 @@ export const INTERNAL_MODULE_IDS = new Set([
   "production_persistence_status",
   "first_working_persistence_plan",
   "audit_event_foundation",
-  "recruiter_calendar",
+  // recruiter_calendar: PAUSED coming-soon on hub (nav hide via HIDE_RECRUITER_CALENDAR_FROM_NAV)
   ...DEMO_SAMPLE_MODULE_IDS,
 ]);
 
@@ -674,6 +674,14 @@ export function getWorkspaceModuleActivationStatus(
   moduleId: string,
 ): WorkspaceModuleActivationStatus {
   return ENTRY_BY_ID.get(moduleId)?.activationStatus ?? "PILOT";
+}
+
+/** Persona-aware activation status (resolves short ids like calendar → recruiter_calendar). */
+export function getWorkspaceModuleActivationStatusForPersona(
+  persona: MarketingPersona,
+  moduleId: string,
+): WorkspaceModuleActivationStatus {
+  return resolveActivationEntry(persona, moduleId)?.activationStatus ?? getWorkspaceModuleActivationStatus(moduleId);
 }
 
 export function isWorkspaceModuleVisible(moduleId: string): boolean {
