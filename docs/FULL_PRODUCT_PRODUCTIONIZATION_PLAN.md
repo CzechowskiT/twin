@@ -234,4 +234,9 @@ Monetization/Stripe public and ATS live-sync remain **outside** waves until expl
 
 **Exit status:** **DONE_WITH_POLICY_HOLDS** — 18 Hard LIVE PASS; MS write / ATS write-sync / Stripe / Authologic / enrollment / auto-apply held; Wave 4 noted as missing.
 
-**Next:** Wave 6 Privacy / DSR Complete (do not start in this batch).
+## 13b. Career Evidence Graph & AI Compliance Foundation (Phase A)
+
+Alembic **092**. Production claim graph + AI registries/decision log + guards. Wave 4 remains **NOT_IMPLEMENTED**. LIVE badges only after authenticated module smoke.
+
+**Next:** Wave 6 Privacy / DSR Complete if DONE_WITH_POLICY_HOLDS; else Gap Close. Do not start Wave 6 in this batch.
+

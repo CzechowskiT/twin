@@ -13,12 +13,14 @@ import {
   HARD_LIVE_EVIDENCE_REGISTRY_WAVE2,
   HARD_LIVE_EVIDENCE_REGISTRY_WAVE3,
   HARD_LIVE_EVIDENCE_REGISTRY_WAVE5,
+  HARD_LIVE_EVIDENCE_REGISTRY_AI_COMPLIANCE,
   HARD_LIVE_REGISTRY_META,
   assertNoLivePassWithoutSmoke,
   registryModuleIds,
   wave2PendingSmokeIds,
   wave3PendingSmokeIds,
   wave5PendingSmokeIds,
+  aiCompliancePendingSmokeIds,
 } from "../src/lib/hard-live-evidence-registry";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -128,7 +130,9 @@ test("docs registry JSON mirrors TS module ids and PASS smoke fields", () => {
   }
   assert.match(raw, /HELD_POLICY/);
   assert.match(raw, /DEMO_ONLY/);
-  assert.doesNotMatch(raw, /"status": "PENDING_SMOKE"/);
+  assert.match(raw, /"status": "PENDING_SMOKE"/); // AI compliance Phase A pending until smoke
+  assert.match(raw, /ai_claim_declared/);
+  assert.match(raw, /ai_autonomous_employment/);
   assert.match(raw, /company_org_settings/);
   assert.match(raw, /company_demo_pipeline/);
   assert.match(raw, /plat_ics_export/);
@@ -141,4 +145,14 @@ test("production action gates still block enrollment", () => {
   const gates = readFileSync(join(root, "frontend/src/lib/production-action-gates.ts"), "utf8");
   assert.match(gates, /BLOCKED_BY_FOUNDER/);
   assert.doesNotMatch(gates, /EXTERNAL_PILOT_ENROLLMENT_ENABLED\s*=\s*true/);
+});
+
+
+test("ai compliance modules pending until smoke with policy holds intact", () => {
+  assert.equal(HARD_LIVE_EVIDENCE_REGISTRY_AI_COMPLIANCE.length, 33);
+  assert.equal(aiCompliancePendingSmokeIds().length, 28);
+  const held = HARD_LIVE_EVIDENCE_REGISTRY_AI_COMPLIANCE.filter((r) => r.status === "HELD_POLICY");
+  assert.equal(held.length, 5);
+  assert.ok(held.some((r) => r.module_id === "ai_autonomous_employment"));
+  assert.ok(held.some((r) => r.module_id === "ai_wave6_dsr_delete_export"));
 });

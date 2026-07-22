@@ -29,6 +29,7 @@
 | Recruiter Wave 2 | #532 / Alembic **089** — module smoke **PASS 20/20**; Hard LIVE PASS + DEMO_ONLY isolation; ATS/MS/enrollment **HELD**; stance unchanged |
 | Company Wave 3 | #534 / Alembic **090** — module smoke **PASS 16/16**; Hard LIVE PASS + DEMO_ONLY isolation; ATS/Stripe/MS/invites **HELD**; stance unchanged |
 | Integrations Wave 5 | #536 / Alembic **091** — module smoke **PASS 18/18**; Hard LIVE PASS + capability-split inventory; MS write/ATS/Stripe/Authologic **HELD**; Wave 4 **not shipped** |
+| AI Compliance Phase A | Alembic **092** — graph/provenance/decision log/guards; Hard LIVE 28 PENDING_SMOKE + 5 HELD until smoke; Wave 4 **NOT_IMPLEMENTED**; Wave 6 **NOT_STARTED** |
 | Hard LIVE evidence | [`HARD_LIVE_EVIDENCE_REGISTRY.json`](./HARD_LIVE_EVIDENCE_REGISTRY.json) · TS `hard-live-evidence-registry.ts` |
 | Productionization plan | [`FULL_PRODUCT_PRODUCTIONIZATION_PLAN.md`](./FULL_PRODUCT_PRODUCTIONIZATION_PLAN.md) |
 | Hard LIVE | [`HARD_LIVE_DEFINITION_30.md`](./HARD_LIVE_DEFINITION_30.md) |

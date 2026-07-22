@@ -49,7 +49,10 @@
       "write": true,
       "exclude_from_product_metrics": true,
       "jwt_never_committed": true
-    }
+    },
+    "ai_compliance_script": "frontend/scripts/ai-compliance-module-prod-smoke.test.ts",
+    "ai_compliance_sha": null,
+    "ai_compliance_at": null
   },
   "modules": [
     {
@@ -976,7 +979,7 @@
       "owner": "platform",
       "blocker": null,
       "missing_criteria": [],
-      "notes": "Google Calendar OAuth CONFIGURATION — Wave 5 smoke PASS.",
+      "notes": "Google Calendar OAuth CONFIGURATION \u2014 Wave 5 smoke PASS.",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -989,7 +992,7 @@
       "owner": "platform",
       "blocker": null,
       "missing_criteria": [],
-      "notes": "Google Calendar READ — Wave 5 smoke PASS.",
+      "notes": "Google Calendar READ \u2014 Wave 5 smoke PASS.",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1002,7 +1005,7 @@
       "owner": "platform",
       "blocker": null,
       "missing_criteria": [],
-      "notes": "Google Calendar WRITE honesty (smoke never writes provider) — Wave 5 smoke PASS.",
+      "notes": "Google Calendar WRITE honesty (smoke never writes provider) \u2014 Wave 5 smoke PASS.",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1015,7 +1018,7 @@
       "owner": "platform",
       "blocker": null,
       "missing_criteria": [],
-      "notes": "Google freebusy/slots — Wave 5 smoke PASS.",
+      "notes": "Google freebusy/slots \u2014 Wave 5 smoke PASS.",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1028,7 +1031,7 @@
       "owner": "platform",
       "blocker": null,
       "missing_criteria": [],
-      "notes": "Calendar provider monitoring — Wave 5 smoke PASS.",
+      "notes": "Calendar provider monitoring \u2014 Wave 5 smoke PASS.",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1041,7 +1044,7 @@
       "owner": "platform",
       "blocker": null,
       "missing_criteria": [],
-      "notes": "ICS generate/export — Wave 5 smoke PASS.",
+      "notes": "ICS generate/export \u2014 Wave 5 smoke PASS.",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1054,7 +1057,7 @@
       "owner": "platform",
       "blocker": null,
       "missing_criteria": [],
-      "notes": "ICS share token mint/expiry — Wave 5 smoke PASS.",
+      "notes": "ICS share token mint/expiry \u2014 Wave 5 smoke PASS.",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1067,7 +1070,7 @@
       "owner": "platform",
       "blocker": null,
       "missing_criteria": [],
-      "notes": "WebCal subscribe feed — Wave 5 smoke PASS.",
+      "notes": "WebCal subscribe feed \u2014 Wave 5 smoke PASS.",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1080,7 +1083,7 @@
       "owner": "platform",
       "blocker": null,
       "missing_criteria": [],
-      "notes": "ICS CANCEL/UID/SEQUENCE — Wave 5 smoke PASS.",
+      "notes": "ICS CANCEL/UID/SEQUENCE \u2014 Wave 5 smoke PASS.",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1093,7 +1096,7 @@
       "owner": "platform",
       "blocker": null,
       "missing_criteria": [],
-      "notes": "Microsoft Calendar CONFIGURATION honesty — WRITE stays HELD.",
+      "notes": "Microsoft Calendar CONFIGURATION honesty \u2014 WRITE stays HELD.",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1106,7 +1109,7 @@
       "owner": "platform",
       "blocker": null,
       "missing_criteria": [],
-      "notes": "ATS CONFIGURATION/READ honesty — WRITE stays BLOCKED.",
+      "notes": "ATS CONFIGURATION/READ honesty \u2014 WRITE stays BLOCKED.",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1119,7 +1122,7 @@
       "owner": "platform",
       "blocker": null,
       "missing_criteria": [],
-      "notes": "ATS webhook HMAC verify dry-run — no write sync.",
+      "notes": "ATS webhook HMAC verify dry-run \u2014 no write sync.",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1132,7 +1135,7 @@
       "owner": "platform",
       "blocker": null,
       "missing_criteria": [],
-      "notes": "Email DRAFT outbox only — real send forbidden in smoke.",
+      "notes": "Email DRAFT outbox only \u2014 real send forbidden in smoke.",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1145,7 +1148,7 @@
       "owner": "platform",
       "blocker": null,
       "missing_criteria": [],
-      "notes": "Notification preferences READ — metrics exclusion required.",
+      "notes": "Notification preferences READ \u2014 metrics exclusion required.",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1158,7 +1161,7 @@
       "owner": "platform",
       "blocker": null,
       "missing_criteria": [],
-      "notes": "OAuth providers CONFIGURATION status — Wave 5 smoke PASS.",
+      "notes": "OAuth providers CONFIGURATION status \u2014 Wave 5 smoke PASS.",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1171,7 +1174,7 @@
       "owner": "platform",
       "blocker": null,
       "missing_criteria": [],
-      "notes": "CSV export with formula injection escape — Wave 5 smoke PASS.",
+      "notes": "CSV export with formula injection escape \u2014 Wave 5 smoke PASS.",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1184,7 +1187,7 @@
       "owner": "platform",
       "blocker": null,
       "missing_criteria": [],
-      "notes": "Per-capability integration inventory MONITORING — Wave 5 smoke PASS.",
+      "notes": "Per-capability integration inventory MONITORING \u2014 Wave 5 smoke PASS.",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1197,7 +1200,7 @@
       "owner": "platform",
       "blocker": null,
       "missing_criteria": [],
-      "notes": "Webhook delivery attempt ledger MONITORING — Wave 5 smoke PASS.",
+      "notes": "Webhook delivery attempt ledger MONITORING \u2014 Wave 5 smoke PASS.",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1380,7 +1383,371 @@
         28
       ],
       "notes": "ICS import/parse not built."
+    },
+    {
+      "module_id": "ai_claim_declared",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/evidence/claims",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_claim_extracted",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/evidence/claims",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_claim_inferred",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/evidence/claims",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_claim_provenance",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/evidence/claims",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_claim_human_confirm",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/recruiter/evidence/claims",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_claim_evidence_link",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/evidence/claims",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_claim_evidence_backed",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/evidence/claims",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_claim_dispute",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/evidence/disputes",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_claim_dispute_resolve",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/recruiter/evidence/disputes",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_claim_supersede",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/evidence/claims",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_claim_history",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/evidence/claims",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_decision_log",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/evidence/ai-runs",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_explainability",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/evidence/ai-runs",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_human_override",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/recruiter/evidence/reviews",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_override_audit",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/company/evidence/audit",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_tenant_isolation_claim",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/evidence/claims",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_tenant_isolation_evidence",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/evidence/claims",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_prompt_injection_guard",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/evidence/security",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_protected_attr_ban",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/evidence/security",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_prohibited_use_guard",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/evidence/security",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_registry",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/board/ai-compliance",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_prompt_registry",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/board/ai-compliance",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_model_rollback_audit",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/board/ai-compliance",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_compliance_status",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/board/ai-compliance",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_smoke_metrics_exclusion",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/evidence/claims",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_no_outbound",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/evidence/claims",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_consent_visibility",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/evidence/claims",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_claim_cleanup",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/evidence/claims",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_external_verification",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "HELD_POLICY",
+      "route": "/dashboard/evidence/claims",
+      "blocker": "EXTERNAL_VERIFICATION_OFF",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_protected_attr_monitoring",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "HELD_POLICY",
+      "route": "/board/ai-compliance",
+      "blocker": "PROTECTED_ATTR_MONITORING_LEGAL_HOLD",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_autonomous_employment",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "HELD_POLICY",
+      "route": "/recruiter/evidence/reviews",
+      "blocker": "AUTONOMOUS_EMPLOYMENT_HARD_BAN",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_act_certified_claim",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "HELD_POLICY",
+      "route": "/board/ai-compliance",
+      "blocker": "NO_LEGAL_CERTIFICATION",
+      "owner": "platform",
+      "smoke_sha": null,
+      "smoke_at": null
+    },
+    {
+      "module_id": "ai_wave6_dsr_delete_export",
+      "persona": "platform",
+      "wave": "ai_compliance",
+      "status": "HELD_POLICY",
+      "route": "/dashboard/trust/revoke-delete",
+      "blocker": "WAVE6_NOT_STARTED",
+      "owner": "privacy",
+      "smoke_sha": null,
+      "smoke_at": null
     }
   ],
-  "wave4_note": "Wave 4 Investor Complete was not shipped — Wave 5 proceeds on Wave 3 HEAD without inventing Wave 4."
+  "wave4_note": "Wave 4 Investor Complete was not shipped \u2014 Wave 5 proceeds on Wave 3 HEAD without inventing Wave 4.",
+  "ai_compliance_note": "Phase A PENDING_SMOKE until authenticated module smoke PASS; Wave 4 NOT_IMPLEMENTED; Wave 6 NOT_STARTED."
 }
