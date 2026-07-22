@@ -48,6 +48,22 @@ export async function mintWebcalFeed(authToken: string): Promise<WebcalFeedOut> 
   );
 }
 
+export type IcsImportOut = {
+  imported: number;
+  created: number;
+  updated: number;
+  provider_write: boolean;
+};
+
+/** Import VEVENT holds from ICS text — local busy blocks only (no Google/MS write). */
+export async function importIcsText(authToken: string, icsText: string): Promise<IcsImportOut> {
+  return apiFetch<IcsImportOut>(
+    "/api/v1/calendar/me/ics/import",
+    { method: "POST", body: JSON.stringify({ ics_text: icsText }) },
+    authToken,
+  );
+}
+
 /** Mint (or refresh) feed URL and trigger calendar-app subscribe in one gesture. */
 export async function mintAndOpenWebcalSubscribe(authToken: string): Promise<WebcalFeedOut> {
   const out = await mintWebcalFeed(authToken);

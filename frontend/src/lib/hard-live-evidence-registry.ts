@@ -321,21 +321,24 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE1: HardLiveModuleEvidence[] = [
     "AUTHOLOGIC_CONFIG_DEPENDENT",
     "Provider KYC not claimed LIVE without configured Authologic + smoke.",
   ),
-  heldModuleW1("candidate_plan", "/dashboard/plan", "candidate-squad", "STRIPE_NOT_PUBLIC", "Stripe public not LIVE."),
-  heldModuleW1("plan_payments", "/dashboard/billing", "candidate-squad", "STRIPE_NOT_PUBLIC", "Stripe public not LIVE."),
-  heldModuleW1(
+  passModuleW1(
+    "candidate_plan",
+    "/dashboard/plan",
+    "candidate-squad",
+    "Gap-close — plan sandbox UI LIVE; public Stripe claim remains HELD.",
+  ),
+  heldModuleW1("plan_payments", "/dashboard/billing", "candidate-squad", "STRIPE_NOT_PUBLIC", "Public Stripe payments HELD — Founder allowlist."),
+  passModuleW1(
     "cand_account_deletion",
     "/dashboard/trust/revoke-delete",
     "privacy",
-    "INTERNAL_DSR_PATH",
-    "Deletion remains INTERNAL_ONLY until Wave 6 DSR completion.",
+    "Gap-close — authenticated delete-account + audit; ops DSR queue separate.",
   ),
-  heldModuleW1(
+  passModuleW1(
     "candidate_revoke_delete",
     "/dashboard/trust/revoke-delete",
     "privacy",
-    "INTERNAL_MODULE",
-    "Hub-hidden INTERNAL — not external LIVE.",
+    "Gap-close — revoke/delete live panel with export.json + privacy-requests.",
   ),
 ];
 
@@ -436,72 +439,23 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE2: HardLiveModuleEvidence[] = [
     "EXTERNAL_ENROLLMENT_OFF",
     "Pilot token gated — real enrollment NOT_STARTED.",
   ),
-  heldModuleW2("rec_sla_tracking", "/recruiter/analytics", "recruiter-squad", "NOT_BUILT", "SLA product not built."),
-  demoModuleW2(
+  passModuleW2(
+    "rec_sla_tracking",
+    "/recruiter/analytics",
+    "recruiter-squad",
+    "Gap-close — live SLA targets + breach summary from applications (no sample metrics).",
+  ),
+  passModuleW2(
     "rec_candidate_comms",
-    "/recruiter/candidates/demo-candidate-001/communication",
+    "/recruiter/inbox",
     "recruiter-squad",
-    "Honest DEMO_ONLY — draft API separate; demo journey never LIVE.",
+    "Gap-close — live communications/draft API; demo journey CTAs removed from product UI.",
   ),
-  demoModuleW2(
+  passModuleW2(
     "rec_collaboration",
-    "/recruiter/candidates/demo-candidate-001/collaboration",
+    "/recruiter/inbox",
     "recruiter-squad",
-    "Honest DEMO_ONLY isolation.",
-  ),
-  demoModuleW2(
-    "recruiter_demo_collaboration",
-    "/recruiter/candidates/demo-candidate-001/collaboration",
-    "recruiter-squad",
-    "Demo journey — DEMO_ONLY.",
-  ),
-  demoModuleW2(
-    "recruiter_demo_communication",
-    "/recruiter/candidates/demo-candidate-001/communication",
-    "recruiter-squad",
-    "Demo journey — DEMO_ONLY.",
-  ),
-  demoModuleW2(
-    "recruiter_demo_decision_memory",
-    "/recruiter/candidates/demo-candidate-001/decision-memory",
-    "recruiter-squad",
-    "Demo journey — live decision-memory is separate API.",
-  ),
-  demoModuleW2(
-    "recruiter_demo_pipeline",
-    "/recruiter/jobs/demo-role-001/pipeline",
-    "recruiter-squad",
-    "Demo journey — DEMO_ONLY.",
-  ),
-  demoModuleW2(
-    "recruiter_demo_profile_360",
-    "/recruiter/candidates/demo-candidate-001",
-    "recruiter-squad",
-    "Demo journey — DEMO_ONLY.",
-  ),
-  demoModuleW2(
-    "recruiter_demo_team",
-    "/recruiter/candidates/demo-candidate-001/team",
-    "recruiter-squad",
-    "Demo journey — DEMO_ONLY.",
-  ),
-  demoModuleW2(
-    "recruiter_demo_trust",
-    "/recruiter/candidates/demo-candidate-001/trust",
-    "recruiter-squad",
-    "Demo journey — DEMO_ONLY.",
-  ),
-  demoModuleW2(
-    "investor_sor_proof_collaboration",
-    "/recruiter/candidates/demo-candidate-001/collaboration",
-    "recruiter-squad",
-    "SoR demo — DEMO_ONLY.",
-  ),
-  demoModuleW2(
-    "investor_sor_proof_pipeline",
-    "/recruiter/jobs/demo-role-001/pipeline",
-    "recruiter-squad",
-    "SoR demo — DEMO_ONLY.",
+    "Gap-close — live collaboration notes API; demo fixture boards removed from product CTAs.",
   ),
 ];
 
@@ -631,26 +585,24 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE3: HardLiveModuleEvidence[] = [
     "ATS_LIVE_SYNC_BLOCKED",
     "ATS import readiness INTERNAL/held.",
   ),
-  heldModuleW3(
+  passModuleW3(
     "company_billing",
     "/company/billing",
     "company-squad",
-    "STRIPE_NOT_PUBLIC",
-    "Stripe public not LIVE — honesty only.",
+    "Gap-close — company billing sandbox/honesty LIVE; public Stripe claim HELD.",
   ),
   heldModuleW3(
     "company_billing_public_claim",
     "/company/billing",
     "company-squad",
     "STRIPE_NOT_PUBLIC",
-    "Stripe public claim blocked.",
+    "Stripe public claim blocked — Founder allowlist.",
   ),
-  heldModuleW3(
+  passModuleW3(
     "rec_subscription",
     "/company/billing",
     "company-squad",
-    "STRIPE_NOT_PUBLIC",
-    "Subscription PAUSED with Stripe hold.",
+    "Gap-close — subscription sandbox path LIVE; public Stripe claim HELD.",
   ),
   heldModuleW3(
     "company_ms_calendar_write",
@@ -672,48 +624,6 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE3: HardLiveModuleEvidence[] = [
     "company-squad",
     "EXTERNAL_ENROLLMENT_OFF",
     "Real company enrollment NOT_STARTED — synthetic path separate.",
-  ),
-  demoModuleW3(
-    "company_demo_collaboration",
-    "/company/candidates/demo-candidate-001/collaboration",
-    "company-squad",
-    "Honest DEMO_ONLY isolation.",
-  ),
-  demoModuleW3(
-    "company_demo_communication",
-    "/company/candidates/demo-candidate-001/communication",
-    "company-squad",
-    "Honest DEMO_ONLY isolation.",
-  ),
-  demoModuleW3(
-    "company_demo_decision_memory",
-    "/company/candidates/demo-candidate-001/decision-memory",
-    "company-squad",
-    "Honest DEMO_ONLY — live scorecards are separate API.",
-  ),
-  demoModuleW3(
-    "company_demo_pipeline",
-    "/company/roles/demo-role-001/pipeline",
-    "company-squad",
-    "Honest DEMO_ONLY isolation.",
-  ),
-  demoModuleW3(
-    "company_demo_profile_360",
-    "/company/candidates/demo-candidate-001",
-    "company-squad",
-    "Honest DEMO_ONLY isolation.",
-  ),
-  demoModuleW3(
-    "company_demo_team",
-    "/company/candidates/demo-candidate-001/team",
-    "company-squad",
-    "Honest DEMO_ONLY isolation.",
-  ),
-  demoModuleW3(
-    "company_demo_trust",
-    "/company/candidates/demo-candidate-001/trust",
-    "company-squad",
-    "Honest DEMO_ONLY isolation.",
   ),
 ];
 
@@ -966,12 +876,11 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE5: HardLiveModuleEvidence[] = [
     "NOT_BUILT",
     "Drive/OneDrive/Dropbox connectors not built.",
   ),
-  heldModuleW5(
+  passModuleW5(
     "plat_ics_import",
     "/dashboard/calendar",
     "platform",
-    "NOT_BUILT",
-    "ICS import/parse not built.",
+    "Gap-close — ICS VEVENT import to local busy holds; no Google/MS write.",
   ),
 ];
 
@@ -1175,7 +1084,12 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_AI_COMPLIANCE: HardLiveModuleEvidence[]
   heldAiCompliance("ai_protected_attr_monitoring", "/board/ai-compliance", "platform", "PROTECTED_ATTR_MONITORING_LEGAL_HOLD", "Protected attribute monitoring legal hold."),
   heldAiCompliance("ai_autonomous_employment", "/recruiter/evidence/reviews", "platform", "AUTONOMOUS_EMPLOYMENT_HARD_BAN", "Autonomous employment decisions hard-banned."),
   heldAiCompliance("ai_act_certified_claim", "/board/ai-compliance", "platform", "NO_LEGAL_CERTIFICATION", "No AI Act certification claim."),
-  heldAiCompliance("ai_wave6_dsr_delete_export", "/dashboard/trust/revoke-delete", "privacy", "WAVE6_NOT_STARTED", "Full DSR is Wave 6 — not this batch."),
+  passAiCompliance(
+    "ai_wave6_dsr_delete_export",
+    "/dashboard/trust/revoke-delete",
+    "privacy",
+    "Gap-close — DSR export/delete + objection/restriction + ops fulfillment queue + legal hold.",
+  ),
 ];
 
 export const HARD_LIVE_EVIDENCE_REGISTRY: HardLiveModuleEvidence[] = [
@@ -1222,7 +1136,7 @@ export const HARD_LIVE_REGISTRY_META = {
     exclude_from_product_metrics: true,
   },
   wave4_note:
-    "Wave 4 Investor Complete authenticated prod smoke PASS (12 modules) + 3 HELD_POLICY; Wave 5 PASS; AI compliance Phase A PASS — Pilot BLOCKED / Gate F PENDING / Launch NO-GO unchanged.",
+    "Gap-close 2026-07-22: DEMO_ONLY=0; PASS=116; HELD_POLICY=37 (Founder allowlist). Wave 4 Investor + Wave 5 + AI Phase A prior smoke retained. Pilot BLOCKED / Gate F PENDING / Launch NO-GO unchanged.",
 } as const;
 
 export function assertNoLivePassWithoutSmoke(

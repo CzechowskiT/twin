@@ -708,6 +708,128 @@ def recruiter_analytics(
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
 
+@router.get("/sla")
+def recruiter_sla_summary(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    from app.services.recruiter_sla import build_sla_summary
+
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
+    try:
+        return build_sla_summary(db, company_slug=slug)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+class RecruiterSlaTargetsIn(BaseModel):
+    targets: list[dict] = Field(default_factory=list)
+
+
+@router.put("/sla/targets")
+def recruiter_sla_targets_put(
+    body: RecruiterSlaTargetsIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    from app.services.recruiter_sla import upsert_sla_targets
+
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
+    try:
+        items = upsert_sla_targets(db, company_slug=slug, targets=body.targets)
+        return {"company_slug": slug, "targets": items}
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+class RecruiterCollaborationNoteIn(BaseModel):
+    subject_type: str = Field("candidate", max_length=32)
+    subject_id: str = Field(..., min_length=1, max_length=64)
+    body: str = Field(..., min_length=1, max_length=4000)
+    author_label: str | None = Field(None, max_length=128)
+
+
+@router.get("/collaboration/notes")
+def recruiter_collaboration_notes_list(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    company_slug: str | None = Query(None, max_length=80),
+    subject_type: str = Query("candidate", max_length=32),
+    subject_id: str = Query(..., max_length=64),
+    limit: int = Query(50, ge=1, le=100),
+) -> dict:
+    from app.services.recruiter_collaboration import list_collaboration_notes
+
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
+    try:
+        return list_collaboration_notes(
+            db,
+            company_slug=slug,
+            subject_type=subject_type,
+            subject_id=subject_id,
+            limit=limit,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/collaboration/notes", status_code=status.HTTP_201_CREATED)
+def recruiter_collaboration_notes_create(
+    body: RecruiterCollaborationNoteIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    from app.services.recruiter_collaboration import create_collaboration_note
+
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
+    try:
+        return create_collaboration_note(
+            db,
+            company_slug=slug,
+            subject_type=body.subject_type,
+            subject_id=body.subject_id,
+            body=body.body,
+            author_label=body.author_label,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
 @router.get("/pipeline")
 def recruiter_pipeline_list(
     request: Request,

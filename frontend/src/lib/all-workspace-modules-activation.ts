@@ -68,7 +68,6 @@ export const INTERNAL_MODULE_IDS = new Set([
   "auto_apply",
   "plan_payments",
   "candidate_plan",
-  "candidate_revoke_delete",
   "recruiter_hub",
   "recruiter_operational_work_queue",
   "recruiter_ats_import_readiness",

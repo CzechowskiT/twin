@@ -16,6 +16,8 @@ ALLOWED_EVENT_TYPES = frozenset(
         "consent_withdrawn",
         "privacy_request_created",
         "privacy_request_cancelled",
+        "privacy_request_ops_created",
+        "privacy_request_fulfilled",
         "profile_updated",
         "export_requested",
         "trust_center_viewed",

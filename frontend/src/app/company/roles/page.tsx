@@ -21,7 +21,7 @@ import {
   resolveCompanySlugFromRaw,
   writeRecruiterInboxSession,
 } from "@/lib/recruiter-inbox";
-import { COLLAPSE_COMPANY_DEMO_JOURNEYS, COMPANY_ROLES_SHIP_STATUS } from "@/lib/seven-day-d4-company";
+import { COMPANY_ROLES_SHIP_STATUS } from "@/lib/seven-day-d4-company";
 
 export default function CompanyRolesPage() {
   const { t } = useTranslation();
@@ -155,24 +155,11 @@ export default function CompanyRolesPage() {
             <Link href="/company/talent-pool" className="twin-link font-medium">
               {t("companyTalentPool.navLink")}
             </Link>
+            <span className="twin-muted mx-2">·</span>
+            <Link href="/company/pipeline" className="twin-link font-medium">
+              {t("jobPipeline.openPipeline")}
+            </Link>
           </p>
-          <div className="mt-6 rounded-lg border border-[var(--twin-border)]/80 p-4">
-            {COLLAPSE_COMPANY_DEMO_JOURNEYS ? (
-              <details data-seven-day-company-demo-journeys-collapsed>
-                <summary className="twin-link cursor-pointer text-sm font-medium [&::-webkit-details-marker]:hidden">
-                  {t("companyJobs.demoJourneysToggle")}
-                </summary>
-                <p className="twin-muted mt-3 text-sm leading-relaxed">{t("companyJobs.demoJourneysBoundary")}</p>
-                <Link
-                  href="/company/roles/demo-role-001/pipeline"
-                  className="twin-link mt-3 inline-block text-sm font-medium"
-                  data-testid="company-roles-demo-pipeline-link"
-                >
-                  {t("jobPipeline.openPipeline")}
-                </Link>
-              </details>
-            ) : null}
-          </div>
         </div>
       </Card>
     </Shell>

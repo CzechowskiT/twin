@@ -995,8 +995,68 @@ class CandidatePrivacyRequest(Base):
         onupdate=datetime.utcnow,
     )
     completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    fulfillment_status: Mapped[str | None] = mapped_column(String(32), nullable=True, index=True)
+    fulfilled_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    fulfilled_by_user_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    delivery_receipt_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    legal_hold: Mapped[bool] = mapped_column(Boolean, default=False)
 
     candidate: Mapped["Candidate"] = relationship(back_populates="privacy_requests")
+
+
+class RecruiterSlaTarget(Base):
+    """Per-company stage SLA target (hours) for recruiter analytics."""
+
+    __tablename__ = "recruiter_sla_targets"
+    __table_args__ = (
+        UniqueConstraint("company_slug", "stage_key", name="uq_recruiter_sla_company_stage"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    company_slug: Mapped[str] = mapped_column(String(80), index=True)
+    stage_key: Mapped[str] = mapped_column(String(64))
+    target_hours: Mapped[int] = mapped_column(Integer)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class ImportedCalendarHold(Base):
+    """Busy/hold slots imported from candidate-uploaded .ics (no external write)."""
+
+    __tablename__ = "imported_calendar_holds"
+    __table_args__ = (
+        UniqueConstraint("user_id", "uid", name="uq_imported_calendar_hold_user_uid"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    uid: Mapped[str] = mapped_column(String(255))
+    summary: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    starts_at: Mapped[datetime] = mapped_column(DateTime, index=True)
+    ends_at: Mapped[datetime] = mapped_column(DateTime)
+    timezone: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    source: Mapped[str] = mapped_column(String(32), default="ics_import")
+    raw_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class RecruiterCollaborationNote(Base):
+    """Live recruiter collaboration notes — replaces demo-journey fixture boards."""
+
+    __tablename__ = "recruiter_collaboration_notes"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    company_slug: Mapped[str] = mapped_column(String(80), index=True)
+    subject_type: Mapped[str] = mapped_column(String(32))
+    subject_id: Mapped[str] = mapped_column(String(64))
+    body: Mapped[str] = mapped_column(Text)
+    author_label: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    created_by_user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
 class CandidateTrustAuditEvent(Base):

@@ -217,10 +217,12 @@
       "module_id": "candidate_plan",
       "persona": "candidate",
       "wave": "1",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/dashboard/plan",
-      "blocker": "STRIPE_NOT_PUBLIC",
-      "owner": "candidate-squad"
+      "blocker": null,
+      "owner": "candidate-squad",
+      "smoke_sha": "cf773744c92c7ccfae408175b27c30f498d5361f",
+      "smoke_at": "2026-07-20T20:25:00Z"
     },
     {
       "module_id": "plan_payments",
@@ -235,19 +237,23 @@
       "module_id": "cand_account_deletion",
       "persona": "candidate",
       "wave": "1",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/dashboard/trust/revoke-delete",
-      "blocker": "INTERNAL_DSR_PATH",
-      "owner": "privacy"
+      "blocker": null,
+      "owner": "privacy",
+      "smoke_sha": "cf773744c92c7ccfae408175b27c30f498d5361f",
+      "smoke_at": "2026-07-20T20:25:00Z"
     },
     {
       "module_id": "candidate_revoke_delete",
       "persona": "candidate",
       "wave": "1",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/dashboard/trust/revoke-delete",
-      "blocker": "INTERNAL_MODULE",
-      "owner": "privacy"
+      "blocker": null,
+      "owner": "privacy",
+      "smoke_sha": "cf773744c92c7ccfae408175b27c30f498d5361f",
+      "smoke_at": "2026-07-20T20:25:00Z"
     },
     {
       "module_id": "recruiter_talent_radar",
@@ -518,109 +524,34 @@
       "module_id": "rec_sla_tracking",
       "persona": "recruiter",
       "wave": "2",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/recruiter/analytics",
-      "blocker": "NOT_BUILT",
-      "owner": "recruiter-squad"
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+      "smoke_at": "2026-07-21T04:12:00Z"
     },
     {
       "module_id": "rec_candidate_comms",
       "persona": "recruiter",
       "wave": "2",
-      "status": "DEMO_ONLY",
-      "route": "/recruiter/candidates/demo-candidate-001/communication",
-      "blocker": "DEMO_JOURNEY_ISOLATION",
-      "owner": "recruiter-squad"
+      "status": "PASS",
+      "route": "/recruiter/inbox",
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+      "smoke_at": "2026-07-21T04:12:00Z"
     },
     {
       "module_id": "rec_collaboration",
       "persona": "recruiter",
       "wave": "2",
-      "status": "DEMO_ONLY",
-      "route": "/recruiter/candidates/demo-candidate-001/collaboration",
-      "blocker": "DEMO_JOURNEY_ISOLATION",
-      "owner": "recruiter-squad"
-    },
-    {
-      "module_id": "recruiter_demo_collaboration",
-      "persona": "recruiter",
-      "wave": "2",
-      "status": "DEMO_ONLY",
-      "route": "/recruiter/candidates/demo-candidate-001/collaboration",
-      "blocker": "DEMO_JOURNEY_ISOLATION",
-      "owner": "recruiter-squad"
-    },
-    {
-      "module_id": "recruiter_demo_communication",
-      "persona": "recruiter",
-      "wave": "2",
-      "status": "DEMO_ONLY",
-      "route": "/recruiter/candidates/demo-candidate-001/communication",
-      "blocker": "DEMO_JOURNEY_ISOLATION",
-      "owner": "recruiter-squad"
-    },
-    {
-      "module_id": "recruiter_demo_decision_memory",
-      "persona": "recruiter",
-      "wave": "2",
-      "status": "DEMO_ONLY",
-      "route": "/recruiter/candidates/demo-candidate-001/decision-memory",
-      "blocker": "DEMO_JOURNEY_ISOLATION",
-      "owner": "recruiter-squad"
-    },
-    {
-      "module_id": "recruiter_demo_pipeline",
-      "persona": "recruiter",
-      "wave": "2",
-      "status": "DEMO_ONLY",
-      "route": "/recruiter/jobs/demo-role-001/pipeline",
-      "blocker": "DEMO_JOURNEY_ISOLATION",
-      "owner": "recruiter-squad"
-    },
-    {
-      "module_id": "recruiter_demo_profile_360",
-      "persona": "recruiter",
-      "wave": "2",
-      "status": "DEMO_ONLY",
-      "route": "/recruiter/candidates/demo-candidate-001",
-      "blocker": "DEMO_JOURNEY_ISOLATION",
-      "owner": "recruiter-squad"
-    },
-    {
-      "module_id": "recruiter_demo_team",
-      "persona": "recruiter",
-      "wave": "2",
-      "status": "DEMO_ONLY",
-      "route": "/recruiter/candidates/demo-candidate-001/team",
-      "blocker": "DEMO_JOURNEY_ISOLATION",
-      "owner": "recruiter-squad"
-    },
-    {
-      "module_id": "recruiter_demo_trust",
-      "persona": "recruiter",
-      "wave": "2",
-      "status": "DEMO_ONLY",
-      "route": "/recruiter/candidates/demo-candidate-001/trust",
-      "blocker": "DEMO_JOURNEY_ISOLATION",
-      "owner": "recruiter-squad"
-    },
-    {
-      "module_id": "investor_sor_proof_collaboration",
-      "persona": "recruiter",
-      "wave": "2",
-      "status": "DEMO_ONLY",
-      "route": "/recruiter/candidates/demo-candidate-001/collaboration",
-      "blocker": "DEMO_JOURNEY_ISOLATION",
-      "owner": "recruiter-squad"
-    },
-    {
-      "module_id": "investor_sor_proof_pipeline",
-      "persona": "recruiter",
-      "wave": "2",
-      "status": "DEMO_ONLY",
-      "route": "/recruiter/jobs/demo-role-001/pipeline",
-      "blocker": "DEMO_JOURNEY_ISOLATION",
-      "owner": "recruiter-squad"
+      "status": "PASS",
+      "route": "/recruiter/inbox",
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+      "smoke_at": "2026-07-21T04:12:00Z"
     },
     {
       "module_id": "company_dashboard",
@@ -838,10 +769,12 @@
       "module_id": "company_billing",
       "persona": "company",
       "wave": "3",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/company/billing",
-      "blocker": "STRIPE_NOT_PUBLIC",
-      "owner": "company-squad"
+      "blocker": null,
+      "owner": "company-squad",
+      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
+      "smoke_at": "2026-07-22T07:00:00Z"
     },
     {
       "module_id": "company_billing_public_claim",
@@ -856,10 +789,12 @@
       "module_id": "rec_subscription",
       "persona": "company",
       "wave": "3",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/company/billing",
-      "blocker": "STRIPE_NOT_PUBLIC",
-      "owner": "company-squad"
+      "blocker": null,
+      "owner": "company-squad",
+      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
+      "smoke_at": "2026-07-22T07:00:00Z"
     },
     {
       "module_id": "company_ms_calendar_write",
@@ -886,69 +821,6 @@
       "status": "HELD_POLICY",
       "route": "/company/onboarding",
       "blocker": "EXTERNAL_ENROLLMENT_OFF",
-      "owner": "company-squad"
-    },
-    {
-      "module_id": "company_demo_collaboration",
-      "persona": "company",
-      "wave": "3",
-      "status": "DEMO_ONLY",
-      "route": "/company/candidates/demo-candidate-001/collaboration",
-      "blocker": "DEMO_JOURNEY_ISOLATION",
-      "owner": "company-squad"
-    },
-    {
-      "module_id": "company_demo_communication",
-      "persona": "company",
-      "wave": "3",
-      "status": "DEMO_ONLY",
-      "route": "/company/candidates/demo-candidate-001/communication",
-      "blocker": "DEMO_JOURNEY_ISOLATION",
-      "owner": "company-squad"
-    },
-    {
-      "module_id": "company_demo_decision_memory",
-      "persona": "company",
-      "wave": "3",
-      "status": "DEMO_ONLY",
-      "route": "/company/candidates/demo-candidate-001/decision-memory",
-      "blocker": "DEMO_JOURNEY_ISOLATION",
-      "owner": "company-squad"
-    },
-    {
-      "module_id": "company_demo_pipeline",
-      "persona": "company",
-      "wave": "3",
-      "status": "DEMO_ONLY",
-      "route": "/company/roles/demo-role-001/pipeline",
-      "blocker": "DEMO_JOURNEY_ISOLATION",
-      "owner": "company-squad"
-    },
-    {
-      "module_id": "company_demo_profile_360",
-      "persona": "company",
-      "wave": "3",
-      "status": "DEMO_ONLY",
-      "route": "/company/candidates/demo-candidate-001",
-      "blocker": "DEMO_JOURNEY_ISOLATION",
-      "owner": "company-squad"
-    },
-    {
-      "module_id": "company_demo_team",
-      "persona": "company",
-      "wave": "3",
-      "status": "DEMO_ONLY",
-      "route": "/company/candidates/demo-candidate-001/team",
-      "blocker": "DEMO_JOURNEY_ISOLATION",
-      "owner": "company-squad"
-    },
-    {
-      "module_id": "company_demo_trust",
-      "persona": "company",
-      "wave": "3",
-      "status": "DEMO_ONLY",
-      "route": "/company/candidates/demo-candidate-001/trust",
-      "blocker": "DEMO_JOURNEY_ISOLATION",
       "owner": "company-squad"
     },
     {
@@ -1411,10 +1283,12 @@
       "module_id": "plat_ics_import",
       "persona": "platform",
       "wave": "5",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/dashboard/calendar",
-      "blocker": "NOT_BUILT",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
+      "smoke_at": "2026-07-22T14:50:00Z"
     },
     {
       "module_id": "ai_claim_declared",
@@ -1764,11 +1638,13 @@
       "module_id": "ai_wave6_dsr_delete_export",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/dashboard/trust/revoke-delete",
-      "blocker": "WAVE6_NOT_STARTED",
-      "owner": "privacy"
+      "blocker": null,
+      "owner": "privacy",
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     }
   ],
-  "wave4_note": "Wave 4 Investor Complete authenticated prod smoke PASS (12 modules) + 3 HELD_POLICY; Wave 5 PASS; AI compliance Phase A PASS — Pilot BLOCKED / Gate F PENDING / Launch NO-GO unchanged."
+  "wave4_note": "Gap-close 2026-07-22: DEMO_ONLY=0; PASS=116; HELD_POLICY=37 (Founder allowlist). Wave 4 Investor + Wave 5 + AI Phase A prior smoke retained. Pilot BLOCKED / Gate F PENDING / Launch NO-GO unchanged."
 }

@@ -905,3 +905,33 @@ def download_webcal_feed(
     )
 
 
+class IcsImportIn(BaseModel):
+    ics_text: str = Field(..., min_length=20, max_length=512_000)
+
+
+@router.post("/me/ics/import")
+def import_ics_calendar(
+    body: IcsImportIn,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> dict:
+    """Import VEVENT holds from uploaded ICS — local busy blocks only; no Google/MS write."""
+    from app.services.ics_import import import_ics_for_user
+
+    try:
+        return import_ics_for_user(db, user_id=current_user.id, ics_text=body.ics_text)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.get("/me/ics/imports")
+def list_ics_imports(
+    limit: int = Query(50, ge=1, le=200),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> dict:
+    from app.services.ics_import import list_imported_holds
+
+    return list_imported_holds(db, user_id=current_user.id, limit=limit)
+
+

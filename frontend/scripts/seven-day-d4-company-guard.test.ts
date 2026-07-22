@@ -157,12 +157,13 @@ test("8 billing — premium preview only, not checkout", () => {
   assert.match(en.productPolish.premiumPreviewCompanyLead ?? "", /not live|preview-only/i);
 });
 
-test("9 roles and pipeline — demo journeys collapsed, human decision copy", () => {
+test("9 roles and pipeline — demo journey CTAs removed; human decision copy", () => {
   const roles = read("src/app/company/roles/page.tsx");
-  assert.match(roles, /COLLAPSE_COMPANY_DEMO_JOURNEYS/);
-  assert.match(roles, /data-seven-day-company-demo-journeys-collapsed/);
+  assert.doesNotMatch(roles, /demo-role-001/);
+  assert.doesNotMatch(roles, /COLLAPSE_COMPANY_DEMO_JOURNEYS/);
   assert.doesNotMatch(roles, /DemoJourneyPilotStatus/);
-  assert.match(en.companyJobs.demoJourneysBoundary ?? "", /human decision required/i);
+  assert.doesNotMatch(roles, /data-seven-day-company-demo-journeys-collapsed/);
+  assert.match(roles, /\/company\/pipeline/);
 
   const pipeline = read("src/app/company/pipeline/company-pipeline-client.tsx");
   assert.match(pipeline, /companyPipeline\.humanDecisionNote/);

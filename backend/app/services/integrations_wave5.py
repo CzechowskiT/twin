@@ -282,7 +282,7 @@ INTEGRATION_INVENTORY_SEED: tuple[tuple[str, str, str, str | None, str], ...] = 
     ("ats", "MONITORING", "PARTIAL", None, "Honesty endpoints + Wave 5 ledger"),
     ("ics_webcal", "EXPORT", "LIVE", None, "ICS generate/download + WebCal feed"),
     ("ics_webcal", "CONFIGURATION", "LIVE", None, "Token mint + TTL"),
-    ("ics_webcal", "IMPORT", "NOT_BUILT", "NO_ICS_IMPORT", "Parse/import not built"),
+    ("ics_webcal", "IMPORT", "LIVE", None, "Parse/import VEVENT to local busy holds"),
     ("ics_webcal", "MONITORING", "LIVE", None, "Expiry + UID/SEQUENCE observability"),
     ("email", "DRAFT", "LIVE", None, "Outbox draft-only for Wave 5 smoke"),
     ("email", "WRITE", "LIVE", None, "Platform send path exists — smoke must not send"),

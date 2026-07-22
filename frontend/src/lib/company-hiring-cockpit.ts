@@ -1,11 +1,8 @@
-/** Company hiring team cockpit — deterministic demo queues and module links. */
+/** Company hiring team cockpit — live workspace links (no demo fixture CTAs). */
 
 import { atsImportReadinessHref } from "@/lib/ats-import-readiness";
-import { candidateCollaborationHref } from "@/lib/candidate-collaboration";
 import { candidateProfile360Href } from "@/lib/candidate-profile-360";
-import { candidateTrustHref } from "@/lib/candidate-trust";
 import { COMPANY_ROLES_ROUTE } from "@/lib/company-jobs-roles";
-import { decisionMemoryHref } from "@/lib/decision-memory";
 import { jobPipelineHref } from "@/lib/job-pipeline";
 import { LAUNCH_STANCE } from "@/lib/investor-metrics-reality";
 import type { TranslationKey } from "@/lib/i18n";
@@ -16,8 +13,6 @@ import {
   COMPANY_HIRING_COCKPIT_DEMO_ROLE_ID,
   type CompanyHiringCockpitRecord,
 } from "@/lib/company-hiring-cockpit-demo-data";
-import { candidateCommunicationHref } from "@/lib/safe-communication";
-import { candidateTeamHref } from "@/lib/team-collaboration";
 
 export {
   COMPANY_HIRING_COCKPIT_DEMO_ATS_ID,
@@ -62,32 +57,32 @@ export const COMPANY_HIRING_COCKPIT_MODULE_LINKS = [
   },
   {
     id: "profile360",
-    href: candidateProfile360Href(COMPANY_HIRING_COCKPIT_DEMO_CANDIDATE_ID, "company"),
+    href: "/company/talent-pool",
     labelKey: "companyHiringCockpit.linkProfile360" as TranslationKey,
   },
   {
     id: "pipeline",
-    href: jobPipelineHref(COMPANY_HIRING_COCKPIT_DEMO_ROLE_ID, "company"),
+    href: "/company/pipeline",
     labelKey: "companyHiringCockpit.linkPipeline" as TranslationKey,
   },
   {
     id: "notes",
-    href: candidateCollaborationHref(COMPANY_HIRING_COCKPIT_DEMO_CANDIDATE_ID, "company"),
+    href: "/company/scorecards",
     labelKey: "companyHiringCockpit.linkNotes" as TranslationKey,
   },
   {
     id: "trust",
-    href: candidateTrustHref(COMPANY_HIRING_COCKPIT_DEMO_CANDIDATE_ID, "company"),
+    href: "/company/trust-summary",
     labelKey: "companyHiringCockpit.linkTrust" as TranslationKey,
   },
   {
     id: "team",
-    href: candidateTeamHref(COMPANY_HIRING_COCKPIT_DEMO_CANDIDATE_ID, "company"),
+    href: "/company/team",
     labelKey: "companyHiringCockpit.linkTeam" as TranslationKey,
   },
   {
     id: "communication",
-    href: candidateCommunicationHref(COMPANY_HIRING_COCKPIT_DEMO_CANDIDATE_ID, "company"),
+    href: "/company/notifications",
     labelKey: "companyHiringCockpit.linkCommunication" as TranslationKey,
   },
   {
@@ -97,7 +92,7 @@ export const COMPANY_HIRING_COCKPIT_MODULE_LINKS = [
   },
   {
     id: "decision_memory",
-    href: decisionMemoryHref(COMPANY_HIRING_COCKPIT_DEMO_CANDIDATE_ID, "company"),
+    href: "/company/scorecards",
     labelKey: "companyHiringCockpit.linkDecisionMemory" as TranslationKey,
   },
 ] as const;

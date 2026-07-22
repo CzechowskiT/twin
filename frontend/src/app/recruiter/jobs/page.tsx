@@ -9,7 +9,6 @@ import { RecruiterWorkspaceNav } from "@/components/recruiter/recruiter-workspac
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
-import { COLLAPSE_RECRUITER_DEMO_JOURNEYS } from "@/lib/seven-day-d3-recruiter";
 import {
   mergeCompanyOptions,
   readRecruiterInboxSession,
@@ -181,24 +180,11 @@ export default function RecruiterJobsPage() {
         <Link href="/recruiter/inbox" className="twin-link mt-6 inline-block text-sm">
           {t("recruiterJobs.inboxLink")}
         </Link>
-        {COLLAPSE_RECRUITER_DEMO_JOURNEYS ? (
-          <details
-            className="mt-6 rounded-lg border border-[var(--twin-border)]/80 p-4"
-            data-seven-day-recruiter-demo-journeys-collapsed
-          >
-            <summary className="twin-link cursor-pointer text-sm font-medium [&::-webkit-details-marker]:hidden">
-              {t("recruiterJobs.demoJourneysToggle")}
-            </summary>
-            <p className="twin-muted mt-3 text-sm leading-relaxed">{t("recruiterJobs.demoJourneysBoundary")}</p>
-            <Link
-              href="/recruiter/jobs/demo-role-001/pipeline"
-              className="twin-link mt-3 inline-block text-sm font-medium"
-              data-testid="recruiter-jobs-demo-pipeline-link"
-            >
-              {t("jobPipeline.openPipeline")}
-            </Link>
-          </details>
-        ) : null}
+        <p className="twin-muted mt-4 text-sm leading-relaxed">
+          <Link href="/recruiter/pipeline" className="twin-link font-medium">
+            {t("jobPipeline.openPipeline")}
+          </Link>
+        </p>
       </Card>
     </Shell>
   );

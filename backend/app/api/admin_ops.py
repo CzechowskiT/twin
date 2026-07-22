@@ -30,7 +30,7 @@ def _require_ops_admin(settings: Settings, authorization: str | None) -> None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid admin token")
 
 
-EXPECTED_ALEMBIC_HEAD = "089_recruiter_wave2_hard_live"
+EXPECTED_ALEMBIC_HEAD = "094_gap_close_dsr_sla_ics"
 
 
 def _read_alembic_current(db: Session) -> str | None:
@@ -585,3 +585,80 @@ def admin_remove_participant(
     except ValueError as exc:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
     return {"id": participant_id, "removed": True}
+
+
+class PrivacyFulfillIn(BaseModel):
+    fulfillment_status: str = Field(..., min_length=3, max_length=32)
+    delivery_receipt: dict | None = None
+
+
+class PrivacyOpsCreateIn(BaseModel):
+    candidate_id: int = Field(..., ge=1)
+    request_type: str = Field(..., min_length=3, max_length=64)
+    payload: dict | None = None
+    legal_hold: bool = False
+
+
+@router.get("/privacy/dsr-queue")
+def admin_privacy_dsr_queue(
+    status_filter: str | None = None,
+    limit: int = 50,
+    offset: int = 0,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None, alias="Authorization"),
+) -> dict:
+    """Ops DSR queue — no public enrollment; Bearer ops token only."""
+    from app.services.candidate_privacy_request_service import list_privacy_ops_queue
+
+    _require_ops_admin(settings, authorization)
+    return list_privacy_ops_queue(
+        db, status_filter=status_filter, limit=min(limit, 200), offset=max(offset, 0)
+    )
+
+
+@router.post("/privacy/dsr-queue", status_code=status.HTTP_201_CREATED)
+def admin_privacy_dsr_create(
+    body: PrivacyOpsCreateIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None, alias="Authorization"),
+) -> dict:
+    from app.services.candidate_privacy_request_service import create_ops_privacy_request
+
+    _require_ops_admin(settings, authorization)
+    try:
+        return create_ops_privacy_request(
+            db,
+            candidate_id=body.candidate_id,
+            actor_user_id=0,
+            request_type=body.request_type,
+            payload=body.payload,
+            legal_hold=body.legal_hold,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/privacy/dsr-queue/{request_id}/fulfill")
+def admin_privacy_dsr_fulfill(
+    request_id: int,
+    body: PrivacyFulfillIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None, alias="Authorization"),
+) -> dict:
+    from app.services.candidate_privacy_request_service import fulfill_privacy_request
+
+    _require_ops_admin(settings, authorization)
+    try:
+        return fulfill_privacy_request(
+            db,
+            request_id=request_id,
+            actor_user_id=0,
+            fulfillment_status=body.fulfillment_status,
+            delivery_receipt=body.delivery_receipt,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+

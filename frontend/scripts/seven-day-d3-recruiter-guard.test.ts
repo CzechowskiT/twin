@@ -164,12 +164,13 @@ test("8 integrations — coming soon roadmap, no live ATS sync rows", () => {
   assert.equal(calendar?.status, "not_live");
 });
 
-test("9 jobs demo journeys collapsed — no DemoJourneyPilotStatus in primary", () => {
+test("9 jobs page — demo journey CTAs removed from product UI", () => {
   const page = read("src/app/recruiter/jobs/page.tsx");
-  assert.match(page, /COLLAPSE_RECRUITER_DEMO_JOURNEYS/);
-  assert.match(page, /data-seven-day-recruiter-demo-journeys-collapsed/);
+  assert.doesNotMatch(page, /demo-role-001/);
+  assert.doesNotMatch(page, /COLLAPSE_RECRUITER_DEMO_JOURNEYS/);
   assert.doesNotMatch(page, /DemoJourneyPilotStatus/);
-  assert.match(en.recruiterJobs.demoJourneysBoundary ?? "", /human decision required/i);
+  assert.doesNotMatch(page, /data-seven-day-recruiter-demo-journeys-collapsed/);
+  assert.match(page, /\/recruiter\/pipeline/);
 });
 
 test("10 talent radar and pool — limited pilot boundaries", () => {
