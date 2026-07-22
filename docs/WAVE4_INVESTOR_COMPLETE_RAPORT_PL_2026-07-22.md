@@ -2,7 +2,7 @@
 
 **Data:** 2026-07-22  
 **Branch:** `feat/career-evidence-ai-compliance`  
-**Verdict:** **ENGINEERING_PARTIAL_AWAITING_SMOKE** (nie twierdzić DONE bez authenticated prod smoke)
+**Verdict:** **DONE_WITH_POLICY_HOLDS** — authenticated prod smoke PASS 12/12 @ `2987e168`
 
 ## Stance (immutable)
 
@@ -18,7 +18,7 @@
 - Backend: `investor_wave4` service + API `/platform/wave4/*`, Alembic **093**, model `InvestorNdaAcceptance`
 - NDA accept/status, data-room documents list, placement/trust readonly summaries, board readiness
 - Frontend deep-link panele: data-room live, placement readonly, trust-proof readonly (hub-hidden do smoke PASS)
-- Hard LIVE registry Wave 4: **12 PENDING_SMOKE** + **3 HELD_POLICY**
+- Hard LIVE registry Wave 4: **12 PASS** + **3 HELD_POLICY**
 - Hub: DEMO theater + incomplete investor/board modules **ukryte** z głównych workspace
 
 ## HELD (honest)
@@ -29,7 +29,7 @@
 
 ## Smoke
 
-Authenticated prod smoke Wave 4 **nie uruchomiony w tej sesji** — brak LIVE badge / capability map PASS.
+Authenticated prod smoke Wave 4 **PASS 12/12** (`test:wave4-investor-module-prod-smoke`) — LIVE badges promoted; stance nie zmieniony.
 
 ## Relacja do Wave 5
 

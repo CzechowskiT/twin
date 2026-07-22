@@ -218,7 +218,7 @@ Monetization/Stripe public and ATS live-sync remain **outside** waves until expl
 
 **Exit status:** **DONE_WITH_POLICY_HOLDS** — 16 Hard LIVE PASS; ATS/Stripe/MS write/invite delivery/enrollment held; demo isolated DEMO_ONLY.
 
-**Next:** Wave 4 Investor Complete engineering **shipped as PENDING_SMOKE** (Alembic 093 + `/platform/wave4`) — awaiting authenticated prod smoke before LIVE badges. Wave 5 Calendar & Integrations already PASS on Wave 3 HEAD.
+**Next:** Wave 4 Investor Complete + AI Phase A authenticated prod smoke **PASS** on `2987e168` — Hard LIVE **106 PASS** / **0 PENDING_SMOKE**. Wave 6 Privacy / DSR next. Stance unchanged.
 
 ## 13. Wave 5 Calendar & Integrations Complete (this batch)
 
@@ -236,7 +236,7 @@ Monetization/Stripe public and ATS live-sync remain **outside** waves until expl
 
 ## 13b. Career Evidence Graph & AI Compliance Foundation (Phase A)
 
-Alembic **092**. Production claim graph + AI registries/decision log + guards. LIVE badges only after authenticated module smoke (**28 PENDING_SMOKE** + **5 HELD_POLICY**).
+Alembic **092**. Production claim graph + AI registries/decision log + guards. Authenticated module smoke **PASS 28/28** + **5 HELD_POLICY** on aligned SHA `2987e168`.
 
 ## 14. Wave 4 Investor Complete (backfill — this batch)
 
@@ -249,8 +249,8 @@ Alembic **092**. Production claim graph + AI registries/decision log + guards. L
 - [ ] Authenticated per-module prod smoke PASS on aligned SHA (pending Founder JWT)
 - [ ] Capability map LIVE promotions only after smoke PASS
 
-**Exit status:** **ENGINEERING_PARTIAL_AWAITING_SMOKE** — 12 PENDING_SMOKE + 3 HELD_POLICY; stance unchanged.
+**Exit status:** **DONE_WITH_POLICY_HOLDS** — 12 Hard LIVE PASS + 3 HELD_POLICY after authenticated prod smoke on `2987e168`; stance unchanged.
 
-**Next:** Authenticated Wave 4 + AI compliance prod smoke → PARTIAL/PENDING→PASS; then Wave 6 Privacy / DSR. Do not flip Gate F / Launch.
+**Next:** Wave 6 Privacy / DSR. Do not flip Gate F / Launch / Pilot.
 
 

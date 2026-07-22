@@ -23,12 +23,15 @@
     "wave3_script": "frontend/scripts/wave3-company-module-prod-smoke.test.ts",
     "wave3_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
     "wave3_at": "2026-07-22T07:00:00Z",
+    "wave4_script": "frontend/scripts/wave4-investor-module-prod-smoke.test.ts",
+    "wave4_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+    "wave4_at": "2026-07-22T16:28:00Z",
     "wave5_script": "frontend/scripts/wave5-integrations-module-prod-smoke.test.ts",
     "wave5_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
     "wave5_at": "2026-07-22T14:50:00Z",
     "ai_compliance_script": "frontend/scripts/ai-compliance-module-prod-smoke.test.ts",
-    "ai_compliance_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-    "ai_compliance_at": "2026-07-22T16:16:30Z",
+    "ai_compliance_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+    "ai_compliance_at": "2026-07-22T16:28:00Z",
     "write": true,
     "exclude_from_product_metrics": true
   },
@@ -952,109 +955,133 @@
       "module_id": "investor_data_room",
       "persona": "investor",
       "wave": "4",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/investor/data-room",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "investor-squad"
+      "blocker": null,
+      "owner": "investor-squad",
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "investor_nda_acceptance",
       "persona": "investor",
       "wave": "4",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/investor/data-room",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "investor-squad"
+      "blocker": null,
+      "owner": "investor-squad",
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "investor_data_room_list",
       "persona": "investor",
       "wave": "4",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/investor/data-room",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "investor-squad"
+      "blocker": null,
+      "owner": "investor-squad",
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "investor_placement_readonly",
       "persona": "investor",
       "wave": "4",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/investor/placement",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "investor-squad"
+      "blocker": null,
+      "owner": "investor-squad",
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "investor_trust_proof_readonly",
       "persona": "investor",
       "wave": "4",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/investor/trust-proof",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "investor-squad"
+      "blocker": null,
+      "owner": "investor-squad",
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "investor_login_gate",
       "persona": "investor",
       "wave": "4",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/login/investor",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "investor-squad"
+      "blocker": null,
+      "owner": "investor-squad",
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "board_implementation_tracker",
       "persona": "investor",
       "wave": "4",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/board/implementation-tracker",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "investor-squad"
+      "blocker": null,
+      "owner": "investor-squad",
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "investor_metrics_wave4",
       "persona": "investor",
       "wave": "4",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/investor/metrics",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "investor-squad"
+      "blocker": null,
+      "owner": "investor-squad",
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "investor_roadmap_wave4",
       "persona": "investor",
       "wave": "4",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/investor/roadmap",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "investor-squad"
+      "blocker": null,
+      "owner": "investor-squad",
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "investor_calculator_wave4",
       "persona": "investor",
       "wave": "4",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/investor/calculator",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "investor-squad"
+      "blocker": null,
+      "owner": "investor-squad",
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "investor_contact_wave4",
       "persona": "investor",
       "wave": "4",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "mailto:contact@twin.care",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "investor-squad"
+      "blocker": null,
+      "owner": "investor-squad",
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "investor_product_proof_boundary",
       "persona": "investor",
       "wave": "4",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/investor/product-proof",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "investor-squad"
+      "blocker": null,
+      "owner": "investor-squad",
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "investor_external_attestations",
@@ -1397,8 +1424,8 @@
       "route": "/dashboard/evidence/claims",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_claim_extracted",
@@ -1408,8 +1435,8 @@
       "route": "/dashboard/evidence/claims",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_claim_inferred",
@@ -1419,8 +1446,8 @@
       "route": "/dashboard/evidence/claims",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_claim_provenance",
@@ -1430,8 +1457,8 @@
       "route": "/dashboard/evidence/claims",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_claim_human_confirm",
@@ -1441,8 +1468,8 @@
       "route": "/recruiter/evidence/claims",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_claim_evidence_link",
@@ -1452,8 +1479,8 @@
       "route": "/dashboard/evidence/claims",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_claim_evidence_backed",
@@ -1463,8 +1490,8 @@
       "route": "/dashboard/evidence/claims",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_claim_dispute",
@@ -1474,8 +1501,8 @@
       "route": "/dashboard/evidence/disputes",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_claim_dispute_resolve",
@@ -1485,8 +1512,8 @@
       "route": "/recruiter/evidence/disputes",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_claim_supersede",
@@ -1496,8 +1523,8 @@
       "route": "/dashboard/evidence/claims",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_claim_history",
@@ -1507,8 +1534,8 @@
       "route": "/dashboard/evidence/claims",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_decision_log",
@@ -1518,8 +1545,8 @@
       "route": "/dashboard/evidence/ai-runs",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_explainability",
@@ -1529,8 +1556,8 @@
       "route": "/dashboard/evidence/ai-runs",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_human_override",
@@ -1540,8 +1567,8 @@
       "route": "/recruiter/evidence/reviews",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_override_audit",
@@ -1551,8 +1578,8 @@
       "route": "/company/evidence/audit",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_tenant_isolation_claim",
@@ -1562,8 +1589,8 @@
       "route": "/dashboard/evidence/claims",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_tenant_isolation_evidence",
@@ -1573,8 +1600,8 @@
       "route": "/dashboard/evidence/claims",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_prompt_injection_guard",
@@ -1584,8 +1611,8 @@
       "route": "/dashboard/evidence/security",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_protected_attr_ban",
@@ -1595,8 +1622,8 @@
       "route": "/dashboard/evidence/security",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_prohibited_use_guard",
@@ -1606,8 +1633,8 @@
       "route": "/dashboard/evidence/security",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_registry",
@@ -1617,8 +1644,8 @@
       "route": "/board/ai-compliance",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_prompt_registry",
@@ -1628,8 +1655,8 @@
       "route": "/board/ai-compliance",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_model_rollback_audit",
@@ -1639,8 +1666,8 @@
       "route": "/board/ai-compliance",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_compliance_status",
@@ -1650,8 +1677,8 @@
       "route": "/board/ai-compliance",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_smoke_metrics_exclusion",
@@ -1661,8 +1688,8 @@
       "route": "/dashboard/evidence/claims",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_no_outbound",
@@ -1672,8 +1699,8 @@
       "route": "/dashboard/evidence/claims",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_consent_visibility",
@@ -1683,8 +1710,8 @@
       "route": "/dashboard/evidence/claims",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_claim_cleanup",
@@ -1694,8 +1721,8 @@
       "route": "/dashboard/evidence/claims",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-      "smoke_at": "2026-07-22T16:16:30Z"
+      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
+      "smoke_at": "2026-07-22T16:28:00Z"
     },
     {
       "module_id": "ai_external_verification",
@@ -1743,5 +1770,5 @@
       "owner": "privacy"
     }
   ],
-  "wave4_note": "Wave 4 Investor Complete engineering shipped as PENDING_SMOKE (12 modules) + 3 HELD_POLICY — awaiting authenticated prod smoke; Wave 5 already PASS; AI compliance foundation PENDING_SMOKE."
+  "wave4_note": "Wave 4 Investor Complete authenticated prod smoke PASS (12 modules) + 3 HELD_POLICY; Wave 5 PASS; AI compliance Phase A PASS — Pilot BLOCKED / Gate F PENDING / Launch NO-GO unchanged."
 }
