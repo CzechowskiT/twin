@@ -1,14 +1,15 @@
 /**
- * Machine-readable Hard LIVE 30 evidence registry — Wave 1 Candidate + Wave 2 Recruiter + Wave 3 Company.
+ * Machine-readable Hard LIVE 30 evidence registry — Wave 1 Candidate + Wave 2 Recruiter + Wave 3 Company + Wave 5 Integrations.
  * LIVE badges in capability map / activation require status=PASS after authenticated prod smoke.
  * Stance: Pilot BLOCKED_BY_FOUNDER · Gate F PENDING · Launch NO-GO.
+ * Note: Wave 4 Investor Complete was not shipped — Wave 5 proceeds on Wave 3 HEAD.
  */
 export type HardLiveCriterionResult = "PASS" | "FAIL" | "N/A" | "PENDING";
 
 export type HardLiveModuleEvidence = {
   module_id: string;
-  persona: "candidate" | "recruiter" | "company";
-  wave: "1" | "2" | "3";
+  persona: "candidate" | "recruiter" | "company" | "platform";
+  wave: "1" | "2" | "3" | "5";
   /** Never claim product LIVE until PASS + docs update post-smoke. */
   status: "PENDING_SMOKE" | "PASS" | "FAIL" | "PARTIAL" | "HELD_POLICY" | "DEMO_ONLY";
   route: string;
@@ -35,6 +36,10 @@ export const WAVE2_SMOKE_AT: string | null = "2026-07-21T04:12:00Z";
 /** Filled after Wave 3 authenticated prod smoke PASS — null until post-merge smoke. */
 export const WAVE3_SMOKE_SHA: string | null = "e841dffc0db0faabef2ed9e067b2581559752a66";
 export const WAVE3_SMOKE_AT: string | null = "2026-07-22T07:00:00Z";
+
+/** Filled after Wave 5 authenticated prod smoke PASS — null until post-merge smoke. */
+export const WAVE5_SMOKE_SHA: string | null = null;
+export const WAVE5_SMOKE_AT: string | null = null;
 
 function passModuleW1(
   module_id: string,
@@ -704,15 +709,252 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE3: HardLiveModuleEvidence[] = [
   ),
 ];
 
+function pendingModuleW5(
+  module_id: string,
+  route: string,
+  owner: string,
+  notes: string,
+): HardLiveModuleEvidence {
+  return {
+    module_id,
+    persona: "platform",
+    wave: "5",
+    status: "PENDING_SMOKE",
+    route,
+    owner,
+    blocker: "authenticated_prod_smoke_required",
+    missing_criteria: [25],
+    criteria: { ...ALL_PENDING, "25": "PENDING" },
+    notes,
+  };
+}
+
+function heldModuleW5(
+  module_id: string,
+  route: string,
+  owner: string,
+  blocker: string,
+  notes: string,
+): HardLiveModuleEvidence {
+  return {
+    module_id,
+    persona: "platform",
+    wave: "5",
+    status: "HELD_POLICY",
+    route,
+    owner,
+    blocker,
+    missing_criteria: [13, 15, 28],
+    criteria: { ...ALL_PENDING, "28": "FAIL" },
+    notes,
+  };
+}
+
+export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE5: HardLiveModuleEvidence[] = [
+  pendingModuleW5(
+    "plat_google_calendar_oauth",
+    "/dashboard/calendar",
+    "platform",
+    "Google Calendar OAuth CONFIGURATION — pending Wave 5 smoke.",
+  ),
+  pendingModuleW5(
+    "plat_google_calendar_read",
+    "/dashboard/calendar",
+    "platform",
+    "Google Calendar READ — pending Wave 5 smoke.",
+  ),
+  pendingModuleW5(
+    "plat_google_calendar_write",
+    "/dashboard/calendar",
+    "platform",
+    "Google Calendar WRITE honesty (smoke never writes provider) — pending smoke.",
+  ),
+  pendingModuleW5(
+    "plat_google_calendar_availability",
+    "/dashboard/calendar",
+    "platform",
+    "Google freebusy/slots — pending Wave 5 smoke.",
+  ),
+  pendingModuleW5(
+    "plat_google_calendar_monitoring",
+    "/dashboard/calendar/readiness",
+    "platform",
+    "Calendar provider monitoring — pending Wave 5 smoke.",
+  ),
+  pendingModuleW5(
+    "plat_ics_export",
+    "/dashboard/calendar",
+    "platform",
+    "ICS generate/export — pending Wave 5 smoke.",
+  ),
+  pendingModuleW5(
+    "plat_ics_share_token",
+    "/dashboard/calendar",
+    "platform",
+    "ICS share token mint/expiry — pending Wave 5 smoke.",
+  ),
+  pendingModuleW5(
+    "plat_webcal_subscribe",
+    "/dashboard/calendar",
+    "platform",
+    "WebCal subscribe feed — pending Wave 5 smoke.",
+  ),
+  pendingModuleW5(
+    "plat_ics_cancel_uid",
+    "/dashboard/calendar",
+    "platform",
+    "ICS CANCEL/UID/SEQUENCE — pending Wave 5 smoke.",
+  ),
+  pendingModuleW5(
+    "plat_ms_calendar_oauth_config",
+    "/dashboard/calendar",
+    "platform",
+    "Microsoft Calendar CONFIGURATION honesty — WRITE stays HELD.",
+  ),
+  pendingModuleW5(
+    "plat_ats_config_read",
+    "/recruiter/integrations",
+    "platform",
+    "ATS CONFIGURATION/READ honesty — WRITE stays BLOCKED.",
+  ),
+  pendingModuleW5(
+    "plat_ats_webhook_verify",
+    "/recruiter/integrations",
+    "platform",
+    "ATS webhook HMAC verify dry-run — no write sync.",
+  ),
+  pendingModuleW5(
+    "plat_email_draft",
+    "/dashboard/trust/controls",
+    "platform",
+    "Email DRAFT outbox only — real send forbidden in smoke.",
+  ),
+  pendingModuleW5(
+    "plat_notifications_prefs",
+    "/dashboard/trust/controls",
+    "platform",
+    "Notification preferences READ — metrics exclusion required.",
+  ),
+  pendingModuleW5(
+    "plat_oauth_providers_status",
+    "/login",
+    "platform",
+    "OAuth providers CONFIGURATION status — pending Wave 5 smoke.",
+  ),
+  pendingModuleW5(
+    "plat_csv_export_safe",
+    "/dashboard/matches",
+    "platform",
+    "CSV export with formula injection escape — pending Wave 5 smoke.",
+  ),
+  pendingModuleW5(
+    "plat_integration_inventory",
+    "/board/calendar-readiness",
+    "platform",
+    "Per-capability integration inventory MONITORING — pending smoke.",
+  ),
+  pendingModuleW5(
+    "plat_webhook_delivery_ledger",
+    "/board/calendar-readiness",
+    "platform",
+    "Webhook delivery attempt ledger MONITORING — pending smoke.",
+  ),
+  heldModuleW5(
+    "plat_ms_calendar_write",
+    "/dashboard/calendar",
+    "platform",
+    "MICROSOFT_WRITE_BLOCKED",
+    "Microsoft Calendar WRITE remains policy-held.",
+  ),
+  heldModuleW5(
+    "plat_ms_calendar_busy_read",
+    "/dashboard/calendar",
+    "platform",
+    "MICROSOFT_BUSY_READ_FLAG_OFF",
+    "Microsoft busy-read gated false on prod.",
+  ),
+  heldModuleW5(
+    "plat_ats_live_sync_write",
+    "/company/integrations",
+    "platform",
+    "ATS_LIVE_SYNC_BLOCKED",
+    "ATS live-sync WRITE blocked.",
+  ),
+  heldModuleW5(
+    "plat_ats_write_sync",
+    "/company/integrations",
+    "platform",
+    "ATS_LIVE_SYNC_BLOCKED",
+    "ATS write SYNC blocked.",
+  ),
+  heldModuleW5(
+    "plat_stripe_public",
+    "/dashboard/billing",
+    "platform",
+    "STRIPE_NOT_PUBLIC",
+    "Stripe public checkout NOT LIVE.",
+  ),
+  heldModuleW5(
+    "plat_authologic_auto_kyc",
+    "/dashboard/identity",
+    "platform",
+    "AUTHOLOGIC_AUTO_KYC_OFF",
+    "Authologic Auto KYC OFF.",
+  ),
+  heldModuleW5(
+    "plat_google_calendar_push_webhook",
+    "/dashboard/calendar",
+    "platform",
+    "NOT_BUILT",
+    "Google Calendar push/watch channels not built.",
+  ),
+  heldModuleW5(
+    "plat_slack_connector",
+    "/company/integrations",
+    "platform",
+    "NOT_BUILT",
+    "Slack connector not built.",
+  ),
+  heldModuleW5(
+    "plat_teams_connector",
+    "/company/integrations",
+    "platform",
+    "NOT_BUILT",
+    "Teams connector not built (meeting URL metadata only).",
+  ),
+  heldModuleW5(
+    "plat_zapier_connector",
+    "/company/integrations",
+    "platform",
+    "NOT_BUILT",
+    "Zapier connector not built.",
+  ),
+  heldModuleW5(
+    "plat_cloud_storage_connectors",
+    "/company/integrations",
+    "platform",
+    "NOT_BUILT",
+    "Drive/OneDrive/Dropbox connectors not built.",
+  ),
+  heldModuleW5(
+    "plat_ics_import",
+    "/dashboard/calendar",
+    "platform",
+    "NOT_BUILT",
+    "ICS import/parse not built.",
+  ),
+];
+
 export const HARD_LIVE_EVIDENCE_REGISTRY: HardLiveModuleEvidence[] = [
   ...HARD_LIVE_EVIDENCE_REGISTRY_WAVE1,
   ...HARD_LIVE_EVIDENCE_REGISTRY_WAVE2,
   ...HARD_LIVE_EVIDENCE_REGISTRY_WAVE3,
+  ...HARD_LIVE_EVIDENCE_REGISTRY_WAVE5,
 ];
 
 export const HARD_LIVE_REGISTRY_META = {
   definition: "docs/HARD_LIVE_DEFINITION_30.md",
-  wave: "3",
+  wave: "5",
   stance: {
     pilot: "BLOCKED_BY_FOUNDER",
     gate_f: "PENDING",
@@ -732,9 +974,14 @@ export const HARD_LIVE_REGISTRY_META = {
     wave3_script: "frontend/scripts/wave3-company-module-prod-smoke.test.ts",
     wave3_sha: WAVE3_SMOKE_SHA,
     wave3_at: WAVE3_SMOKE_AT,
+    wave5_script: "frontend/scripts/wave5-integrations-module-prod-smoke.test.ts",
+    wave5_sha: WAVE5_SMOKE_SHA,
+    wave5_at: WAVE5_SMOKE_AT,
     write: true,
     exclude_from_product_metrics: true,
   },
+  wave4_note:
+    "Wave 4 Investor Complete was not shipped — Wave 5 proceeds on Wave 3 HEAD without inventing Wave 4.",
 } as const;
 
 export function assertNoLivePassWithoutSmoke(
@@ -767,4 +1014,8 @@ export function wave2PendingSmokeIds(): string[] {
 
 export function wave3PendingSmokeIds(): string[] {
   return HARD_LIVE_EVIDENCE_REGISTRY_WAVE3.filter((r) => r.status === "PENDING_SMOKE").map((r) => r.module_id);
+}
+
+export function wave5PendingSmokeIds(): string[] {
+  return HARD_LIVE_EVIDENCE_REGISTRY_WAVE5.filter((r) => r.status === "PENDING_SMOKE").map((r) => r.module_id);
 }

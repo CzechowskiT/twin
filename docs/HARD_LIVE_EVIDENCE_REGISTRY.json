@@ -1,6 +1,6 @@
 {
   "definition": "docs/HARD_LIVE_DEFINITION_30.md",
-  "wave": "3",
+  "wave": "5",
   "updated": "2026-07-22",
   "stance": {
     "pilot": "BLOCKED_BY_FOUNDER",
@@ -37,6 +37,15 @@
       "sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
       "at": "2026-07-22T07:00:00Z",
       "result": "PASS 4/4 modules 16/16",
+      "write": true,
+      "exclude_from_product_metrics": true,
+      "jwt_never_committed": true
+    },
+    "wave5": {
+      "script": "frontend/scripts/wave5-integrations-module-prod-smoke.test.ts",
+      "sha": null,
+      "at": null,
+      "result": "PENDING_SMOKE — badges deferred until post-merge PASS",
       "write": true,
       "exclude_from_product_metrics": true,
       "jwt_never_committed": true
@@ -957,6 +966,421 @@
       "route": "/company/candidates/demo-candidate-001/trust",
       "blocker": "DEMO_JOURNEY_ISOLATION",
       "owner": "company-squad"
+    },
+    {
+      "module_id": "plat_google_calendar_oauth",
+      "persona": "platform",
+      "wave": "5",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/calendar",
+      "owner": "platform",
+      "blocker": "authenticated_prod_smoke_required",
+      "missing_criteria": [
+        25
+      ],
+      "notes": "Google Calendar OAuth CONFIGURATION — pending Wave 5 smoke."
+    },
+    {
+      "module_id": "plat_google_calendar_read",
+      "persona": "platform",
+      "wave": "5",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/calendar",
+      "owner": "platform",
+      "blocker": "authenticated_prod_smoke_required",
+      "missing_criteria": [
+        25
+      ],
+      "notes": "Google Calendar READ — pending Wave 5 smoke."
+    },
+    {
+      "module_id": "plat_google_calendar_write",
+      "persona": "platform",
+      "wave": "5",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/calendar",
+      "owner": "platform",
+      "blocker": "authenticated_prod_smoke_required",
+      "missing_criteria": [
+        25
+      ],
+      "notes": "Google Calendar WRITE honesty (smoke never writes provider) — pending smoke."
+    },
+    {
+      "module_id": "plat_google_calendar_availability",
+      "persona": "platform",
+      "wave": "5",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/calendar",
+      "owner": "platform",
+      "blocker": "authenticated_prod_smoke_required",
+      "missing_criteria": [
+        25
+      ],
+      "notes": "Google freebusy/slots — pending Wave 5 smoke."
+    },
+    {
+      "module_id": "plat_google_calendar_monitoring",
+      "persona": "platform",
+      "wave": "5",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/calendar/readiness",
+      "owner": "platform",
+      "blocker": "authenticated_prod_smoke_required",
+      "missing_criteria": [
+        25
+      ],
+      "notes": "Calendar provider monitoring — pending Wave 5 smoke."
+    },
+    {
+      "module_id": "plat_ics_export",
+      "persona": "platform",
+      "wave": "5",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/calendar",
+      "owner": "platform",
+      "blocker": "authenticated_prod_smoke_required",
+      "missing_criteria": [
+        25
+      ],
+      "notes": "ICS generate/export — pending Wave 5 smoke."
+    },
+    {
+      "module_id": "plat_ics_share_token",
+      "persona": "platform",
+      "wave": "5",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/calendar",
+      "owner": "platform",
+      "blocker": "authenticated_prod_smoke_required",
+      "missing_criteria": [
+        25
+      ],
+      "notes": "ICS share token mint/expiry — pending Wave 5 smoke."
+    },
+    {
+      "module_id": "plat_webcal_subscribe",
+      "persona": "platform",
+      "wave": "5",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/calendar",
+      "owner": "platform",
+      "blocker": "authenticated_prod_smoke_required",
+      "missing_criteria": [
+        25
+      ],
+      "notes": "WebCal subscribe feed — pending Wave 5 smoke."
+    },
+    {
+      "module_id": "plat_ics_cancel_uid",
+      "persona": "platform",
+      "wave": "5",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/calendar",
+      "owner": "platform",
+      "blocker": "authenticated_prod_smoke_required",
+      "missing_criteria": [
+        25
+      ],
+      "notes": "ICS CANCEL/UID/SEQUENCE — pending Wave 5 smoke."
+    },
+    {
+      "module_id": "plat_ms_calendar_oauth_config",
+      "persona": "platform",
+      "wave": "5",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/calendar",
+      "owner": "platform",
+      "blocker": "authenticated_prod_smoke_required",
+      "missing_criteria": [
+        25
+      ],
+      "notes": "Microsoft Calendar CONFIGURATION honesty — WRITE stays HELD."
+    },
+    {
+      "module_id": "plat_ats_config_read",
+      "persona": "platform",
+      "wave": "5",
+      "status": "PENDING_SMOKE",
+      "route": "/recruiter/integrations",
+      "owner": "platform",
+      "blocker": "authenticated_prod_smoke_required",
+      "missing_criteria": [
+        25
+      ],
+      "notes": "ATS CONFIGURATION/READ honesty — WRITE stays BLOCKED."
+    },
+    {
+      "module_id": "plat_ats_webhook_verify",
+      "persona": "platform",
+      "wave": "5",
+      "status": "PENDING_SMOKE",
+      "route": "/recruiter/integrations",
+      "owner": "platform",
+      "blocker": "authenticated_prod_smoke_required",
+      "missing_criteria": [
+        25
+      ],
+      "notes": "ATS webhook HMAC verify dry-run — no write sync."
+    },
+    {
+      "module_id": "plat_email_draft",
+      "persona": "platform",
+      "wave": "5",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/trust/controls",
+      "owner": "platform",
+      "blocker": "authenticated_prod_smoke_required",
+      "missing_criteria": [
+        25
+      ],
+      "notes": "Email DRAFT outbox only — real send forbidden in smoke."
+    },
+    {
+      "module_id": "plat_notifications_prefs",
+      "persona": "platform",
+      "wave": "5",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/trust/controls",
+      "owner": "platform",
+      "blocker": "authenticated_prod_smoke_required",
+      "missing_criteria": [
+        25
+      ],
+      "notes": "Notification preferences READ — metrics exclusion required."
+    },
+    {
+      "module_id": "plat_oauth_providers_status",
+      "persona": "platform",
+      "wave": "5",
+      "status": "PENDING_SMOKE",
+      "route": "/login",
+      "owner": "platform",
+      "blocker": "authenticated_prod_smoke_required",
+      "missing_criteria": [
+        25
+      ],
+      "notes": "OAuth providers CONFIGURATION status — pending Wave 5 smoke."
+    },
+    {
+      "module_id": "plat_csv_export_safe",
+      "persona": "platform",
+      "wave": "5",
+      "status": "PENDING_SMOKE",
+      "route": "/dashboard/matches",
+      "owner": "platform",
+      "blocker": "authenticated_prod_smoke_required",
+      "missing_criteria": [
+        25
+      ],
+      "notes": "CSV export with formula injection escape — pending Wave 5 smoke."
+    },
+    {
+      "module_id": "plat_integration_inventory",
+      "persona": "platform",
+      "wave": "5",
+      "status": "PENDING_SMOKE",
+      "route": "/board/calendar-readiness",
+      "owner": "platform",
+      "blocker": "authenticated_prod_smoke_required",
+      "missing_criteria": [
+        25
+      ],
+      "notes": "Per-capability integration inventory MONITORING — pending smoke."
+    },
+    {
+      "module_id": "plat_webhook_delivery_ledger",
+      "persona": "platform",
+      "wave": "5",
+      "status": "PENDING_SMOKE",
+      "route": "/board/calendar-readiness",
+      "owner": "platform",
+      "blocker": "authenticated_prod_smoke_required",
+      "missing_criteria": [
+        25
+      ],
+      "notes": "Webhook delivery attempt ledger MONITORING — pending smoke."
+    },
+    {
+      "module_id": "plat_ms_calendar_write",
+      "persona": "platform",
+      "wave": "5",
+      "status": "HELD_POLICY",
+      "route": "/dashboard/calendar",
+      "owner": "platform",
+      "blocker": "MICROSOFT_WRITE_BLOCKED",
+      "missing_criteria": [
+        13,
+        15,
+        28
+      ],
+      "notes": "Microsoft Calendar WRITE remains policy-held."
+    },
+    {
+      "module_id": "plat_ms_calendar_busy_read",
+      "persona": "platform",
+      "wave": "5",
+      "status": "HELD_POLICY",
+      "route": "/dashboard/calendar",
+      "owner": "platform",
+      "blocker": "MICROSOFT_BUSY_READ_FLAG_OFF",
+      "missing_criteria": [
+        13,
+        15,
+        28
+      ],
+      "notes": "Microsoft busy-read gated false on prod."
+    },
+    {
+      "module_id": "plat_ats_live_sync_write",
+      "persona": "platform",
+      "wave": "5",
+      "status": "HELD_POLICY",
+      "route": "/company/integrations",
+      "owner": "platform",
+      "blocker": "ATS_LIVE_SYNC_BLOCKED",
+      "missing_criteria": [
+        13,
+        15,
+        28
+      ],
+      "notes": "ATS live-sync WRITE blocked."
+    },
+    {
+      "module_id": "plat_ats_write_sync",
+      "persona": "platform",
+      "wave": "5",
+      "status": "HELD_POLICY",
+      "route": "/company/integrations",
+      "owner": "platform",
+      "blocker": "ATS_LIVE_SYNC_BLOCKED",
+      "missing_criteria": [
+        13,
+        15,
+        28
+      ],
+      "notes": "ATS write SYNC blocked."
+    },
+    {
+      "module_id": "plat_stripe_public",
+      "persona": "platform",
+      "wave": "5",
+      "status": "HELD_POLICY",
+      "route": "/dashboard/billing",
+      "owner": "platform",
+      "blocker": "STRIPE_NOT_PUBLIC",
+      "missing_criteria": [
+        13,
+        15,
+        28
+      ],
+      "notes": "Stripe public checkout NOT LIVE."
+    },
+    {
+      "module_id": "plat_authologic_auto_kyc",
+      "persona": "platform",
+      "wave": "5",
+      "status": "HELD_POLICY",
+      "route": "/dashboard/identity",
+      "owner": "platform",
+      "blocker": "AUTHOLOGIC_AUTO_KYC_OFF",
+      "missing_criteria": [
+        13,
+        15,
+        28
+      ],
+      "notes": "Authologic Auto KYC OFF."
+    },
+    {
+      "module_id": "plat_google_calendar_push_webhook",
+      "persona": "platform",
+      "wave": "5",
+      "status": "HELD_POLICY",
+      "route": "/dashboard/calendar",
+      "owner": "platform",
+      "blocker": "NOT_BUILT",
+      "missing_criteria": [
+        13,
+        15,
+        28
+      ],
+      "notes": "Google Calendar push/watch channels not built."
+    },
+    {
+      "module_id": "plat_slack_connector",
+      "persona": "platform",
+      "wave": "5",
+      "status": "HELD_POLICY",
+      "route": "/company/integrations",
+      "owner": "platform",
+      "blocker": "NOT_BUILT",
+      "missing_criteria": [
+        13,
+        15,
+        28
+      ],
+      "notes": "Slack connector not built."
+    },
+    {
+      "module_id": "plat_teams_connector",
+      "persona": "platform",
+      "wave": "5",
+      "status": "HELD_POLICY",
+      "route": "/company/integrations",
+      "owner": "platform",
+      "blocker": "NOT_BUILT",
+      "missing_criteria": [
+        13,
+        15,
+        28
+      ],
+      "notes": "Teams connector not built (meeting URL metadata only)."
+    },
+    {
+      "module_id": "plat_zapier_connector",
+      "persona": "platform",
+      "wave": "5",
+      "status": "HELD_POLICY",
+      "route": "/company/integrations",
+      "owner": "platform",
+      "blocker": "NOT_BUILT",
+      "missing_criteria": [
+        13,
+        15,
+        28
+      ],
+      "notes": "Zapier connector not built."
+    },
+    {
+      "module_id": "plat_cloud_storage_connectors",
+      "persona": "platform",
+      "wave": "5",
+      "status": "HELD_POLICY",
+      "route": "/company/integrations",
+      "owner": "platform",
+      "blocker": "NOT_BUILT",
+      "missing_criteria": [
+        13,
+        15,
+        28
+      ],
+      "notes": "Drive/OneDrive/Dropbox connectors not built."
+    },
+    {
+      "module_id": "plat_ics_import",
+      "persona": "platform",
+      "wave": "5",
+      "status": "HELD_POLICY",
+      "route": "/dashboard/calendar",
+      "owner": "platform",
+      "blocker": "NOT_BUILT",
+      "missing_criteria": [
+        13,
+        15,
+        28
+      ],
+      "notes": "ICS import/parse not built."
     }
-  ]
+  ],
+  "wave4_note": "Wave 4 Investor Complete was not shipped — Wave 5 proceeds on Wave 3 HEAD without inventing Wave 4."
 }
