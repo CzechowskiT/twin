@@ -56,6 +56,7 @@ import {
 import type { TranslationKey } from "@/lib/i18n";
 import { detectMeetingProvider, meetingProviderLabelKey } from "@/lib/meeting-link";
 import {
+  importIcsText,
   mintAndOpenWebcalSubscribe,
   mintWebcalFeed,
   persistWebcalUrl,
@@ -204,6 +205,7 @@ export default function DashboardCalendarPage() {
   const [notifPrefsSaveError, setNotifPrefsSaveError] = useState(false);
   const [notifPrefsSaving, setNotifPrefsSaving] = useState<null | keyof AuthMeOut>(null);
   const [webcalLinkCopied, setWebcalLinkCopied] = useState(false);
+  const [icsImportResult, setIcsImportResult] = useState<string | null>(null);
   const [weekStart, setWeekStart] = useState(() => startOfWeekMonday(new Date()));
   const [displayEvents, setDisplayEvents] = useState<DisplayCalendarEvent[]>([]);
   const [eventsLoading, setEventsLoading] = useState(false);
@@ -775,6 +777,30 @@ export default function DashboardCalendarPage() {
     }
   }
 
+  async function importIcsFile(file: File) {
+    const token = getToken();
+    if (!token) return;
+    setActionBusy("ics-import");
+    setActionError(false);
+    setIcsImportResult(null);
+    try {
+      const text = await file.text();
+      const out = await importIcsText(token, text);
+      setIcsImportResult(
+        t("dashboard.calendarIcsImportResult")
+          .replace("{imported}", String(out.imported))
+          .replace("{created}", String(out.created))
+          .replace("{updated}", String(out.updated)),
+      );
+    } catch (e) {
+      setActionError(true);
+      setIcsImportResult(t("dashboard.calendarIcsImportError"));
+      console.warn("[calendar] ics import failed", e);
+    } finally {
+      setActionBusy(null);
+    }
+  }
+
   async function disconnect() {
     const token = getToken();
     if (!token) return;
@@ -1070,6 +1096,8 @@ export default function DashboardCalendarPage() {
         onSubscribeWebcal={() => void subscribeWebcalOneClick()}
         onCopyWebcalLink={() => void copyWebcalLink()}
         onGenerateWebcalLink={() => void generateWebcalLink()}
+        onImportIcsFile={(file) => void importIcsFile(file)}
+        icsImportResult={icsImportResult}
         onRetryCalendarEvents={() => void fetchCalendarWeekEvents()}
         onRetryCalendarStatus={() => {
           void (async () => {

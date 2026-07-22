@@ -1,6 +1,8 @@
 /** Recruiter daily operating cockpit — live workspace links (no demo fixture CTAs). */
 
 import { atsImportReadinessHref } from "@/lib/ats-import-readiness";
+import { candidateProfile360Href } from "@/lib/candidate-profile-360";
+import { jobPipelineHref } from "@/lib/job-pipeline";
 import { LAUNCH_STANCE } from "@/lib/investor-metrics-reality";
 import type { TranslationKey } from "@/lib/i18n";
 import {

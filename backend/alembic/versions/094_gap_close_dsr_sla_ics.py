@@ -57,7 +57,7 @@ def upgrade() -> None:
         if not _has_column("candidate_privacy_requests", "legal_hold"):
             op.add_column(
                 "candidate_privacy_requests",
-                sa.Column("legal_hold", sa.Boolean(), nullable=False, server_default=sa.text("0")),
+                sa.Column("legal_hold", sa.Boolean(), nullable=False, server_default=sa.false()),
             )
 
     if not _has_table("recruiter_sla_targets"):
