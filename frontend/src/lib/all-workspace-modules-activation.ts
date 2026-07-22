@@ -41,7 +41,29 @@ export type WorkspaceModuleActivationEntry = {
   owner: string;
 };
 
-/** Security-sensitive or meta modules — never shown in persona hubs. */
+/** Demo / sample journeys — never claim LIVE; hub-hidden internal. */
+export const DEMO_SAMPLE_MODULE_IDS = new Set([
+  "recruiter_demo_pipeline",
+  "recruiter_demo_profile_360",
+  "recruiter_demo_collaboration",
+  "recruiter_demo_trust",
+  "recruiter_demo_team",
+  "recruiter_demo_communication",
+  "recruiter_demo_decision_memory",
+  "company_demo_pipeline",
+  "company_demo_profile_360",
+  "company_demo_collaboration",
+  "company_demo_trust",
+  "company_demo_team",
+  "company_demo_communication",
+  "company_demo_decision_memory",
+  "investor_demo",
+  "investor_sor_proof_pipeline",
+  "investor_sor_proof_collaboration",
+  "investor_sor_proof_ats",
+]);
+
+/** Security-sensitive, incomplete, or demo-theater modules — never shown in persona hubs. */
 export const INTERNAL_MODULE_IDS = new Set([
   "auto_apply",
   "plan_payments",
@@ -52,6 +74,21 @@ export const INTERNAL_MODULE_IDS = new Set([
   "recruiter_ats_import_readiness",
   "company_ats_import_readiness",
   "company_billing",
+  "investor_data_room",
+  "data_room",
+  "investor_placement",
+  "placement",
+  "investor_trust_proof",
+  "login",
+  "investor_login",
+  "board_implementation_tracker",
+  "working_features_readiness",
+  "working_data_readiness",
+  "production_persistence_status",
+  "first_working_persistence_plan",
+  "audit_event_foundation",
+  "recruiter_calendar",
+  ...DEMO_SAMPLE_MODULE_IDS,
 ]);
 
 /** Modules confirmed GREEN_WORKING (Wave 2B smoke-close + core MVP). */
@@ -111,28 +148,6 @@ const EXTENDED_MODULE_IDS = new Set([
   "candidate_referrals",
   "referrals",
   "company_candidate_trust_summary",
-]);
-
-/** Demo / sample journeys — never claim LIVE; stay pilot_preview. */
-export const DEMO_SAMPLE_MODULE_IDS = new Set([
-  "recruiter_demo_pipeline",
-  "recruiter_demo_profile_360",
-  "recruiter_demo_collaboration",
-  "recruiter_demo_trust",
-  "recruiter_demo_team",
-  "recruiter_demo_communication",
-  "recruiter_demo_decision_memory",
-  "company_demo_pipeline",
-  "company_demo_profile_360",
-  "company_demo_collaboration",
-  "company_demo_trust",
-  "company_demo_team",
-  "company_demo_communication",
-  "company_demo_decision_memory",
-  "investor_demo",
-  "investor_sor_proof_pipeline",
-  "investor_sor_proof_collaboration",
-  "investor_sor_proof_ats",
 ]);
 
 const ACTIVATION_OVERRIDES: Partial<
@@ -545,7 +560,7 @@ function defaultHubSection(
   activationStatus: WorkspaceModuleActivationStatus,
 ): WorkspaceModuleHubSection {
   if (INTERNAL_MODULE_IDS.has(id) || activationStatus === "INTERNAL") return "internal";
-  if (DEMO_SAMPLE_MODULE_IDS.has(id)) return "pilot_preview";
+  if (DEMO_SAMPLE_MODULE_IDS.has(id)) return "internal";
   if (activationStatus === "COMING_SOON" || activationStatus === "PAUSED") return "coming_soon_paused";
   if (activationStatus === "PILOT" || activationStatus === "PREVIEW") return "pilot_preview";
   if (EXTENDED_MODULE_IDS.has(id)) return "extended";
@@ -571,8 +586,14 @@ function buildEntryFromRoute(
   if (DEMO_SAMPLE_MODULE_IDS.has(id) && activationStatus === "LIVE") {
     activationStatus = "PREVIEW";
   }
-  const hubSection = override?.hubSection ?? defaultHubSection(id, activationStatus);
-  const visible = activationStatus !== "INTERNAL" && !INTERNAL_MODULE_IDS.has(id);
+  let hubSection = override?.hubSection ?? defaultHubSection(id, activationStatus);
+  if (DEMO_SAMPLE_MODULE_IDS.has(id) || INTERNAL_MODULE_IDS.has(id)) {
+    hubSection = "internal";
+  }
+  const visible =
+    activationStatus !== "INTERNAL" &&
+    !INTERNAL_MODULE_IDS.has(id) &&
+    !DEMO_SAMPLE_MODULE_IDS.has(id);
 
   return {
     id,

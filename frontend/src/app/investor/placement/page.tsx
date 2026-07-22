@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { PlacementVerificationDemo } from "@/components/investor/placement-verification-demo";
+import { InvestorPlacementReadonlyPanel } from "@/components/investor/investor-placement-readonly-panel";
 import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 import { PersonaWorkspaceGate } from "@/components/persona-workspace-gate";
 import { useTranslation } from "@/components/language-provider";
@@ -34,7 +35,13 @@ export default function InvestorPlacementPage() {
             <p className="text-sm leading-relaxed text-[var(--twin-muted-strong)]">{t("sevenDayD5.placementPilotBoundaryBody")}</p>
           </Card>
         ) : null}
-        <PlacementVerificationDemo />
+        <InvestorPlacementReadonlyPanel />
+        <details className="mt-6 rounded-lg border border-[var(--twin-border)] p-4">
+          <summary className="cursor-pointer text-sm font-medium">Sample illustration (demo timeline)</summary>
+          <div className="mt-4">
+            <PlacementVerificationDemo />
+          </div>
+        </details>
         <Link href="/workspace/investor" className="twin-link mt-8 inline-block text-sm font-medium">
           ← {t("dataRoom.backInvestor")}
         </Link>

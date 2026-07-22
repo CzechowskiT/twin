@@ -11,6 +11,7 @@ from app.database.models import DataRoomDocumentMetadata, User
 from app.database.session import get_db
 from app.schemas.investor_data_room import DataRoomUploadIn, DataRoomUploadOut
 from app.services import data_room_upload as dr_upload
+from app.services import investor_wave4 as wave4
 
 router = APIRouter()
 
@@ -54,6 +55,15 @@ def _upload_out(row: DataRoomDocumentMetadata, settings: Settings, *, mode: str,
         upload_url_expires_in_seconds=3600 if upload_url else None,
         created_at=row.created_at,
     )
+
+
+@router.get("/data-room/documents")
+def list_data_room_documents(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    """List authenticated user's data room document metadata (no blob download without S3)."""
+    return wave4.list_data_room_documents(db, user=user)
 
 
 @router.post("/data-room/uploads", response_model=DataRoomUploadOut, status_code=status.HTTP_201_CREATED)

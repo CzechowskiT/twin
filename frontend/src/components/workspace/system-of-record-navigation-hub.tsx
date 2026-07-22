@@ -11,6 +11,7 @@ import {
 import { splitActivationSurfaceRoutes } from "@/lib/product-surface-visibility";
 import {
   INVESTOR_BOARD_COLLAPSED_DEFAULT,
+  HIDE_BOARD_FROM_INVESTOR_DEFAULT_HUB,
 } from "@/lib/seven-day-d5-investor";
 import {
   getSystemOfRecordRoutesForPersona,
@@ -148,7 +149,11 @@ export function SystemOfRecordNavigationHub({
               );
             })}
           </div>
-          {investorBoardRoutes.length > 0 ? (
+          {HIDE_BOARD_FROM_INVESTOR_DEFAULT_HUB ? (
+            <div data-seven-day-investor-board-hidden className="sr-only">
+              Board evidence hidden from default investor hub
+            </div>
+          ) : investorBoardRoutes.length > 0 ? (
             <div data-product-surface-board data-seven-day-investor-board>
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>

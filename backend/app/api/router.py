@@ -49,6 +49,7 @@ from app.api import (
     recruiter_wave2,
     company_wave3,
     integrations_wave5,
+    investor_wave4,
     ai_compliance,
     referrals,
     request_intake,
@@ -84,6 +85,11 @@ api_router.include_router(
     integrations_wave5.router,
     prefix="/platform/wave5",
     tags=["Integrations Wave 5"],
+)
+api_router.include_router(
+    investor_wave4.router,
+    prefix="/platform/wave4",
+    tags=["Investor Wave 4"],
 )
 api_router.include_router(
     ai_compliance.router,

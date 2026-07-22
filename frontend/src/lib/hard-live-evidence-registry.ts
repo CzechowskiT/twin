@@ -8,7 +8,7 @@ export type HardLiveCriterionResult = "PASS" | "FAIL" | "N/A" | "PENDING";
 export type HardLiveModuleEvidence = {
   module_id: string;
   persona: "candidate" | "recruiter" | "company" | "platform" | "investor";
-  wave: "1" | "2" | "3" | "4" | "5" | "ai";
+  wave: "1" | "2" | "3" | "4" | "5" | "ai" | "ai_compliance";
   /** Never claim product LIVE until PASS + docs update post-smoke. */
   status: "PENDING_SMOKE" | "PASS" | "FAIL" | "PARTIAL" | "HELD_POLICY" | "DEMO_ONLY";
   route: string;
@@ -971,6 +971,83 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE5: HardLiveModuleEvidence[] = [
   ),
 ];
 
+function pendingModuleW4(
+  module_id: string,
+  route: string,
+  owner: string,
+  notes: string,
+): HardLiveModuleEvidence {
+  return {
+    module_id,
+    persona: "investor",
+    wave: "4",
+    status: "PENDING_SMOKE",
+    route,
+    owner,
+    blocker: "authenticated_prod_smoke_required",
+    missing_criteria: [25],
+    criteria: { ...ALL_PENDING },
+    notes,
+  };
+}
+
+function heldModuleW4(
+  module_id: string,
+  route: string,
+  owner: string,
+  blocker: string,
+  notes: string,
+): HardLiveModuleEvidence {
+  return {
+    module_id,
+    persona: "investor",
+    wave: "4",
+    status: "HELD_POLICY",
+    route,
+    owner,
+    blocker,
+    missing_criteria: [13, 15, 25, 28],
+    criteria: { ...ALL_PENDING, "28": "FAIL" },
+    notes,
+  };
+}
+
+/** Wave 4 Investor — PENDING_SMOKE until authenticated module smoke PASS on aligned SHA. */
+export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE4: HardLiveModuleEvidence[] = [
+  pendingModuleW4("investor_data_room", "/investor/data-room", "investor-squad", "Data room NDA + metadata path pending smoke."),
+  pendingModuleW4("investor_nda_acceptance", "/investor/data-room", "investor-squad", "NDA acceptance ledger pending smoke."),
+  pendingModuleW4("investor_data_room_list", "/investor/data-room", "investor-squad", "Document list pending smoke."),
+  pendingModuleW4("investor_placement_readonly", "/investor/placement", "investor-squad", "Placement readonly summary pending smoke."),
+  pendingModuleW4("investor_trust_proof_readonly", "/investor/trust-proof", "investor-squad", "Trust proof readonly pending smoke."),
+  pendingModuleW4("investor_login_gate", "/login/investor", "investor-squad", "Investor login gate pending smoke."),
+  pendingModuleW4("board_implementation_tracker", "/board/implementation-tracker", "investor-squad", "Board readiness aggregation pending smoke."),
+  pendingModuleW4("investor_metrics_wave4", "/investor/metrics", "investor-squad", "Metrics reconfirm Wave 4 pending smoke."),
+  pendingModuleW4("investor_roadmap_wave4", "/investor/roadmap", "investor-squad", "Roadmap reconfirm Wave 4 pending smoke."),
+  pendingModuleW4("investor_calculator_wave4", "/investor/calculator", "investor-squad", "Calculator reconfirm Wave 4 pending smoke."),
+  pendingModuleW4("investor_contact_wave4", "mailto:contact@twin.care", "investor-squad", "Contact reconfirm Wave 4 pending smoke."),
+  pendingModuleW4("investor_product_proof_boundary", "/investor/product-proof", "investor-squad", "Product proof boundary pending smoke."),
+  heldModuleW4(
+    "investor_external_attestations",
+    "/investor/trust-proof",
+    "investor-squad",
+    "NO_VERIFIED_CUSTOMER_CLAIMS",
+    "No verified external customer attestations.",
+  ),
+  heldModuleW4(
+    "investor_s3_required_download",
+    "/investor/data-room",
+    "investor-squad",
+    "S3_FOUNDER_KEYS",
+    "Confidential download requires founder S3 keys.",
+  ),
+  heldModuleW4(
+    "investor_self_serve_enrollment",
+    "/register/investor",
+    "investor-squad",
+    "ENROLLMENT_OFF",
+    "Self-serve investor enrollment OFF — Founder block.",
+  ),
+];
 
 function pendingAiCompliance(
   module_id: string,
@@ -981,7 +1058,7 @@ function pendingAiCompliance(
   return {
     module_id,
     persona: "platform",
-    wave: "ai_compliance" as HardLiveModuleEvidence["wave"],
+    wave: "ai_compliance",
     status: "PENDING_SMOKE",
     route,
     owner,
@@ -1002,7 +1079,7 @@ function heldAiCompliance(
   return {
     module_id,
     persona: "platform",
-    wave: "ai_compliance" as HardLiveModuleEvidence["wave"],
+    wave: "ai_compliance",
     status: "HELD_POLICY",
     route,
     owner,
@@ -1053,6 +1130,7 @@ export const HARD_LIVE_EVIDENCE_REGISTRY: HardLiveModuleEvidence[] = [
   ...HARD_LIVE_EVIDENCE_REGISTRY_WAVE1,
   ...HARD_LIVE_EVIDENCE_REGISTRY_WAVE2,
   ...HARD_LIVE_EVIDENCE_REGISTRY_WAVE3,
+  ...HARD_LIVE_EVIDENCE_REGISTRY_WAVE4,
   ...HARD_LIVE_EVIDENCE_REGISTRY_WAVE5,
   ...HARD_LIVE_EVIDENCE_REGISTRY_AI_COMPLIANCE,
 ];
@@ -1089,7 +1167,7 @@ export const HARD_LIVE_REGISTRY_META = {
     exclude_from_product_metrics: true,
   },
   wave4_note:
-    "Wave 4 Investor Complete was not shipped — Wave 5 proceeds on Wave 3 HEAD without inventing Wave 4.",
+    "Wave 4 Investor Complete engineering shipped as PENDING_SMOKE (12 modules) + 3 HELD_POLICY — awaiting authenticated prod smoke; Wave 5 already PASS; AI compliance foundation PENDING_SMOKE.",
 } as const;
 
 export function assertNoLivePassWithoutSmoke(
@@ -1129,7 +1207,7 @@ export function wave5PendingSmokeIds(): string[] {
 }
 
 export function wave4PendingSmokeIds(): string[] {
-  return [];
+  return HARD_LIVE_EVIDENCE_REGISTRY_WAVE4.filter((r) => r.status === "PENDING_SMOKE").map((r) => r.module_id);
 }
 
 export function aiCompliancePendingSmokeIds(): string[] {
