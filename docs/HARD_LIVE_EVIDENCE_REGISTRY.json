@@ -27,8 +27,8 @@
     "wave5_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
     "wave5_at": "2026-07-22T14:50:00Z",
     "ai_compliance_script": "frontend/scripts/ai-compliance-module-prod-smoke.test.ts",
-    "ai_compliance_sha": null,
-    "ai_compliance_at": null,
+    "ai_compliance_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+    "ai_compliance_at": "2026-07-22T16:16:30Z",
     "write": true,
     "exclude_from_product_metrics": true
   },
@@ -1393,253 +1393,309 @@
       "module_id": "ai_claim_declared",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/evidence/claims",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_claim_extracted",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/evidence/claims",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_claim_inferred",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/evidence/claims",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_claim_provenance",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/evidence/claims",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_claim_human_confirm",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/recruiter/evidence/claims",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_claim_evidence_link",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/evidence/claims",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_claim_evidence_backed",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/evidence/claims",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_claim_dispute",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/evidence/disputes",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_claim_dispute_resolve",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/recruiter/evidence/disputes",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_claim_supersede",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/evidence/claims",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_claim_history",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/evidence/claims",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_decision_log",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/evidence/ai-runs",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_explainability",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/evidence/ai-runs",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_human_override",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/recruiter/evidence/reviews",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_override_audit",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/company/evidence/audit",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_tenant_isolation_claim",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/evidence/claims",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_tenant_isolation_evidence",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/evidence/claims",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_prompt_injection_guard",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/evidence/security",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_protected_attr_ban",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/evidence/security",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_prohibited_use_guard",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/evidence/security",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_registry",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/board/ai-compliance",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_prompt_registry",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/board/ai-compliance",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_model_rollback_audit",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/board/ai-compliance",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_compliance_status",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/board/ai-compliance",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_smoke_metrics_exclusion",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/evidence/claims",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_no_outbound",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/evidence/claims",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_consent_visibility",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/evidence/claims",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_claim_cleanup",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/dashboard/evidence/claims",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
+      "smoke_at": "2026-07-22T16:16:30Z"
     },
     {
       "module_id": "ai_external_verification",
