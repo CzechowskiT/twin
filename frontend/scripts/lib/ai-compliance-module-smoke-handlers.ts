@@ -107,7 +107,11 @@ export async function runModuleSmoke(
         if (!body || body.live_claim !== false || body.ai_autonomous_employment_decisions !== false) {
           return { module_id: moduleId, ok: false, reason: "policy_stance_invalid" };
         }
-        if (body.wave4 !== "NOT_IMPLEMENTED" || body.wave6 !== "NOT_STARTED") {
+        // Wave 4 may be NOT_IMPLEMENTED (pre-#539) or ENGINEERING_PARTIAL_* after Investor Complete ship.
+        const wave4Ok =
+          body.wave4 === "NOT_IMPLEMENTED" ||
+          (typeof body.wave4 === "string" && String(body.wave4).startsWith("ENGINEERING_PARTIAL"));
+        if (!wave4Ok || body.wave6 !== "NOT_STARTED") {
           return { module_id: moduleId, ok: false, reason: "wave_honesty_invalid" };
         }
         return { module_id: moduleId, ok: true };

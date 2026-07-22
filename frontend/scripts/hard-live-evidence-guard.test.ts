@@ -37,7 +37,7 @@ test("stance remains Founder-blocked", () => {
 test("no PASS rows with missing criterion 25 or without smoke_sha", () => {
   assert.doesNotThrow(() => assertNoLivePassWithoutSmoke());
   const passed = HARD_LIVE_EVIDENCE_REGISTRY.filter((r) => r.status === "PASS");
-  assert.equal(passed.length, 94); // post AI compliance Phase A smoke
+  assert.equal(passed.length, 106); // Wave4+AI smoke PASS on 2987e168
   for (const row of passed) {
     assert.ok(!row.missing_criteria.includes(25), row.module_id);
     assert.ok(row.smoke_sha, row.module_id);
@@ -126,13 +126,13 @@ test("docs registry JSON mirrors TS module ids and PASS smoke fields", () => {
   assert.equal(doc.stance.external_pilot_enrollment_enabled, false);
   assert.equal(doc.wave, "5");
   const passDocs = doc.modules.filter((m) => m.status === "PASS");
-  assert.equal(passDocs.length, 94);
+  assert.equal(passDocs.length, 106);
   for (const m of passDocs) {
     assert.ok(m.smoke_sha, m.module_id);
   }
   assert.match(raw, /HELD_POLICY/);
   assert.match(raw, /DEMO_ONLY/);
-  assert.match(raw, /"status": "PENDING_SMOKE"/); // Wave 4 investor modules remain PENDING_SMOKE (not LIVE)
+  assert.doesNotMatch(raw, /"status": "PENDING_SMOKE"/);
   assert.match(raw, /ai_claim_declared/);
   assert.match(raw, /ai_autonomous_employment/);
   assert.match(raw, /investor_data_room/);
@@ -141,8 +141,9 @@ test("docs registry JSON mirrors TS module ids and PASS smoke fields", () => {
   assert.match(raw, /company_demo_pipeline/);
   assert.match(raw, /plat_ics_export/);
   assert.match(raw, /plat_ms_calendar_write/);
-  assert.match(raw, /Wave 4 Investor Complete engineering shipped/);
+  assert.match(raw, /Wave 4 Investor Complete authenticated prod smoke PASS/);
   assert.doesNotMatch(raw, /Wave 4 Investor Complete was not shipped/);
+  assert.match(raw, /2987e16804fcd7de19db3930f9b7184e465a1d18/);
   assert.match(raw, /b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18/);
 });
 
@@ -164,11 +165,13 @@ test("ai compliance modules PASS after smoke with policy holds intact", () => {
   assert.ok(held.some((r) => r.module_id === "ai_wave6_dsr_delete_export"));
 });
 
-test("wave4 investor modules pending until smoke with policy holds intact", () => {
+test("wave4 investor modules PASS after smoke with policy holds intact", () => {
   assert.equal(HARD_LIVE_EVIDENCE_REGISTRY_WAVE4.length, 15);
-  assert.equal(wave4PendingSmokeIds().length, 12);
+  const passed = HARD_LIVE_EVIDENCE_REGISTRY_WAVE4.filter((r) => r.status === "PASS");
+  assert.equal(passed.length, 12);
+  assert.equal(wave4PendingSmokeIds().length, 0);
   const held = HARD_LIVE_EVIDENCE_REGISTRY_WAVE4.filter((r) => r.status === "HELD_POLICY");
   assert.equal(held.length, 3);
   assert.ok(held.some((r) => r.module_id === "investor_self_serve_enrollment"));
-  assert.match(HARD_LIVE_REGISTRY_META.wave4_note, /engineering shipped/);
+  assert.match(HARD_LIVE_REGISTRY_META.wave4_note, /authenticated prod smoke PASS/);
 });

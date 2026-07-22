@@ -178,6 +178,8 @@
     "test:wave3-module-smoke-handlers": "npx --yes tsx --test scripts/wave3-module-smoke-handlers.test.ts",
     "test:wave5-integrations-module-prod-smoke": "npx --yes tsx --test scripts/wave5-integrations-module-prod-smoke.test.ts",
     "test:wave5-module-smoke-handlers": "npx --yes tsx --test scripts/wave5-module-smoke-handlers.test.ts",
+    "test:wave4-investor-module-prod-smoke": "npx --yes tsx --test scripts/wave4-investor-module-prod-smoke.test.ts",
+    "test:wave4-module-smoke-handlers": "npx --yes tsx --test scripts/wave4-module-smoke-handlers.test.ts",
     "test:ai-compliance-module-prod-smoke": "npx --yes tsx --test scripts/ai-compliance-module-prod-smoke.test.ts",
     "test:ai-compliance-module-smoke-handlers": "npx --yes tsx --test scripts/ai-compliance-module-smoke-handlers.test.ts",
     "test:hardening-retention-preview-guard": "npx --yes tsx scripts/hardening-retention-preview-guard.test.ts",

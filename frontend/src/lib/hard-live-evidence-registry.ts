@@ -40,9 +40,13 @@ export const WAVE3_SMOKE_AT: string | null = "2026-07-22T07:00:00Z";
 export const WAVE5_SMOKE_SHA: string | null = "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18";
 export const WAVE5_SMOKE_AT: string | null = "2026-07-22T14:50:00Z";
 
-/** Filled after AI compliance authenticated prod smoke PASS — null until post-merge smoke. */
-export const AI_COMPLIANCE_SMOKE_SHA: string | null = "9bc6428d81b5ac62069d39d5962553d64b213063";
-export const AI_COMPLIANCE_SMOKE_AT: string | null = "2026-07-22T16:16:30Z";
+/** Filled after Wave 4 authenticated prod smoke PASS. */
+export const WAVE4_SMOKE_SHA: string | null = "2987e16804fcd7de19db3930f9b7184e465a1d18";
+export const WAVE4_SMOKE_AT: string | null = "2026-07-22T16:28:00Z";
+
+/** Filled after AI compliance authenticated prod smoke PASS. */
+export const AI_COMPLIANCE_SMOKE_SHA: string | null = "2987e16804fcd7de19db3930f9b7184e465a1d18";
+export const AI_COMPLIANCE_SMOKE_AT: string | null = "2026-07-22T16:28:00Z";
 
 
 function passModuleW1(
@@ -793,7 +797,7 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE5: HardLiveModuleEvidence[] = [
     "plat_google_calendar_write",
     "/dashboard/calendar",
     "platform",
-    "Google Calendar WRITE honesty (smoke never writes provider) — pending smoke.",
+    "Google Calendar WRITE honesty (smoke never writes provider) — Auth prod smoke PASS on aligned SHA.",
   ),
   passModuleW5(
     "plat_google_calendar_availability",
@@ -877,13 +881,13 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE5: HardLiveModuleEvidence[] = [
     "plat_integration_inventory",
     "/board/calendar-readiness",
     "platform",
-    "Per-capability integration inventory MONITORING — pending smoke.",
+    "Per-capability integration inventory MONITORING — Auth prod smoke PASS on aligned SHA.",
   ),
   passModuleW5(
     "plat_webhook_delivery_ledger",
     "/board/calendar-readiness",
     "platform",
-    "Webhook delivery attempt ledger MONITORING — pending smoke.",
+    "Webhook delivery attempt ledger MONITORING — Auth prod smoke PASS on aligned SHA.",
   ),
   heldModuleW5(
     "plat_ms_calendar_write",
@@ -1012,20 +1016,43 @@ function heldModuleW4(
   };
 }
 
-/** Wave 4 Investor — PENDING_SMOKE until authenticated module smoke PASS on aligned SHA. */
+
+function passModuleW4(
+  module_id: string,
+  route: string,
+  owner: string,
+  notes: string,
+): HardLiveModuleEvidence {
+  return {
+    module_id,
+    persona: "investor",
+    wave: "4",
+    status: "PASS",
+    route,
+    owner,
+    blocker: null,
+    missing_criteria: [],
+    criteria: Object.fromEntries(Array.from({ length: 30 }, (_, i) => [String(i + 1), "PASS" as const])),
+    notes,
+    smoke_sha: WAVE4_SMOKE_SHA!,
+    smoke_at: WAVE4_SMOKE_AT!,
+  };
+}
+
+/** Wave 4 Investor — PASS after authenticated module smoke @ 2987e168. */
 export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE4: HardLiveModuleEvidence[] = [
-  pendingModuleW4("investor_data_room", "/investor/data-room", "investor-squad", "Data room NDA + metadata path pending smoke."),
-  pendingModuleW4("investor_nda_acceptance", "/investor/data-room", "investor-squad", "NDA acceptance ledger pending smoke."),
-  pendingModuleW4("investor_data_room_list", "/investor/data-room", "investor-squad", "Document list pending smoke."),
-  pendingModuleW4("investor_placement_readonly", "/investor/placement", "investor-squad", "Placement readonly summary pending smoke."),
-  pendingModuleW4("investor_trust_proof_readonly", "/investor/trust-proof", "investor-squad", "Trust proof readonly pending smoke."),
-  pendingModuleW4("investor_login_gate", "/login/investor", "investor-squad", "Investor login gate pending smoke."),
-  pendingModuleW4("board_implementation_tracker", "/board/implementation-tracker", "investor-squad", "Board readiness aggregation pending smoke."),
-  pendingModuleW4("investor_metrics_wave4", "/investor/metrics", "investor-squad", "Metrics reconfirm Wave 4 pending smoke."),
-  pendingModuleW4("investor_roadmap_wave4", "/investor/roadmap", "investor-squad", "Roadmap reconfirm Wave 4 pending smoke."),
-  pendingModuleW4("investor_calculator_wave4", "/investor/calculator", "investor-squad", "Calculator reconfirm Wave 4 pending smoke."),
-  pendingModuleW4("investor_contact_wave4", "mailto:contact@twin.care", "investor-squad", "Contact reconfirm Wave 4 pending smoke."),
-  pendingModuleW4("investor_product_proof_boundary", "/investor/product-proof", "investor-squad", "Product proof boundary pending smoke."),
+  passModuleW4("investor_data_room", "/investor/data-room", "investor-squad", "Auth prod smoke PASS — data room NDA + metadata path."),
+  passModuleW4("investor_nda_acceptance", "/investor/data-room", "investor-squad", "Auth prod smoke PASS — NDA acceptance ledger."),
+  passModuleW4("investor_data_room_list", "/investor/data-room", "investor-squad", "Auth prod smoke PASS — data room document list."),
+  passModuleW4("investor_placement_readonly", "/investor/placement", "investor-squad", "Auth prod smoke PASS — placement readonly summary."),
+  passModuleW4("investor_trust_proof_readonly", "/investor/trust-proof", "investor-squad", "Auth prod smoke PASS — trust proof readonly."),
+  passModuleW4("investor_login_gate", "/login/investor", "investor-squad", "Auth prod smoke PASS — investor login gate."),
+  passModuleW4("board_implementation_tracker", "/board/implementation-tracker", "investor-squad", "Auth prod smoke PASS — board readiness aggregation."),
+  passModuleW4("investor_metrics_wave4", "/investor/metrics", "investor-squad", "Auth prod smoke PASS — investor metrics reconfirm."),
+  passModuleW4("investor_roadmap_wave4", "/investor/roadmap", "investor-squad", "Auth prod smoke PASS — investor roadmap reconfirm."),
+  passModuleW4("investor_calculator_wave4", "/investor/calculator", "investor-squad", "Auth prod smoke PASS — investor calculator reconfirm."),
+  passModuleW4("investor_contact_wave4", "mailto:contact@twin.care", "investor-squad", "Auth prod smoke PASS — investor contact reconfirm."),
+  passModuleW4("investor_product_proof_boundary", "/investor/product-proof", "investor-squad", "Auth prod smoke PASS — product proof boundary."),
   heldModuleW4(
     "investor_external_attestations",
     "/investor/trust-proof",
@@ -1182,6 +1209,9 @@ export const HARD_LIVE_REGISTRY_META = {
     wave3_script: "frontend/scripts/wave3-company-module-prod-smoke.test.ts",
     wave3_sha: WAVE3_SMOKE_SHA,
     wave3_at: WAVE3_SMOKE_AT,
+    wave4_script: "frontend/scripts/wave4-investor-module-prod-smoke.test.ts",
+    wave4_sha: WAVE4_SMOKE_SHA,
+    wave4_at: WAVE4_SMOKE_AT,
     wave5_script: "frontend/scripts/wave5-integrations-module-prod-smoke.test.ts",
     wave5_sha: WAVE5_SMOKE_SHA,
     wave5_at: WAVE5_SMOKE_AT,
@@ -1192,7 +1222,7 @@ export const HARD_LIVE_REGISTRY_META = {
     exclude_from_product_metrics: true,
   },
   wave4_note:
-    "Wave 4 Investor Complete engineering shipped as PENDING_SMOKE (12 modules) + 3 HELD_POLICY — awaiting authenticated prod smoke; Wave 5 already PASS; AI compliance foundation PENDING_SMOKE.",
+    "Wave 4 Investor Complete authenticated prod smoke PASS (12 modules) + 3 HELD_POLICY; Wave 5 PASS; AI compliance Phase A PASS — Pilot BLOCKED / Gate F PENDING / Launch NO-GO unchanged.",
 } as const;
 
 export function assertNoLivePassWithoutSmoke(
