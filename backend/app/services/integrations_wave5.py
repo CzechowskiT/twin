@@ -216,42 +216,42 @@ WAVE5_HELD_MODULES: tuple[dict[str, str], ...] = (
     },
     {
         "module_id": "plat_google_calendar_push_webhook",
-        "blocker": "NOT_BUILT",
+        "blocker": "BLOCKED_EXTERNAL_CREDENTIALS",
         "owner": "platform",
         "route": "/dashboard/calendar",
         "capability": "WEBHOOK",
     },
     {
         "module_id": "plat_slack_connector",
-        "blocker": "NOT_BUILT",
+        "blocker": "BLOCKED_EXTERNAL_CREDENTIALS",
         "owner": "platform",
         "route": "/company/integrations",
         "capability": "CONFIGURATION",
     },
     {
         "module_id": "plat_teams_connector",
-        "blocker": "NOT_BUILT",
+        "blocker": "BLOCKED_EXTERNAL_CREDENTIALS",
         "owner": "platform",
         "route": "/company/integrations",
         "capability": "CONFIGURATION",
     },
     {
         "module_id": "plat_zapier_connector",
-        "blocker": "NOT_BUILT",
+        "blocker": "BLOCKED_EXTERNAL_CREDENTIALS",
         "owner": "platform",
         "route": "/company/integrations",
         "capability": "CONFIGURATION",
     },
     {
         "module_id": "plat_cloud_storage_connectors",
-        "blocker": "NOT_BUILT",
+        "blocker": "BLOCKED_EXTERNAL_CREDENTIALS",
         "owner": "platform",
         "route": "/company/integrations",
         "capability": "CONFIGURATION",
     },
     {
         "module_id": "plat_ics_import",
-        "blocker": "NOT_BUILT",
+        "blocker": None,
         "owner": "platform",
         "route": "/dashboard/calendar",
         "capability": "IMPORT",
@@ -265,7 +265,7 @@ INTEGRATION_INVENTORY_SEED: tuple[tuple[str, str, str, str | None, str], ...] = 
     ("google_calendar", "WRITE", "LIVE", None, "Create/update/delete events when connected"),
     ("google_calendar", "EXPORT", "LIVE", None, "Per-interview ICS download"),
     ("google_calendar", "SYNC", "PARTIAL", "NO_BIDIRECTIONAL_PUSH", "Token refresh only; no push channels"),
-    ("google_calendar", "WEBHOOK", "NOT_BUILT", "NO_PUSH_WATCH", "Google Calendar push/watch not built"),
+    ("google_calendar", "WEBHOOK", "BLOCKED_EXTERNAL_CREDENTIALS", "BLOCKED_EXTERNAL_CREDENTIALS", "Push handler+watch built; needs public webhook URL"),
     ("google_calendar", "MONITORING", "LIVE", None, "Provider health + readiness"),
     ("microsoft_calendar", "CONFIGURATION", "PARTIAL", "COMING_SOON_UI", "OAuth code present; product Coming Soon"),
     ("microsoft_calendar", "READ", "HELD_POLICY", "MICROSOFT_BUSY_READ_FLAG_OFF", "Busy-read gated false on prod"),
@@ -302,10 +302,10 @@ INTEGRATION_INVENTORY_SEED: tuple[tuple[str, str, str, str | None, str], ...] = 
     ("stripe", "WRITE", "HELD_POLICY", "STRIPE_NOT_PUBLIC", "Public launch not LIVE"),
     ("authologic", "CONFIGURATION", "HELD_POLICY", "AUTHOLOGIC_AUTO_KYC_OFF", "Vendor start held"),
     ("authologic", "WRITE", "HELD_POLICY", "AUTHOLOGIC_AUTO_KYC_OFF", "Auto KYC OFF"),
-    ("slack", "CONFIGURATION", "NOT_BUILT", "NOT_BUILT", "No product connector"),
-    ("teams", "CONFIGURATION", "NOT_BUILT", "NOT_BUILT", "Meeting URL metadata only"),
-    ("zapier", "CONFIGURATION", "NOT_BUILT", "NOT_BUILT", "No Zapier connector"),
-    ("cloud_storage", "CONFIGURATION", "NOT_BUILT", "NOT_BUILT", "Drive/OneDrive/Dropbox not built"),
+    ("slack", "CONFIGURATION", "BLOCKED_EXTERNAL_CREDENTIALS", "BLOCKED_EXTERNAL_CREDENTIALS", "Status API; webhook URL required"),
+    ("teams", "CONFIGURATION", "BLOCKED_EXTERNAL_CREDENTIALS", "BLOCKED_EXTERNAL_CREDENTIALS", "Status API; webhook URL required"),
+    ("zapier", "CONFIGURATION", "BLOCKED_EXTERNAL_CREDENTIALS", "BLOCKED_EXTERNAL_CREDENTIALS", "Status API; hook URL required"),
+    ("cloud_storage", "CONFIGURATION", "BLOCKED_EXTERNAL_CREDENTIALS", "BLOCKED_EXTERNAL_CREDENTIALS", "S3/local abstraction; vendor OAuth needs creds"),
 )
 
 CSV_FORMULA_RE = re.compile(r"^[=+\-@]")
@@ -899,10 +899,12 @@ def csv_export_safe(rows: list[dict[str, str]]) -> dict[str, Any]:
 
 
 def storage_honesty() -> dict[str, Any]:
-    settings = get_settings()
-    configured = bool(getattr(settings, "aws_s3_bucket", None) or getattr(settings, "s3_bucket", None))
+    from app.services.object_storage import storage_backend_status
+
+    backend = storage_backend_status()
+    configured = backend.get("backend") in {"s3_compatible", "local_filesystem"}
     return {
-        "signed_urls": "PARTIAL" if configured else "NOT_CONFIGURED",
+        "signed_urls": "PARTIAL" if backend.get("backend") == "s3_compatible" else "LOCAL_OR_NONE",
         "expiry_enforced": True,
         "content_type_check": "PARTIAL",
         "virus_scan": "NOT_BUILT",
@@ -911,6 +913,10 @@ def storage_honesty() -> dict[str, Any]:
         "large_file_limits": "PARTIAL",
         "cleanup": "PARTIAL",
         "source": "honesty",
+        "backend": backend,
+        "status": backend.get("status"),
+        "blocker": backend.get("blocker"),
+        "configured": configured,
     }
 
 

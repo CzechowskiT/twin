@@ -152,7 +152,7 @@
       "wave": "1",
       "status": "HELD_POLICY",
       "route": "/dashboard/cv",
-      "blocker": "PROFILE_EDIT_REQUIRES_STANDARD",
+      "blocker": "PUBLIC_STRIPE_STANDARD_OFF",
       "owner": "candidate-squad"
     },
     {
@@ -161,7 +161,7 @@
       "wave": "1",
       "status": "HELD_POLICY",
       "route": "/dashboard/cv",
-      "blocker": "PROFILE_EDIT_REQUIRES_STANDARD",
+      "blocker": "PUBLIC_STRIPE_STANDARD_OFF",
       "owner": "candidate-squad"
     },
     {
@@ -1238,45 +1238,45 @@
       "module_id": "plat_google_calendar_push_webhook",
       "persona": "platform",
       "wave": "5",
-      "status": "HELD_POLICY",
+      "status": "BLOCKED_EXTERNAL_CREDENTIALS",
       "route": "/dashboard/calendar",
-      "blocker": "NOT_BUILT",
+      "blocker": "BLOCKED_EXTERNAL_CREDENTIALS",
       "owner": "platform"
     },
     {
       "module_id": "plat_slack_connector",
       "persona": "platform",
       "wave": "5",
-      "status": "HELD_POLICY",
+      "status": "BLOCKED_EXTERNAL_CREDENTIALS",
       "route": "/company/integrations",
-      "blocker": "NOT_BUILT",
+      "blocker": "BLOCKED_EXTERNAL_CREDENTIALS",
       "owner": "platform"
     },
     {
       "module_id": "plat_teams_connector",
       "persona": "platform",
       "wave": "5",
-      "status": "HELD_POLICY",
+      "status": "BLOCKED_EXTERNAL_CREDENTIALS",
       "route": "/company/integrations",
-      "blocker": "NOT_BUILT",
+      "blocker": "BLOCKED_EXTERNAL_CREDENTIALS",
       "owner": "platform"
     },
     {
       "module_id": "plat_zapier_connector",
       "persona": "platform",
       "wave": "5",
-      "status": "HELD_POLICY",
+      "status": "BLOCKED_EXTERNAL_CREDENTIALS",
       "route": "/company/integrations",
-      "blocker": "NOT_BUILT",
+      "blocker": "BLOCKED_EXTERNAL_CREDENTIALS",
       "owner": "platform"
     },
     {
       "module_id": "plat_cloud_storage_connectors",
       "persona": "platform",
       "wave": "5",
-      "status": "HELD_POLICY",
+      "status": "BLOCKED_EXTERNAL_CREDENTIALS",
       "route": "/company/integrations",
-      "blocker": "NOT_BUILT",
+      "blocker": "BLOCKED_EXTERNAL_CREDENTIALS",
       "owner": "platform"
     },
     {
@@ -1646,5 +1646,5 @@
       "smoke_at": "2026-07-22T16:28:00Z"
     }
   ],
-  "wave4_note": "Gap-close 2026-07-22: DEMO_ONLY=0; PASS=116; HELD_POLICY=37 (Founder allowlist). Wave 4 Investor + Wave 5 + AI Phase A prior smoke retained. Pilot BLOCKED / Gate F PENDING / Launch NO-GO unchanged."
+  "wave4_note": "Gap-close 2026-07-22+: DEMO_ONLY=0; connectors/push reclassed BLOCKED_EXTERNAL_CREDENTIALS; CV sandbox entitlement. Wave 4 Investor + Wave 5 + AI Phase A prior smoke retained. Pilot BLOCKED / Gate F PENDING / Launch NO-GO unchanged."
 }

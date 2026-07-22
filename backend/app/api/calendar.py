@@ -935,3 +935,34 @@ def list_ics_imports(
     return list_imported_holds(db, user_id=current_user.id, limit=limit)
 
 
+@router.get("/google/push/status")
+def google_push_status_endpoint(
+    current_user: User = Depends(get_current_user),
+) -> dict:
+    from app.services.google_calendar_push import google_push_status
+
+    return google_push_status()
+
+
+@router.post("/google/push/watch")
+def google_push_watch_start(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> dict:
+    """Start Google Calendar events.watch when OAuth + public webhook URL are configured."""
+    from app.services.google_calendar_push import start_calendar_watch
+
+    token = _calendar_access_token(db, current_user.id)
+    return start_calendar_watch(db, user_id=current_user.id, access_token=token)
+
+
+@router.post("/google/push/webhook")
+async def google_push_webhook(request: Request) -> dict:
+    """Public Google Calendar push receiver — ack only; no secrets logged."""
+    from app.services.google_calendar_push import handle_push_notification
+
+    channel_id = request.headers.get("X-Goog-Channel-ID")
+    resource_state = request.headers.get("X-Goog-Resource-State")
+    return handle_push_notification(channel_id=channel_id, resource_state=resource_state)
+
+

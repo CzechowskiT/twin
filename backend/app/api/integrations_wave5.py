@@ -228,3 +228,25 @@ def get_notifications_prefs(
     user: User = Depends(get_current_user),
 ) -> dict:
     return wave5.notifications_prefs_snapshot(user)
+
+
+@router.get("/connectors/status")
+def get_connectors_status(
+    _user: User = Depends(get_current_user),
+) -> dict:
+    from app.services.external_connectors import all_connector_statuses
+    from app.services.object_storage import storage_backend_status
+
+    return {
+        **all_connector_statuses(),
+        "storage": storage_backend_status(),
+    }
+
+
+@router.get("/google-push/status")
+def get_google_push_status(
+    _user: User = Depends(get_current_user),
+) -> dict:
+    from app.services.google_calendar_push import google_push_status
+
+    return google_push_status()

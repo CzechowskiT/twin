@@ -10,7 +10,7 @@ export type HardLiveModuleEvidence = {
   persona: "candidate" | "recruiter" | "company" | "platform" | "investor";
   wave: "1" | "2" | "3" | "4" | "5" | "ai" | "ai_compliance";
   /** Never claim product LIVE until PASS + docs update post-smoke. */
-  status: "PENDING_SMOKE" | "PASS" | "FAIL" | "PARTIAL" | "HELD_POLICY" | "DEMO_ONLY";
+  status: "PENDING_SMOKE" | "PASS" | "FAIL" | "PARTIAL" | "HELD_POLICY" | "DEMO_ONLY" | "BLOCKED_EXTERNAL_CREDENTIALS";
   route: string;
   owner: string;
   blocker: string | null;
@@ -284,15 +284,15 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE1: HardLiveModuleEvidence[] = [
     "cand_cv_import",
     "/dashboard/cv",
     "candidate-squad",
-    "PROFILE_EDIT_REQUIRES_STANDARD",
-    "CV upload gated by PROFILE_EDIT → Standard+; Stripe public not LIVE — policy hold.",
+    "PUBLIC_STRIPE_STANDARD_OFF",
+    "Sandbox/smoke (exclude_from_product_metrics) may upload/parse without Stripe; public Standard+ still OFF.",
   ),
   heldModuleW1(
     "cand_cv_parsing",
     "/dashboard/cv",
     "candidate-squad",
-    "PROFILE_EDIT_REQUIRES_STANDARD",
-    "CV parse path shares PROFILE_EDIT Standard+ gate — policy hold with Stripe/plan.",
+    "PUBLIC_STRIPE_STANDARD_OFF",
+    "Sandbox/smoke parse allowed via metrics-excluded entitlement; public Standard+ paywall unchanged.",
   ),
   passModuleW1(
     "cand_feedback",
@@ -669,6 +669,28 @@ function pendingModuleW5(
   };
 }
 
+
+function blockedExternalW5(
+  module_id: string,
+  route: string,
+  owner: string,
+  blocker: string,
+  notes: string,
+): HardLiveModuleEvidence {
+  return {
+    module_id,
+    persona: "platform",
+    wave: "5",
+    status: "BLOCKED_EXTERNAL_CREDENTIALS",
+    route,
+    owner,
+    blocker,
+    missing_criteria: [13, 15, 28],
+    criteria: { ...ALL_PENDING, "28": "FAIL" },
+    notes,
+  };
+}
+
 function heldModuleW5(
   module_id: string,
   route: string,
@@ -841,40 +863,40 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE5: HardLiveModuleEvidence[] = [
     "AUTHOLOGIC_AUTO_KYC_OFF",
     "Authologic Auto KYC OFF.",
   ),
-  heldModuleW5(
+  blockedExternalW5(
     "plat_google_calendar_push_webhook",
     "/dashboard/calendar",
     "platform",
-    "NOT_BUILT",
-    "Google Calendar push/watch channels not built.",
+    "BLOCKED_EXTERNAL_CREDENTIALS",
+    "Push/watch built; needs GOOGLE_CALENDAR_PUSH_WEBHOOK_URL + OAuth — not Founder policy.",
   ),
-  heldModuleW5(
+  blockedExternalW5(
     "plat_slack_connector",
     "/company/integrations",
     "platform",
-    "NOT_BUILT",
-    "Slack connector not built.",
+    "BLOCKED_EXTERNAL_CREDENTIALS",
+    "Connector status API live; SLACK_INCOMING_WEBHOOK_URL unset on prod.",
   ),
-  heldModuleW5(
+  blockedExternalW5(
     "plat_teams_connector",
     "/company/integrations",
     "platform",
-    "NOT_BUILT",
-    "Teams connector not built (meeting URL metadata only).",
+    "BLOCKED_EXTERNAL_CREDENTIALS",
+    "Connector status API live; TEAMS_INCOMING_WEBHOOK_URL unset on prod.",
   ),
-  heldModuleW5(
+  blockedExternalW5(
     "plat_zapier_connector",
     "/company/integrations",
     "platform",
-    "NOT_BUILT",
-    "Zapier connector not built.",
+    "BLOCKED_EXTERNAL_CREDENTIALS",
+    "Connector status API live; ZAPIER_HOOK_URL unset on prod.",
   ),
-  heldModuleW5(
+  blockedExternalW5(
     "plat_cloud_storage_connectors",
     "/company/integrations",
     "platform",
-    "NOT_BUILT",
-    "Drive/OneDrive/Dropbox connectors not built.",
+    "BLOCKED_EXTERNAL_CREDENTIALS",
+    "S3-compatible + local abstraction shipped; cloud vendor OAuth (Drive/OneDrive/Dropbox) needs founder credentials. Local/S3 path usable when configured.",
   ),
   passModuleW5(
     "plat_ics_import",
@@ -1136,7 +1158,7 @@ export const HARD_LIVE_REGISTRY_META = {
     exclude_from_product_metrics: true,
   },
   wave4_note:
-    "Gap-close 2026-07-22: DEMO_ONLY=0; PASS=116; HELD_POLICY=37 (Founder allowlist). Wave 4 Investor + Wave 5 + AI Phase A prior smoke retained. Pilot BLOCKED / Gate F PENDING / Launch NO-GO unchanged.",
+    "Gap-close 2026-07-22+: DEMO_ONLY=0; connectors/push reclassed BLOCKED_EXTERNAL_CREDENTIALS; CV sandbox entitlement. Wave 4 Investor + Wave 5 + AI Phase A prior smoke retained. Pilot BLOCKED / Gate F PENDING / Launch NO-GO unchanged.",
 } as const;
 
 export function assertNoLivePassWithoutSmoke(

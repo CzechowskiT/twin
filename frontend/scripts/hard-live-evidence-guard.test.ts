@@ -109,11 +109,17 @@ test("wave5 integrations modules PASS after smoke with policy holds intact", () 
   assert.equal(passed.length, 19);
   assert.ok(passed.every((r) => r.smoke_sha === "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18"));
   const held = HARD_LIVE_EVIDENCE_REGISTRY_WAVE5.filter((r) => r.status === "HELD_POLICY");
-  assert.equal(held.length, 11);
+  assert.equal(held.length, 6);
   assert.ok(held.some((r) => r.module_id === "plat_ms_calendar_write"));
   assert.ok(held.some((r) => r.module_id === "plat_ats_live_sync_write"));
   assert.ok(held.some((r) => r.module_id === "plat_stripe_public"));
   assert.ok(held.some((r) => r.module_id === "plat_authologic_auto_kyc"));
+  const blockedExt = HARD_LIVE_EVIDENCE_REGISTRY_WAVE5.filter(
+    (r) => r.status === "BLOCKED_EXTERNAL_CREDENTIALS",
+  );
+  assert.equal(blockedExt.length, 5);
+  assert.ok(blockedExt.some((r) => r.module_id === "plat_google_calendar_push_webhook"));
+  assert.ok(blockedExt.some((r) => r.module_id === "plat_slack_connector"));
   assert.ok(passed.some((r) => r.module_id === "plat_ics_import"));
   assert.equal(HARD_LIVE_REGISTRY_META.wave, "5");
   assert.equal(HARD_LIVE_REGISTRY_META.smoke_evidence.wave5_sha, "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18");
