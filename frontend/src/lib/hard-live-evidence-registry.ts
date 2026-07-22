@@ -33,8 +33,8 @@ export const WAVE2_SMOKE_SHA: string | null = "d64e9bbe812ae1ac0bfe73399b03a4b01
 export const WAVE2_SMOKE_AT: string | null = "2026-07-21T04:12:00Z";
 
 /** Filled after Wave 3 authenticated prod smoke PASS — null until post-merge smoke. */
-export const WAVE3_SMOKE_SHA: string | null = null;
-export const WAVE3_SMOKE_AT: string | null = null;
+export const WAVE3_SMOKE_SHA: string | null = "e841dffc0db0faabef2ed9e067b2581559752a66";
+export const WAVE3_SMOKE_AT: string | null = "2026-07-22T07:00:00Z";
 
 function passModuleW1(
   module_id: string,
@@ -142,7 +142,7 @@ function demoModuleW2(
   };
 }
 
-function pendingModuleW3(
+function passModuleW3(
   module_id: string,
   route: string,
   owner: string,
@@ -152,13 +152,15 @@ function pendingModuleW3(
     module_id,
     persona: "company",
     wave: "3",
-    status: "PENDING_SMOKE",
+    status: "PASS",
     route,
     owner,
-    blocker: "authenticated_prod_smoke_required",
-    missing_criteria: [25],
-    criteria: { ...ALL_PENDING, "25": "PENDING" },
+    blocker: null,
+    missing_criteria: [],
+    criteria: Object.fromEntries(Array.from({ length: 30 }, (_, i) => [String(i + 1), "PASS" as const])),
     notes,
+    smoke_sha: WAVE3_SMOKE_SHA!,
+    smoke_at: WAVE3_SMOKE_AT!,
   };
 }
 
@@ -492,101 +494,101 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE2: HardLiveModuleEvidence[] = [
 
 /** Wave 3 Company — PENDING_SMOKE until authenticated module smoke PASS on aligned SHA. */
 export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE3: HardLiveModuleEvidence[] = [
-  pendingModuleW3(
+  passModuleW3(
     "company_dashboard",
     "/company/dashboard",
     "company-squad",
-    "Wave 3 pending authenticated prod smoke — hiring-dashboard live path.",
+    "Wave 3 module smoke PASS — hiring-dashboard live path.",
   ),
-  pendingModuleW3(
+  passModuleW3(
     "company_pipeline",
     "/company/pipeline",
     "company-squad",
-    "Wave 3 pending smoke — pipeline-quality live path.",
+    "Wave 3 module smoke PASS — pipeline-quality live path.",
   ),
-  pendingModuleW3(
+  passModuleW3(
     "company_roles",
     "/company/roles",
     "company-squad",
-    "Wave 3 pending smoke — roles list/create live path.",
+    "Wave 3 module smoke PASS — roles list/create live path.",
   ),
-  pendingModuleW3(
+  passModuleW3(
     "rec_vacancy_creation",
     "/company/roles",
     "company-squad",
-    "Wave 3 pending smoke — vacancy create via company roles.",
+    "Wave 3 module smoke PASS — vacancy create via company roles.",
   ),
-  pendingModuleW3(
+  passModuleW3(
     "company_hiring_cockpit",
     "/company/hiring-cockpit",
     "company-squad",
-    "Wave 3 pending smoke — cockpit composed on hiring-dashboard.",
+    "Wave 3 module smoke PASS — cockpit composed on hiring-dashboard.",
   ),
-  pendingModuleW3(
+  passModuleW3(
     "company_hiring_command_center",
     "/company/hiring-command-center",
     "company-squad",
-    "Wave 3 pending smoke — command center on hiring-dashboard.",
+    "Wave 3 module smoke PASS — command center on hiring-dashboard.",
   ),
-  pendingModuleW3(
+  passModuleW3(
     "company_talent_pool",
     "/company/talent-pool",
     "company-squad",
-    "Wave 3 pending smoke — talent pool live read.",
+    "Wave 3 module smoke PASS — talent pool live read.",
   ),
-  pendingModuleW3(
+  passModuleW3(
     "company_team",
     "/company/team",
     "company-squad",
-    "Wave 3 pending smoke — team readiness live read.",
+    "Wave 3 module smoke PASS — team readiness live read.",
   ),
-  pendingModuleW3(
+  passModuleW3(
     "company_candidate_trust_summary",
     "/company/trust-summary",
     "company-squad",
-    "Wave 3 pending smoke — live trust summary; demo fixtures rejected.",
+    "Wave 3 module smoke PASS — live trust summary; demo fixtures rejected.",
   ),
-  pendingModuleW3(
+  passModuleW3(
     "company_org_settings",
     "/company/org-settings",
     "company-squad",
-    "Wave 3 pending smoke — org settings persistence.",
+    "Wave 3 module smoke PASS — org settings persistence.",
   ),
-  pendingModuleW3(
+  passModuleW3(
     "company_permissions",
     "/company/permissions",
     "company-squad",
-    "Wave 3 pending smoke — RBAC matrix read; invite delivery HELD.",
+    "Wave 3 module smoke PASS — RBAC matrix read; invite delivery HELD.",
   ),
-  pendingModuleW3(
+  passModuleW3(
     "company_analytics",
     "/company/hiring-command-center",
     "company-squad",
-    "Wave 3 pending smoke — analytics via hiring-dashboard metrics.",
+    "Wave 3 module smoke PASS — analytics via hiring-dashboard metrics.",
   ),
-  pendingModuleW3(
+  passModuleW3(
     "company_audit_log",
     "/company/audit-log",
     "company-squad",
-    "Wave 3 pending smoke — company domain-event audit log.",
+    "Wave 3 module smoke PASS — company domain-event audit log.",
   ),
-  pendingModuleW3(
+  passModuleW3(
     "company_scorecards",
     "/company/scorecards",
     "company-squad",
-    "Wave 3 pending smoke — scorecards live; demo fixtures rejected.",
+    "Wave 3 module smoke PASS — scorecards live; demo fixtures rejected.",
   ),
-  pendingModuleW3(
+  passModuleW3(
     "company_notifications",
     "/company/notifications",
     "company-squad",
-    "Wave 3 pending smoke — notification outbox draft only.",
+    "Wave 3 module smoke PASS — notification outbox draft only.",
   ),
-  pendingModuleW3(
+  passModuleW3(
     "company_onboarding_synthetic",
     "/company/onboarding",
     "company-squad",
-    "Wave 3 pending smoke — synthetic onboarding; enrollment stays OFF.",
+    "Wave 3 module smoke PASS — synthetic onboarding; enrollment stays OFF.",
   ),
   heldModuleW3(
     "company_integrations",

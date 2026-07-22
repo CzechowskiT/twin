@@ -1,6 +1,5 @@
 /**
  * Hard LIVE evidence registry CI guard — Wave 1+2+3; no PASS without criterion 25 + smoke_sha; stance frozen.
- * Wave 3 may remain PENDING_SMOKE until authenticated prod smoke PASS (no LIVE badge inflation).
  */
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -32,7 +31,7 @@ test("stance remains Founder-blocked", () => {
 test("no PASS rows with missing criterion 25 or without smoke_sha", () => {
   assert.doesNotThrow(() => assertNoLivePassWithoutSmoke());
   const passed = HARD_LIVE_EVIDENCE_REGISTRY.filter((r) => r.status === "PASS");
-  assert.equal(passed.length, 32); // 12 wave1 + 20 wave2 — wave3 PENDING until smoke
+  assert.equal(passed.length, 48); // 12 wave1 + 20 wave2 + 16 wave3
   for (const row of passed) {
     assert.ok(!row.missing_criteria.includes(25), row.module_id);
     assert.ok(row.smoke_sha, row.module_id);
@@ -73,10 +72,12 @@ test("wave2 recruiter modules PASS after smoke with held/demo isolation", () => 
   assert.ok(demo.every((r) => r.blocker === "DEMO_JOURNEY_ISOLATION"));
 });
 
-test("wave3 company modules pending smoke with held/demo isolation", () => {
+test("wave3 company modules PASS after smoke with held/demo isolation", () => {
   assert.ok(HARD_LIVE_EVIDENCE_REGISTRY_WAVE3.length >= 30);
-  assert.equal(wave3PendingSmokeIds().length, 16);
-  assert.equal(HARD_LIVE_EVIDENCE_REGISTRY_WAVE3.filter((r) => r.status === "PASS").length, 0);
+  assert.equal(wave3PendingSmokeIds().length, 0);
+  const passed = HARD_LIVE_EVIDENCE_REGISTRY_WAVE3.filter((r) => r.status === "PASS");
+  assert.equal(passed.length, 16);
+  assert.ok(passed.every((r) => r.smoke_sha === "e841dffc0db0faabef2ed9e067b2581559752a66"));
   const held = HARD_LIVE_EVIDENCE_REGISTRY_WAVE3.filter((r) => r.status === "HELD_POLICY");
   assert.ok(held.some((r) => r.module_id === "company_integrations"));
   assert.ok(held.some((r) => r.module_id === "company_billing_public_claim"));
@@ -104,20 +105,15 @@ test("docs registry JSON mirrors TS module ids and PASS smoke fields", () => {
   assert.equal(doc.stance.external_pilot_enrollment_enabled, false);
   assert.equal(doc.wave, "3");
   const passDocs = doc.modules.filter((m) => m.status === "PASS");
-  assert.equal(passDocs.length, 32);
+  assert.equal(passDocs.length, 48);
   for (const m of passDocs) {
     assert.ok(m.smoke_sha, m.module_id);
   }
   assert.match(raw, /HELD_POLICY/);
   assert.match(raw, /DEMO_ONLY/);
-  assert.match(raw, /PENDING_SMOKE/);
+  assert.doesNotMatch(raw, /PENDING_SMOKE/);
   assert.match(raw, /company_org_settings/);
   assert.match(raw, /company_demo_pipeline/);
-  // Wave 1+2 must not regress to PENDING_SMOKE
-  const w12Pending = doc.modules.filter(
-    (m) => (m.wave === "1" || m.wave === "2") && m.status === "PENDING_SMOKE",
-  );
-  assert.equal(w12Pending.length, 0);
 });
 
 test("production action gates still block enrollment", () => {

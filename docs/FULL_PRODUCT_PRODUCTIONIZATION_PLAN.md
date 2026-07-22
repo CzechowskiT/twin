@@ -213,9 +213,9 @@ Monetization/Stripe public and ATS live-sync remain **outside** waves until expl
 - [x] Migration `090_company_wave3_hard_live` + wave3 flags + evidence seed
 - [x] `WAVE3_SMOKE_MODULES` fail-closed harness + CI guards
 - [x] Policy holds unchanged: ATS / MS write / auto-apply / Stripe / Authologic / enrollment OFF
-- [ ] Authenticated per-module prod smoke PASS on aligned SHA (post-merge)
-- [ ] Capability map LIVE promotions only after smoke PASS
+- [x] Authenticated per-module prod smoke PASS on aligned SHA (post-merge)
+- [x] Capability map LIVE promotions only after smoke PASS
 
-**Exit status (pre-smoke):** engineering complete; Hard LIVE rows **PENDING_SMOKE** for 16 smokeable modules — **no LIVE badge inflation**. Final verdict after smoke: **DONE_WITH_POLICY_HOLDS** if only ATS/Stripe/MS/invites remain held.
+**Exit status:** **DONE_WITH_POLICY_HOLDS** — 16 Hard LIVE PASS; ATS/Stripe/MS write/invite delivery/enrollment held; demo isolated DEMO_ONLY.
 
-**Next:** After merge + Railway/Vercel + Alembic 090 + auth smoke → Wave 3 LIVE badges docs PR; then Wave 4 Investor Complete only if DONE_WITH_POLICY_HOLDS.
+**Next:** Wave 4 Investor Complete (no enrollment / Gate F flip).
