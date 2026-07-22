@@ -34,9 +34,9 @@
     },
     "wave3": {
       "script": "frontend/scripts/wave3-company-module-prod-smoke.test.ts",
-      "sha": null,
-      "at": null,
-      "result": "PENDING_SMOKE — await authenticated prod smoke after merge",
+      "sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
+      "at": "2026-07-22T07:00:00Z",
+      "result": "PASS 4/4 modules 16/16",
       "write": true,
       "exclude_from_product_metrics": true,
       "jwt_never_committed": true
@@ -633,145 +633,177 @@
       "module_id": "company_dashboard",
       "persona": "company",
       "wave": "3",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/company/dashboard",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "company-squad"
+      "blocker": null,
+      "owner": "company-squad",
+      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
+      "smoke_at": "2026-07-22T07:00:00Z"
     },
     {
       "module_id": "company_pipeline",
       "persona": "company",
       "wave": "3",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/company/pipeline",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "company-squad"
+      "blocker": null,
+      "owner": "company-squad",
+      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
+      "smoke_at": "2026-07-22T07:00:00Z"
     },
     {
       "module_id": "company_roles",
       "persona": "company",
       "wave": "3",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/company/roles",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "company-squad"
+      "blocker": null,
+      "owner": "company-squad",
+      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
+      "smoke_at": "2026-07-22T07:00:00Z"
     },
     {
       "module_id": "rec_vacancy_creation",
       "persona": "company",
       "wave": "3",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/company/roles",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "company-squad"
+      "blocker": null,
+      "owner": "company-squad",
+      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
+      "smoke_at": "2026-07-22T07:00:00Z"
     },
     {
       "module_id": "company_hiring_cockpit",
       "persona": "company",
       "wave": "3",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/company/hiring-cockpit",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "company-squad"
+      "blocker": null,
+      "owner": "company-squad",
+      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
+      "smoke_at": "2026-07-22T07:00:00Z"
     },
     {
       "module_id": "company_hiring_command_center",
       "persona": "company",
       "wave": "3",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/company/hiring-command-center",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "company-squad"
+      "blocker": null,
+      "owner": "company-squad",
+      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
+      "smoke_at": "2026-07-22T07:00:00Z"
     },
     {
       "module_id": "company_talent_pool",
       "persona": "company",
       "wave": "3",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/company/talent-pool",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "company-squad"
+      "blocker": null,
+      "owner": "company-squad",
+      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
+      "smoke_at": "2026-07-22T07:00:00Z"
     },
     {
       "module_id": "company_team",
       "persona": "company",
       "wave": "3",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/company/team",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "company-squad"
+      "blocker": null,
+      "owner": "company-squad",
+      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
+      "smoke_at": "2026-07-22T07:00:00Z"
     },
     {
       "module_id": "company_candidate_trust_summary",
       "persona": "company",
       "wave": "3",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/company/trust-summary",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "company-squad"
+      "blocker": null,
+      "owner": "company-squad",
+      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
+      "smoke_at": "2026-07-22T07:00:00Z"
     },
     {
       "module_id": "company_org_settings",
       "persona": "company",
       "wave": "3",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/company/org-settings",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "company-squad"
+      "blocker": null,
+      "owner": "company-squad",
+      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
+      "smoke_at": "2026-07-22T07:00:00Z"
     },
     {
       "module_id": "company_permissions",
       "persona": "company",
       "wave": "3",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/company/permissions",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "company-squad"
+      "blocker": null,
+      "owner": "company-squad",
+      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
+      "smoke_at": "2026-07-22T07:00:00Z"
     },
     {
       "module_id": "company_analytics",
       "persona": "company",
       "wave": "3",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/company/hiring-command-center",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "company-squad"
+      "blocker": null,
+      "owner": "company-squad",
+      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
+      "smoke_at": "2026-07-22T07:00:00Z"
     },
     {
       "module_id": "company_audit_log",
       "persona": "company",
       "wave": "3",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/company/audit-log",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "company-squad"
+      "blocker": null,
+      "owner": "company-squad",
+      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
+      "smoke_at": "2026-07-22T07:00:00Z"
     },
     {
       "module_id": "company_scorecards",
       "persona": "company",
       "wave": "3",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/company/scorecards",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "company-squad"
+      "blocker": null,
+      "owner": "company-squad",
+      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
+      "smoke_at": "2026-07-22T07:00:00Z"
     },
     {
       "module_id": "company_notifications",
       "persona": "company",
       "wave": "3",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/company/notifications",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "company-squad"
+      "blocker": null,
+      "owner": "company-squad",
+      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
+      "smoke_at": "2026-07-22T07:00:00Z"
     },
     {
       "module_id": "company_onboarding_synthetic",
       "persona": "company",
       "wave": "3",
-      "status": "PENDING_SMOKE",
+      "status": "PASS",
       "route": "/company/onboarding",
-      "blocker": "authenticated_prod_smoke_required",
-      "owner": "company-squad"
+      "blocker": null,
+      "owner": "company-squad",
+      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
+      "smoke_at": "2026-07-22T07:00:00Z"
     },
     {
       "module_id": "company_integrations",
