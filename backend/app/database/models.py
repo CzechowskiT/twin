@@ -2168,3 +2168,43 @@ class HardLiveEvidenceRecord(Base):
     )
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
+
+class CompanyOrgSettings(Base):
+    """Company org settings — Wave 3 Hard LIVE persistence (tenant-scoped)."""
+
+    __tablename__ = "company_org_settings"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    company_slug: Mapped[str] = mapped_column(String(80), unique=True, index=True)
+    display_name: Mapped[str] = mapped_column(String(200))
+    timezone: Mapped[str] = mapped_column(String(64), default="Europe/Warsaw")
+    locale: Mapped[str] = mapped_column(String(16), default="pl")
+    hiring_policy_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    updated_by_role: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CompanyScorecardEntry(Base):
+    """Company hiring scorecard / decision — never demo fixtures as production truth."""
+
+    __tablename__ = "company_scorecard_entries"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    company_slug: Mapped[str] = mapped_column(String(80), index=True)
+    subject_type: Mapped[str] = mapped_column(String(32))
+    subject_id: Mapped[str] = mapped_column(String(64))
+    role_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    decision_code: Mapped[str] = mapped_column(String(64))
+    rating: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    summary: Mapped[str] = mapped_column(String(500))
+    source: Mapped[str] = mapped_column(String(32), default="live")
+    demo_fixture: Mapped[bool] = mapped_column(Boolean, default=False)
+    meta_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+

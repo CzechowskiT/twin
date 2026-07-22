@@ -1,7 +1,7 @@
 {
   "definition": "docs/HARD_LIVE_DEFINITION_30.md",
-  "wave": "2",
-  "updated": "2026-07-21",
+  "wave": "3",
+  "updated": "2026-07-22",
   "stance": {
     "pilot": "BLOCKED_BY_FOUNDER",
     "gate_f": "PENDING",
@@ -9,6 +9,7 @@
     "pmf": "INSUFFICIENT_DATA",
     "real_candidate_enrollment": "NOT_STARTED",
     "real_recruiter_enrollment": "NOT_STARTED",
+    "real_company_enrollment": "NOT_STARTED",
     "external_pilot_enrollment_enabled": false
   },
   "live_badge_rule": "PASS status + authenticated prod smoke on aligned SHA required before capability map LIVE",
@@ -27,6 +28,15 @@
       "sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
       "at": "2026-07-21T04:12:00Z",
       "result": "PASS 4/4 modules 20/20",
+      "write": true,
+      "exclude_from_product_metrics": true,
+      "jwt_never_committed": true
+    },
+    "wave3": {
+      "script": "frontend/scripts/wave3-company-module-prod-smoke.test.ts",
+      "sha": null,
+      "at": null,
+      "result": "PENDING_SMOKE — await authenticated prod smoke after merge",
       "write": true,
       "exclude_from_product_metrics": true,
       "jwt_never_committed": true
@@ -618,6 +628,303 @@
       "route": "/recruiter/jobs/demo-role-001/pipeline",
       "blocker": "DEMO_JOURNEY_ISOLATION",
       "owner": "recruiter-squad"
+    },
+    {
+      "module_id": "company_dashboard",
+      "persona": "company",
+      "wave": "3",
+      "status": "PENDING_SMOKE",
+      "route": "/company/dashboard",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "company_pipeline",
+      "persona": "company",
+      "wave": "3",
+      "status": "PENDING_SMOKE",
+      "route": "/company/pipeline",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "company_roles",
+      "persona": "company",
+      "wave": "3",
+      "status": "PENDING_SMOKE",
+      "route": "/company/roles",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "rec_vacancy_creation",
+      "persona": "company",
+      "wave": "3",
+      "status": "PENDING_SMOKE",
+      "route": "/company/roles",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "company_hiring_cockpit",
+      "persona": "company",
+      "wave": "3",
+      "status": "PENDING_SMOKE",
+      "route": "/company/hiring-cockpit",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "company_hiring_command_center",
+      "persona": "company",
+      "wave": "3",
+      "status": "PENDING_SMOKE",
+      "route": "/company/hiring-command-center",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "company_talent_pool",
+      "persona": "company",
+      "wave": "3",
+      "status": "PENDING_SMOKE",
+      "route": "/company/talent-pool",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "company_team",
+      "persona": "company",
+      "wave": "3",
+      "status": "PENDING_SMOKE",
+      "route": "/company/team",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "company_candidate_trust_summary",
+      "persona": "company",
+      "wave": "3",
+      "status": "PENDING_SMOKE",
+      "route": "/company/trust-summary",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "company_org_settings",
+      "persona": "company",
+      "wave": "3",
+      "status": "PENDING_SMOKE",
+      "route": "/company/org-settings",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "company_permissions",
+      "persona": "company",
+      "wave": "3",
+      "status": "PENDING_SMOKE",
+      "route": "/company/permissions",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "company_analytics",
+      "persona": "company",
+      "wave": "3",
+      "status": "PENDING_SMOKE",
+      "route": "/company/hiring-command-center",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "company_audit_log",
+      "persona": "company",
+      "wave": "3",
+      "status": "PENDING_SMOKE",
+      "route": "/company/audit-log",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "company_scorecards",
+      "persona": "company",
+      "wave": "3",
+      "status": "PENDING_SMOKE",
+      "route": "/company/scorecards",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "company_notifications",
+      "persona": "company",
+      "wave": "3",
+      "status": "PENDING_SMOKE",
+      "route": "/company/notifications",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "company_onboarding_synthetic",
+      "persona": "company",
+      "wave": "3",
+      "status": "PENDING_SMOKE",
+      "route": "/company/onboarding",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "company_integrations",
+      "persona": "company",
+      "wave": "3",
+      "status": "HELD_POLICY",
+      "route": "/company/integrations",
+      "blocker": "ATS_LIVE_SYNC_BLOCKED",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "rec_ats_sync",
+      "persona": "company",
+      "wave": "3",
+      "status": "HELD_POLICY",
+      "route": "/company/integrations",
+      "blocker": "ATS_LIVE_SYNC_BLOCKED",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "rec_vacancy_import",
+      "persona": "company",
+      "wave": "3",
+      "status": "HELD_POLICY",
+      "route": "/company/integrations/ats/import-readiness",
+      "blocker": "ATS_LIVE_SYNC_BLOCKED",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "company_ats_import_readiness",
+      "persona": "company",
+      "wave": "3",
+      "status": "HELD_POLICY",
+      "route": "/company/integrations/ats/import-readiness",
+      "blocker": "ATS_LIVE_SYNC_BLOCKED",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "company_billing",
+      "persona": "company",
+      "wave": "3",
+      "status": "HELD_POLICY",
+      "route": "/company/billing",
+      "blocker": "STRIPE_NOT_PUBLIC",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "company_billing_public_claim",
+      "persona": "company",
+      "wave": "3",
+      "status": "HELD_POLICY",
+      "route": "/company/billing",
+      "blocker": "STRIPE_NOT_PUBLIC",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "rec_subscription",
+      "persona": "company",
+      "wave": "3",
+      "status": "HELD_POLICY",
+      "route": "/company/billing",
+      "blocker": "STRIPE_NOT_PUBLIC",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "company_ms_calendar_write",
+      "persona": "company",
+      "wave": "3",
+      "status": "HELD_POLICY",
+      "route": "/company/hiring-cockpit",
+      "blocker": "MICROSOFT_WRITE_BLOCKED",
+      "owner": "platform"
+    },
+    {
+      "module_id": "company_invite_delivery",
+      "persona": "company",
+      "wave": "3",
+      "status": "HELD_POLICY",
+      "route": "/company/team",
+      "blocker": "EXTERNAL_ENROLLMENT_OFF",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "rec_company_onboarding",
+      "persona": "company",
+      "wave": "3",
+      "status": "HELD_POLICY",
+      "route": "/company/onboarding",
+      "blocker": "EXTERNAL_ENROLLMENT_OFF",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "company_demo_collaboration",
+      "persona": "company",
+      "wave": "3",
+      "status": "DEMO_ONLY",
+      "route": "/company/candidates/demo-candidate-001/collaboration",
+      "blocker": "DEMO_JOURNEY_ISOLATION",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "company_demo_communication",
+      "persona": "company",
+      "wave": "3",
+      "status": "DEMO_ONLY",
+      "route": "/company/candidates/demo-candidate-001/communication",
+      "blocker": "DEMO_JOURNEY_ISOLATION",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "company_demo_decision_memory",
+      "persona": "company",
+      "wave": "3",
+      "status": "DEMO_ONLY",
+      "route": "/company/candidates/demo-candidate-001/decision-memory",
+      "blocker": "DEMO_JOURNEY_ISOLATION",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "company_demo_pipeline",
+      "persona": "company",
+      "wave": "3",
+      "status": "DEMO_ONLY",
+      "route": "/company/roles/demo-role-001/pipeline",
+      "blocker": "DEMO_JOURNEY_ISOLATION",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "company_demo_profile_360",
+      "persona": "company",
+      "wave": "3",
+      "status": "DEMO_ONLY",
+      "route": "/company/candidates/demo-candidate-001",
+      "blocker": "DEMO_JOURNEY_ISOLATION",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "company_demo_team",
+      "persona": "company",
+      "wave": "3",
+      "status": "DEMO_ONLY",
+      "route": "/company/candidates/demo-candidate-001/team",
+      "blocker": "DEMO_JOURNEY_ISOLATION",
+      "owner": "company-squad"
+    },
+    {
+      "module_id": "company_demo_trust",
+      "persona": "company",
+      "wave": "3",
+      "status": "DEMO_ONLY",
+      "route": "/company/candidates/demo-candidate-001/trust",
+      "blocker": "DEMO_JOURNEY_ISOLATION",
+      "owner": "company-squad"
     }
   ]
 }

@@ -1,5 +1,6 @@
 /**
- * Hard LIVE evidence registry CI guard — Wave 1+2; no PASS without criterion 25 + smoke_sha; stance frozen.
+ * Hard LIVE evidence registry CI guard — Wave 1+2+3; no PASS without criterion 25 + smoke_sha; stance frozen.
+ * Wave 3 may remain PENDING_SMOKE until authenticated prod smoke PASS (no LIVE badge inflation).
  */
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -11,10 +12,12 @@ import {
   HARD_LIVE_EVIDENCE_REGISTRY,
   HARD_LIVE_EVIDENCE_REGISTRY_WAVE1,
   HARD_LIVE_EVIDENCE_REGISTRY_WAVE2,
+  HARD_LIVE_EVIDENCE_REGISTRY_WAVE3,
   HARD_LIVE_REGISTRY_META,
   assertNoLivePassWithoutSmoke,
   registryModuleIds,
   wave2PendingSmokeIds,
+  wave3PendingSmokeIds,
 } from "../src/lib/hard-live-evidence-registry";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -29,7 +32,7 @@ test("stance remains Founder-blocked", () => {
 test("no PASS rows with missing criterion 25 or without smoke_sha", () => {
   assert.doesNotThrow(() => assertNoLivePassWithoutSmoke());
   const passed = HARD_LIVE_EVIDENCE_REGISTRY.filter((r) => r.status === "PASS");
-  assert.equal(passed.length, 32); // 12 wave1 + 20 wave2
+  assert.equal(passed.length, 32); // 12 wave1 + 20 wave2 — wave3 PENDING until smoke
   for (const row of passed) {
     assert.ok(!row.missing_criteria.includes(25), row.module_id);
     assert.ok(row.smoke_sha, row.module_id);
@@ -70,6 +73,20 @@ test("wave2 recruiter modules PASS after smoke with held/demo isolation", () => 
   assert.ok(demo.every((r) => r.blocker === "DEMO_JOURNEY_ISOLATION"));
 });
 
+test("wave3 company modules pending smoke with held/demo isolation", () => {
+  assert.ok(HARD_LIVE_EVIDENCE_REGISTRY_WAVE3.length >= 30);
+  assert.equal(wave3PendingSmokeIds().length, 16);
+  assert.equal(HARD_LIVE_EVIDENCE_REGISTRY_WAVE3.filter((r) => r.status === "PASS").length, 0);
+  const held = HARD_LIVE_EVIDENCE_REGISTRY_WAVE3.filter((r) => r.status === "HELD_POLICY");
+  assert.ok(held.some((r) => r.module_id === "company_integrations"));
+  assert.ok(held.some((r) => r.module_id === "company_billing_public_claim"));
+  assert.ok(held.some((r) => r.module_id === "company_ms_calendar_write"));
+  const demo = HARD_LIVE_EVIDENCE_REGISTRY_WAVE3.filter((r) => r.status === "DEMO_ONLY");
+  assert.equal(demo.length, 7);
+  assert.ok(demo.every((r) => r.blocker === "DEMO_JOURNEY_ISOLATION"));
+  assert.equal(HARD_LIVE_REGISTRY_META.wave, "3");
+});
+
 test("docs registry JSON mirrors TS module ids and PASS smoke fields", () => {
   const jsonPath = join(root, "docs/HARD_LIVE_EVIDENCE_REGISTRY.json");
   const raw = readFileSync(jsonPath, "utf8");
@@ -85,7 +102,7 @@ test("docs registry JSON mirrors TS module ids and PASS smoke fields", () => {
   }
   assert.equal(doc.stance.pilot, "BLOCKED_BY_FOUNDER");
   assert.equal(doc.stance.external_pilot_enrollment_enabled, false);
-  assert.equal(doc.wave, "2");
+  assert.equal(doc.wave, "3");
   const passDocs = doc.modules.filter((m) => m.status === "PASS");
   assert.equal(passDocs.length, 32);
   for (const m of passDocs) {
@@ -93,8 +110,14 @@ test("docs registry JSON mirrors TS module ids and PASS smoke fields", () => {
   }
   assert.match(raw, /HELD_POLICY/);
   assert.match(raw, /DEMO_ONLY/);
-  assert.doesNotMatch(raw, /PENDING_SMOKE/);
-  assert.match(raw, /recruiter_talent_radar/);
+  assert.match(raw, /PENDING_SMOKE/);
+  assert.match(raw, /company_org_settings/);
+  assert.match(raw, /company_demo_pipeline/);
+  // Wave 1+2 must not regress to PENDING_SMOKE
+  const w12Pending = doc.modules.filter(
+    (m) => (m.wave === "1" || m.wave === "2") && m.status === "PENDING_SMOKE",
+  );
+  assert.equal(w12Pending.length, 0);
 });
 
 test("production action gates still block enrollment", () => {

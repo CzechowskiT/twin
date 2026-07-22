@@ -1,5 +1,5 @@
 /**
- * Machine-readable Hard LIVE 30 evidence registry — Wave 1 Candidate + Wave 2 Recruiter.
+ * Machine-readable Hard LIVE 30 evidence registry — Wave 1 Candidate + Wave 2 Recruiter + Wave 3 Company.
  * LIVE badges in capability map / activation require status=PASS after authenticated prod smoke.
  * Stance: Pilot BLOCKED_BY_FOUNDER · Gate F PENDING · Launch NO-GO.
  */
@@ -7,8 +7,8 @@ export type HardLiveCriterionResult = "PASS" | "FAIL" | "N/A" | "PENDING";
 
 export type HardLiveModuleEvidence = {
   module_id: string;
-  persona: "candidate" | "recruiter";
-  wave: "1" | "2";
+  persona: "candidate" | "recruiter" | "company";
+  wave: "1" | "2" | "3";
   /** Never claim product LIVE until PASS + docs update post-smoke. */
   status: "PENDING_SMOKE" | "PASS" | "FAIL" | "PARTIAL" | "HELD_POLICY" | "DEMO_ONLY";
   route: string;
@@ -31,6 +31,10 @@ const WAVE1_SMOKE_AT = "2026-07-20T20:25:00Z";
 /** Filled after Wave 2 authenticated prod smoke PASS. */
 export const WAVE2_SMOKE_SHA: string | null = "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55";
 export const WAVE2_SMOKE_AT: string | null = "2026-07-21T04:12:00Z";
+
+/** Filled after Wave 3 authenticated prod smoke PASS — null until post-merge smoke. */
+export const WAVE3_SMOKE_SHA: string | null = null;
+export const WAVE3_SMOKE_AT: string | null = null;
 
 function passModuleW1(
   module_id: string,
@@ -128,6 +132,67 @@ function demoModuleW2(
     module_id,
     persona: "recruiter",
     wave: "2",
+    status: "DEMO_ONLY",
+    route,
+    owner,
+    blocker: "DEMO_JOURNEY_ISOLATION",
+    missing_criteria: [14, 21, 25],
+    criteria: { ...ALL_PENDING, "14": "FAIL", "21": "FAIL" },
+    notes,
+  };
+}
+
+function pendingModuleW3(
+  module_id: string,
+  route: string,
+  owner: string,
+  notes: string,
+): HardLiveModuleEvidence {
+  return {
+    module_id,
+    persona: "company",
+    wave: "3",
+    status: "PENDING_SMOKE",
+    route,
+    owner,
+    blocker: "authenticated_prod_smoke_required",
+    missing_criteria: [25],
+    criteria: { ...ALL_PENDING, "25": "PENDING" },
+    notes,
+  };
+}
+
+function heldModuleW3(
+  module_id: string,
+  route: string,
+  owner: string,
+  blocker: string,
+  notes: string,
+): HardLiveModuleEvidence {
+  return {
+    module_id,
+    persona: "company",
+    wave: "3",
+    status: "HELD_POLICY",
+    route,
+    owner,
+    blocker,
+    missing_criteria: [13, 15, 28],
+    criteria: { ...ALL_PENDING, "28": "FAIL" },
+    notes,
+  };
+}
+
+function demoModuleW3(
+  module_id: string,
+  route: string,
+  owner: string,
+  notes: string,
+): HardLiveModuleEvidence {
+  return {
+    module_id,
+    persona: "company",
+    wave: "3",
     status: "DEMO_ONLY",
     route,
     owner,
@@ -425,14 +490,227 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE2: HardLiveModuleEvidence[] = [
   ),
 ];
 
+/** Wave 3 Company — PENDING_SMOKE until authenticated module smoke PASS on aligned SHA. */
+export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE3: HardLiveModuleEvidence[] = [
+  pendingModuleW3(
+    "company_dashboard",
+    "/company/dashboard",
+    "company-squad",
+    "Wave 3 pending authenticated prod smoke — hiring-dashboard live path.",
+  ),
+  pendingModuleW3(
+    "company_pipeline",
+    "/company/pipeline",
+    "company-squad",
+    "Wave 3 pending smoke — pipeline-quality live path.",
+  ),
+  pendingModuleW3(
+    "company_roles",
+    "/company/roles",
+    "company-squad",
+    "Wave 3 pending smoke — roles list/create live path.",
+  ),
+  pendingModuleW3(
+    "rec_vacancy_creation",
+    "/company/roles",
+    "company-squad",
+    "Wave 3 pending smoke — vacancy create via company roles.",
+  ),
+  pendingModuleW3(
+    "company_hiring_cockpit",
+    "/company/hiring-cockpit",
+    "company-squad",
+    "Wave 3 pending smoke — cockpit composed on hiring-dashboard.",
+  ),
+  pendingModuleW3(
+    "company_hiring_command_center",
+    "/company/hiring-command-center",
+    "company-squad",
+    "Wave 3 pending smoke — command center on hiring-dashboard.",
+  ),
+  pendingModuleW3(
+    "company_talent_pool",
+    "/company/talent-pool",
+    "company-squad",
+    "Wave 3 pending smoke — talent pool live read.",
+  ),
+  pendingModuleW3(
+    "company_team",
+    "/company/team",
+    "company-squad",
+    "Wave 3 pending smoke — team readiness live read.",
+  ),
+  pendingModuleW3(
+    "company_candidate_trust_summary",
+    "/company/trust-summary",
+    "company-squad",
+    "Wave 3 pending smoke — live trust summary; demo fixtures rejected.",
+  ),
+  pendingModuleW3(
+    "company_org_settings",
+    "/company/org-settings",
+    "company-squad",
+    "Wave 3 pending smoke — org settings persistence.",
+  ),
+  pendingModuleW3(
+    "company_permissions",
+    "/company/permissions",
+    "company-squad",
+    "Wave 3 pending smoke — RBAC matrix read; invite delivery HELD.",
+  ),
+  pendingModuleW3(
+    "company_analytics",
+    "/company/hiring-command-center",
+    "company-squad",
+    "Wave 3 pending smoke — analytics via hiring-dashboard metrics.",
+  ),
+  pendingModuleW3(
+    "company_audit_log",
+    "/company/audit-log",
+    "company-squad",
+    "Wave 3 pending smoke — company domain-event audit log.",
+  ),
+  pendingModuleW3(
+    "company_scorecards",
+    "/company/scorecards",
+    "company-squad",
+    "Wave 3 pending smoke — scorecards live; demo fixtures rejected.",
+  ),
+  pendingModuleW3(
+    "company_notifications",
+    "/company/notifications",
+    "company-squad",
+    "Wave 3 pending smoke — notification outbox draft only.",
+  ),
+  pendingModuleW3(
+    "company_onboarding_synthetic",
+    "/company/onboarding",
+    "company-squad",
+    "Wave 3 pending smoke — synthetic onboarding; enrollment stays OFF.",
+  ),
+  heldModuleW3(
+    "company_integrations",
+    "/company/integrations",
+    "company-squad",
+    "ATS_LIVE_SYNC_BLOCKED",
+    "ATS live-sync hard ban — honesty endpoint only.",
+  ),
+  heldModuleW3(
+    "rec_ats_sync",
+    "/company/integrations",
+    "company-squad",
+    "ATS_LIVE_SYNC_BLOCKED",
+    "ATS live-sync hard ban.",
+  ),
+  heldModuleW3(
+    "rec_vacancy_import",
+    "/company/integrations/ats/import-readiness",
+    "company-squad",
+    "ATS_LIVE_SYNC_BLOCKED",
+    "Vacancy import stays held with ATS ban.",
+  ),
+  heldModuleW3(
+    "company_ats_import_readiness",
+    "/company/integrations/ats/import-readiness",
+    "company-squad",
+    "ATS_LIVE_SYNC_BLOCKED",
+    "ATS import readiness INTERNAL/held.",
+  ),
+  heldModuleW3(
+    "company_billing",
+    "/company/billing",
+    "company-squad",
+    "STRIPE_NOT_PUBLIC",
+    "Stripe public not LIVE — honesty only.",
+  ),
+  heldModuleW3(
+    "company_billing_public_claim",
+    "/company/billing",
+    "company-squad",
+    "STRIPE_NOT_PUBLIC",
+    "Stripe public claim blocked.",
+  ),
+  heldModuleW3(
+    "rec_subscription",
+    "/company/billing",
+    "company-squad",
+    "STRIPE_NOT_PUBLIC",
+    "Subscription PAUSED with Stripe hold.",
+  ),
+  heldModuleW3(
+    "company_ms_calendar_write",
+    "/company/hiring-cockpit",
+    "platform",
+    "MICROSOFT_WRITE_BLOCKED",
+    "MS calendar write blocked.",
+  ),
+  heldModuleW3(
+    "company_invite_delivery",
+    "/company/team",
+    "company-squad",
+    "EXTERNAL_ENROLLMENT_OFF",
+    "Invite dry-run only — real delivery HELD.",
+  ),
+  heldModuleW3(
+    "rec_company_onboarding",
+    "/company/onboarding",
+    "company-squad",
+    "EXTERNAL_ENROLLMENT_OFF",
+    "Real company enrollment NOT_STARTED — synthetic path separate.",
+  ),
+  demoModuleW3(
+    "company_demo_collaboration",
+    "/company/candidates/demo-candidate-001/collaboration",
+    "company-squad",
+    "Honest DEMO_ONLY isolation.",
+  ),
+  demoModuleW3(
+    "company_demo_communication",
+    "/company/candidates/demo-candidate-001/communication",
+    "company-squad",
+    "Honest DEMO_ONLY isolation.",
+  ),
+  demoModuleW3(
+    "company_demo_decision_memory",
+    "/company/candidates/demo-candidate-001/decision-memory",
+    "company-squad",
+    "Honest DEMO_ONLY — live scorecards are separate API.",
+  ),
+  demoModuleW3(
+    "company_demo_pipeline",
+    "/company/roles/demo-role-001/pipeline",
+    "company-squad",
+    "Honest DEMO_ONLY isolation.",
+  ),
+  demoModuleW3(
+    "company_demo_profile_360",
+    "/company/candidates/demo-candidate-001",
+    "company-squad",
+    "Honest DEMO_ONLY isolation.",
+  ),
+  demoModuleW3(
+    "company_demo_team",
+    "/company/candidates/demo-candidate-001/team",
+    "company-squad",
+    "Honest DEMO_ONLY isolation.",
+  ),
+  demoModuleW3(
+    "company_demo_trust",
+    "/company/candidates/demo-candidate-001/trust",
+    "company-squad",
+    "Honest DEMO_ONLY isolation.",
+  ),
+];
+
 export const HARD_LIVE_EVIDENCE_REGISTRY: HardLiveModuleEvidence[] = [
   ...HARD_LIVE_EVIDENCE_REGISTRY_WAVE1,
   ...HARD_LIVE_EVIDENCE_REGISTRY_WAVE2,
+  ...HARD_LIVE_EVIDENCE_REGISTRY_WAVE3,
 ];
 
 export const HARD_LIVE_REGISTRY_META = {
   definition: "docs/HARD_LIVE_DEFINITION_30.md",
-  wave: "2",
+  wave: "3",
   stance: {
     pilot: "BLOCKED_BY_FOUNDER",
     gate_f: "PENDING",
@@ -449,6 +727,9 @@ export const HARD_LIVE_REGISTRY_META = {
     wave2_script: "frontend/scripts/wave2-recruiter-module-prod-smoke.test.ts",
     wave2_sha: WAVE2_SMOKE_SHA,
     wave2_at: WAVE2_SMOKE_AT,
+    wave3_script: "frontend/scripts/wave3-company-module-prod-smoke.test.ts",
+    wave3_sha: WAVE3_SMOKE_SHA,
+    wave3_at: WAVE3_SMOKE_AT,
     write: true,
     exclude_from_product_metrics: true,
   },
@@ -466,7 +747,7 @@ export function assertNoLivePassWithoutSmoke(
         throw new Error(`Module ${row.module_id} PASS requires smoke_sha`);
       }
     }
-    if (row.status === "DEMO_ONLY" && row.persona === "recruiter") {
+    if (row.status === "DEMO_ONLY" && (row.persona === "recruiter" || row.persona === "company")) {
       if (!row.blocker) {
         throw new Error(`Demo module ${row.module_id} requires blocker`);
       }
@@ -480,4 +761,8 @@ export function registryModuleIds(): string[] {
 
 export function wave2PendingSmokeIds(): string[] {
   return HARD_LIVE_EVIDENCE_REGISTRY_WAVE2.filter((r) => r.status === "PENDING_SMOKE").map((r) => r.module_id);
+}
+
+export function wave3PendingSmokeIds(): string[] {
+  return HARD_LIVE_EVIDENCE_REGISTRY_WAVE3.filter((r) => r.status === "PENDING_SMOKE").map((r) => r.module_id);
 }

@@ -33,6 +33,13 @@
 | `RECRUITER_WAVE2_TEAM_INVITE_DRY_RUN` | DB seed via `recruiter_wave2` | `true` | Team invite dry-run — no real email |
 | `RECRUITER_WAVE2_COMMS_DRAFT_ONLY` | DB seed via `recruiter_wave2` | `true` | Recruiter comms outbox draft only |
 | `RECRUITER_WAVE2_DEMO_ISOLATION` | DB seed via `recruiter_wave2` | `true` | Demo journeys forced DEMO_ONLY |
+| `COMPANY_WAVE3_HARD_LIVE_REGISTRY` | DB seed via `company_wave3` | `true` | Wave 3 Hard LIVE evidence rows |
+| `COMPANY_WAVE3_ORG_SETTINGS_LIVE` | DB seed via `company_wave3` | `true` | Company org settings live persistence |
+| `COMPANY_WAVE3_SCORECARDS_LIVE` | DB seed via `company_wave3` | `true` | Company scorecards live (no demo fixtures) |
+| `COMPANY_WAVE3_TEAM_INVITE_DRY_RUN` | DB seed via `company_wave3` | `true` | Team invite dry-run — delivery HELD |
+| `COMPANY_WAVE3_COMMS_DRAFT_ONLY` | DB seed via `company_wave3` | `true` | Company notifications outbox draft only |
+| `COMPANY_WAVE3_DEMO_ISOLATION` | DB seed via `company_wave3` | `true` | Company demo journeys forced DEMO_ONLY |
+| `COMPANY_WAVE3_RBAC_MATRIX` | DB seed via `company_wave3` | `true` | Company RBAC matrix + hiring_manager role |
 
 ## Hard-ban flags (must remain true / blocked)
 
