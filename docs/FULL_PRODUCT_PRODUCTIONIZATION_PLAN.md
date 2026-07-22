@@ -218,4 +218,20 @@ Monetization/Stripe public and ATS live-sync remain **outside** waves until expl
 
 **Exit status:** **DONE_WITH_POLICY_HOLDS** — 16 Hard LIVE PASS; ATS/Stripe/MS write/invite delivery/enrollment held; demo isolated DEMO_ONLY.
 
-**Next:** Wave 4 Investor Complete (no enrollment / Gate F flip).
+**Next:** Wave 4 Investor Complete was **not shipped**. Wave 5 Calendar & Integrations proceeds on Wave 3 HEAD.
+
+## 13. Wave 5 Calendar & Integrations Complete (this batch)
+
+- [x] Capability-split integration inventory (CONFIGURATION/READ/IMPORT/EXPORT/DRAFT/WRITE/SYNC/WEBHOOK/MONITORING)
+- [x] ICS/WebCal portability (preview, CANCEL/STATUS/SEQUENCE/UID, WebCal mint with metrics exclusion)
+- [x] Google/MS/ATS honesty endpoints — WRITE holds intact (MS HELD, ATS BLOCKED)
+- [x] Email draft-only + webhook HMAC verify dry-run + CSV formula escape + storage honesty
+- [x] Migration `091_integrations_wave5_hard_live` + wave5 flags + evidence seed
+- [x] `WAVE5_SMOKE_MODULES` fail-closed harness + CI guards
+- [x] Policy holds unchanged: ATS / MS write / auto-apply / Stripe / Authologic / enrollment OFF
+- [ ] Authenticated per-module prod smoke PASS on aligned SHA (post-merge)
+- [ ] Capability map LIVE promotions only after smoke PASS
+
+**Exit status (engineering ship):** pending post-merge smoke — LIVE badges deferred. Wave 4 noted as missing.
+
+**Next:** After Wave 5 smoke PASS → Wave 6 Privacy / DSR Complete (do not start in this batch).

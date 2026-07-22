@@ -176,6 +176,8 @@
     "test:wave2-module-smoke-handlers": "npx --yes tsx --test scripts/wave2-module-smoke-handlers.test.ts",
     "test:wave3-company-module-prod-smoke": "npx --yes tsx --test scripts/wave3-company-module-prod-smoke.test.ts",
     "test:wave3-module-smoke-handlers": "npx --yes tsx --test scripts/wave3-module-smoke-handlers.test.ts",
+    "test:wave5-integrations-module-prod-smoke": "npx --yes tsx --test scripts/wave5-integrations-module-prod-smoke.test.ts",
+    "test:wave5-module-smoke-handlers": "npx --yes tsx --test scripts/wave5-module-smoke-handlers.test.ts",
     "test:hardening-retention-preview-guard": "npx --yes tsx scripts/hardening-retention-preview-guard.test.ts",
     "test:hardening-pilot-readiness-dashboard-guard": "npx --yes tsx scripts/hardening-pilot-readiness-dashboard-guard.test.ts",
     "test:hardening-workspace-suspension-guard": "npx --yes tsx scripts/hardening-workspace-suspension-guard.test.ts",

@@ -40,6 +40,13 @@
 | `COMPANY_WAVE3_COMMS_DRAFT_ONLY` | DB seed via `company_wave3` | `true` | Company notifications outbox draft only |
 | `COMPANY_WAVE3_DEMO_ISOLATION` | DB seed via `company_wave3` | `true` | Company demo journeys forced DEMO_ONLY |
 | `COMPANY_WAVE3_RBAC_MATRIX` | DB seed via `company_wave3` | `true` | Company RBAC matrix + hiring_manager role |
+| `INTEGRATIONS_WAVE5_HARD_LIVE_REGISTRY` | DB seed via `integrations_wave5` | `true` | Wave 5 Hard LIVE evidence rows |
+| `INTEGRATIONS_WAVE5_ICS_WEBCAL_LIVE` | DB seed via `integrations_wave5` | `true` | ICS/WebCal portability engineering path |
+| `INTEGRATIONS_WAVE5_INVENTORY_SPLIT` | DB seed via `integrations_wave5` | `true` | Per-capability integration inventory |
+| `INTEGRATIONS_WAVE5_WEBHOOK_LEDGER` | DB seed via `integrations_wave5` | `true` | Webhook delivery attempt ledger |
+| `INTEGRATIONS_WAVE5_COMMS_DRAFT_ONLY` | DB seed via `integrations_wave5` | `true` | Wave 5 email = outbox draft only |
+| `INTEGRATIONS_WAVE5_SMOKE_FAIL_CLOSED` | DB seed via `integrations_wave5` | `true` | Smoke fails closed on real provider writes |
+| `AUTOLOGIC_AUTO_KYC` | DB seed via `integrations_wave5` | `false` | Hard ban — Authologic Auto KYC OFF |
 
 ## Hard-ban flags (must remain true / blocked)
 

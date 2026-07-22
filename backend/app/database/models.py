@@ -2169,6 +2169,52 @@ class HardLiveEvidenceRecord(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
+class IntegrationCapabilityRecord(Base):
+    """Per-integration capability status — Wave 5 (never collapse whole vendor to LIVE)."""
+
+    __tablename__ = "integration_capability_records"
+    __table_args__ = (
+        UniqueConstraint(
+            "integration_key",
+            "capability",
+            name="uq_integration_capability_key_cap",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    integration_key: Mapped[str] = mapped_column(String(64), index=True)
+    capability: Mapped[str] = mapped_column(String(32))
+    status: Mapped[str] = mapped_column(String(32), index=True)
+    blocker: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    owner: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    evidence_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    notes: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class WebhookDeliveryAttempt(Base):
+    """Append-only webhook verify/delivery attempts — Wave 5 observability (no PII payloads)."""
+
+    __tablename__ = "webhook_delivery_attempts"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    provider: Mapped[str] = mapped_column(String(64), index=True)
+    direction: Mapped[str] = mapped_column(String(16))
+    event_type: Mapped[str] = mapped_column(String(128))
+    idempotency_key: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
+    signature_ok: Mapped[bool] = mapped_column(Boolean, default=False)
+    replay_rejected: Mapped[bool] = mapped_column(Boolean, default=False)
+    status: Mapped[str] = mapped_column(String(32))
+    http_status: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    attempt_n: Mapped[int] = mapped_column(Integer, default=1)
+    error_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    meta_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+
+
 class CompanyOrgSettings(Base):
     """Company org settings — Wave 3 Hard LIVE persistence (tenant-scoped)."""
 
