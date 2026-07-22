@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 import test from "node:test";
 
 import {
+  GAP_CLOSE_SMOKE_SHA,
   HARD_LIVE_EVIDENCE_REGISTRY,
   HARD_LIVE_EVIDENCE_REGISTRY_WAVE1,
   HARD_LIVE_EVIDENCE_REGISTRY_WAVE2,
@@ -77,7 +78,14 @@ test("wave2 recruiter modules PASS after smoke; demo journeys removed", () => {
   assert.equal(wave2PendingSmokeIds().length, 0);
   const passed = HARD_LIVE_EVIDENCE_REGISTRY_WAVE2.filter((r) => r.status === "PASS");
   assert.equal(passed.length, 23);
-  assert.ok(passed.every((r) => r.smoke_sha === "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55"));
+  const gapCloseW2 = new Set(["rec_sla_tracking", "rec_collaboration", "rec_candidate_comms"]);
+  assert.ok(
+    passed.every((r) =>
+      gapCloseW2.has(r.module_id)
+        ? r.smoke_sha === GAP_CLOSE_SMOKE_SHA
+        : r.smoke_sha === "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+    ),
+  );
   const held = HARD_LIVE_EVIDENCE_REGISTRY_WAVE2.filter((r) => r.status === "HELD_POLICY");
   assert.ok(held.some((r) => r.module_id === "recruiter_calendar"));
   assert.ok(held.some((r) => r.module_id === "recruiter_integrations"));
@@ -107,7 +115,13 @@ test("wave5 integrations modules PASS after smoke with policy holds intact", () 
   assert.equal(wave5PendingSmokeIds().length, 0);
   const passed = HARD_LIVE_EVIDENCE_REGISTRY_WAVE5.filter((r) => r.status === "PASS");
   assert.equal(passed.length, 19);
-  assert.ok(passed.every((r) => r.smoke_sha === "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18"));
+  assert.ok(
+    passed.every((r) =>
+      r.module_id === "plat_ics_import"
+        ? r.smoke_sha === GAP_CLOSE_SMOKE_SHA
+        : r.smoke_sha === "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
+    ),
+  );
   const held = HARD_LIVE_EVIDENCE_REGISTRY_WAVE5.filter((r) => r.status === "HELD_POLICY");
   assert.equal(held.length, 6);
   assert.ok(held.some((r) => r.module_id === "plat_ms_calendar_write"));

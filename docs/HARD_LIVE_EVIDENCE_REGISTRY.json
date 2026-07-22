@@ -32,6 +32,9 @@
     "ai_compliance_script": "frontend/scripts/ai-compliance-module-prod-smoke.test.ts",
     "ai_compliance_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
     "ai_compliance_at": "2026-07-22T16:28:00Z",
+    "gap_close_script": "frontend/scripts/gap-close-module-prod-smoke.test.ts",
+    "gap_close_sha": "81630ab30bcbee46f57ff7d6868bf6cb7151b4ec",
+    "gap_close_at": "2026-07-22T19:06:00Z",
     "write": true,
     "exclude_from_product_metrics": true
   },
@@ -241,8 +244,8 @@
       "route": "/dashboard/trust/revoke-delete",
       "blocker": null,
       "owner": "privacy",
-      "smoke_sha": "cf773744c92c7ccfae408175b27c30f498d5361f",
-      "smoke_at": "2026-07-20T20:25:00Z"
+      "smoke_sha": "81630ab30bcbee46f57ff7d6868bf6cb7151b4ec",
+      "smoke_at": "2026-07-22T19:06:00Z"
     },
     {
       "module_id": "candidate_revoke_delete",
@@ -252,8 +255,8 @@
       "route": "/dashboard/trust/revoke-delete",
       "blocker": null,
       "owner": "privacy",
-      "smoke_sha": "cf773744c92c7ccfae408175b27c30f498d5361f",
-      "smoke_at": "2026-07-20T20:25:00Z"
+      "smoke_sha": "81630ab30bcbee46f57ff7d6868bf6cb7151b4ec",
+      "smoke_at": "2026-07-22T19:06:00Z"
     },
     {
       "module_id": "recruiter_talent_radar",
@@ -528,8 +531,8 @@
       "route": "/recruiter/analytics",
       "blocker": null,
       "owner": "recruiter-squad",
-      "smoke_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
-      "smoke_at": "2026-07-21T04:12:00Z"
+      "smoke_sha": "81630ab30bcbee46f57ff7d6868bf6cb7151b4ec",
+      "smoke_at": "2026-07-22T19:06:00Z"
     },
     {
       "module_id": "rec_candidate_comms",
@@ -539,8 +542,8 @@
       "route": "/recruiter/inbox",
       "blocker": null,
       "owner": "recruiter-squad",
-      "smoke_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
-      "smoke_at": "2026-07-21T04:12:00Z"
+      "smoke_sha": "81630ab30bcbee46f57ff7d6868bf6cb7151b4ec",
+      "smoke_at": "2026-07-22T19:06:00Z"
     },
     {
       "module_id": "rec_collaboration",
@@ -550,8 +553,8 @@
       "route": "/recruiter/inbox",
       "blocker": null,
       "owner": "recruiter-squad",
-      "smoke_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
-      "smoke_at": "2026-07-21T04:12:00Z"
+      "smoke_sha": "81630ab30bcbee46f57ff7d6868bf6cb7151b4ec",
+      "smoke_at": "2026-07-22T19:06:00Z"
     },
     {
       "module_id": "company_dashboard",
@@ -1287,8 +1290,8 @@
       "route": "/dashboard/calendar",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
-      "smoke_at": "2026-07-22T14:50:00Z"
+      "smoke_sha": "81630ab30bcbee46f57ff7d6868bf6cb7151b4ec",
+      "smoke_at": "2026-07-22T19:06:00Z"
     },
     {
       "module_id": "ai_claim_declared",
@@ -1642,8 +1645,8 @@
       "route": "/dashboard/trust/revoke-delete",
       "blocker": null,
       "owner": "privacy",
-      "smoke_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
-      "smoke_at": "2026-07-22T16:28:00Z"
+      "smoke_sha": "81630ab30bcbee46f57ff7d6868bf6cb7151b4ec",
+      "smoke_at": "2026-07-22T19:06:00Z"
     }
   ],
   "wave4_note": "Gap-close 2026-07-22+: DEMO_ONLY=0; connectors/push reclassed BLOCKED_EXTERNAL_CREDENTIALS; CV sandbox entitlement. Wave 4 Investor + Wave 5 + AI Phase A prior smoke retained. Pilot BLOCKED / Gate F PENDING / Launch NO-GO unchanged."

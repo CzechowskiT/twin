@@ -217,14 +217,21 @@ test("3 per-module authenticated gap-close smoke", async (t) => {
     results.ai_wave6_dsr_delete_export = "PASS";
   }
 
-  // rec_candidate_comms — draft/preview honesty
+  // rec_candidate_comms — draft/preview honesty (unique preview avoids outbox conflicts)
   {
     const res = await api("/api/v1/platform/wave5/email/draft", {
       method: "POST",
       headers: authHeaders(),
-      body: JSON.stringify({ body_preview: "gap-close smoke draft", send: false }),
+      body: JSON.stringify({
+        body_preview: `gap-close smoke draft ${Date.now()}`,
+        send: false,
+      }),
     });
     assert.ok([200, 201].includes(res.status), `comms ${res.status} ${res.body.slice(0, 180)}`);
+    const body = JSON.parse(res.body) as { draft?: boolean; send?: boolean; provider_write?: boolean };
+    assert.equal(body.draft, true);
+    assert.equal(body.send, false);
+    assert.equal(body.provider_write, false);
     results.rec_candidate_comms = "PASS";
   }
 

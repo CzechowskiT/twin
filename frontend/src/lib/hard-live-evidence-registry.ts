@@ -48,6 +48,11 @@ export const WAVE4_SMOKE_AT: string | null = "2026-07-22T16:28:00Z";
 export const AI_COMPLIANCE_SMOKE_SHA: string | null = "2987e16804fcd7de19db3930f9b7184e465a1d18";
 export const AI_COMPLIANCE_SMOKE_AT: string | null = "2026-07-22T16:28:00Z";
 
+/** Gap-close authenticated prod smoke (ICS/SLA/collab/DSR/delete) on Railway API. */
+export const GAP_CLOSE_SMOKE_SHA: string | null = "81630ab30bcbee46f57ff7d6868bf6cb7151b4ec";
+export const GAP_CLOSE_SMOKE_AT: string | null = "2026-07-22T19:06:00Z";
+
+
 
 function passModuleW1(
   module_id: string,
@@ -219,6 +224,15 @@ function demoModuleW3(
 }
 
 /** Canonical Wave 1 registry — CI guards assert no PASS without smoke evidence fields. */
+
+function withGapCloseSmoke<T extends HardLiveModuleEvidence>(row: T): T {
+  return {
+    ...row,
+    smoke_sha: GAP_CLOSE_SMOKE_SHA!,
+    smoke_at: GAP_CLOSE_SMOKE_AT!,
+  };
+}
+
 export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE1: HardLiveModuleEvidence[] = [
   passModuleW1(
     "candidate_consent_receipt",
@@ -328,17 +342,21 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE1: HardLiveModuleEvidence[] = [
     "Gap-close — plan sandbox UI LIVE; public Stripe claim remains HELD.",
   ),
   heldModuleW1("plan_payments", "/dashboard/billing", "candidate-squad", "STRIPE_NOT_PUBLIC", "Public Stripe payments HELD — Founder allowlist."),
+  withGapCloseSmoke(
   passModuleW1(
     "cand_account_deletion",
     "/dashboard/trust/revoke-delete",
     "privacy",
     "Gap-close — authenticated delete-account + audit; ops DSR queue separate.",
   ),
+  ),
+  withGapCloseSmoke(
   passModuleW1(
     "candidate_revoke_delete",
     "/dashboard/trust/revoke-delete",
     "privacy",
     "Gap-close — revoke/delete live panel with export.json + privacy-requests.",
+  ),
   ),
 ];
 
@@ -439,23 +457,29 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE2: HardLiveModuleEvidence[] = [
     "EXTERNAL_ENROLLMENT_OFF",
     "Pilot token gated — real enrollment NOT_STARTED.",
   ),
+  withGapCloseSmoke(
   passModuleW2(
     "rec_sla_tracking",
     "/recruiter/analytics",
     "recruiter-squad",
     "Gap-close — live SLA targets + breach summary from applications (no sample metrics).",
   ),
+  ),
+  withGapCloseSmoke(
   passModuleW2(
     "rec_candidate_comms",
     "/recruiter/inbox",
     "recruiter-squad",
     "Gap-close — live communications/draft API; demo journey CTAs removed from product UI.",
   ),
+  ),
+  withGapCloseSmoke(
   passModuleW2(
     "rec_collaboration",
     "/recruiter/inbox",
     "recruiter-squad",
     "Gap-close — live collaboration notes API; demo fixture boards removed from product CTAs.",
+  ),
   ),
 ];
 
@@ -898,11 +922,13 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE5: HardLiveModuleEvidence[] = [
     "BLOCKED_EXTERNAL_CREDENTIALS",
     "S3-compatible + local abstraction shipped; cloud vendor OAuth (Drive/OneDrive/Dropbox) needs founder credentials. Local/S3 path usable when configured.",
   ),
+  withGapCloseSmoke(
   passModuleW5(
     "plat_ics_import",
     "/dashboard/calendar",
     "platform",
     "Gap-close — ICS VEVENT import to local busy holds; no Google/MS write.",
+  ),
   ),
 ];
 
@@ -1106,11 +1132,13 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_AI_COMPLIANCE: HardLiveModuleEvidence[]
   heldAiCompliance("ai_protected_attr_monitoring", "/board/ai-compliance", "platform", "PROTECTED_ATTR_MONITORING_LEGAL_HOLD", "Protected attribute monitoring legal hold."),
   heldAiCompliance("ai_autonomous_employment", "/recruiter/evidence/reviews", "platform", "AUTONOMOUS_EMPLOYMENT_HARD_BAN", "Autonomous employment decisions hard-banned."),
   heldAiCompliance("ai_act_certified_claim", "/board/ai-compliance", "platform", "NO_LEGAL_CERTIFICATION", "No AI Act certification claim."),
+  withGapCloseSmoke(
   passAiCompliance(
     "ai_wave6_dsr_delete_export",
     "/dashboard/trust/revoke-delete",
     "privacy",
     "Gap-close — DSR export/delete + objection/restriction + ops fulfillment queue + legal hold.",
+  ),
   ),
 ];
 
@@ -1154,6 +1182,9 @@ export const HARD_LIVE_REGISTRY_META = {
     ai_compliance_script: "frontend/scripts/ai-compliance-module-prod-smoke.test.ts",
     ai_compliance_sha: AI_COMPLIANCE_SMOKE_SHA,
     ai_compliance_at: AI_COMPLIANCE_SMOKE_AT,
+    gap_close_script: "frontend/scripts/gap-close-module-prod-smoke.test.ts",
+    gap_close_sha: GAP_CLOSE_SMOKE_SHA,
+    gap_close_at: GAP_CLOSE_SMOKE_AT,
     write: true,
     exclude_from_product_metrics: true,
   },

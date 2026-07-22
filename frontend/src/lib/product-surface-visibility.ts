@@ -176,7 +176,7 @@ export function tierFromWorkspaceStatus(status: WorkspaceModuleStatus): ProductS
             : "INTERNAL";
 }
 
-/** @deprecated No primary limits — full product surface visible. */
+/** Full product surface — green-only mode is off. */
 export function getWorkspacePrimaryLimits(): Readonly<Record<MarketingPersona, number>> {
-  return CONTROLLED_PILOT_PRIMARY_LIMITS;
+  return FULL_SURFACE_PRIMARY_LIMITS;
 }
