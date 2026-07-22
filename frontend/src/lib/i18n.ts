@@ -8808,7 +8808,8 @@ const pl: MessageTree = {
     exploreGroupDemo: "Demo i wiedza",
     exploreGroupTrust: "Zaufanie i status",
     ariaExplorePanel: "Trasy Poznaj TWIN",
-    logoutToSwitchRole: "Wyloguj się, aby przełączyć rolę",
+    switchPersona: "Przełącz przestrzeń",
+    logoutToSwitchRole: "Użyj przełącznika przestrzeni w nagłówku albo wyloguj się, aby zmienić rolę",
   },
   home: {
     tagline: "Bliźniak kariery AI",
