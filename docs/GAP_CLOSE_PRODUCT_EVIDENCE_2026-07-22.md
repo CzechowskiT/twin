@@ -1,34 +1,30 @@
-# Gap-close product evidence — 2026-07-22
+# Gap-close product evidence — 2026-07-22 (post-094 hotfix)
 
 **Branch:** `cursor/phase1-monorepo-scaffold`  
-**Baseline HEAD:** `95739790`  
-**Stance unchanged:** Pilot `BLOCKED_BY_FOUNDER` · Gate F `PENDING` · Launch `NO-GO` · enrollment OFF · no Founder Command · no Product Agent · no real invites.
+**Canonical tip (this batch):** post-commit HEAD (see git)  
+**API smoke SHA:** `81630ab30bcbee46f57ff7d6868bf6cb7151b4ec` (≥094 boolean hotfix)  
+**Alembic prod:** `094_gap_close_dsr_sla_ics` (`is_at_head=true`)
 
-## Registry delta
+## Stance (unchanged)
+Pilot `BLOCKED_BY_FOUNDER` · Gate F `PENDING` · Launch `NO-GO` · Phase 3B `BLOCKED` · enrollment OFF
 
-| Metric | Before | After |
-|--------|-------:|------:|
-| PASS | 106 | 116 |
-| HELD_POLICY | 45 | 37 |
-| DEMO_ONLY | 18 | **0** |
-| PENDING_SMOKE | 0 | **0** |
-| Modules total | 169 | 153 |
+## Registry
+| Metric | Count |
+|--------|------:|
+| PASS | 118 |
+| HELD_POLICY | 30 |
+| BLOCKED_EXTERNAL_CREDENTIALS | 5 |
+| DEMO_ONLY | 0 |
+| PENDING_SMOKE | 0 |
+| Total | 153 |
 
-## Built in this batch
+## Smokes
+- Gap-close module prod smoke (`test:gap-close-module-prod-smoke`): **PASS 4/4** on API `81630ab3` (ICS, SLA, collab, DSR objection, delete read, comms draft)
+- CV sandbox: PUT profile + POST `/candidates/me/cv` **200** on metrics-excluded account (no public Stripe)
+- Wave 4 / AI Compliance: prior PASS retained @ `2987e168` (not re-run as unfinished)
 
-- Alembic **094** — DSR fulfillment columns, SLA targets, ICS import holds, collaboration notes
-- Privacy/DSR — objection + restriction + ops queue fulfill + legal hold flag
-- Recruiter SLA summary API (`GET/PUT /api/v1/recruiter/sla`)
-- ICS import API (`POST /api/v1/calendar/me/ics/import`)
-- Live collaboration notes API (rejects demo fixture IDs)
-- Product UI — removed demo journey CTAs from jobs/roles/talent-radar/cockpit module links
-- Hard LIVE — DEMO_ONLY fixtures removed; completable modules promoted to PASS
+## Connectors
+Google push / Slack / Teams / Zapier / cloud storage: **BLOCKED_EXTERNAL_CREDENTIALS** (APIs present; vendor secrets missing) — not fake HELD_POLICY.
 
-## HELD_POLICY remaining (Founder allowlist / explicit blocks)
-
-Stripe public, ATS write/sync, MS calendar write/busy, Authologic KYC, enrollment/invites, auto-apply, AI external verification / protected-attr monitoring / autonomous employment / AI Act cert, CV Standard+ paywall, Google Calendar push webhook, Slack/Teams/Zapier/cloud storage connectors, investor S3/attestations.
-
-## Tests
-
-- `npm run test:hard-live-evidence-guard` — PASS
-- `pytest tests/test_gap_close_dsr_sla_ics.py` — 7 PASS
+## Founder HELD allowlist (30)
+Stripe public, ATS write/sync, MS calendar write/busy, Authologic KYC, enrollment/invites, auto-apply, AI hard bans, investor S3/attestations/self-serve — only policy/hard bans remain.

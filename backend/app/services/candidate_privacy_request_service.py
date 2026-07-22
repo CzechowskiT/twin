@@ -218,21 +218,28 @@ def create_ops_privacy_request(
     db: Session,
     *,
     candidate_id: int,
-    actor_user_id: int,
+    actor_user_id: int | None,
     request_type: str,
     payload: dict[str, Any] | None = None,
     legal_hold: bool = False,
 ) -> dict[str, Any]:
     """Ops/admin path — supports legal_hold and queue seeding."""
+    from app.database.models import Candidate
+
     if request_type not in ALL_REQUEST_TYPES:
         raise ValueError(f"Unknown request type: {request_type}")
+    candidate = db.query(Candidate).filter(Candidate.id == candidate_id).first()
+    if not candidate:
+        raise ValueError("Candidate not found")
+    # created_by_user_id is NOT NULL FK — attribute to candidate owner when ops actor is token-only.
+    created_by = actor_user_id if actor_user_id and actor_user_id > 0 else candidate.user_id
     is_hold = request_type == "legal_hold" or legal_hold
     row = CandidatePrivacyRequest(
         candidate_id=candidate_id,
         request_type=request_type,
         status="open",
         payload_json=_dump_json(payload or {}),
-        created_by_user_id=actor_user_id,
+        created_by_user_id=created_by,
         fulfillment_status="queued",
         legal_hold=is_hold,
     )
@@ -245,7 +252,33 @@ def create_ops_privacy_request(
         summary=f"Ops privacy request: {request_type}",
         metadata={"request_id": row.id, "request_type": request_type, "legal_hold": is_hold},
         actor="ops",
-        actor_user_id=actor_user_id,
+        actor_user_id=actor_user_id if actor_user_id and actor_user_id > 0 else None,
+    )
+    db.commit()
+    db.refresh(row)
+    return _serialize(row)
+
+
+def set_privacy_request_legal_hold(
+    db: Session,
+    *,
+    request_id: int,
+    legal_hold: bool,
+    actor_user_id: int | None = None,
+) -> dict[str, Any]:
+    row = db.query(CandidatePrivacyRequest).filter(CandidatePrivacyRequest.id == request_id).first()
+    if not row:
+        raise ValueError("Privacy request not found")
+    row.legal_hold = bool(legal_hold)
+    row.updated_at = _utcnow()
+    record_trust_audit_event(
+        db,
+        candidate_id=row.candidate_id,
+        event_type="privacy_request_ops_created",
+        summary=f"Legal hold {'set' if legal_hold else 'cleared'} on privacy request {request_id}",
+        metadata={"request_id": row.id, "legal_hold": bool(legal_hold)},
+        actor="ops",
+        actor_user_id=actor_user_id if actor_user_id and actor_user_id > 0 else None,
     )
     db.commit()
     db.refresh(row)
@@ -274,7 +307,7 @@ def fulfill_privacy_request(
     db: Session,
     *,
     request_id: int,
-    actor_user_id: int,
+    actor_user_id: int | None,
     fulfillment_status: str,
     delivery_receipt: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
@@ -287,17 +320,18 @@ def fulfill_privacy_request(
         raise ValueError("legal_hold_blocks_deletion_fulfillment")
     row.fulfillment_status = fulfillment_status
     row.updated_at = _utcnow()
+    actor_id = actor_user_id if actor_user_id and actor_user_id > 0 else None
     if fulfillment_status == "fulfilled":
         row.status = "completed"
         row.completed_at = _utcnow()
         row.fulfilled_at = _utcnow()
-        row.fulfilled_by_user_id = actor_user_id
+        row.fulfilled_by_user_id = actor_id
         if delivery_receipt is not None:
             row.delivery_receipt_json = _dump_json(delivery_receipt)
     elif fulfillment_status == "rejected":
         row.status = "completed"
         row.completed_at = _utcnow()
-        row.fulfilled_by_user_id = actor_user_id
+        row.fulfilled_by_user_id = actor_id
         if delivery_receipt is not None:
             row.delivery_receipt_json = _dump_json(delivery_receipt)
     elif fulfillment_status == "cancelled":
@@ -315,7 +349,7 @@ def fulfill_privacy_request(
             "delivery_receipt": delivery_receipt or {},
         },
         actor="ops",
-        actor_user_id=actor_user_id,
+        actor_user_id=actor_id,
     )
     db.commit()
     db.refresh(row)

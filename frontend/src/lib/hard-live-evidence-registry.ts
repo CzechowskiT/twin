@@ -50,7 +50,7 @@ export const AI_COMPLIANCE_SMOKE_AT: string | null = "2026-07-22T16:28:00Z";
 
 /** Gap-close authenticated prod smoke (ICS/SLA/collab/DSR/delete) on Railway API. */
 export const GAP_CLOSE_SMOKE_SHA: string | null = "81630ab30bcbee46f57ff7d6868bf6cb7151b4ec";
-export const GAP_CLOSE_SMOKE_AT: string | null = "2026-07-22T19:06:00Z";
+export const GAP_CLOSE_SMOKE_AT: string | null = "2026-07-22T19:20:00Z";
 
 
 
@@ -294,19 +294,21 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE1: HardLiveModuleEvidence[] = [
     "candidate-squad",
     "Module smoke PASS — visibility preferences POST/PATCH persistence.",
   ),
-  heldModuleW1(
+  withGapCloseSmoke(
+  passModuleW1(
     "cand_cv_import",
     "/dashboard/cv",
     "candidate-squad",
-    "PUBLIC_STRIPE_STANDARD_OFF",
-    "Sandbox/smoke (exclude_from_product_metrics) may upload/parse without Stripe; public Standard+ still OFF.",
+    "Gap-close — metrics-excluded sandbox upload LIVE; public Stripe Standard+ remains HELD via plan_payments.",
   ),
-  heldModuleW1(
+  ),
+  withGapCloseSmoke(
+  passModuleW1(
     "cand_cv_parsing",
     "/dashboard/cv",
     "candidate-squad",
-    "PUBLIC_STRIPE_STANDARD_OFF",
-    "Sandbox/smoke parse allowed via metrics-excluded entitlement; public Standard+ paywall unchanged.",
+    "Gap-close — sandbox parse LIVE on excluded accounts; public Standard+ paywall unchanged.",
+  ),
   ),
   passModuleW1(
     "cand_feedback",

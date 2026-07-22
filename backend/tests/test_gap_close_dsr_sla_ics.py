@@ -112,7 +112,7 @@ def test_privacy_objection_and_fulfillment() -> None:
     fulfilled = fulfill_privacy_request(
         db,
         request_id=created["id"],
-        actor_user_id=0,
+        actor_user_id=None,
         fulfillment_status="fulfilled",
         delivery_receipt={"channel": "in_app", "note": "done"},
     )

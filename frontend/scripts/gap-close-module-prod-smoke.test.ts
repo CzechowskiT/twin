@@ -202,8 +202,20 @@ test("3 per-module authenticated gap-close smoke", async (t) => {
     results.candidate_revoke_delete = "PASS_READ";
   }
 
-  // ai_wave6_dsr_delete_export — DSR request create (no real email)
+  // ai_wave6_dsr_delete_export — ensure profile then DSR create (no real email)
   {
+    const profile = await api("/api/v1/candidates/me", {
+      method: "PUT",
+      headers: authHeaders(),
+      body: JSON.stringify({
+        name: "Gap Close Smoke",
+        location: "Warsaw",
+        experience_years: 3,
+        skills: ["smoke"],
+        desired_roles: ["engineer"],
+      }),
+    });
+    assert.ok([200, 201].includes(profile.status), `profile bootstrap ${profile.status} ${profile.body.slice(0, 160)}`);
     const res = await api("/api/v1/candidates/me/privacy-requests", {
       method: "POST",
       headers: authHeaders(),

@@ -592,6 +592,10 @@ class PrivacyFulfillIn(BaseModel):
     delivery_receipt: dict | None = None
 
 
+class PrivacyLegalHoldIn(BaseModel):
+    legal_hold: bool = True
+
+
 class PrivacyOpsCreateIn(BaseModel):
     candidate_id: int = Field(..., ge=1)
     request_type: str = Field(..., min_length=3, max_length=64)
@@ -631,10 +635,32 @@ def admin_privacy_dsr_create(
         return create_ops_privacy_request(
             db,
             candidate_id=body.candidate_id,
-            actor_user_id=0,
+            actor_user_id=None,
             request_type=body.request_type,
             payload=body.payload,
             legal_hold=body.legal_hold,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/privacy/dsr-queue/{request_id}/legal-hold")
+def admin_privacy_dsr_legal_hold(
+    request_id: int,
+    body: PrivacyLegalHoldIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None, alias="Authorization"),
+) -> dict:
+    from app.services.candidate_privacy_request_service import set_privacy_request_legal_hold
+
+    _require_ops_admin(settings, authorization)
+    try:
+        return set_privacy_request_legal_hold(
+            db,
+            request_id=request_id,
+            legal_hold=body.legal_hold,
+            actor_user_id=None,
         )
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
@@ -655,7 +681,7 @@ def admin_privacy_dsr_fulfill(
         return fulfill_privacy_request(
             db,
             request_id=request_id,
-            actor_user_id=0,
+            actor_user_id=None,
             fulfillment_status=body.fulfillment_status,
             delivery_receipt=body.delivery_receipt,
         )
