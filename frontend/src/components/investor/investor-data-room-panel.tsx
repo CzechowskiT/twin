@@ -16,6 +16,7 @@ import {
 } from "@/lib/investor-data-room-request-access";
 import { DATA_ROOM_INVITE_ONLY_PREVIEW } from "@/lib/seven-day-d5-investor";
 import { getPublicApiBase } from "@/lib/public-api-base";
+import { InvestorDataRoomLivePanel } from "@/components/investor/investor-data-room-live-panel";
 
 const DOC_LABEL_KEY: Record<(typeof INVESTOR_DATA_ROOM_PUBLIC_DOCS)[number]["id"], TranslationKey> = {
   dueDiligencePack: "investorDataRoom.docDueDiligencePack",
@@ -79,6 +80,7 @@ export function InvestorDataRoomPanel() {
           <p className="twin-muted mt-2 max-w-3xl text-sm leading-relaxed">{t("sevenDayD5.dataRoomBoundaryBody")}</p>
         </Card>
       ) : null}
+      <InvestorDataRoomLivePanel />
       <Card variant="soft" className="p-5 sm:p-6" data-testid={INVESTOR_DATA_ROOM_VISUAL_MARKERS.transparencyBanner}>
         <h2 className="text-lg font-semibold">{t("investorDataRoom.transparencyTitle")}</h2>
         <p className="twin-muted mt-2 max-w-3xl text-sm leading-relaxed">{t("investorDataRoom.transparencyBody")}</p>

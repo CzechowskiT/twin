@@ -493,6 +493,20 @@ class DataRoomDocumentMetadata(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
+class InvestorNdaAcceptance(Base):
+    """Investor NDA acceptance record — gate before confidential data room uploads."""
+
+    __tablename__ = "investor_nda_acceptances"
+    __table_args__ = (UniqueConstraint("user_id", "nda_version", name="uq_investor_nda_user_version"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    nda_version: Mapped[str] = mapped_column(String(32), nullable=False)
+    ip_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    user_agent_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    accepted_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
 class Job(Base):
     __tablename__ = "jobs"
     __table_args__ = (UniqueConstraint("job_board", "external_id", name="uq_job_board_external"),)

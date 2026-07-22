@@ -12,6 +12,7 @@ import {
   HARD_LIVE_EVIDENCE_REGISTRY_WAVE1,
   HARD_LIVE_EVIDENCE_REGISTRY_WAVE2,
   HARD_LIVE_EVIDENCE_REGISTRY_WAVE3,
+  HARD_LIVE_EVIDENCE_REGISTRY_WAVE4,
   HARD_LIVE_EVIDENCE_REGISTRY_WAVE5,
   HARD_LIVE_EVIDENCE_REGISTRY_AI_COMPLIANCE,
   HARD_LIVE_REGISTRY_META,
@@ -19,6 +20,7 @@ import {
   registryModuleIds,
   wave2PendingSmokeIds,
   wave3PendingSmokeIds,
+  wave4PendingSmokeIds,
   wave5PendingSmokeIds,
   aiCompliancePendingSmokeIds,
 } from "../src/lib/hard-live-evidence-registry";
@@ -130,14 +132,17 @@ test("docs registry JSON mirrors TS module ids and PASS smoke fields", () => {
   }
   assert.match(raw, /HELD_POLICY/);
   assert.match(raw, /DEMO_ONLY/);
-  assert.match(raw, /"status": "PENDING_SMOKE"/); // AI compliance Phase A pending until smoke
+  assert.match(raw, /"status": "PENDING_SMOKE"/); // Wave 4 + AI compliance pending until smoke
   assert.match(raw, /ai_claim_declared/);
   assert.match(raw, /ai_autonomous_employment/);
+  assert.match(raw, /investor_data_room/);
+  assert.match(raw, /investor_nda_acceptance/);
   assert.match(raw, /company_org_settings/);
   assert.match(raw, /company_demo_pipeline/);
   assert.match(raw, /plat_ics_export/);
   assert.match(raw, /plat_ms_calendar_write/);
-  assert.match(raw, /Wave 4 Investor Complete was not shipped/);
+  assert.match(raw, /Wave 4 Investor Complete engineering shipped/);
+  assert.doesNotMatch(raw, /Wave 4 Investor Complete was not shipped/);
   assert.match(raw, /b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18/);
 });
 
@@ -155,4 +160,13 @@ test("ai compliance modules pending until smoke with policy holds intact", () =>
   assert.equal(held.length, 5);
   assert.ok(held.some((r) => r.module_id === "ai_autonomous_employment"));
   assert.ok(held.some((r) => r.module_id === "ai_wave6_dsr_delete_export"));
+});
+
+test("wave4 investor modules pending until smoke with policy holds intact", () => {
+  assert.equal(HARD_LIVE_EVIDENCE_REGISTRY_WAVE4.length, 15);
+  assert.equal(wave4PendingSmokeIds().length, 12);
+  const held = HARD_LIVE_EVIDENCE_REGISTRY_WAVE4.filter((r) => r.status === "HELD_POLICY");
+  assert.equal(held.length, 3);
+  assert.ok(held.some((r) => r.module_id === "investor_self_serve_enrollment"));
+  assert.match(HARD_LIVE_REGISTRY_META.wave4_note, /engineering shipped/);
 });

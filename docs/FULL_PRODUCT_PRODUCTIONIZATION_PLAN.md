@@ -218,7 +218,7 @@ Monetization/Stripe public and ATS live-sync remain **outside** waves until expl
 
 **Exit status:** **DONE_WITH_POLICY_HOLDS** — 16 Hard LIVE PASS; ATS/Stripe/MS write/invite delivery/enrollment held; demo isolated DEMO_ONLY.
 
-**Next:** Wave 4 Investor Complete was **not shipped**. Wave 5 Calendar & Integrations proceeds on Wave 3 HEAD.
+**Next:** Wave 4 Investor Complete engineering **shipped as PENDING_SMOKE** (Alembic 093 + `/platform/wave4`) — awaiting authenticated prod smoke before LIVE badges. Wave 5 Calendar & Integrations already PASS on Wave 3 HEAD.
 
 ## 13. Wave 5 Calendar & Integrations Complete (this batch)
 
@@ -232,11 +232,25 @@ Monetization/Stripe public and ATS live-sync remain **outside** waves until expl
 - [x] Authenticated per-module prod smoke PASS on aligned SHA (post-merge)
 - [x] Capability map LIVE promotions only after smoke PASS
 
-**Exit status:** **DONE_WITH_POLICY_HOLDS** — 18 Hard LIVE PASS; MS write / ATS write-sync / Stripe / Authologic / enrollment / auto-apply held; Wave 4 noted as missing.
+**Exit status:** **DONE_WITH_POLICY_HOLDS** — 18 Hard LIVE PASS; MS write / ATS write-sync / Stripe / Authologic / enrollment / auto-apply held; Wave 4 later backfilled as engineering PENDING_SMOKE (see §14).
 
 ## 13b. Career Evidence Graph & AI Compliance Foundation (Phase A)
 
-Alembic **092**. Production claim graph + AI registries/decision log + guards. Wave 4 remains **NOT_IMPLEMENTED**. LIVE badges only after authenticated module smoke.
+Alembic **092**. Production claim graph + AI registries/decision log + guards. LIVE badges only after authenticated module smoke (**28 PENDING_SMOKE** + **5 HELD_POLICY**).
 
-**Next:** Wave 6 Privacy / DSR Complete if DONE_WITH_POLICY_HOLDS; else Gap Close. Do not start Wave 6 in this batch.
+## 14. Wave 4 Investor Complete (backfill — this batch)
+
+- [x] Investor surface inventory + Hard LIVE evidence registry (Wave 4)
+- [x] NDA acceptance ledger + data-room document list (S3 download remains HELD)
+- [x] Placement / trust-proof readonly APIs + deep-link UI panels
+- [x] Board readiness aggregation endpoint; board hub-hidden until smoke
+- [x] Migration `093_investor_wave4_hard_live` + wave4 flags + evidence seed
+- [x] DEMO / incomplete modules hub-hidden in production workspaces
+- [ ] Authenticated per-module prod smoke PASS on aligned SHA (pending Founder JWT)
+- [ ] Capability map LIVE promotions only after smoke PASS
+
+**Exit status:** **ENGINEERING_PARTIAL_AWAITING_SMOKE** — 12 PENDING_SMOKE + 3 HELD_POLICY; stance unchanged.
+
+**Next:** Authenticated Wave 4 + AI compliance prod smoke → PARTIAL/PENDING→PASS; then Wave 6 Privacy / DSR. Do not flip Gate F / Launch.
+
 

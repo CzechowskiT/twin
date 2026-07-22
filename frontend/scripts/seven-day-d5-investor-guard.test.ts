@@ -67,6 +67,9 @@ function investorUiBlob(): string {
     read("src/app/investor/data-room/page.tsx"),
     read("src/components/investor/investor-data-room-panel.tsx"),
     read("src/app/investor/placement/page.tsx"),
+    read("src/components/investor/investor-placement-readonly-panel.tsx"),
+    read("src/components/investor/investor-data-room-live-panel.tsx"),
+    read("src/components/investor/investor-trust-proof-readonly-panel.tsx"),
     read("src/components/investor/investor-trust-proof-workspace.tsx"),
     read("src/components/investor/executive-product-proof-board.tsx"),
     read("src/components/investor/investor-metrics-reality-dashboard.tsx"),
@@ -118,18 +121,18 @@ test("3 workspace modules — data room preview invite-only, placement pilot", (
   assert.equal(moduleStatus("calculator").status, "live");
 });
 
-test("4 product surface — board hidden, data room/placement hidden, metrics primary", () => {
+test("4 product surface — board/data room/placement hidden, metrics primary", () => {
   const split = splitWorkspaceModules("investor", INVESTOR_WORKSPACE_MODULES);
   assert.ok(split.primary.some((m) => m.id === "metrics"));
   assert.ok(!split.primary.some((m) => m.id === "data_room"));
   assert.ok(!split.primary.some((m) => m.id === "placement"));
-  assert.equal(split.roadmap.length, 0);
+  assert.ok(split.hidden.some((m) => m.id === "data_room") || split.roadmap.length === 0);
 
   const sor = splitProductSurfaceRoutes("investor", getSystemOfRecordRoutesForPersona("investor"));
   assert.ok(sor.primary.some((r) => r.id === "investor_metrics"));
   assert.ok(sor.hidden.some((r) => r.id === "investor_data_room"));
   assert.ok(sor.hidden.some((r) => r.href.startsWith("/board/")));
-  assert.equal(shouldHideFromDefaultHub("investor", "/board/working-features-readiness"), true);
+  assert.equal(shouldHideFromDefaultHub("investor", "board_implementation_tracker"), true);
   assert.equal(classifyProductSurfaceTier("investor", "data_room", "preview"), "INTERNAL");
 });
 
@@ -144,13 +147,12 @@ test("5 investor room — preview copy, collapsed details, no duplicate SoR", ()
   assert.match(room, /HIDE_INVESTOR_SOR_ON_PUBLIC_ROOM \? null/);
 });
 
-test("6 workspace hub — next action and board collapsed internal", () => {
+test("6 workspace hub — next action and board hidden marker", () => {
   const hub = read("src/app/workspace/investor/page.tsx");
   assert.match(hub, /InvestorHubNextAction/);
   assert.match(hub, /SHOW_INVESTOR_HUB_NEXT_ACTION/);
   const sorHub = read("src/components/workspace/system-of-record-navigation-hub.tsx");
   assert.match(sorHub, /data-seven-day-investor-board-hidden/);
-  assert.match(sorHub, /investor-board-internal-toggle/);
   assert.match(sorHub, /HIDE_BOARD_FROM_INVESTOR_DEFAULT_HUB/);
 });
 
@@ -160,6 +162,7 @@ test("7 data room — invite-only badge, request access, no fake secure room", (
   assert.match(page, /sevenDayD5\.dataRoomInviteOnlyBadge/);
   const panel = read("src/components/investor/investor-data-room-panel.tsx");
   assert.match(panel, /data-seven-day-investor-data-room-invite-boundary/);
+  assert.match(panel, /InvestorDataRoomLivePanel/);
   assert.match(panel, /requestAccessCta/);
   assert.match(en.sevenDayD5.dataRoomBoundaryBody ?? "", /No live secure|not a fake/i);
   assert.doesNotMatch(panel, /secure vault is live/i);
@@ -168,9 +171,11 @@ test("7 data room — invite-only badge, request access, no fake secure room", (
 test("8 placement and proof — pilot/preview boundaries", () => {
   const placement = read("src/app/investor/placement/page.tsx");
   assert.match(placement, /data-seven-day-investor-placement-pilot-boundary/);
+  assert.match(placement, /InvestorPlacementReadonlyPanel/);
   assert.match(en.sevenDayD5.placementPilotBoundaryBody ?? "", /limited pilot/i);
   const trust = read("src/components/investor/investor-trust-proof-workspace.tsx");
   assert.match(trust, /data-seven-day-investor-trust-proof-preview-boundary/);
+  assert.match(trust, /InvestorTrustProofReadonlyPanel/);
   const product = read("src/components/investor/executive-product-proof-board.tsx");
   assert.match(product, /data-seven-day-investor-product-proof-preview-boundary/);
   assert.match(en.sevenDayD5.trustProofPreviewBoundaryBody ?? "", /founder-led/i);

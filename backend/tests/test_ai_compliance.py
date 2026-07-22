@@ -67,7 +67,7 @@ def test_status_policy_holds(client: tuple[TestClient, Session]) -> None:
     assert body["pilot_stance"] == "BLOCKED_BY_FOUNDER"
     assert body["gate_f"] == "PENDING"
     assert body["launch"] == "NO-GO"
-    assert body["wave4"] == "NOT_IMPLEMENTED"
+    assert body["wave4"] == "ENGINEERING_PARTIAL_AWAITING_SMOKE"
     assert body["wave6"] == "NOT_STARTED"
     assert body["ai_autonomous_employment_decisions"] is False
     assert body["ai_external_verification_enabled"] is False

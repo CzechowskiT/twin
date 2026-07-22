@@ -86,7 +86,7 @@ test("3 candidate trust center restored to visible hub", () => {
   assert.ok(isWorkspaceModuleVisible("candidate_trust"));
 });
 
-test("4 recruiter integrations talent pool radar cockpit trust review visible", () => {
+test("4 recruiter integrations talent pool radar cockpit trust review visible; demos hub-hidden", () => {
   assert.equal(HIDE_RECRUITER_INTEGRATIONS_FROM_HUB, false);
   assert.equal(RECRUITER_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE, false);
   const split = splitActivationSurfaceRoutes("recruiter", getSystemOfRecordRoutesForPersona("recruiter"));
@@ -97,10 +97,11 @@ test("4 recruiter integrations talent pool radar cockpit trust review visible", 
     "recruiter_talent_radar",
     "recruiter_daily_cockpit",
     "recruiter_trust_review_queue",
-    "recruiter_demo_collaboration",
   ]) {
     assert.ok(shown.some((r) => r.id === id), id);
   }
+  assert.ok(!isWorkspaceModuleVisible("recruiter_demo_collaboration"));
+  assert.ok(split.internal.some((r) => r.id === "recruiter_demo_collaboration"));
 });
 
 test("5 company integrations team talent pool cockpit command center billing visible in hub or internal", () => {
@@ -118,22 +119,25 @@ test("5 company integrations team talent pool cockpit command center billing vis
     assert.ok(shown.some((r) => r.id === id), id);
   }
   assert.ok(split.internal.some((r) => r.id === "company_billing"));
+  assert.ok(!isWorkspaceModuleVisible("company_demo_pipeline"));
 });
 
-test("6 investor login data room placement proof readiness visible", () => {
-  assert.equal(HIDE_INVESTOR_DATA_ROOM_FROM_HUB, false);
-  assert.equal(HIDE_INVESTOR_PLACEMENT_FROM_HUB, false);
-  assert.equal(HIDE_INVESTOR_PUBLIC_LOGIN_FROM_PREVIEW, false);
-  assert.equal(HIDE_BOARD_FROM_INVESTOR_DEFAULT_HUB, false);
+test("6 investor incomplete modules hub-hidden (Full Product Completion 2026-07-22)", () => {
+  // Jul-10 "all visible" superseded for DEMO/incomplete investor surfaces.
+  assert.equal(HIDE_INVESTOR_DATA_ROOM_FROM_HUB, true);
+  assert.equal(HIDE_INVESTOR_PLACEMENT_FROM_HUB, true);
+  assert.equal(HIDE_INVESTOR_PUBLIC_LOGIN_FROM_PREVIEW, true);
+  assert.equal(HIDE_BOARD_FROM_INVESTOR_DEFAULT_HUB, true);
+  assert.ok(!isWorkspaceModuleVisible("investor_data_room"));
+  assert.ok(!isWorkspaceModuleVisible("investor_placement"));
+  assert.ok(!isWorkspaceModuleVisible("investor_trust_proof"));
+  assert.ok(!isWorkspaceModuleVisible("login"));
+  assert.ok(!isWorkspaceModuleVisible("recruiter_demo_pipeline"));
   const investorRoutes = getSystemOfRecordRoutesForPersona("investor");
   const split = splitActivationSurfaceRoutes("investor", investorRoutes);
   const shown = [...split.core, ...split.extended, ...split.pilotPreview, ...split.comingSoonPaused];
-  for (const id of ["investor_data_room", "investor_placement", "investor_trust_proof", "investor_product_proof"]) {
-    assert.ok(shown.some((r) => r.id === id), id);
-  }
-  const login = INVESTOR_PUBLIC_PREVIEW_MODULES.find((m) => m.id === "login");
-  assert.ok(login);
-  assert.ok(isWorkspaceModuleVisible("login"));
+  assert.ok(shown.some((r) => r.id === "investor_product_proof"));
+  assert.ok(shown.some((r) => r.id === "investor_metrics"));
 });
 
 test("7 hub component uses activation sections", () => {

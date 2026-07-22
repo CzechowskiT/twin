@@ -1120,7 +1120,7 @@ def compliance_status(db: Session) -> dict[str, Any]:
         "gate_f": "PENDING",
         "launch": "NO-GO",
         "phase_3b": "UNCHANGED",
-        "wave4": "NOT_IMPLEMENTED",
+        "wave4": "ENGINEERING_PARTIAL_AWAITING_SMOKE",
         "wave6": "NOT_STARTED",
         "external_pilot_enrollment_enabled": False,
         "ai_autonomous_employment_decisions": False,

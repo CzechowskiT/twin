@@ -103,10 +103,10 @@ test("3 seven-day hide flags reversed — modules restored to hub", () => {
   assert.equal(HIDE_COMPANY_INTEGRATIONS_FROM_HUB, false);
   assert.equal(COMPANY_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE, false);
   assert.equal(HIDE_COMPANY_INTEGRATIONS_FROM_NAV, false);
-  assert.equal(HIDE_INVESTOR_DATA_ROOM_FROM_HUB, false);
-  assert.equal(HIDE_INVESTOR_PUBLIC_LOGIN_FROM_PREVIEW, false);
-  assert.equal(INVESTOR_PUBLIC_LOGIN_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE, false);
-  assert.ok(INVESTOR_ROADMAP_MODULE_IDS.length > 0);
+  assert.equal(HIDE_INVESTOR_DATA_ROOM_FROM_HUB, true);
+  assert.equal(HIDE_INVESTOR_PUBLIC_LOGIN_FROM_PREVIEW, true);
+  assert.equal(INVESTOR_PUBLIC_LOGIN_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE, true);
+  assert.equal(INVESTOR_ROADMAP_MODULE_IDS.length, 0);
 });
 
 test("4 splitWorkspaceModules — pilot modules in roadmap section", () => {
