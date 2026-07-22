@@ -37,7 +37,7 @@ test("stance remains Founder-blocked", () => {
 test("no PASS rows with missing criterion 25 or without smoke_sha", () => {
   assert.doesNotThrow(() => assertNoLivePassWithoutSmoke());
   const passed = HARD_LIVE_EVIDENCE_REGISTRY.filter((r) => r.status === "PASS");
-  assert.equal(passed.length, 66); // 12 wave1 + 20 wave2 + 16 wave3 + 18 wave5
+  assert.equal(passed.length, 94); // post AI compliance Phase A smoke
   for (const row of passed) {
     assert.ok(!row.missing_criteria.includes(25), row.module_id);
     assert.ok(row.smoke_sha, row.module_id);
@@ -126,13 +126,13 @@ test("docs registry JSON mirrors TS module ids and PASS smoke fields", () => {
   assert.equal(doc.stance.external_pilot_enrollment_enabled, false);
   assert.equal(doc.wave, "5");
   const passDocs = doc.modules.filter((m) => m.status === "PASS");
-  assert.equal(passDocs.length, 66);
+  assert.equal(passDocs.length, 94);
   for (const m of passDocs) {
     assert.ok(m.smoke_sha, m.module_id);
   }
   assert.match(raw, /HELD_POLICY/);
   assert.match(raw, /DEMO_ONLY/);
-  assert.match(raw, /"status": "PENDING_SMOKE"/); // Wave 4 + AI compliance pending until smoke
+  assert.match(raw, /"status": "PENDING_SMOKE"/); // Wave 4 investor modules remain PENDING_SMOKE (not LIVE)
   assert.match(raw, /ai_claim_declared/);
   assert.match(raw, /ai_autonomous_employment/);
   assert.match(raw, /investor_data_room/);
@@ -153,9 +153,11 @@ test("production action gates still block enrollment", () => {
 });
 
 
-test("ai compliance modules pending until smoke with policy holds intact", () => {
+test("ai compliance modules PASS after smoke with policy holds intact", () => {
   assert.equal(HARD_LIVE_EVIDENCE_REGISTRY_AI_COMPLIANCE.length, 33);
-  assert.equal(aiCompliancePendingSmokeIds().length, 28);
+  const passedAi = HARD_LIVE_EVIDENCE_REGISTRY_AI_COMPLIANCE.filter((r) => r.status === "PASS");
+  assert.equal(passedAi.length, 28);
+  assert.equal(aiCompliancePendingSmokeIds().length, 0);
   const held = HARD_LIVE_EVIDENCE_REGISTRY_AI_COMPLIANCE.filter((r) => r.status === "HELD_POLICY");
   assert.equal(held.length, 5);
   assert.ok(held.some((r) => r.module_id === "ai_autonomous_employment"));

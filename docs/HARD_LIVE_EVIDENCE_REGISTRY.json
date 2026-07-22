@@ -14,45 +14,23 @@
   },
   "live_badge_rule": "PASS status + authenticated prod smoke on aligned SHA required before capability map LIVE",
   "smoke_evidence": {
-    "wave1": {
-      "script": "frontend/scripts/wave1-candidate-module-prod-smoke.test.ts",
-      "sha": "cf773744c92c7ccfae408175b27c30f498d5361f",
-      "at": "2026-07-20T20:25:00Z",
-      "result": "PASS 4/4 modules 6/6",
-      "write": true,
-      "exclude_from_product_metrics": true,
-      "jwt_never_committed": true
-    },
-    "wave2": {
-      "script": "frontend/scripts/wave2-recruiter-module-prod-smoke.test.ts",
-      "sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
-      "at": "2026-07-21T04:12:00Z",
-      "result": "PASS 4/4 modules 20/20",
-      "write": true,
-      "exclude_from_product_metrics": true,
-      "jwt_never_committed": true
-    },
-    "wave3": {
-      "script": "frontend/scripts/wave3-company-module-prod-smoke.test.ts",
-      "sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
-      "at": "2026-07-22T07:00:00Z",
-      "result": "PASS 4/4 modules 16/16",
-      "write": true,
-      "exclude_from_product_metrics": true,
-      "jwt_never_committed": true
-    },
-    "wave5": {
-      "script": "frontend/scripts/wave5-integrations-module-prod-smoke.test.ts",
-      "sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
-      "at": "2026-07-22T14:50:00Z",
-      "result": "PASS 4/4 modules 18/18",
-      "write": true,
-      "exclude_from_product_metrics": true,
-      "jwt_never_committed": true
-    },
+    "wave1_script": "frontend/scripts/wave1-candidate-module-prod-smoke.test.ts",
+    "wave1_sha": "cf773744c92c7ccfae408175b27c30f498d5361f",
+    "wave1_at": "2026-07-20T20:25:00Z",
+    "wave2_script": "frontend/scripts/wave2-recruiter-module-prod-smoke.test.ts",
+    "wave2_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+    "wave2_at": "2026-07-21T04:12:00Z",
+    "wave3_script": "frontend/scripts/wave3-company-module-prod-smoke.test.ts",
+    "wave3_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
+    "wave3_at": "2026-07-22T07:00:00Z",
+    "wave5_script": "frontend/scripts/wave5-integrations-module-prod-smoke.test.ts",
+    "wave5_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
+    "wave5_at": "2026-07-22T14:50:00Z",
     "ai_compliance_script": "frontend/scripts/ai-compliance-module-prod-smoke.test.ts",
     "ai_compliance_sha": "9bc6428d81b5ac62069d39d5962553d64b213063",
-    "ai_compliance_at": "2026-07-22T16:16:30Z"
+    "ai_compliance_at": "2026-07-22T16:16:30Z",
+    "write": true,
+    "exclude_from_product_metrics": true
   },
   "modules": [
     {
@@ -971,15 +949,148 @@
       "owner": "company-squad"
     },
     {
+      "module_id": "investor_data_room",
+      "persona": "investor",
+      "wave": "4",
+      "status": "PENDING_SMOKE",
+      "route": "/investor/data-room",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "investor-squad"
+    },
+    {
+      "module_id": "investor_nda_acceptance",
+      "persona": "investor",
+      "wave": "4",
+      "status": "PENDING_SMOKE",
+      "route": "/investor/data-room",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "investor-squad"
+    },
+    {
+      "module_id": "investor_data_room_list",
+      "persona": "investor",
+      "wave": "4",
+      "status": "PENDING_SMOKE",
+      "route": "/investor/data-room",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "investor-squad"
+    },
+    {
+      "module_id": "investor_placement_readonly",
+      "persona": "investor",
+      "wave": "4",
+      "status": "PENDING_SMOKE",
+      "route": "/investor/placement",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "investor-squad"
+    },
+    {
+      "module_id": "investor_trust_proof_readonly",
+      "persona": "investor",
+      "wave": "4",
+      "status": "PENDING_SMOKE",
+      "route": "/investor/trust-proof",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "investor-squad"
+    },
+    {
+      "module_id": "investor_login_gate",
+      "persona": "investor",
+      "wave": "4",
+      "status": "PENDING_SMOKE",
+      "route": "/login/investor",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "investor-squad"
+    },
+    {
+      "module_id": "board_implementation_tracker",
+      "persona": "investor",
+      "wave": "4",
+      "status": "PENDING_SMOKE",
+      "route": "/board/implementation-tracker",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "investor-squad"
+    },
+    {
+      "module_id": "investor_metrics_wave4",
+      "persona": "investor",
+      "wave": "4",
+      "status": "PENDING_SMOKE",
+      "route": "/investor/metrics",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "investor-squad"
+    },
+    {
+      "module_id": "investor_roadmap_wave4",
+      "persona": "investor",
+      "wave": "4",
+      "status": "PENDING_SMOKE",
+      "route": "/investor/roadmap",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "investor-squad"
+    },
+    {
+      "module_id": "investor_calculator_wave4",
+      "persona": "investor",
+      "wave": "4",
+      "status": "PENDING_SMOKE",
+      "route": "/investor/calculator",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "investor-squad"
+    },
+    {
+      "module_id": "investor_contact_wave4",
+      "persona": "investor",
+      "wave": "4",
+      "status": "PENDING_SMOKE",
+      "route": "mailto:contact@twin.care",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "investor-squad"
+    },
+    {
+      "module_id": "investor_product_proof_boundary",
+      "persona": "investor",
+      "wave": "4",
+      "status": "PENDING_SMOKE",
+      "route": "/investor/product-proof",
+      "blocker": "authenticated_prod_smoke_required",
+      "owner": "investor-squad"
+    },
+    {
+      "module_id": "investor_external_attestations",
+      "persona": "investor",
+      "wave": "4",
+      "status": "HELD_POLICY",
+      "route": "/investor/trust-proof",
+      "blocker": "NO_VERIFIED_CUSTOMER_CLAIMS",
+      "owner": "investor-squad"
+    },
+    {
+      "module_id": "investor_s3_required_download",
+      "persona": "investor",
+      "wave": "4",
+      "status": "HELD_POLICY",
+      "route": "/investor/data-room",
+      "blocker": "S3_FOUNDER_KEYS",
+      "owner": "investor-squad"
+    },
+    {
+      "module_id": "investor_self_serve_enrollment",
+      "persona": "investor",
+      "wave": "4",
+      "status": "HELD_POLICY",
+      "route": "/register/investor",
+      "blocker": "ENROLLMENT_OFF",
+      "owner": "investor-squad"
+    },
+    {
       "module_id": "plat_google_calendar_oauth",
       "persona": "platform",
       "wave": "5",
       "status": "PASS",
       "route": "/dashboard/calendar",
-      "owner": "platform",
       "blocker": null,
-      "missing_criteria": [],
-      "notes": "Google Calendar OAuth CONFIGURATION \u2014 Wave 5 smoke PASS.",
+      "owner": "platform",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -989,10 +1100,8 @@
       "wave": "5",
       "status": "PASS",
       "route": "/dashboard/calendar",
-      "owner": "platform",
       "blocker": null,
-      "missing_criteria": [],
-      "notes": "Google Calendar READ \u2014 Wave 5 smoke PASS.",
+      "owner": "platform",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1002,10 +1111,8 @@
       "wave": "5",
       "status": "PASS",
       "route": "/dashboard/calendar",
-      "owner": "platform",
       "blocker": null,
-      "missing_criteria": [],
-      "notes": "Google Calendar WRITE honesty (smoke never writes provider) \u2014 Wave 5 smoke PASS.",
+      "owner": "platform",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1015,10 +1122,8 @@
       "wave": "5",
       "status": "PASS",
       "route": "/dashboard/calendar",
-      "owner": "platform",
       "blocker": null,
-      "missing_criteria": [],
-      "notes": "Google freebusy/slots \u2014 Wave 5 smoke PASS.",
+      "owner": "platform",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1028,10 +1133,8 @@
       "wave": "5",
       "status": "PASS",
       "route": "/dashboard/calendar/readiness",
-      "owner": "platform",
       "blocker": null,
-      "missing_criteria": [],
-      "notes": "Calendar provider monitoring \u2014 Wave 5 smoke PASS.",
+      "owner": "platform",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1041,10 +1144,8 @@
       "wave": "5",
       "status": "PASS",
       "route": "/dashboard/calendar",
-      "owner": "platform",
       "blocker": null,
-      "missing_criteria": [],
-      "notes": "ICS generate/export \u2014 Wave 5 smoke PASS.",
+      "owner": "platform",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1054,10 +1155,8 @@
       "wave": "5",
       "status": "PASS",
       "route": "/dashboard/calendar",
-      "owner": "platform",
       "blocker": null,
-      "missing_criteria": [],
-      "notes": "ICS share token mint/expiry \u2014 Wave 5 smoke PASS.",
+      "owner": "platform",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1067,10 +1166,8 @@
       "wave": "5",
       "status": "PASS",
       "route": "/dashboard/calendar",
-      "owner": "platform",
       "blocker": null,
-      "missing_criteria": [],
-      "notes": "WebCal subscribe feed \u2014 Wave 5 smoke PASS.",
+      "owner": "platform",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1080,10 +1177,8 @@
       "wave": "5",
       "status": "PASS",
       "route": "/dashboard/calendar",
-      "owner": "platform",
       "blocker": null,
-      "missing_criteria": [],
-      "notes": "ICS CANCEL/UID/SEQUENCE \u2014 Wave 5 smoke PASS.",
+      "owner": "platform",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1093,10 +1188,8 @@
       "wave": "5",
       "status": "PASS",
       "route": "/dashboard/calendar",
-      "owner": "platform",
       "blocker": null,
-      "missing_criteria": [],
-      "notes": "Microsoft Calendar CONFIGURATION honesty \u2014 WRITE stays HELD.",
+      "owner": "platform",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1106,10 +1199,8 @@
       "wave": "5",
       "status": "PASS",
       "route": "/recruiter/integrations",
-      "owner": "platform",
       "blocker": null,
-      "missing_criteria": [],
-      "notes": "ATS CONFIGURATION/READ honesty \u2014 WRITE stays BLOCKED.",
+      "owner": "platform",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1119,10 +1210,8 @@
       "wave": "5",
       "status": "PASS",
       "route": "/recruiter/integrations",
-      "owner": "platform",
       "blocker": null,
-      "missing_criteria": [],
-      "notes": "ATS webhook HMAC verify dry-run \u2014 no write sync.",
+      "owner": "platform",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1132,10 +1221,8 @@
       "wave": "5",
       "status": "PASS",
       "route": "/dashboard/trust/controls",
-      "owner": "platform",
       "blocker": null,
-      "missing_criteria": [],
-      "notes": "Email DRAFT outbox only \u2014 real send forbidden in smoke.",
+      "owner": "platform",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1145,10 +1232,8 @@
       "wave": "5",
       "status": "PASS",
       "route": "/dashboard/trust/controls",
-      "owner": "platform",
       "blocker": null,
-      "missing_criteria": [],
-      "notes": "Notification preferences READ \u2014 metrics exclusion required.",
+      "owner": "platform",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1158,10 +1243,8 @@
       "wave": "5",
       "status": "PASS",
       "route": "/login",
-      "owner": "platform",
       "blocker": null,
-      "missing_criteria": [],
-      "notes": "OAuth providers CONFIGURATION status \u2014 Wave 5 smoke PASS.",
+      "owner": "platform",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1171,10 +1254,8 @@
       "wave": "5",
       "status": "PASS",
       "route": "/dashboard/matches",
-      "owner": "platform",
       "blocker": null,
-      "missing_criteria": [],
-      "notes": "CSV export with formula injection escape \u2014 Wave 5 smoke PASS.",
+      "owner": "platform",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1184,10 +1265,8 @@
       "wave": "5",
       "status": "PASS",
       "route": "/board/calendar-readiness",
-      "owner": "platform",
       "blocker": null,
-      "missing_criteria": [],
-      "notes": "Per-capability integration inventory MONITORING \u2014 Wave 5 smoke PASS.",
+      "owner": "platform",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1197,10 +1276,8 @@
       "wave": "5",
       "status": "PASS",
       "route": "/board/calendar-readiness",
-      "owner": "platform",
       "blocker": null,
-      "missing_criteria": [],
-      "notes": "Webhook delivery attempt ledger MONITORING \u2014 Wave 5 smoke PASS.",
+      "owner": "platform",
       "smoke_sha": "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
       "smoke_at": "2026-07-22T14:50:00Z"
     },
@@ -1210,14 +1287,8 @@
       "wave": "5",
       "status": "HELD_POLICY",
       "route": "/dashboard/calendar",
-      "owner": "platform",
       "blocker": "MICROSOFT_WRITE_BLOCKED",
-      "missing_criteria": [
-        13,
-        15,
-        28
-      ],
-      "notes": "Microsoft Calendar WRITE remains policy-held."
+      "owner": "platform"
     },
     {
       "module_id": "plat_ms_calendar_busy_read",
@@ -1225,14 +1296,8 @@
       "wave": "5",
       "status": "HELD_POLICY",
       "route": "/dashboard/calendar",
-      "owner": "platform",
       "blocker": "MICROSOFT_BUSY_READ_FLAG_OFF",
-      "missing_criteria": [
-        13,
-        15,
-        28
-      ],
-      "notes": "Microsoft busy-read gated false on prod."
+      "owner": "platform"
     },
     {
       "module_id": "plat_ats_live_sync_write",
@@ -1240,14 +1305,8 @@
       "wave": "5",
       "status": "HELD_POLICY",
       "route": "/company/integrations",
-      "owner": "platform",
       "blocker": "ATS_LIVE_SYNC_BLOCKED",
-      "missing_criteria": [
-        13,
-        15,
-        28
-      ],
-      "notes": "ATS live-sync WRITE blocked."
+      "owner": "platform"
     },
     {
       "module_id": "plat_ats_write_sync",
@@ -1255,14 +1314,8 @@
       "wave": "5",
       "status": "HELD_POLICY",
       "route": "/company/integrations",
-      "owner": "platform",
       "blocker": "ATS_LIVE_SYNC_BLOCKED",
-      "missing_criteria": [
-        13,
-        15,
-        28
-      ],
-      "notes": "ATS write SYNC blocked."
+      "owner": "platform"
     },
     {
       "module_id": "plat_stripe_public",
@@ -1270,14 +1323,8 @@
       "wave": "5",
       "status": "HELD_POLICY",
       "route": "/dashboard/billing",
-      "owner": "platform",
       "blocker": "STRIPE_NOT_PUBLIC",
-      "missing_criteria": [
-        13,
-        15,
-        28
-      ],
-      "notes": "Stripe public checkout NOT LIVE."
+      "owner": "platform"
     },
     {
       "module_id": "plat_authologic_auto_kyc",
@@ -1285,14 +1332,8 @@
       "wave": "5",
       "status": "HELD_POLICY",
       "route": "/dashboard/identity",
-      "owner": "platform",
       "blocker": "AUTHOLOGIC_AUTO_KYC_OFF",
-      "missing_criteria": [
-        13,
-        15,
-        28
-      ],
-      "notes": "Authologic Auto KYC OFF."
+      "owner": "platform"
     },
     {
       "module_id": "plat_google_calendar_push_webhook",
@@ -1300,14 +1341,8 @@
       "wave": "5",
       "status": "HELD_POLICY",
       "route": "/dashboard/calendar",
-      "owner": "platform",
       "blocker": "NOT_BUILT",
-      "missing_criteria": [
-        13,
-        15,
-        28
-      ],
-      "notes": "Google Calendar push/watch channels not built."
+      "owner": "platform"
     },
     {
       "module_id": "plat_slack_connector",
@@ -1315,14 +1350,8 @@
       "wave": "5",
       "status": "HELD_POLICY",
       "route": "/company/integrations",
-      "owner": "platform",
       "blocker": "NOT_BUILT",
-      "missing_criteria": [
-        13,
-        15,
-        28
-      ],
-      "notes": "Slack connector not built."
+      "owner": "platform"
     },
     {
       "module_id": "plat_teams_connector",
@@ -1330,14 +1359,8 @@
       "wave": "5",
       "status": "HELD_POLICY",
       "route": "/company/integrations",
-      "owner": "platform",
       "blocker": "NOT_BUILT",
-      "missing_criteria": [
-        13,
-        15,
-        28
-      ],
-      "notes": "Teams connector not built (meeting URL metadata only)."
+      "owner": "platform"
     },
     {
       "module_id": "plat_zapier_connector",
@@ -1345,14 +1368,8 @@
       "wave": "5",
       "status": "HELD_POLICY",
       "route": "/company/integrations",
-      "owner": "platform",
       "blocker": "NOT_BUILT",
-      "missing_criteria": [
-        13,
-        15,
-        28
-      ],
-      "notes": "Zapier connector not built."
+      "owner": "platform"
     },
     {
       "module_id": "plat_cloud_storage_connectors",
@@ -1360,14 +1377,8 @@
       "wave": "5",
       "status": "HELD_POLICY",
       "route": "/company/integrations",
-      "owner": "platform",
       "blocker": "NOT_BUILT",
-      "missing_criteria": [
-        13,
-        15,
-        28
-      ],
-      "notes": "Drive/OneDrive/Dropbox connectors not built."
+      "owner": "platform"
     },
     {
       "module_id": "plat_ics_import",
@@ -1375,14 +1386,8 @@
       "wave": "5",
       "status": "HELD_POLICY",
       "route": "/dashboard/calendar",
-      "owner": "platform",
       "blocker": "NOT_BUILT",
-      "missing_criteria": [
-        13,
-        15,
-        28
-      ],
-      "notes": "ICS import/parse not built."
+      "owner": "platform"
     },
     {
       "module_id": "ai_claim_declared",
@@ -1699,9 +1704,7 @@
       "status": "HELD_POLICY",
       "route": "/dashboard/evidence/claims",
       "blocker": "EXTERNAL_VERIFICATION_OFF",
-      "owner": "platform",
-      "smoke_sha": null,
-      "smoke_at": null
+      "owner": "platform"
     },
     {
       "module_id": "ai_protected_attr_monitoring",
@@ -1710,9 +1713,7 @@
       "status": "HELD_POLICY",
       "route": "/board/ai-compliance",
       "blocker": "PROTECTED_ATTR_MONITORING_LEGAL_HOLD",
-      "owner": "platform",
-      "smoke_sha": null,
-      "smoke_at": null
+      "owner": "platform"
     },
     {
       "module_id": "ai_autonomous_employment",
@@ -1721,9 +1722,7 @@
       "status": "HELD_POLICY",
       "route": "/recruiter/evidence/reviews",
       "blocker": "AUTONOMOUS_EMPLOYMENT_HARD_BAN",
-      "owner": "platform",
-      "smoke_sha": null,
-      "smoke_at": null
+      "owner": "platform"
     },
     {
       "module_id": "ai_act_certified_claim",
@@ -1732,9 +1731,7 @@
       "status": "HELD_POLICY",
       "route": "/board/ai-compliance",
       "blocker": "NO_LEGAL_CERTIFICATION",
-      "owner": "platform",
-      "smoke_sha": null,
-      "smoke_at": null
+      "owner": "platform"
     },
     {
       "module_id": "ai_wave6_dsr_delete_export",
@@ -1743,11 +1740,8 @@
       "status": "HELD_POLICY",
       "route": "/dashboard/trust/revoke-delete",
       "blocker": "WAVE6_NOT_STARTED",
-      "owner": "privacy",
-      "smoke_sha": null,
-      "smoke_at": null
+      "owner": "privacy"
     }
   ],
-  "wave4_note": "Wave 4 Investor Complete was not shipped \u2014 Wave 5 proceeds on Wave 3 HEAD without inventing Wave 4.",
-  "ai_compliance_note": "Phase A smoke PASS 28/28 @ 9bc6428d; 5 HELD_POLICY remain."
+  "wave4_note": "Wave 4 Investor Complete engineering shipped as PENDING_SMOKE (12 modules) + 3 HELD_POLICY — awaiting authenticated prod smoke; Wave 5 already PASS; AI compliance foundation PENDING_SMOKE."
 }
