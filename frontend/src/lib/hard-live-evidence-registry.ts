@@ -49,8 +49,8 @@ export const AI_COMPLIANCE_SMOKE_SHA: string | null = "2987e16804fcd7de19db3930f
 export const AI_COMPLIANCE_SMOKE_AT: string | null = "2026-07-22T16:28:00Z";
 
 /** Gap-close authenticated prod smoke (ICS/SLA/collab/DSR/delete) on Railway API. */
-export const GAP_CLOSE_SMOKE_SHA: string | null = "81630ab30bcbee46f57ff7d6868bf6cb7151b4ec";
-export const GAP_CLOSE_SMOKE_AT: string | null = "2026-07-22T19:20:00Z";
+export const GAP_CLOSE_SMOKE_SHA: string | null = "193590f42f75fb3158415d93166c48e60e9be99e";
+export const GAP_CLOSE_SMOKE_AT: string | null = "2026-07-22T19:24:00Z";
 
 
 
