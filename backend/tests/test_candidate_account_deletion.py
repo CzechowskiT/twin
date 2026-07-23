@@ -164,6 +164,34 @@ def test_delete_account_creates_completed_privacy_request_lifecycle() -> None:
         db.close()
 
 
+def test_delete_account_blocked_by_legal_hold() -> None:
+    db = _sqlite_session()
+    try:
+        user, cand = _seed_user(db, "held@example.com")
+        db.add(
+            CandidatePrivacyRequest(
+                candidate_id=cand.id,
+                created_by_user_id=user.id,
+                request_type="deletion",
+                status="pending",
+                legal_hold=True,
+                created_at=datetime.now(timezone.utc),
+                updated_at=datetime.now(timezone.utc),
+            )
+        )
+        db.commit()
+        client = _client_for(db, user)
+        r = client.post("/api/v1/candidates/me/delete-account", json={"confirmation": "DELETE"})
+        assert r.status_code == 403
+        assert "legal_hold" in r.json()["detail"]
+        db.refresh(user)
+        assert user.is_active is True
+        assert user.email == "held@example.com"
+    finally:
+        app.dependency_overrides.clear()
+        db.close()
+
+
 def test_delete_account_rate_limited() -> None:
     """Self-service delete is capped at 3/min per user (abuse guard)."""
     db = _sqlite_session()

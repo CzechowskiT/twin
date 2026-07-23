@@ -1048,7 +1048,12 @@ def delete_my_account(
         )
     except ValueError as exc:
         detail = str(exc)
-        code = status.HTTP_409_CONFLICT if "already deleted" in detail.lower() else status.HTTP_422_UNPROCESSABLE_ENTITY
+        if "legal_hold" in detail.lower():
+            code = status.HTTP_403_FORBIDDEN
+        elif "already deleted" in detail.lower():
+            code = status.HTTP_409_CONFLICT
+        else:
+            code = status.HTTP_422_UNPROCESSABLE_ENTITY
         raise HTTPException(status_code=code, detail=detail) from exc
     return AccountDeleteOut.model_validate(data)
 

@@ -228,11 +228,20 @@ def start_work_email_verification(
         except Exception:
             logger.exception("Placement verification email failed application_id=%s", application_id)
     else:
-        logger.warning(
-            "Placement verify link (no mail configured): application_id=%s url=%s",
-            application_id,
-            link,
-        )
+        # Never log raw placement verify URLs outside development/debug.
+        env = (settings.environment or "").strip().lower()
+        if settings.debug or env == "development":
+            logger.warning(
+                "Placement verify link (no mail configured): application_id=%s url=%s",
+                application_id,
+                link,
+            )
+        else:
+            logger.warning(
+                "Placement verify mail not configured; application_id=%s token_fp=%s",
+                application_id,
+                hashlib.sha256(raw.encode("utf-8")).hexdigest()[:12],
+            )
 
     record_placement_event(
         db,

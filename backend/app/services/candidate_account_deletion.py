@@ -75,6 +75,17 @@ def execute_candidate_account_deletion(
     if not user.is_active:
         raise ValueError("Account already deleted or inactive")
 
+    held = (
+        db.query(CandidatePrivacyRequest)
+        .filter(
+            CandidatePrivacyRequest.candidate_id == candidate.id,
+            CandidatePrivacyRequest.legal_hold.is_(True),
+        )
+        .first()
+    )
+    if held is not None:
+        raise ValueError("legal_hold_blocks_self_service_deletion")
+
     deleted_at = _utcnow()
     _anonymize_candidate(candidate)
     _anonymize_user(user)

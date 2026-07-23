@@ -65,10 +65,18 @@ def request_password_reset(db: Session, settings: Settings, email: str) -> str:
             if settings.debug or _is_development(settings):
                 logger.warning("Password reset link (after email send failure): %s", url)
     else:
-        logger.warning(
-            "Password reset link (no mail configured; set SMTP_* or RESEND_API_KEY + MAIL_FROM): %s",
-            url,
-        )
+        # Never log raw reset URLs outside development/debug — log fingerprint only.
+        if settings.debug or _is_development(settings):
+            logger.warning(
+                "Password reset link (no mail configured; set SMTP_* or RESEND_API_KEY + MAIL_FROM): %s",
+                url,
+            )
+        else:
+            logger.warning(
+                "Password reset mail not configured; token fingerprint=%s user_id=%s",
+                hash_reset_token(raw)[:12],
+                user.id,
+            )
 
     return FORGOT_PASSWORD_ACK
 
