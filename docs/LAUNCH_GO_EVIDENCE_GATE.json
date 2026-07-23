@@ -1,0 +1,32 @@
+{
+  "schema": "twin.launch_go_evidence_gate/v1",
+  "updated_at": "2026-07-23T20:30:00Z",
+  "default_decision": "NO-GO",
+  "note": "Launch GO requires real pilot evidence AND separate Founder business decision. Evidence-ready ≠ Launch GO. Enrollment remains OFF even if evidence-ready.",
+  "required_criteria": [
+    "founder_approved_real_org_count_ge_1",
+    "invitation_pack_sent_ge_1",
+    "named_real_recipients_ge_3",
+    "kpi_not_no_real_pilot_data",
+    "no_fake_customer_claims"
+  ],
+  "frozen_axes": {
+    "enrollment": "OFF",
+    "phase_3b": "BLOCKED",
+    "stripe_public": "NOT_LIVE",
+    "ats_live_sync": "BLOCKED",
+    "microsoft_calendar_write": "BLOCKED"
+  },
+  "forbidden_shortcuts": [
+    "synthetic_nova_hiring_pl_as_real_org",
+    "demo_email_as_real_recipient",
+    "empty_tracker_rows",
+    "marketing_quotes_without_attestation",
+    "flipping_EXTERNAL_PILOT_ENROLLMENT_ENABLED"
+  ],
+  "kpi_tokens": [
+    "NO_REAL_PILOT_DATA",
+    "PARTIAL_REAL_PILOT_DATA",
+    "SUFFICIENT_REAL_PILOT_DATA"
+  ]
+}

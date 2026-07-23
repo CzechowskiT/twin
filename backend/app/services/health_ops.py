@@ -73,6 +73,12 @@ def build_health_ops_public(s: Settings) -> dict[str, Any]:
         "rc1_pilot_stance": resolve_pilot_stance(s),
         "rc1_launch": "NO-GO",
         "rc1_phase_3b": "BLOCKED",
+        "rc1_kpi_token": "NO_REAL_PILOT_DATA",
+        "rc1_os_verdict": (
+            "CONTROLLED PILOT OPERATING SYSTEM READY — "
+            "AWAITING FIRST FOUNDER-APPROVED PILOT ORGANIZATION"
+        ),
+        "rc1_founder_approved_real_orgs": 0,
     }
     try:
         from sqlalchemy import text
@@ -88,6 +94,32 @@ def build_health_ops_public(s: Settings) -> dict[str, Any]:
                 db_sess.execute(text("SET LOCAL statement_timeout = '2s'"))
             out["partner_export_configured"] = partner_export_configured(db_sess, s)
             out["validated_jobs"] = count_validated_jobs_public_traction(db_sess)
+            try:
+                from app.database.models import PilotInvitationPack, PilotOrganization
+
+                approved = (
+                    db_sess.query(PilotOrganization)
+                    .filter(
+                        PilotOrganization.approval_status == "FOUNDER_APPROVED",
+                        PilotOrganization.is_synthetic.is_(False),
+                    )
+                    .count()
+                )
+                sent = (
+                    db_sess.query(PilotInvitationPack)
+                    .filter(PilotInvitationPack.status == "SENT")
+                    .count()
+                )
+                out["rc1_founder_approved_real_orgs"] = int(approved)
+                if approved >= 1 and sent >= 1:
+                    out["rc1_kpi_token"] = "PARTIAL_REAL_PILOT_DATA"
+                    out["rc1_os_verdict"] = (
+                        "CONTROLLED PILOT ACTIVE — FIRST REAL USERS ONBOARDED"
+                    )
+                elif approved >= 1:
+                    out["rc1_kpi_token"] = "NO_REAL_PILOT_DATA"
+            except Exception:
+                pass
         # Avoid heavy market_coverage_report COUNTs on the public health path — use Redis scrape snapshot only.
         from app.services.market_coverage_status import feed_stale_hours_threshold, _parse_run_ts
         from datetime import datetime, timezone

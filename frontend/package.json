@@ -171,6 +171,7 @@
     "test:hard-live-evidence-guard": "npx --yes tsx --test scripts/hard-live-evidence-guard.test.ts",
     "test:product-inclusion-taxonomy-guard": "npx --yes tsx --test scripts/product-inclusion-taxonomy-guard.test.ts",
     "test:production-topology-rc1-guard": "npx --yes tsx --test scripts/production-topology-rc1-guard.test.ts",
+    "test:controlled-pilot-os-guard": "npx --yes tsx --test scripts/controlled-pilot-os-guard.test.ts",
     "sync:hard-live-registry-json": "npx --yes tsx scripts/sync-hard-live-registry-json.mjs",
     "test:deploy-alignment-poller": "npx --yes tsx --test scripts/deploy-alignment-poller.test.ts",
     "wait:strict-deploy-alignment": "npx --yes tsx scripts/wait-strict-deploy-alignment.ts",

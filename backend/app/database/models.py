@@ -2869,3 +2869,77 @@ class CompanyCalendarHold(Base):
     status: Mapped[str] = mapped_column(String(32), default="draft")
     provider_event_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class PilotOrganization(Base):
+    """Controlled-pilot employer/org candidate — FOUNDER_APPROVED required before invites."""
+
+    __tablename__ = "pilot_organizations"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    slug: Mapped[str] = mapped_column(String(80), unique=True, index=True)
+    display_name: Mapped[str] = mapped_column(String(200))
+    market: Mapped[str] = mapped_column(String(64), default="PL", index=True)
+    approval_status: Mapped[str] = mapped_column(
+        String(32), default="CANDIDATE", index=True
+    )  # CANDIDATE|FOUNDER_APPROVED|REJECTED|WITHDRAWN
+    is_synthetic: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+    recipient_emails_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    cohort_id: Mapped[int | None] = mapped_column(
+        ForeignKey("activation_cohorts.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    tenant_id: Mapped[int | None] = mapped_column(
+        ForeignKey("organization_tenants.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    approved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    approved_by_label: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class PilotInvitationPack(Base):
+    """Invitation pack for a pilot org — DRAFT/READY_UNSENT until Founder send approval."""
+
+    __tablename__ = "pilot_invitation_packs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    organization_id: Mapped[int] = mapped_column(
+        ForeignKey("pilot_organizations.id", ondelete="CASCADE"), index=True
+    )
+    status: Mapped[str] = mapped_column(
+        String(32), default="DRAFT", index=True
+    )  # DRAFT|READY_UNSENT|SENT|REVOKED
+    recipients_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    template_key: Mapped[str] = mapped_column(String(128), default="controlled_pilot_invite_v1")
+    prepared_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    sent_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    founder_send_approval_ref: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class PilotSupportTicket(Base):
+    """Lightweight pilot support queue — no PII in logs; escalate to on-call."""
+
+    __tablename__ = "pilot_support_tickets"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    organization_id: Mapped[int | None] = mapped_column(
+        ForeignKey("pilot_organizations.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    category: Mapped[str] = mapped_column(String(64), default="general", index=True)
+    status: Mapped[str] = mapped_column(String(32), default="open", index=True)
+    subject: Mapped[str] = mapped_column(String(200))
+    body_summary: Mapped[str | None] = mapped_column(Text, nullable=True)
+    severity: Mapped[str] = mapped_column(String(16), default="normal")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)

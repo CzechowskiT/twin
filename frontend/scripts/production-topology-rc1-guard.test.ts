@@ -34,7 +34,7 @@ test("PRODUCTION_TOPOLOGY_RC1.json exists and is valid", () => {
   assert.ok(doc.vercel.domains_attached.includes("twin.care"));
   assert.ok(doc.vercel.domains_attached.includes("app.twin.care"));
   assert.equal(doc.vercel.dns_blocker, "afternic_nameservers");
-  assert.equal(doc.railway.alembic_head_expected, "099_data_room_document_blobs");
+  assert.equal(doc.railway.alembic_head_expected, "100_controlled_pilot_os");
   assert.equal(doc.railway.api_service, "twin");
   assert.equal(doc.railway.worker_service, "enthusiastic-encouragement");
   assert.equal(doc.on_call_roles.never_invent_human_names, true);
@@ -42,7 +42,8 @@ test("PRODUCTION_TOPOLOGY_RC1.json exists and is valid", () => {
   assert.ok(
     doc.verdict === "A_CONTROLLED_PILOT_OPERATIONAL" ||
       doc.verdict === "A_READY" ||
-      doc.verdict === "B_AWAITING_ON_CALL",
+      doc.verdict === "B_AWAITING_ON_CALL" ||
+      doc.verdict === "CONTROLLED_PILOT_OS_READY_AWAITING_FIRST_FOUNDER_APPROVED_ORG",
   );
 });
 

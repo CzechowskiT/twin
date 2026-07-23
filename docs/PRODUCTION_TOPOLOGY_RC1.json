@@ -1,6 +1,6 @@
 {
   "schema": "twin.production_topology.rc1/v1",
-  "updated_at": "2026-07-23T20:15:00Z",
+  "updated_at": "2026-07-23T20:35:00Z",
   "branch": "cursor/phase1-monorepo-scaffold",
   "hard_live_denominator": "CORE_PILOT_ONLY",
   "stance": {
@@ -13,7 +13,8 @@
     "external_pilot_enrollment_enabled": false,
     "stripe_public": "NOT_LIVE",
     "ats_live_sync": "BLOCKED",
-    "microsoft_calendar_write": "BLOCKED"
+    "microsoft_calendar_write": "BLOCKED",
+    "kpi_token": "NO_REAL_PILOT_DATA"
   },
   "canonical_urls": {
     "operational_frontend": "https://twin-sooty.vercel.app",
@@ -21,7 +22,7 @@
     "preferred_public_frontend": "https://twin.care",
     "preferred_app_frontend": "https://app.twin.care",
     "api": "https://twin-production-bcd9.up.railway.app",
-    "note": "TEMPORARY_PILOT_CANONICAL_URL = twin-sooty.vercel.app. twin.care/app.twin.care attached to Vercel project twin but Afternic NS still park apex — custom DNS desirable but must NOT block controlled pilot."
+    "note": "TEMPORARY_PILOT_CANONICAL_URL = twin-sooty.vercel.app. twin.care Afternic NS parks apex — non-blocking for controlled pilot OS."
   },
   "vercel": {
     "team": "twin",
@@ -50,7 +51,7 @@
     "worker_service": "enthusiastic-encouragement",
     "postgres": "Postgres",
     "redis": "Redis",
-    "alembic_head_expected": "099_data_room_document_blobs"
+    "alembic_head_expected": "100_controlled_pilot_os"
   },
   "on_call_roles": {
     "primary": "PILOT_ON_CALL_PRIMARY",
@@ -65,8 +66,15 @@
   "synthetic_pilot_identities": {
     "doc": "docs/RC1_SYNTHETIC_PILOT_IDENTITIES.md",
     "candidate": "demo@twin.career",
-    "recruiter_company_slug": "nova-hiring-pl"
+    "recruiter_company_slug": "nova-hiring-pl",
+    "not_founder_approved_real_org": true
   },
-  "verified_tip": "b4b7e917abf2e8dad0ad675056dd42e5ee3d2246",
-  "verdict": "A_CONTROLLED_PILOT_OPERATIONAL"
+  "controlled_pilot_os": {
+    "manifest": "docs/CONTROLLED_PILOT_OS_MANIFEST.json",
+    "index": "docs/CONTROLLED_PILOT_OPERATING_SYSTEM.md",
+    "launch_go_gate": "docs/LAUNCH_GO_EVIDENCE_GATE.json",
+    "status_api": "/api/v1/admin/pilot-os/status"
+  },
+  "verified_tip": "pending_os_deploy",
+  "verdict": "CONTROLLED_PILOT_OS_READY_AWAITING_FIRST_FOUNDER_APPROVED_ORG"
 }

@@ -13,6 +13,10 @@ export const PILOT_STANCE = "READY_FOR_CONTROLLED_PILOT" as const;
 export type PilotStance = "BLOCKED_BY_FOUNDER" | "READY_FOR_CONTROLLED_PILOT";
 /** Stable Vercel production alias while twin.care Afternic NS parks apex. */
 export const TEMPORARY_PILOT_CANONICAL_URL = "https://twin-sooty.vercel.app" as const;
+/** Honest KPI until a non-synthetic FOUNDER_APPROVED org has SENT invites. */
+export const PILOT_KPI_TOKEN = "NO_REAL_PILOT_DATA" as const;
+export const CONTROLLED_PILOT_OS_VERDICT =
+  "CONTROLLED PILOT OPERATING SYSTEM READY — AWAITING FIRST FOUNDER-APPROVED PILOT ORGANIZATION" as const;
 export const GATE_F_STATUS = "PASS" as const;
 export const LAUNCH_STANCE_CANON = "NO-GO" as const;
 export const PMF_EVIDENCE = "INSUFFICIENT_DATA" as const;

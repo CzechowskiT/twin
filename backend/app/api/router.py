@@ -11,6 +11,7 @@ from app.api import (
     company,
     company_feedback_persistence,
     consent,
+    controlled_pilot_os,
     csp_reports,
     demo,
     export_requests,
@@ -153,6 +154,7 @@ api_router.include_router(applications.router, prefix="/applications", tags=["Ap
 api_router.include_router(auto_apply_settings.router, prefix="/auto-apply", tags=["Auto-apply"])
 api_router.include_router(feedback.router, prefix="/feedback", tags=["Feedback"])
 api_router.include_router(admin_ops.router, prefix="/admin", tags=["Admin"])
+api_router.include_router(controlled_pilot_os.router, prefix="/admin", tags=["Controlled Pilot OS"])
 api_router.include_router(ops.router, prefix="/ops", tags=["Ops"])
 api_router.include_router(
     founder_command.router, prefix="/founder-command", tags=["Founder Command"]
