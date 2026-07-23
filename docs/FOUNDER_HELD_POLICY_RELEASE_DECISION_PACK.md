@@ -1,14 +1,31 @@
 # Founder HELD_POLICY Release Decision Pack
 
-**Type:** Blank Founder decision form — Cursor does **not** decide RELEASE.  
+**Type:** Founder-signed execution pack — BUILD (E) + RELEASE_WITH_CONTROLS (A) approved 2026-07-23.  
 **Branch:** `cursor/phase1-monorepo-scaffold`  
 **Prepared:** 2026-07-23  
-**Canonical SHA (at pack time):** `51927b99d53ec11a136cb002a6450e9f4e463203` (activation FE/API/worker aligned)  
+**Canonical SHA (at pack start):** `5b37212d6447c54f751ee430427bac6ce2f45205` · tip updates during BUILD batch  
 **Hard LIVE stance (unchanged):** Gate F **PASS** · Pilot **BLOCKED_BY_FOUNDER** · Launch **NO-GO** · Enrollment **OFF** · Phase 3B **BLOCKED**
 
 This pack covers every `HELD_POLICY` and credential/legal hold that still blocks 100% PASS.  
 Founder chooses per row: `RELEASE` · `RELEASE_WITH_CONTROLS` · `MAINTAIN_HOLD` · `REMOVE_FROM_LAUNCH_SCOPE`.  
 Do **not** flip Pilot / Launch / Enrollment / Phase 3B from this pack alone unless the row explicitly requires it and Founder signs that stance change separately.
+
+---
+
+## Founder execution decision (2026-07-23)
+
+**Founder instruction:** Full Product Completion — BUILD all missing modules + prepare for 100% PASS.
+
+| Class | Founder decision | Notes |
+|-------|------------------|-------|
+| **E** | **BUILD** (all) | Do not REMOVE_FROM_LAUNCH_SCOPE. PASS only after full impl + prod smoke. |
+| **A** | **RELEASE_WITH_CONTROLS** | Individual PASS after verify + controls + tests + smoke. No automatic PASS. |
+| **C** | Finish Cursor work without secrets; smoke+PASS if creds present else runbook | Slack / Authologic / S3 |
+| **D** | Tech readiness + truthful claims guards; no false certification | Legal marketing claim gated separately |
+| **F** | Do not delete to lower counts; redesign safe HITL or formal REMOVE_FROM_PRODUCT_SCOPE rec | `ai_autonomous_employment` = recommendation-only + human approval |
+| Stance | **UNCHANGED** | Pilot BLOCKED_BY_FOUNDER · Launch NO-GO · Enrollment OFF · Phase 3B BLOCKED · Gate F PASS |
+
+Cursor attestation: decisions recorded from Founder batch “BUILD all missing + RELEASE_WITH_CONTROLS”. Global enrollment kill-switch remains OFF.
 
 ---
 
@@ -83,3 +100,66 @@ Copy and mark:
 | Security (recommendations only) | Cursor pack 2026-07-23 | 2026-07-23 | Recommendations above — not decisions |
 
 **Cursor attestation:** Decision cells left blank. No HELD_POLICY status flipped to PASS from this document. No Pilot/Launch/Enrollment/Phase 3B stance change.
+
+
+---
+
+## Founder filled decisions (execution)
+
+| # | module_id | Class | Founder decision | Controls / notes |
+|---|-----------|-------|------------------|------------------|
+| 1 | auto_apply | A | RELEASE_WITH_CONTROLS | Default REVIEW_BEFORE_SUBMIT; no CAPTCHA bypass; consent + rate caps + kill switch |
+| 2 | cand_ms_calendar | A | RELEASE_WITH_CONTROLS | Write allowlist + re-consent + audit |
+| 3 | plat_identity_kyc | C | OPERATOR_CREDS | Finish code; PASS only with Authologic keys |
+| 4 | plan_payments | A | RELEASE_WITH_CONTROLS | Sandbox smoke OK; no real charges in smoke |
+| 5 | rec_interview_scheduling | E | BUILD | Full recruiter scheduling product |
+| 6 | recruiter_calendar | E | BUILD | Live calendar surface |
+| 7 | recruiter_integrations | E | BUILD | ATS OAuth + honesty→live readiness |
+| 8 | investor_sor_proof_ats | E | BUILD | Depends on ATS import evidence |
+| 9 | rec_recruiter_onboarding | A | RELEASE_WITH_CONTROLS | Capability PASS with enrollment kill-switch OFF; stance unchanged |
+| 10 | company_integrations | E | BUILD | |
+| 11 | rec_ats_sync | E | BUILD | Dry-run first; write gated |
+| 12 | rec_vacancy_import | E | BUILD | Real connector state |
+| 13 | company_ats_import_readiness | E | BUILD | |
+| 14 | company_billing_public_claim | E | BUILD | B2B Stripe sandbox path |
+| 15 | company_ms_calendar_write | E | BUILD | |
+| 16 | company_invite_delivery | A | RELEASE_WITH_CONTROLS | Worker ready; enrollment OFF |
+| 17 | rec_company_onboarding | A | RELEASE_WITH_CONTROLS | Same enrollment kill-switch distinction |
+| 18 | investor_external_attestations | F | HITL_SAFE_VARIANT | No fake claims; signed attestation queue only |
+| 19 | investor_s3_required_download | C | OPERATOR_CREDS | Local/FS fallback PASS if declared; S3 when keys |
+| 20 | investor_self_serve_enrollment | A | RELEASE_WITH_CONTROLS | Kill-switch OFF; readiness vs launch stance |
+| 21 | plat_ms_calendar_write | A | RELEASE_WITH_CONTROLS | |
+| 22 | plat_ms_calendar_busy_read | A | RELEASE_WITH_CONTROLS | Flag ON with audit |
+| 23 | plat_ats_live_sync_write | E | BUILD | |
+| 24 | plat_ats_write_sync | E | BUILD | |
+| 25 | plat_stripe_public | A | RELEASE_WITH_CONTROLS | Sandbox claim with controls |
+| 26 | plat_authologic_auto_kyc | A | RELEASE_WITH_CONTROLS | After C creds; auto off until keys |
+| 27 | ai_external_verification | E | BUILD | Provider client + flag |
+| 28 | ai_protected_attr_monitoring | D | TECH_READY_NO_CLAIM | Monitoring tech behind legal gate; no marketing claim |
+| 29 | ai_autonomous_employment | F | HITL_RECOMMENDATION_ONLY | No autonomous final employment decisions |
+| 30 | ai_act_certified_claim | D | TECH_READY_NO_CLAIM | Honesty false until legal cert |
+| — | plat_slack_connector | C | OPERATOR_CREDS | Webhook-only ≠ full OAuth PASS if OAuth claimed |
+
+**Signatures:** Founder — 2026-07-23 — BUILD all E + RELEASE_WITH_CONTROLS all A (batch instruction).
+
+## Execution progress (Cursor BUILD batch)
+
+**Date:** 2026-07-23  
+**Baseline SHA:** `5b37212d6447c54f751ee430427bac6ce2f45205`  
+**Stance unchanged:** Gate F PASS · Pilot BLOCKED_BY_FOUNDER · Launch NO-GO · Enrollment OFF · Phase 3B BLOCKED
+
+### Implemented (code)
+- Class E: ATS Greenhouse Harvest + Lever stub, dry-run write + `ats_sync_attempts`, vacancy preview honesty, company/recruiter calendar holds (draft-first), company Stripe sandbox checkout (test mode or honest stub), AI external verification (sandbox + human_review_required), migration `097`.
+- Class A: auto-apply `REVIEW_BEFORE_SUBMIT` default + kill-switch honesty; enrollment capability vs kill-switch OFF; MS busy-read honesty vs write gated; Stripe sandbox controls with `STRIPE_NOT_PUBLIC_LAUNCH`.
+- Class C: Authologic + S3 operator runbooks (env names only); Slack re-audit remains webhook-only / creds MISSING.
+- Class D: `truthful_claims` guards — no AI Act certified claim; protected-attr monitoring tech vs legal gate doc.
+- Class F: HITL employment recommendations API — never binding hire/reject; `ai_autonomous_employment` recommendation-only.
+- Canonical: `docs/CANONICAL_MODULE_MANIFEST.md` + FE guard.
+
+### Registry
+- **No automatic PASS.** Hard LIVE remains PASS 122 / HELD_POLICY 30 / BLOCKED_EXTERNAL 1 until individual prod smoke evidence.
+- Individual PASS deferred where: operator creds missing (Slack/Authologic/S3/Greenhouse OAuth/Stripe sk_test price), MS busy-read prod flag OFF, ATS_LIVE_SYNC blocked, legal docs for Class D marketing claims.
+
+### Verdict target
+`TECHNICAL IMPLEMENTATION EXHAUSTED — EXTERNAL ACTION REQUIRED` when Cursor-fixable work is committed/deployed and only creds/legal remain.
+

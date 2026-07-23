@@ -22,7 +22,9 @@ Stance unchanged: Pilot `BLOCKED_BY_FOUNDER` · Gate F `PASS` · Launch `NO-GO` 
 | Stale | none |
 | Inaccessible | none for Railway this run |
 
-Also re-checked related operator holds (presence only): `S3_BUCKET` **MISSING**, `AWS_ACCESS_KEY_ID` **MISSING**, `AUTHOLOGIC_API_URL` / `AUTHOLOGIC_API_KEY` **MISSING**.
+Also re-checked related operator holds (presence only): `S3_BUCKET_NAME` **MISSING**, `S3_ACCESS_KEY_ID` **MISSING**, `AUTHOLOGIC_API_BASE_URL` / `AUTHOLOGIC_API_KEY` **MISSING**.
+
+Exact-name runbooks (no secret values): `docs/AUTHOLOGIC_OPERATOR_ENV_RUNBOOK.md`, `docs/S3_OPERATOR_ENV_RUNBOOK.md`.
 
 Aliases checked (code `_env`): `SLACK_CLIENT_ID`/`TWIN_SLACK_CLIENT_ID`, `SLACK_CLIENT_SECRET`/`TWIN_SLACK_CLIENT_SECRET`, `SLACK_INCOMING_WEBHOOK_URL`/`TWIN_SLACK_WEBHOOK_URL`. Also scanned `SLACK_SIGNING_SECRET`, `SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN`, `SLACK_WEBHOOK_URL` — all **MISSING**.
 
