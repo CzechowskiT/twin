@@ -204,6 +204,18 @@ def register(request: Request, body: UserRegister, db: Session = Depends(get_db)
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="All required consents must be accepted (privacy, terms, job data, AI matching)",
         )
+    settings = get_settings()
+    if not settings.external_pilot_enrollment_enabled and settings.pilot_registration_invite_only:
+        allow = {
+            e.strip().lower()
+            for e in (settings.pilot_email_allowlist or "").split(",")
+            if e.strip()
+        }
+        if str(body.email).strip().lower() not in allow:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="registration_invite_only",
+            )
     if db.query(User).filter(User.email == body.email).first():
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")
     stored_ref_note = normalize_stored_referred_by_note(body.referred_by_note)

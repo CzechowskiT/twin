@@ -16,6 +16,8 @@ test("Founder pilot block constants present", () => {
   assert.match(src, /INSUFFICIENT_DATA/);
   assert.match(src, /REAL_CANDIDATE_ENROLLMENT = "NOT_STARTED"/);
   assert.match(src, /EXTERNAL_PILOT_ENROLLMENT_ENABLED/);
+  assert.match(src, /PHASE_3B_STANCE = "BLOCKED"/);
+  assert.match(src, /READY_FOR_CONTROLLED_PILOT/);
 });
 
 test("default enrollment is not hard-coded true", () => {

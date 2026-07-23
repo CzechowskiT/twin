@@ -59,6 +59,18 @@ def build_health_ops_public(s: Settings) -> dict[str, Any]:
         "scrape_beat_enabled": s.scrape_beat_enabled,
         "linkedin_oauth_configured": is_linkedin_oauth_configured(),
         "recruiter_inbox_configured": bool((s.recruiter_inbox_token or "").strip()),
+        "rc1": {
+            "operational_frontend": "https://twin-sooty.vercel.app",
+            "preferred_frontend": "https://twin.care",
+            "pilot_registration_invite_only": bool(s.pilot_registration_invite_only),
+            "external_pilot_enrollment_enabled": bool(s.external_pilot_enrollment_enabled),
+            "on_call_primary_assigned": not str(s.pilot_on_call_primary or "").endswith("UNASSIGNED"),
+            "on_call_secondary_assigned": not str(s.pilot_on_call_secondary or "").endswith(
+                "UNASSIGNED"
+            ),
+            "launch": "NO-GO",
+            "phase_3b": "BLOCKED",
+        },
     }
     try:
         from sqlalchemy import text

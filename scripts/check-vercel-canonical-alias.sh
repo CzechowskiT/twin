@@ -11,6 +11,8 @@
 #     canonical project name = "twin"
 #     canonical org           = "team_kRoghq6m6ogPUxpuwDUongpN" (team scope: twin)
 #     canonical public alias  = https://twin-sooty.vercel.app
+#     preferred public domain = https://twin.care (Afternic NS must move to Vercel — see docs/RC1_DOMAIN_DNS_FOUNDER_ACTION.md)
+#     topology manifest       = docs/PRODUCTION_TOPOLOGY_RC1.json
 #
 # The local link is allowed to drift to `twin-sooty` for historical
 # reasons (Phase 1 git-push deploys still flow through the canonical

@@ -449,6 +449,15 @@ class Settings(BaseSettings):
     # Recruiter session JWT TTL after pilot-token exchange (default 8h).
     recruiter_jwt_expire_minutes: int = 60 * 8
 
+    # Controlled pilot registration — invite-only when enabled (default off in unit tests).
+    # Production Railway: set PILOT_REGISTRATION_INVITE_ONLY=true + PILOT_EMAIL_ALLOWLIST.
+    external_pilot_enrollment_enabled: bool = False
+    pilot_registration_invite_only: bool = False
+    pilot_email_allowlist: str = ""
+    # Role placeholders only — never invent human names in code.
+    pilot_on_call_primary: str = "PILOT_ON_CALL_PRIMARY_UNASSIGNED"
+    pilot_on_call_secondary: str = "PILOT_ON_CALL_SECONDARY_UNASSIGNED"
+
     # --- TWIN Agent Dispatcher (Cursor Cloud Agents) ---
     # Production secret name for Cursor service-account API key (never commit the value):
     # CURSOR_CLOUD_AGENTS_API_KEY

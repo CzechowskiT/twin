@@ -1,17 +1,22 @@
 /**
  * Production action gates — hide/disable non-LIVE mutations outside demo/dev/internal.
  * Founder block 2026-07-20: no external pilot enrollment.
- * Gate F technical PASS (Option 3) — Pilot remains BLOCKED_BY_FOUNDER.
+ * Gate F technical PASS (Option 3).
+ * RC1: Pilot may become READY_FOR_CONTROLLED_PILOT only after §24 checklist
+ * (including named on-call). Until then BLOCKED_BY_FOUNDER. Launch stays NO-GO.
  */
 export const EXTERNAL_PILOT_ENROLLMENT_ENABLED =
   process.env.NEXT_PUBLIC_EXTERNAL_PILOT_ENROLLMENT_ENABLED === "true";
 
+/** Allowed values: BLOCKED_BY_FOUNDER | READY_FOR_CONTROLLED_PILOT */
 export const PILOT_STANCE = "BLOCKED_BY_FOUNDER" as const;
+export type PilotStance = "BLOCKED_BY_FOUNDER" | "READY_FOR_CONTROLLED_PILOT";
 export const GATE_F_STATUS = "PASS" as const;
 export const LAUNCH_STANCE_CANON = "NO-GO" as const;
 export const PMF_EVIDENCE = "INSUFFICIENT_DATA" as const;
 export const REAL_CANDIDATE_ENROLLMENT = "NOT_STARTED" as const;
 export const REAL_RECRUITER_ENROLLMENT = "NOT_STARTED" as const;
+export const PHASE_3B_STANCE = "BLOCKED" as const;
 
 /** True only for local/dev or explicit demo mode — never production LIVE claims. */
 export function isDemoOrDevSurface(): boolean {
