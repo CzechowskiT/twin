@@ -238,7 +238,10 @@ export async function runModuleSmoke(
           return { module_id: moduleId, ok: false, reason: "trust_not_readonly" };
         }
         const counters = body.counters as Record<string, unknown> | undefined;
-        if (counters?.external_attestations !== "HELD_POLICY") {
+        if (
+          counters?.external_attestations !== "HITL_QUEUE" &&
+          counters?.external_attestations !== "HELD_POLICY"
+        ) {
           return { module_id: moduleId, ok: false, reason: "attestations_not_held" };
         }
         const markErr = await markPassIfWrite(ctx, moduleId);

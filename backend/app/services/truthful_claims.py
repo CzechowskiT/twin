@@ -58,14 +58,18 @@ def assert_certification_not_claimable(module_id: str, *, status: str) -> None:
 
 
 def truthful_claims_honesty() -> dict[str, Any]:
+    """Honesty payload — tech_ready flags may be true; certification claims stay false."""
     return {
-        "ai_act_certified": AI_ACT_CERTIFIED_CLAIM,
+        "ai_act_certified": False,  # always — legal cert never inferred from code
         "ai_act_certified_claimable": AI_ACT_CERTIFIED_CLAIMABLE,
         "ai_act_tech_control_coverage_ready": AI_ACT_TECH_CONTROL_COVERAGE_READY,
         "ai_protected_attribute_monitoring_enabled": False,
         "protected_attr_monitoring_tech_ready": PROTECTED_ATTR_MONITORING_TECH_READY,
-        "protected_attr_monitoring_legal_gate_open": PROTECTED_ATTR_MONITORING_LEGAL_GATE_OPEN,
+        "protected_attr_monitoring_legal_gate_open": False,  # always until legal gate opens
         "protected_attr_monitoring_marketing_claimable": PROTECTED_ATTR_MONITORING_MARKETING_CLAIMABLE,
+        "stance": "TECH_READY_NO_CLAIM",
+        "non_claimable_modules": sorted(NON_CLAIMABLE_CERTIFICATION_MODULES),
         "claim_gate_split": CLAIM_GATE_SPLIT,
         "compliance_language": "readiness_and_control_coverage_only",
+        "registry_pass_forbidden": True,
     }

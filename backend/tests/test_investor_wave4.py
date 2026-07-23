@@ -172,7 +172,74 @@ def test_wave4_placement_and_trust_summaries(wave4_client: tuple[TestClient, Ses
     trust = client.get("/api/v1/platform/wave4/trust-proof/summary", headers=headers)
     assert trust.status_code == 200
     assert trust.json()["readonly"] is True
-    assert trust.json()["counters"]["external_attestations"] == "HELD_POLICY"
+    assert trust.json()["counters"]["external_attestations"] == "HITL_QUEUE"
+    assert trust.json()["verified_customer_claims"] is False
+    assert trust.json()["counters"]["verified_customer_claims"] is False
+
+
+def test_wave4_external_attestations_hitl(wave4_client: tuple[TestClient, Session]) -> None:
+    client, db = wave4_client
+    _user, headers = _auth_user(db)
+
+    empty = client.get("/api/v1/platform/wave4/attestations", headers=headers)
+    assert empty.status_code == 200
+    assert empty.json()["verified_customer_claims"] is False
+    assert empty.json()["signed_count"] == 0
+
+    created = client.post(
+        "/api/v1/platform/wave4/attestations",
+        headers=headers,
+        json={
+            "subject_label": "Pilot customer A",
+            "claim_text": "Used TWIN for ranked interview calendar — founder-signed only.",
+            "evidence_ref": "docs/evidence/attestation-a.md",
+        },
+    )
+    assert created.status_code == 201
+    body = created.json()
+    assert body["status"] == "PENDING_FOUNDER_SIGNATURE"
+    assert body["signed_by"] is None
+    att_id = body["id"]
+
+    pending_trust = client.get("/api/v1/platform/wave4/trust-proof/summary", headers=headers)
+    assert pending_trust.json()["verified_customer_claims"] is False
+
+    signed = client.post(
+        f"/api/v1/platform/wave4/attestations/{att_id}/sign",
+        headers=headers,
+        json={"signed_by": "Founder"},
+    )
+    assert signed.status_code == 200
+    assert signed.json()["status"] == "SIGNED"
+    assert signed.json()["signed_by"] == "Founder"
+    assert signed.json()["signed_at"] is not None
+
+    listed = client.get("/api/v1/platform/wave4/attestations", headers=headers)
+    assert listed.status_code == 200
+    assert listed.json()["verified_customer_claims"] is True
+    assert listed.json()["signed_count"] == 1
+
+    status_body = client.get("/api/v1/platform/wave4/status", headers=headers)
+    assert status_body.json()["verified_customer_claims"] is True
+    assert status_body.json()["microsoft_write"] == "BLOCKED"
+    assert status_body.json()["microsoft_calendar_write_enabled"] is False
+    assert "microsoft_busy_read_enabled" in status_body.json()
+
+    rejected = client.post(
+        "/api/v1/platform/wave4/attestations",
+        headers=headers,
+        json={
+            "subject_label": "Rejected claim",
+            "claim_text": "This claim will be rejected by founder.",
+        },
+    )
+    rej_id = rejected.json()["id"]
+    rej = client.post(
+        f"/api/v1/platform/wave4/attestations/{rej_id}/reject",
+        headers=headers,
+    )
+    assert rej.status_code == 200
+    assert rej.json()["status"] == "REJECTED"
 
 
 def test_wave4_board_readiness(wave4_client: tuple[TestClient, Session]) -> None:

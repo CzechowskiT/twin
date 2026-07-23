@@ -259,6 +259,26 @@ test("ai compliance modules PASS after smoke with policy holds intact", () => {
   assert.ok(passedAi.some((r) => r.module_id === "ai_wave6_dsr_delete_export"));
 });
 
+test("Class D TECH_READY_NO_CLAIM modules never PASS in registry", () => {
+  const forbiddenPass = ["ai_act_certified_claim", "ai_protected_attr_monitoring"] as const;
+  for (const moduleId of forbiddenPass) {
+    const row = HARD_LIVE_EVIDENCE_REGISTRY.find((r) => r.module_id === moduleId);
+    assert.ok(row, `missing registry row ${moduleId}`);
+    assert.notEqual(row!.status, "PASS", `${moduleId} must not be PASS (legal hold / TECH_READY_NO_CLAIM)`);
+    assert.equal(row!.status, "HELD_POLICY");
+  }
+  const json = readFileSync(join(root, "docs/HARD_LIVE_EVIDENCE_REGISTRY.json"), "utf8");
+  const parsed = JSON.parse(json) as {
+    modules: Array<{ module_id: string; status: string }>;
+  };
+  assert.ok(Array.isArray(parsed.modules));
+  for (const moduleId of forbiddenPass) {
+    const row = parsed.modules.find((r) => r.module_id === moduleId);
+    assert.ok(row, `missing JSON registry row ${moduleId}`);
+    assert.notEqual(row!.status, "PASS", `JSON registry must not mark ${moduleId} PASS`);
+  }
+});
+
 test("wave4 investor modules PASS after smoke with policy holds intact", () => {
   assert.equal(HARD_LIVE_EVIDENCE_REGISTRY_WAVE4.length, 15);
   const passed = HARD_LIVE_EVIDENCE_REGISTRY_WAVE4.filter((r) => r.status === "PASS");

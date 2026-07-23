@@ -18,11 +18,16 @@ from app.database.models import (
     DataRoomDocumentMetadata,
     FeatureFlagState,
     HardLiveEvidenceRecord,
+    InvestorExternalAttestation,
     InvestorNdaAcceptance,
     User,
 )
 from app.services.data_room_upload import object_storage_configured
-from app.services.platform_foundations import record_domain_event
+from app.services.platform_foundations import enqueue_communication_draft, record_domain_event
+
+ATTESTATION_STATUSES = frozenset(
+    {"PENDING_FOUNDER_SIGNATURE", "SIGNED", "REJECTED"}
+)
 
 logger = logging.getLogger(__name__)
 
@@ -272,8 +277,12 @@ def mark_evidence_after_smoke(
 
 
 def wave4_status(db: Session) -> dict[str, Any]:
+    from app.config import get_settings
+
     seed_flags_and_evidence(db)
     evidence = list_hard_live_evidence(db)
+    settings = get_settings()
+    signed = _signed_attestation_count(db)
     return {
         "wave": "4",
         "name": "investor_complete",
@@ -288,10 +297,17 @@ def wave4_status(db: Session) -> dict[str, Any]:
         "stripe_public": "NOT_LIVE",
         "ats_live_sync": "BLOCKED",
         "microsoft_write": "BLOCKED",
+        "microsoft_calendar_write_enabled": False,
+        "microsoft_busy_read_enabled": bool(settings.microsoft_busy_read_enabled),
+        "microsoft_busy_read": (
+            "LIVE" if settings.microsoft_busy_read_enabled else "READY_FLAG_OFF"
+        ),
         "authologic_kyc": "OFF",
         "nda_version_current": CURRENT_NDA_VERSION,
         "s3_configured": object_storage_configured(),
         "secure_download": "METADATA_ONLY_UNLESS_S3",
+        "verified_customer_claims": signed >= 1,
+        "signed_attestation_count": signed,
         "evidence": evidence["counts"],
         "smokeable_module_ids": [m["module_id"] for m in WAVE4_SMOKEABLE_MODULES],
         "held_module_ids": [m["module_id"] for m in WAVE4_HELD_MODULES],
@@ -305,9 +321,10 @@ def policy_holds() -> dict[str, Any]:
         "stripe_public": "NOT_LIVE",
         "ats_live_sync": "BLOCKED",
         "microsoft_calendar_write": "BLOCKED",
+        "microsoft_busy_read_separate_from_write": True,
         "authologic_auto_kyc": "OFF",
         "external_pilot_enrollment": False,
-        "external_attestations": "FORBIDDEN",
+        "external_attestations": "HITL_FOUNDER_SIGNATURE_REQUIRED",
         "self_serve_investor_enrollment": "NOT_STARTED",
         "pilot": "BLOCKED_BY_FOUNDER",
         "gate_f": "PENDING",
@@ -316,6 +333,173 @@ def policy_holds() -> dict[str, Any]:
         "product_agent": "NOT_USED",
         "real_invites": "FORBIDDEN",
     }
+
+
+def _signed_attestation_count(db: Session) -> int:
+    return (
+        db.query(InvestorExternalAttestation)
+        .filter(InvestorExternalAttestation.status == "SIGNED")
+        .count()
+    )
+
+
+def _serialize_attestation(row: InvestorExternalAttestation) -> dict[str, Any]:
+    return {
+        "id": row.id,
+        "subject_label": row.subject_label,
+        "claim_text": row.claim_text,
+        "status": row.status,
+        "evidence_ref": row.evidence_ref,
+        "signed_by": row.signed_by,
+        "signed_at": _iso(row.signed_at),
+        "created_by_user_id": row.created_by_user_id,
+        "created_at": _iso(row.created_at),
+        "updated_at": _iso(row.updated_at),
+    }
+
+
+def create_external_attestation(
+    db: Session,
+    *,
+    user: User,
+    subject_label: str,
+    claim_text: str,
+    evidence_ref: str | None = None,
+) -> dict[str, Any]:
+    """Queue a founder-signature attestation — never auto-marks verified claims."""
+    label = (subject_label or "").strip()
+    claim = (claim_text or "").strip()
+    if not label:
+        raise ValueError("subject_label_required")
+    if not claim:
+        raise ValueError("claim_text_required")
+    row = InvestorExternalAttestation(
+        subject_label=label[:255],
+        claim_text=claim[:8000],
+        status="PENDING_FOUNDER_SIGNATURE",
+        evidence_ref=(evidence_ref or "").strip()[:512] or None,
+        created_by_user_id=user.id,
+    )
+    db.add(row)
+    db.commit()
+    db.refresh(row)
+    record_domain_event(
+        db,
+        event_name="wave4.external_attestation_created",
+        aggregate_type="investor_external_attestation",
+        aggregate_id=str(row.id),
+        actor_user_id=user.id,
+        payload={"status": row.status, "subject_label": row.subject_label},
+    )
+    enqueue_communication_draft(
+        db,
+        template_key="investor.external_attestation.pending_founder",
+        recipient_user_id=user.id,
+        payload={"attestation_id": row.id, "status": row.status},
+        dedupe_key=f"investor_attestation_pending:{row.id}",
+    )
+    return _serialize_attestation(row)
+
+
+def list_external_attestations(
+    db: Session,
+    *,
+    status: str | None = None,
+) -> dict[str, Any]:
+    seed_flags_and_evidence(db)
+    q = db.query(InvestorExternalAttestation)
+    if status:
+        if status not in ATTESTATION_STATUSES:
+            raise ValueError("invalid_attestation_status")
+        q = q.filter(InvestorExternalAttestation.status == status)
+    rows = q.order_by(InvestorExternalAttestation.id.desc()).all()
+    signed = _signed_attestation_count(db)
+    return {
+        "items": [_serialize_attestation(r) for r in rows],
+        "count": len(rows),
+        "signed_count": signed,
+        "verified_customer_claims": signed >= 1,
+        "module_status": "HELD_POLICY",
+        "blocker": "NO_VERIFIED_CUSTOMER_CLAIMS" if signed < 1 else None,
+        "honesty": "founder_signature_required_no_fake_claims",
+    }
+
+
+def sign_external_attestation(
+    db: Session,
+    *,
+    user: User,
+    attestation_id: int,
+    signed_by: str,
+) -> dict[str, Any]:
+    signer = (signed_by or "").strip()
+    if not signer:
+        raise ValueError("signed_by_required")
+    row = (
+        db.query(InvestorExternalAttestation)
+        .filter(InvestorExternalAttestation.id == attestation_id)
+        .one_or_none()
+    )
+    if row is None:
+        raise ValueError("attestation_not_found")
+    if row.status == "REJECTED":
+        raise ValueError("attestation_already_rejected")
+    if row.status == "SIGNED":
+        return _serialize_attestation(row)
+    if row.status != "PENDING_FOUNDER_SIGNATURE":
+        raise ValueError("attestation_not_pending")
+    row.status = "SIGNED"
+    row.signed_by = signer[:255]
+    row.signed_at = _utcnow()
+    db.commit()
+    db.refresh(row)
+    record_domain_event(
+        db,
+        event_name="wave4.external_attestation_signed",
+        aggregate_type="investor_external_attestation",
+        aggregate_id=str(row.id),
+        actor_user_id=user.id,
+        payload={"signed_by": row.signed_by, "status": row.status},
+    )
+    enqueue_communication_draft(
+        db,
+        template_key="investor.external_attestation.signed",
+        recipient_user_id=user.id,
+        payload={"attestation_id": row.id, "signed_by": row.signed_by},
+        dedupe_key=f"investor_attestation_signed:{row.id}",
+    )
+    return _serialize_attestation(row)
+
+
+def reject_external_attestation(
+    db: Session,
+    *,
+    user: User,
+    attestation_id: int,
+) -> dict[str, Any]:
+    row = (
+        db.query(InvestorExternalAttestation)
+        .filter(InvestorExternalAttestation.id == attestation_id)
+        .one_or_none()
+    )
+    if row is None:
+        raise ValueError("attestation_not_found")
+    if row.status == "SIGNED":
+        raise ValueError("attestation_already_signed")
+    if row.status == "REJECTED":
+        return _serialize_attestation(row)
+    row.status = "REJECTED"
+    db.commit()
+    db.refresh(row)
+    record_domain_event(
+        db,
+        event_name="wave4.external_attestation_rejected",
+        aggregate_type="investor_external_attestation",
+        aggregate_id=str(row.id),
+        actor_user_id=user.id,
+        payload={"status": row.status},
+    )
+    return _serialize_attestation(row)
 
 
 def record_nda_acceptance(
@@ -447,9 +631,17 @@ def placement_readonly_summary(db: Session) -> dict[str, Any]:
 
 def trust_proof_readonly_summary(db: Session) -> dict[str, Any]:
     seed_flags_and_evidence(db)
-    counters: dict[str, int | str] = {
-        "external_attestations": "HELD_POLICY",
-        "verified_customer_claims": "FORBIDDEN",
+    signed = _signed_attestation_count(db)
+    pending = (
+        db.query(InvestorExternalAttestation)
+        .filter(InvestorExternalAttestation.status == "PENDING_FOUNDER_SIGNATURE")
+        .count()
+    )
+    counters: dict[str, int | str | bool] = {
+        "external_attestations": "HITL_QUEUE",
+        "verified_customer_claims": signed >= 1,
+        "signed_attestation_count": signed,
+        "pending_founder_signature_count": pending,
     }
     try:
         from app.database.models import AuditEvent
@@ -465,9 +657,11 @@ def trust_proof_readonly_summary(db: Session) -> dict[str, Any]:
         counters["consent_receipts"] = 0
     return {
         "counters": counters,
+        "verified_customer_claims": signed >= 1,
         "readonly": True,
         "launch": "NO-GO",
         "pilot": "BLOCKED_BY_FOUNDER",
+        "honesty": "no_fake_customer_claims_without_signed_attestation",
     }
 
 

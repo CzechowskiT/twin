@@ -44,6 +44,9 @@ def create_company_sandbox_checkout(
         ),
         "public_launch": False,
     }
+    # Uses STRIPE_PRICE_ID_COMPANY_PILOT when set; sandbox_ready only with test keys + price.
+    sandbox_ready = mode == "test" and bool(price_id) and honesty["stripe_sandbox_checkout_enabled"]
+    honesty["sandbox_ready"] = sandbox_ready
 
     if mode == "live":
         return {
@@ -70,6 +73,7 @@ def create_company_sandbox_checkout(
             "url": None,
             "reason": "stripe_keys_missing",
             "note": "Honest stub — set STRIPE_SECRET_KEY (sk_test_…) for real test Checkout.",
+            "price_env": "STRIPE_PRICE_ID_COMPANY_PILOT",
         }
 
     if not price_id:
@@ -84,6 +88,7 @@ def create_company_sandbox_checkout(
             "url": None,
             "reason": "company_price_id_missing",
             "note": "Set STRIPE_PRICE_ID_COMPANY_PILOT for real test Checkout Session.",
+            "price_env": "STRIPE_PRICE_ID_COMPANY_PILOT",
         }
 
     try:

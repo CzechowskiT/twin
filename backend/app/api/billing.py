@@ -57,14 +57,20 @@ def _stripe_honesty(settings: Settings) -> dict[str, Any]:
     """Candidate plan_payments / plat_stripe_public honesty — sandbox ≠ public launch."""
     key = (settings.stripe_secret_key or "").strip()
     livemode = key.startswith("sk_live")
+    test_mode = key.startswith("sk_test")
+    sandbox_enabled = bool(getattr(settings, "stripe_sandbox_checkout_enabled", True))
+    not_public = bool(getattr(settings, "stripe_not_public_launch", True))
+    # Sandbox ready when test keys + at least one price exist; never implies public launch.
+    sandbox_ready = bool(
+        sandbox_enabled and test_mode and _any_stripe_price_configured(settings) and not livemode
+    )
     return {
-        "stripe_sandbox_checkout_enabled": bool(
-            getattr(settings, "stripe_sandbox_checkout_enabled", True)
-        ),
-        "stripe_not_public_launch": bool(getattr(settings, "stripe_not_public_launch", True)),
+        "stripe_sandbox_checkout_enabled": sandbox_enabled,
+        "stripe_not_public_launch": not_public,
+        "sandbox_ready": sandbox_ready,
         "public_launch": False,
         "livemode": livemode,
-        "stripe_mode": "live" if livemode else ("test" if key.startswith("sk_test") else "unset"),
+        "stripe_mode": "live" if livemode else ("test" if test_mode else "unset"),
     }
 
 
@@ -90,6 +96,7 @@ def list_plans(settings: Annotated[Settings, Depends(get_settings)]) -> PlansPub
         payment_methods_note=pm_note,
         stripe_sandbox_checkout_enabled=honesty["stripe_sandbox_checkout_enabled"],
         stripe_not_public_launch=honesty["stripe_not_public_launch"],
+        sandbox_ready=bool(honesty["sandbox_ready"]),
         public_launch=False,
         stripe_mode=str(honesty["stripe_mode"]),
         plans=[
@@ -212,6 +219,7 @@ def create_checkout_session(
         url=url,
         stripe_sandbox_checkout_enabled=honesty["stripe_sandbox_checkout_enabled"],
         stripe_not_public_launch=honesty["stripe_not_public_launch"],
+        sandbox_ready=bool(honesty["sandbox_ready"]),
         public_launch=False,
         stripe_mode=str(honesty["stripe_mode"]),
     )

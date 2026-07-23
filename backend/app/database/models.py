@@ -508,6 +508,29 @@ class InvestorNdaAcceptance(Base):
     accepted_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
+class InvestorExternalAttestation(Base):
+    """Founder-signed external attestation queue — no fake customer claims without SIGNED row."""
+
+    __tablename__ = "investor_external_attestations"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    subject_label: Mapped[str] = mapped_column(String(255), nullable=False)
+    claim_text: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(
+        String(32), nullable=False, default="PENDING_FOUNDER_SIGNATURE", index=True
+    )
+    evidence_ref: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    signed_by: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    signed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_by_user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
 class Job(Base):
     __tablename__ = "jobs"
     __table_args__ = (UniqueConstraint("job_board", "external_id", name="uq_job_board_external"),)

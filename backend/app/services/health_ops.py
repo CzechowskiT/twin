@@ -44,8 +44,17 @@ def build_health_ops_public(s: Settings) -> dict[str, Any]:
         "microsoft_calendar_configured": is_microsoft_calendar_oauth_configured(),
         "microsoft_busy_read_enabled": s.microsoft_busy_read_enabled,
         "microsoft_oauth_connect_gate_enabled": s.microsoft_oauth_connect_gate_enabled,
-        "microsoft_calendar_write_enabled": s.microsoft_calendar_write_enabled,
+        # Busy-read may be ON on prod; write stays separately gated / never implied.
+        "microsoft_calendar_write_enabled": False
+        if not s.microsoft_calendar_write_enabled
+        else s.microsoft_calendar_write_enabled,
+        "microsoft_write_live_claim": False,
         "stripe_checkout_ready": _stripe_checkout_ready(s),
+        "stripe_sandbox_ready": bool(
+            (s.stripe_secret_key or "").startswith("sk_test")
+            and bool(getattr(s, "stripe_sandbox_checkout_enabled", True))
+        ),
+        "stripe_public_launch": False,
         "scrape_worker_ready": scrape_worker_ready(s),
         "scrape_beat_enabled": s.scrape_beat_enabled,
         "linkedin_oauth_configured": is_linkedin_oauth_configured(),

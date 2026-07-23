@@ -174,12 +174,34 @@ def test_company_stripe_sandbox_stub_without_keys() -> None:
 
 
 def test_truthful_claims_forbid_certified_pass() -> None:
-    from app.services.truthful_claims import assert_certification_not_claimable
+    from app.services.truthful_claims import assert_certification_not_claimable, truthful_claims_honesty
 
     with pytest.raises(ValueError, match="certification_claim_forbidden"):
         assert_certification_not_claimable("ai_act_certified_claim", status="PASS")
+    with pytest.raises(ValueError, match="certification_claim_forbidden"):
+        assert_certification_not_claimable("ai_protected_attr_monitoring", status="PASS")
     assert_certification_not_claimable("ai_decision_log", status="PASS")
+    honesty = truthful_claims_honesty()
+    assert honesty["ai_act_certified"] is False
+    assert honesty["protected_attr_monitoring_legal_gate_open"] is False
+    assert honesty["ai_act_tech_control_coverage_ready"] is True
+    assert honesty["protected_attr_monitoring_tech_ready"] is True
+    assert honesty["stance"] == "TECH_READY_NO_CLAIM"
+    assert honesty["registry_pass_forbidden"] is True
 
+
+def test_company_stripe_sandbox_uses_company_pilot_price_env() -> None:
+    from app.config import Settings
+    from app.services.company_stripe_sandbox import create_company_sandbox_checkout
+
+    settings = Settings(stripe_secret_key="sk_test_x", stripe_price_id_company_pilot="")
+    out = create_company_sandbox_checkout(
+        settings, company_slug="nova-hiring-pl", plan_sku="company_pilot", account_id=1
+    )
+    assert out["public_launch"] is False
+    assert out["sandbox_ready"] is False
+    assert out["reason"] == "company_price_id_missing"
+    assert out["price_env"] == "STRIPE_PRICE_ID_COMPANY_PILOT"
 
 def test_hitl_employment_recommendation(db: Session) -> None:
     from app.database.models import User

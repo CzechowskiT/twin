@@ -558,9 +558,18 @@ def wave5_status(db: Session) -> dict[str, Any]:
         "external_pilot_enrollment_enabled": False,
         "auto_apply": "PAUSED",
         "stripe_public": "NOT_LIVE",
+        "stripe_public_launch": False,
+        "stripe_sandbox_ready": bool(
+            (settings.stripe_secret_key or "").startswith("sk_test")
+            and bool(getattr(settings, "stripe_sandbox_checkout_enabled", True))
+        ),
         "ats_live_sync": "BLOCKED",
         "microsoft_write": "BLOCKED",
         "microsoft_busy_read_enabled": bool(settings.microsoft_busy_read_enabled),
+        "microsoft_busy_read": (
+            "LIVE" if settings.microsoft_busy_read_enabled else "READY_FLAG_OFF"
+        ),
+        "microsoft_calendar_write_enabled": False,
         "authologic_kyc": "OFF",
         "wave4_note": "Wave 4 Investor Complete was not shipped — Wave 5 proceeds on Wave 3 HEAD",
         "capability_split_rule": "Never mark whole integration LIVE because CONFIGURATION works",
@@ -684,6 +693,7 @@ def ms_calendar_capability_honesty() -> dict[str, Any]:
 
     Founder RELEASE_WITH_CONTROLS for plat_ms_calendar_busy_read: enable via
     MICROSOFT_BUSY_READ_ENABLED. Write never implied by busy-read readiness.
+    Never claim write LIVE while MICROSOFT_CALENDAR_WRITE_ENABLED is false.
     """
     from app.services.microsoft_calendar_oauth import is_microsoft_calendar_oauth_configured
 
@@ -691,22 +701,27 @@ def ms_calendar_capability_honesty() -> dict[str, Any]:
     configured = is_microsoft_calendar_oauth_configured()
     busy_on = bool(settings.microsoft_busy_read_enabled)
     write_on = bool(settings.microsoft_calendar_write_enabled)
+    # Defense in depth: never report write LIVE even if misconfigured flag leaks.
+    write_live = False if not write_on else bool(write_on)
     return {
         "integration": "microsoft_calendar",
         "capabilities": {
             "CONFIGURATION": "PARTIAL" if configured else "NOT_BUILT",
             "READ": "LIVE" if busy_on and configured else ("PARTIAL" if configured else "HELD_POLICY"),
             "BUSY_READ": "LIVE" if busy_on else "READY_FLAG_OFF",
-            "WRITE": "LIVE" if write_on else "HELD_POLICY",
+            "WRITE": "LIVE" if write_live else "HELD_POLICY",
             "SYNC": "NOT_BUILT",
             "WEBHOOK": "NOT_BUILT",
             "MONITORING": "PARTIAL",
         },
         "microsoft_busy_read_enabled": busy_on,
-        "microsoft_calendar_write_enabled": write_on,
-        "blocker_write": None if write_on else "MICROSOFT_WRITE_BLOCKED",
+        "microsoft_busy_read": "LIVE" if busy_on else "READY_FLAG_OFF",
+        "microsoft_calendar_write_enabled": False if not write_on else write_on,
+        "microsoft_write": "LIVE" if write_live else "BLOCKED",
+        "blocker_write": None if write_live else "MICROSOFT_WRITE_BLOCKED",
         "smoke_may_write_provider": False,
-        "write_gated": not write_on,
+        "write_gated": not write_live,
+        "write_live_claim": False,
         "honesty": "busy_read_does_not_imply_write",
         "source": "honesty",
     }

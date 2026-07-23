@@ -42,6 +42,7 @@ class PlansPublicResponse(BaseModel):
     # Founder RELEASE_WITH_CONTROLS honesty — sandbox ≠ public launch.
     stripe_sandbox_checkout_enabled: bool = True
     stripe_not_public_launch: bool = True
+    sandbox_ready: bool = False
     public_launch: bool = False
     stripe_mode: str = "unset"
 
@@ -54,6 +55,7 @@ class CheckoutResponse(BaseModel):
     url: str
     stripe_sandbox_checkout_enabled: bool = True
     stripe_not_public_launch: bool = True
+    sandbox_ready: bool = False
     public_launch: bool = False
     stripe_mode: str = "unset"
 
