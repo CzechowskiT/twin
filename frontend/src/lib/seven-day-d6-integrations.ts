@@ -24,23 +24,26 @@ export {
 /** Candidate calendar — Google live, Microsoft coming soon, ICS preview (P2 tiers). */
 export const CANDIDATE_CALENDAR_HONEST_TIERS = true;
 
-/** Recruiter calendar — roadmap only, not primary nav, not live sync. */
-export const RECRUITER_CALENDAR_ROADMAP_ONLY = true;
+/** Recruiter calendar — live holds + interview list (provider write still gated). */
+export const RECRUITER_CALENDAR_ROADMAP_ONLY = false;
 
-/** Company scheduling / employer calendar — roadmap only, not live. */
-export const COMPANY_SCHEDULING_ROADMAP_ONLY = true;
+/** Company scheduling — draft-first holds LIVE; MS provider write gated by backend flag. */
+export const COMPANY_SCHEDULING_ROADMAP_ONLY = false;
 
 /** Integration rows map not_live → coming_soon in user-facing badges. */
 export const NORMALIZE_INTEGRATION_NOT_LIVE_AS_COMING_SOON = true;
 
-/** ATS connectors — coming soon / preview readiness only, no live sync claims. */
+/** ATS write/sync still gated — OAuth + vacancy import preview are live-capable. */
 export const ATS_COMING_SOON_NO_LIVE_SYNC = true;
 
-/** Stripe checkout stays off public launch — premium preview + waitlist only. */
+/** Full public Stripe launch remains controlled — sandbox checkout allowed separately. */
 export const STRIPE_NOT_PUBLIC_LAUNCH = true;
 
-/** Auto-apply strip hidden; nightly beat paused on production. */
-export const AUTO_APPLY_PAUSED_HIDDEN = true;
+/** Sandbox Stripe checkout claim (test mode only) — Founder RELEASE_WITH_CONTROLS. */
+export const STRIPE_SANDBOX_CHECKOUT_ENABLED = true;
+
+/** Auto-apply: strip may show; default REVIEW_BEFORE_SUBMIT (not paused-hidden). */
+export const AUTO_APPLY_PAUSED_HIDDEN = false;
 
 /** User-facing copy must not imply public Stripe launch or fake connected sync. */
 export const NO_FAKE_CHECKOUT_OR_CONNECTED_SYNC_UI = true;

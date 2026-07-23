@@ -3502,10 +3502,12 @@ eyebrow: "Product roadmap",
       "Import is append-only with duplicate detection. Audit events logged. No automatic outreach or live ATS sync.",
   },
   recruiterCalendar: {
-    eyebrow: "Roadmap",
+    eyebrow: "Recruiter workspace",
     title: "Recruiter calendar",
     lead:
-      "TWIN’s north star is a short calendar of acceptance-ready interviews — for candidates and recruiters. The recruiter-side calendar view is not live in this pilot yet.",
+      "TWIN’s north star is a short calendar of acceptance-ready interviews — for candidates and recruiters.",
+    liveLead:
+      "Review manual interview schedules and create local holds for this company slug. Provider calendar write stays gated.",
     notLiveTitle: "Coming soon",
     notLiveBody:
       "Google and Microsoft calendar sync on this page is for candidates only today. Recruiter propose-slot, team holds, and Outlook/Teams integration are on the roadmap — not live on this launch.",
@@ -3517,6 +3519,16 @@ eyebrow: "Product roadmap",
     linkInboxDesc: "Pre-qualified queue with match score and human accept/decline.",
     linkJobsDesc: "Post roles so future matches can enter your queue.",
     linkStoryDesc: "What is live vs roadmap for the recruiter pilot.",
+    loadCta: "Load calendar",
+    loading: "Loading…",
+    loadFailed: "Could not load recruiter calendar.",
+    saveFailed: "Could not create hold.",
+    holdsTitle: "Create hold",
+    holdsLead: "Draft holds are audited locally. Microsoft Graph write requires the write kill-switch.",
+    holdTitleLabel: "Hold title",
+    createHoldCta: "Create draft hold",
+    listTitle: "Scheduled items",
+    empty: "No scheduled interviews or holds yet.",
   },
   companyHiring: {
     eyebrow: "Company workspace",
@@ -3711,9 +3723,18 @@ eyebrow: "Product roadmap",
     integrationStatus_not_live: "Not live",
     ctaTitle: "Request pilot or contact us",
     ctaBody:
-      "During pilot we onboard companies manually. No checkout — tell us your hiring bar and we configure access.",
+      "Public self-serve Stripe launch is not enabled. Sandbox checkout (test mode only) can be exercised for pilot readiness — no public launch claim.",
     ctaPilot: "For companies",
     ctaContact: "Contact founders",
+    sandboxCheckoutLead:
+      "Sandbox Stripe checkout calls the backend checkout-session stub (test keys only). Livemode is forbidden.",
+    sandboxCheckoutCta: "Start sandbox checkout",
+    sandboxCheckoutBusy: "Starting sandbox checkout…",
+    sandboxCheckoutOk: "Sandbox checkout session stub created (not livemode).",
+    sandboxCheckoutStub: "Sandbox path reached — Stripe price IDs not wired yet.",
+    sandboxCheckoutKeysMissing: "Stripe test keys missing — honesty stub returned (still not public launch).",
+    sandboxCheckoutFailed: "Sandbox checkout request failed.",
+    sandboxCheckoutLiveForbidden: "Live Stripe mode is forbidden on this surface.",
     scopeNote:
       "This page does not show invoices, MRR, paid seats, or placement revenue — only workspace readiness and usage counters.",
     loading: "Loading plan & usage…",
@@ -4549,6 +4570,10 @@ eyebrow: "Product roadmap",
       "Integrations roadmap — ATS connectors and calendar sync are coming soon or preview-only. No live sync, no fake connected state.",
     autoApplyPausedBoundary:
       "Auto-apply and delegated outreach stay paused on production — prepare packages only; no marketplace liquidity claims.",
+    autoApplyReviewBeforeSubmitBoundary:
+      "Default mode is review-before-submit: the agent prepares packages for your review. No CAPTCHA bypass. Pause anytime with the kill switch.",
+    autoApplyKillSwitchHonesty:
+      "Kill switch active — scheduled applying is paused for your account or the platform beat is disabled.",
     recruiterCalendarComingSoonTitle: "Coming soon",
     recruiterCalendarComingSoonBody:
       "Recruiter-side calendar, propose-slot, and Teams holds are on the roadmap — not live on this launch. Use the acceptance inbox for interview decisions today.",
@@ -12122,10 +12147,12 @@ const pl: MessageTree = {
       "Import append-only z wykrywaniem duplikatów. Zdarzenia audytu logowane. Bez automatycznego kontaktu wychodzącego ani live sync ATS.",
   },
   recruiterCalendar: {
-    eyebrow: "Roadmapa",
+    eyebrow: "Przestrzeń rekrutera",
     title: "Kalendarz rekrutera",
     lead:
-      "North star TWIN to krótki kalendarz rozmów gotowych do akceptacji — dla kandydatów i rekruterów. Widok kalendarza po stronie rekrutera nie jest jeszcze live w tym pilotażu.",
+      "North star TWIN to krótki kalendarz rozmów gotowych do akceptacji — dla kandydatów i rekruterów.",
+    liveLead:
+      "Przeglądaj ręczne terminy rozmów i twórz lokalne holdy dla tego slug firmy. Zapis do providera kalendarza pozostaje za bramką.",
     notLiveTitle: "Wkrótce",
     notLiveBody:
       "Synchronizacja Google i Microsoft na tej stronie dotyczy dziś tylko kandydatów. Propozycje slotów przez rekrutera, holdy zespołowe i integracja Outlook/Teams to roadmapa — nie live w tym launchu.",
@@ -12137,6 +12164,16 @@ const pl: MessageTree = {
     linkInboxDesc: "Kolejka pre-kwalifikowana z wynikiem dopasowania i akceptuj/odrzuć.",
     linkJobsDesc: "Publikuj role, aby przyszłe dopasowania trafiały do kolejki.",
     linkStoryDesc: "Co jest live, a co roadmapą w pilotażu rekrutera.",
+    loadCta: "Wczytaj kalendarz",
+    loading: "Wczytywanie…",
+    loadFailed: "Nie udało się wczytać kalendarza rekrutera.",
+    saveFailed: "Nie udało się utworzyć holda.",
+    holdsTitle: "Utwórz hold",
+    holdsLead: "Szkice holdów są audytowane lokalnie. Zapis Microsoft Graph wymaga kill-switcha zapisu.",
+    holdTitleLabel: "Tytuł holda",
+    createHoldCta: "Utwórz szkic holda",
+    listTitle: "Zaplanowane pozycje",
+    empty: "Brak zaplanowanych rozmów lub holdów.",
   },
   companyHiring: {
     eyebrow: "Workspace firmy",
@@ -12331,9 +12368,18 @@ const pl: MessageTree = {
     integrationStatus_not_live: "Nie live",
     ctaTitle: "Poproś o pilotaż lub napisz do nas",
     ctaBody:
-      "Podczas pilotażu wdrażamy firmy ręcznie. Bez checkout — opowiedz o swoim progu rekrutacyjnym, a skonfigurujemy dostęp.",
+      "Publiczny self-serve Stripe nie jest włączony. Checkout sandbox (tylko test mode) można ćwiczyć pod gotowość pilotażu — bez twierdzenia o publicznym launchu.",
     ctaPilot: "Dla firm",
     ctaContact: "Napisz do founderów",
+    sandboxCheckoutLead:
+      "Sandboxowy checkout Stripe woła backendowy stub checkout-session (tylko klucze testowe). Livemode jest zabroniony.",
+    sandboxCheckoutCta: "Uruchom checkout sandbox",
+    sandboxCheckoutBusy: "Uruchamianie checkoutu sandbox…",
+    sandboxCheckoutOk: "Utworzono stub sesji sandbox (nie livemode).",
+    sandboxCheckoutStub: "Ścieżka sandbox osiągnięta — price ID Stripe jeszcze nie podpięte.",
+    sandboxCheckoutKeysMissing: "Brak kluczy testowych Stripe — zwrócono honesty stub (nadal bez publicznego launchu).",
+    sandboxCheckoutFailed: "Żądanie checkoutu sandbox nie powiodło się.",
+    sandboxCheckoutLiveForbidden: "Tryb live Stripe jest zabroniony na tej powierzchni.",
     scopeNote:
       "Ta strona nie pokazuje faktur, MRR, opłaconych miejsc ani przychodu z placement — tylko gotowość workspace i liczniki zużycia.",
     loading: "Ładowanie planu i zużycia…",
@@ -13172,6 +13218,10 @@ const pl: MessageTree = {
       "Roadmapa integracji — konektory ATS i sync kalendarza są wkrótce lub tylko podgląd. Bez live sync i fałszywego stanu connected.",
     autoApplyPausedBoundary:
       "Auto-apply i delegated outreach pozostają wstrzymane na produkcji — tylko przygotowanie pakietów; bez obietnic płynności marketplace.",
+    autoApplyReviewBeforeSubmitBoundary:
+      "Domyślny tryb to review-before-submit: agent przygotowuje pakiety do Twojej weryfikacji. Bez omijania CAPTCHA. W każdej chwili możesz wstrzymać (kill switch).",
+    autoApplyKillSwitchHonesty:
+      "Kill switch aktywny — harmonogram aplikacji jest wstrzymany dla konta lub beat platformy jest wyłączony.",
     recruiterCalendarComingSoonTitle: "Wkrótce",
     recruiterCalendarComingSoonBody:
       "Kalendarz rekrutera, propose-slot i holdy Teams są na roadmapie — nie live w tym launchu. Dziś decyzje o rozmowach przez acceptance inbox.",

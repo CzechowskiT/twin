@@ -24,6 +24,9 @@ type AutoApplySettings = {
   profile_ready: boolean;
   verified_readiness_ready: boolean;
   onboarding_completed: boolean;
+  submit_mode?: string;
+  kill_switch_active?: boolean;
+  captcha_bypass?: boolean;
 };
 
 export default function NightlyAutoApplySettingsPage() {
@@ -123,9 +126,23 @@ export default function NightlyAutoApplySettingsPage() {
               {t("dashboard.nightlyAutoApplyTitle")}
             </h1>
             <p className="twin-muted mt-2 max-w-prose text-sm leading-relaxed">{t("dashboard.nightlyAutoApplyLead")}</p>
+            {!AUTO_APPLY_PAUSED_HIDDEN ? (
+              <p
+                className="twin-muted mt-3 max-w-prose text-sm leading-relaxed"
+                data-seven-day-d6-auto-apply-review-mode
+                data-auto-apply-submit-mode={settings?.submit_mode ?? "REVIEW_BEFORE_SUBMIT"}
+              >
+                {t("sevenDayD6.autoApplyReviewBeforeSubmitBoundary")}
+              </p>
+            ) : null}
             {AUTO_APPLY_PAUSED_HIDDEN ? (
               <p className="twin-muted mt-3 max-w-prose text-sm leading-relaxed" data-seven-day-d6-auto-apply-boundary>
                 {t("sevenDayD6.autoApplyPausedBoundary")}
+              </p>
+            ) : null}
+            {settings?.kill_switch_active ? (
+              <p className="twin-muted mt-2 max-w-prose text-sm leading-relaxed" data-auto-apply-kill-switch>
+                {t("sevenDayD6.autoApplyKillSwitchHonesty")}
               </p>
             ) : null}
           </div>

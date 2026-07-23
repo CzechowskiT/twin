@@ -32,7 +32,7 @@ test("1 calendar provider tiers — Google live, Microsoft coming soon, ICS prev
   assert.equal(CALENDAR_PROVIDER_TIERS.google, "live");
   assert.equal(CALENDAR_PROVIDER_TIERS.microsoft, "coming_soon");
   assert.equal(CALENDAR_PROVIDER_TIERS.ics, "preview");
-  assert.equal(FORCE_MICROSOFT_CALENDAR_COMING_SOON, true);
+  assert.equal(FORCE_MICROSOFT_CALENDAR_COMING_SOON, false);
   const panel = read("src/components/calendar/calendar-connections-panel.tsx");
   assert.match(panel, /CALENDAR_PROVIDER_TIERS/);
   assert.match(panel, /FORCE_MICROSOFT_CALENDAR_COMING_SOON/);

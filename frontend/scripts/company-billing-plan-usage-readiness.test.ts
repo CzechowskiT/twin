@@ -35,9 +35,10 @@ test("billing payload is workspace scoped", () => {
   assert.equal(isCompanyBillingWorkspaceScoped({ ...sample, company_slug: "" }), false);
 });
 
-test("billing copy states not live", () => {
+test("billing copy states not live / no public launch", () => {
   assert.match(en.companyBilling.billingNotLiveTitle.toLowerCase(), /not live/);
   assert.match(en.companyBilling.lead.toLowerCase(), /no invoices/);
+  assert.match(en.companyBilling.ctaBody.toLowerCase(), /not enabled|sandbox/);
 });
 
 test("sample payload has no forbidden PII", () => {

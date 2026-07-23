@@ -33,7 +33,7 @@ export const HIDE_RECRUITER_INTEGRATIONS_FROM_NAV = false;
 export { RECRUITER_INTEGRATIONS_ROADMAP_OUTSIDE_HREF } from "@/lib/all-workspace-green-gate";
 
 /** Recruiter calendar hidden from primary nav and hub. */
-export const HIDE_RECRUITER_CALENDAR_FROM_NAV = true;
+export const HIDE_RECRUITER_CALENDAR_FROM_NAV = false;
 
 /** Extended recruiter nav collapsed by default — core ≤5 on hub home. */
 export const RECRUITER_WORKSPACE_NAV_COLLAPSED_DEFAULT = true;

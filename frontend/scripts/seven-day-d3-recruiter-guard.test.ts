@@ -64,7 +64,7 @@ test("1 D3 execution doc exists with stance footer", () => {
 test("2 seven-day-d3 flags — analytics live, integrations roadmap, collapsed nav", () => {
   assert.equal(RECRUITER_ANALYTICS_SHIP_STATUS, "live");
   assert.equal(RECRUITER_INTEGRATIONS_ROADMAP_STATUS, "coming_soon");
-  assert.equal(HIDE_RECRUITER_CALENDAR_FROM_NAV, true);
+  assert.equal(HIDE_RECRUITER_CALENDAR_FROM_NAV, false);
   // Wave 1 / all-modules-visible supersedes D3 hide — integrations restored to extended nav.
   assert.equal(HIDE_RECRUITER_INTEGRATIONS_FROM_NAV, false);
   assert.equal(RECRUITER_WORKSPACE_NAV_COLLAPSED_DEFAULT, true);
@@ -189,10 +189,12 @@ test("10 talent radar and pool — limited pilot boundaries", () => {
   assert.match(en.recruiterTalentPool.pilotBoundaryBody ?? "", /No live ATS sync/i);
 });
 
-test("11 calendar — hidden from nav, roadmap marker on page", () => {
+test("11 calendar — live holds surface (nav restored); provider write still gated", () => {
+  assert.equal(HIDE_RECRUITER_CALENDAR_FROM_NAV, false);
   const calendar = read("src/app/recruiter/calendar/page.tsx");
-  assert.match(calendar, /data-seven-day-recruiter-calendar-roadmap/);
-  assert.match(en.recruiterCalendar.notLiveTitle ?? "", /./);
+  assert.match(calendar, /data-recruiter-calendar-live/);
+  assert.match(calendar, /WorkspaceStatusBadge status="live"/);
+  assert.match(en.recruiterCalendar.liveLead ?? "", /./);
 });
 
 test("12 npm script test:seven-day-d3-recruiter-guard registered", () => {

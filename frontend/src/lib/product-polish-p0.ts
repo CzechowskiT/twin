@@ -9,8 +9,8 @@ import {
 import { RECRUITER_DAILY_COCKPIT_ROUTE } from "@/lib/recruiter-daily-operating-cockpit";
 import { RECRUITER_TRUST_REVIEW_QUEUE_ROUTE } from "@/lib/recruiter-trust-review-queue";
 
-/** Auto-apply stays paused — strip hidden from dashboard home. */
-export const SHOW_DASHBOARD_AUTO_APPLY_STRIP = false;
+/** Auto-apply strip may show for REVIEW_BEFORE_SUBMIT readiness; not autonomous submit. */
+export const SHOW_DASHBOARD_AUTO_APPLY_STRIP = true;
 
 /** Secondary dashboard islands collapsed on home — subroutes stay live. */
 export const SHOW_DASHBOARD_EXTENDED_HOME_MODULES = false;

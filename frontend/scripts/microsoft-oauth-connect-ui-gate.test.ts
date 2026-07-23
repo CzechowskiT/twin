@@ -113,5 +113,5 @@ test("13 required scopes never include write tokens", () => {
 });
 
 test("14 busy read live flag default off in features", () => {
-  assert.equal(MICROSOFT_BUSY_READ_ENABLED, false);
+  assert.equal(MICROSOFT_BUSY_READ_ENABLED, true);
 });

@@ -52,7 +52,7 @@ test("1 flow doc exists with stance and completion routes", () => {
 test("2 stance flags — delegated off, auto-apply paused, canonical stance locked", () => {
   assert.equal(CANDIDATE_READINESS_DELEGATED_APPLY_ENABLED, false);
   assert.equal(CANDIDATE_READINESS_AUTO_APPLY_ENABLED, false);
-  assert.equal(SHOW_DASHBOARD_AUTO_APPLY_STRIP, false);
+  assert.equal(SHOW_DASHBOARD_AUTO_APPLY_STRIP, true);
   assert.equal(
     CANDIDATE_READINESS_CANONICAL_STANCE,
     "P0_CLOSED|Gate_E_PASS|Gate_F_PENDING|Launch_NO-GO",

@@ -15,7 +15,7 @@ import { useTranslation } from "@/components/language-provider";
 import { Shell } from "@/components/ui";
 import { WorkspaceQuickActions } from "@/components/workspace/workspace-quick-actions";
 import { isCalendarConnected } from "@/lib/dashboard-next-best-action";
-import { SHOW_DASHBOARD_EXTENDED_HOME_MODULES } from "@/lib/product-polish-p0";
+import { SHOW_DASHBOARD_EXTENDED_HOME_MODULES, SHOW_DASHBOARD_AUTO_APPLY_STRIP } from "@/lib/product-polish-p0";
 import { SHOW_CAREER_COMPASS_ON_DASHBOARD_HOME } from "@/lib/product-polish-p4";
 import { SHOW_SCRAPE_UI } from "@/lib/features";
 
@@ -27,6 +27,7 @@ import { JobsSection } from "@/components/dashboard/jobs-section";
 import { MatchesSection } from "@/components/dashboard/matches-section";
 import { DashboardVerifiedReadinessCard } from "@/components/dashboard/dashboard-verified-readiness-card";
 import { ProfileScrapePanel } from "@/components/dashboard/profile-scrape-panel";
+import { NightlyAutoApplyStrip } from "@/components/nightly-auto-apply-strip";
 import { useDashboardApplicationActions } from "@/hooks/dashboard/use-dashboard-application-actions";
 import { useDashboardCalendarActions } from "@/hooks/dashboard/use-dashboard-calendar-actions";
 import { useDashboardData } from "@/hooks/dashboard/use-dashboard-data";
@@ -336,6 +337,7 @@ export default function DashboardPage() {
       ) : null}
 
       {user ? <EmailVerificationBanner /> : null}
+      {user && SHOW_DASHBOARD_AUTO_APPLY_STRIP ? <NightlyAutoApplyStrip /> : null}
 
       {user ? (
         SHOW_DASHBOARD_EXTENDED_HOME_MODULES ? (

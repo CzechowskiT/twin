@@ -31,12 +31,13 @@ function readRepo(rel: string): string {
   return readFileSync(join(repoRoot, rel), "utf8");
 }
 
-test("1 P0 flags hide auto-apply strip and extended dashboard overload", () => {
-  assert.equal(SHOW_DASHBOARD_AUTO_APPLY_STRIP, false);
+test("1 P0 flags — auto-apply strip may show; extended dashboard overload stays off", () => {
+  assert.equal(SHOW_DASHBOARD_AUTO_APPLY_STRIP, true);
   assert.equal(SHOW_DASHBOARD_EXTENDED_HOME_MODULES, false);
   const dashboard = read("src/app/dashboard/page.tsx");
-  assert.doesNotMatch(dashboard, /<NightlyAutoApplyStrip/);
-  assert.doesNotMatch(dashboard, /from "@\/components\/nightly-auto-apply-strip"/);
+  assert.match(dashboard, /SHOW_DASHBOARD_AUTO_APPLY_STRIP/);
+  assert.match(dashboard, /<NightlyAutoApplyStrip/);
+  assert.match(dashboard, /from "@\/components\/nightly-auto-apply-strip"/);
   assert.match(dashboard, /SHOW_DASHBOARD_EXTENDED_HOME_MODULES/);
   assert.match(dashboard, /data-dashboard-extended-modules/);
   assert.match(dashboard, /WorkspaceQuickActions/);
@@ -47,7 +48,7 @@ test("1 P0 flags hide auto-apply strip and extended dashboard overload", () => {
   assert.match(dashboard, /\/profile/);
 });
 
-test("2 auto-apply module stays paused — not live on dashboard home", () => {
+test("2 auto-apply module stays paused status — strip is review-before-submit readiness", () => {
   const mod = CANDIDATE_WORKSPACE_MODULES.find((m) => m.id === "auto_apply");
   assert.ok(mod);
   assert.equal(mod!.status, "paused");

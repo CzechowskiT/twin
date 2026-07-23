@@ -13,7 +13,7 @@ export const CALENDAR_PROVIDER_TIERS = {
 export type CalendarProviderTierKey = keyof typeof CALENDAR_PROVIDER_TIERS;
 
 /** Microsoft calendar stays coming soon in product copy even when OAuth exists in env. */
-export const FORCE_MICROSOFT_CALENDAR_COMING_SOON = true;
+export const FORCE_MICROSOFT_CALENDAR_COMING_SOON = false;
 
 /** Billing surfaces show Premium Preview — no fake checkout impression. */
 export const BILLING_PREMIUM_PREVIEW_ONLY = true;

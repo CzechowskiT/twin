@@ -34,12 +34,13 @@ function readRepo(rel: string): string {
   return readFileSync(join(repoRoot, rel), "utf8");
 }
 
-test("1 dashboard declutter — auto-apply off, career compass gated, extended modules collapsed", () => {
-  assert.equal(SHOW_DASHBOARD_AUTO_APPLY_STRIP, false);
+test("1 dashboard declutter — auto-apply strip may show; career compass gated; extended modules collapsed", () => {
+  assert.equal(SHOW_DASHBOARD_AUTO_APPLY_STRIP, true);
   assert.equal(SHOW_DASHBOARD_EXTENDED_HOME_MODULES, false);
   assert.equal(SHOW_CAREER_COMPASS_ON_DASHBOARD_HOME, false);
   const dashboard = read("src/app/dashboard/page.tsx");
-  assert.doesNotMatch(dashboard, /<NightlyAutoApplyStrip/);
+  assert.match(dashboard, /SHOW_DASHBOARD_AUTO_APPLY_STRIP/);
+  assert.match(dashboard, /<NightlyAutoApplyStrip/);
   assert.match(dashboard, /SHOW_CAREER_COMPASS_ON_DASHBOARD_HOME/);
   assert.match(dashboard, /data-dashboard-extended-modules/);
   assert.match(dashboard, /DashboardCommandCenter/);
