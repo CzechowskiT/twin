@@ -914,7 +914,7 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE5: HardLiveModuleEvidence[] = [
     "/company/integrations",
     "platform",
     "BLOCKED_EXTERNAL_CREDENTIALS",
-    "Draft/preview LIVE; OAuth + SLACK_INCOMING_WEBHOOK_URL missing after Railway/GH/Vercel audit — see EXTERNAL_CONNECTOR_OPERATOR_HANDOFF.md.",
+    "Draft/preview LIVE; OAuth + SLACK_INCOMING_WEBHOOK_URL missing after exhaustive Railway API+worker / GH / Vercel / local audit 2026-07-23 — see EXTERNAL_CONNECTOR_OPERATOR_HANDOFF.md.",
   ),
   withConnectorSmoke(
     passModuleW5(
@@ -1210,7 +1210,7 @@ export const HARD_LIVE_REGISTRY_META = {
     exclude_from_product_metrics: true,
   },
   wave4_note:
-    "Connector activation 2026-07-23: Google push/Zapier/storage/Teams draft PASS @ 6317d156; Slack remains BLOCKED_EXTERNAL. DEMO_ONLY=0. Pilot BLOCKED / Gate F PENDING / Launch NO-GO unchanged.",
+    "Connector activation 2026-07-23: Google push/Zapier/storage/Teams draft PASS @ 6317d156; Slack remains BLOCKED_EXTERNAL (exhaustive re-audit 2026-07-23 — credentials missing). O7 fresh PASS o7-r020 @ 8bc25388 / Alembic 096. DEMO_ONLY=0. Pilot BLOCKED / Gate F PENDING / Launch NO-GO unchanged.",
 } as const;
 
 export function assertNoLivePassWithoutSmoke(

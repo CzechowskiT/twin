@@ -548,7 +548,8 @@
     "test:review-queue": "npx --yes tsx scripts/review-queue.test.ts",
     "test:company-feedback": "npx --yes tsx scripts/company-feedback.test.ts",
     "test:gate-f-evidence-completion-guard": "npx --yes tsx scripts/gate-f-evidence-completion-guard.test.ts",
-    "test:gate-f-founder-final-decision-guard": "npx --yes tsx scripts/gate-f-founder-final-decision-guard.test.ts"
+    "test:gate-f-founder-final-decision-guard": "npx --yes tsx scripts/gate-f-founder-final-decision-guard.test.ts",
+    "test:founder-gate-f-final-decision-pack-2026-07-23-guard": "npx --yes tsx scripts/founder-gate-f-final-decision-pack-2026-07-23-guard.test.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
