@@ -189,6 +189,11 @@ def enqueue_communication_draft(
     email_hash = None
     if recipient_email:
         email_hash = hashlib.sha256(recipient_email.strip().lower().encode()).hexdigest()
+    key = dedupe_key[:128] if dedupe_key else None
+    if key:
+        existing = db.query(CommunicationOutbox).filter(CommunicationOutbox.dedupe_key == key).first()
+        if existing is not None:
+            return existing
     row = CommunicationOutbox(
         channel="email",
         template_key=template_key[:128],
@@ -196,10 +201,18 @@ def enqueue_communication_draft(
         recipient_email_hash=email_hash,
         status="draft",
         payload_json=json.dumps(payload or {}, default=str)[:8000],
-        dedupe_key=dedupe_key[:128] if dedupe_key else None,
+        dedupe_key=key,
     )
     db.add(row)
-    db.commit()
+    try:
+        db.commit()
+    except Exception:
+        db.rollback()
+        if key:
+            existing = db.query(CommunicationOutbox).filter(CommunicationOutbox.dedupe_key == key).first()
+            if existing is not None:
+                return existing
+        raise
     db.refresh(row)
     return row
 
