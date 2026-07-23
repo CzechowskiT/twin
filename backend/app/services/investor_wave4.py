@@ -22,6 +22,7 @@ from app.database.models import (
     InvestorNdaAcceptance,
     User,
 )
+from app.services.pilot_stance import resolve_pilot_stance
 from app.services.data_room_upload import object_storage_configured
 from app.services.platform_foundations import enqueue_communication_draft, record_domain_event
 
@@ -242,7 +243,7 @@ def list_hard_live_evidence(
         "wave": wave or "all",
         "persona": persona or "all",
         "live_claim_forbidden_until_smoke": True,
-        "pilot": "BLOCKED_BY_FOUNDER",
+        "pilot": resolve_pilot_stance(),
         "gate_f": "PASS",
         "launch": "NO-GO",
         "items": [_serialize_evidence(r) for r in rows],
@@ -308,7 +309,7 @@ def wave4_status(db: Session) -> dict[str, Any]:
         "wave": "4",
         "name": "investor_complete",
         "live_claim": False,
-        "pilot_stance": "BLOCKED_BY_FOUNDER",
+        "pilot_stance": resolve_pilot_stance(),
         "gate_f": "PASS",
         "launch": "NO-GO",
         "pmf_evidence": "INSUFFICIENT_DATA",
@@ -347,7 +348,7 @@ def policy_holds() -> dict[str, Any]:
         "external_pilot_enrollment": False,
         "external_attestations": "HITL_FOUNDER_SIGNATURE_REQUIRED",
         "self_serve_investor_enrollment": "NOT_STARTED",
-        "pilot": "BLOCKED_BY_FOUNDER",
+        "pilot": resolve_pilot_stance(),
         "gate_f": "PASS",
         "launch": "NO-GO",
         "founder_command": "NOT_USED",
@@ -691,7 +692,7 @@ def trust_proof_readonly_summary(db: Session) -> dict[str, Any]:
         "verified_customer_claims": signed >= 1,
         "readonly": True,
         "launch": "NO-GO",
-        "pilot": "BLOCKED_BY_FOUNDER",
+        "pilot": resolve_pilot_stance(),
         "honesty": "no_fake_customer_claims_without_signed_attestation",
     }
 

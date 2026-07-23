@@ -13,7 +13,7 @@
     "total_core": 143
   },
   "stance": {
-    "pilot": "BLOCKED_BY_FOUNDER",
+    "pilot": "READY_FOR_CONTROLLED_PILOT",
     "gate_f": "PASS",
     "launch": "NO-GO",
     "pmf": "INSUFFICIENT_DATA",
@@ -1878,5 +1878,5 @@
       "smoke_at": "2026-07-22T19:24:00Z"
     }
   ],
-  "wave4_note": "Final Pilot Launch Closure 2026-07-23: Hard LIVE denominator=CORE_PILOT_ONLY; CORE held=0. Optional MS Graph write / Authologic / ATS write / Slack = OPTIONAL_INTEGRATION_NOT_CONFIGURED. ai_act_certified_claim=LEGAL_MARKETING_CLAIM; ai_protected_attr_monitoring=POST_PILOT. investor_s3_required_download PASS via Postgres secure download. Gate F PASS · Pilot BLOCKED_BY_FOUNDER (section-17 ops naming not proven → no READY_FOR_CONTROLLED_PILOT flip) · Launch NO-GO · Enrollment OFF unchanged."
+  "wave4_note": "Controlled Pilot Final Activation 2026-07-23: Hard LIVE denominator=CORE_PILOT_ONLY; CORE held=0. Optional MS Graph write / Authologic / ATS write / Slack = OPTIONAL_INTEGRATION_NOT_CONFIGURED. ai_act_certified_claim=LEGAL_MARKETING_CLAIM; ai_protected_attr_monitoring=POST_PILOT. investor_s3_required_download PASS via Postgres secure download. Gate F PASS · Pilot READY_FOR_CONTROLLED_PILOT (on-call primary Tomasz + secondary contact@twin.care; TEMPORARY_PILOT_CANONICAL_URL=twin-sooty) · Launch NO-GO · Enrollment OFF unchanged."
 }

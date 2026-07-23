@@ -204,8 +204,9 @@ def test_cohort_crud_and_evidence_exclusion(monkeypatch) -> None:
         assert body["north_star_including_test_labeled"]["value"] >= 1
         assert "FOUNDERS_ACTION_REQUIRED_recruit_users" in body["blockers"]
         assert "PILOT_BLOCKED_BY_FOUNDER" in body["blockers"]
-        assert body["gates"]["gate_f"] == "PENDING"
+        assert body["gates"]["gate_f"] == "PASS"
         assert body["gates"]["launch"] == "NO-GO"
+        assert body["gates"]["enrollment"] == "OFF"
 
         excl = client.patch(
             f"/api/v1/admin/cohorts/{cohort_id}/participants/{add_real.json()['id']}",

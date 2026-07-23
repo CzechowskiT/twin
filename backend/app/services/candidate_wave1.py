@@ -10,6 +10,7 @@ from typing import Any
 from sqlalchemy.orm import Session
 
 from app.database.models import Candidate, FeatureFlagState, HardLiveEvidenceRecord, User
+from app.services.pilot_stance import resolve_pilot_stance
 from app.services.candidate_consent_service import list_consent_receipts, list_consents
 from app.services.candidate_privacy_request_service import list_privacy_requests
 from app.services.candidate_trust_audit_service import list_trust_audit_events
@@ -166,7 +167,7 @@ def build_live_trust_bundle(db: Session, *, candidate: Candidate, user: User) ->
         "source": "live",
         "demo_fixture": False,
         "live_claim": False,
-        "pilot_stance": "BLOCKED_BY_FOUNDER",
+        "pilot_stance": resolve_pilot_stance(),
         "trust": trust,
         "consents": consents,
         "consent_receipts": receipts,
@@ -237,7 +238,7 @@ def list_hard_live_evidence(db: Session, *, persona: str | None = "candidate", w
         "wave": wave or "all",
         "persona": persona or "all",
         "live_claim_forbidden_until_smoke": True,
-        "pilot": "BLOCKED_BY_FOUNDER",
+        "pilot": resolve_pilot_stance(),
         "gate_f": "PENDING",
         "launch": "NO-GO",
         "items": [_serialize_evidence(r) for r in rows],
@@ -317,7 +318,7 @@ def wave1_status(db: Session) -> dict[str, Any]:
         "wave": "1",
         "name": "candidate_complete",
         "live_claim": False,
-        "pilot_stance": "BLOCKED_BY_FOUNDER",
+        "pilot_stance": resolve_pilot_stance(),
         "gate_f": "PENDING",
         "launch": "NO-GO",
         "pmf_evidence": "INSUFFICIENT_DATA",

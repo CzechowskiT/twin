@@ -12,8 +12,8 @@
 | prod_api_commit | `b3e2adec…` (public-health aligned) |
 | alignment_status | **ALIGNED** |
 | docs_only_drift | false |
-| Pilot | **BLOCKED_BY_FOUNDER** |
-| Gate F | **PENDING** |
+| Pilot | **READY_FOR_CONTROLLED_PILOT** |
+| Gate F | **PASS** |
 | Launch | **NO-GO** |
 | PMF evidence | **INSUFFICIENT_DATA** |
 | real_candidate_enrollment | **NOT_STARTED** |
@@ -43,7 +43,7 @@
 3. Do **not** flip Gate F / Launch / Phase 3B / Pilot enrollment without Founder criteria.
 4. Every non-LIVE module must appear on `UNICORN_ROADMAP.md` **or** be REJECTED/DEPRECATED here with owner + stop rule.
 5. Status vocabulary is exactly: LIVE | LIVE_BEHIND_FLAG | PILOT | PARTIAL | INTERNAL_ONLY | DEMO_ONLY | PAUSED | BLOCKED | DEPRECATED | NOT_BUILT | REJECTED.
-6. External pilot enrollment remains **OFF** (`EXTERNAL_PILOT_ENROLLMENT_ENABLED=false`) while Pilot=BLOCKED_BY_FOUNDER.
+6. External mass enrollment remains **OFF** (`EXTERNAL_PILOT_ENROLLMENT_ENABLED=false`); controlled pilot uses invite-only registration only.
 
 ## 1. Personas (repo-verified)
 

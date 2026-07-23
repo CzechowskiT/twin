@@ -28,6 +28,7 @@ from app.database.models import (
     User,
     WebhookDeliveryAttempt,
 )
+from app.services.pilot_stance import resolve_pilot_stance
 from app.services.ics_export import interviews_feed_to_ics, scheduled_interview_to_ics
 from app.services.platform_foundations import enqueue_communication_draft, record_domain_event
 
@@ -487,7 +488,7 @@ def list_hard_live_evidence(
         "wave": wave or "all",
         "persona": persona or "all",
         "live_claim_forbidden_until_smoke": True,
-        "pilot": "BLOCKED_BY_FOUNDER",
+        "pilot": resolve_pilot_stance(),
         "gate_f": "PENDING",
         "launch": "NO-GO",
         "items": [_serialize_evidence(r) for r in rows],
@@ -550,7 +551,7 @@ def wave5_status(db: Session) -> dict[str, Any]:
         "wave": "5",
         "name": "calendar_integrations_complete",
         "live_claim": False,
-        "pilot_stance": "BLOCKED_BY_FOUNDER",
+        "pilot_stance": resolve_pilot_stance(),
         "gate_f": "PENDING",
         "launch": "NO-GO",
         "pmf_evidence": "INSUFFICIENT_DATA",
@@ -633,7 +634,7 @@ def policy_holds() -> dict[str, Any]:
         "microsoft_calendar_write": "BLOCKED",
         "authologic_auto_kyc": "OFF",
         "external_pilot_enrollment": False,
-        "pilot": "BLOCKED_BY_FOUNDER",
+        "pilot": resolve_pilot_stance(),
         "gate_f": "PENDING",
         "launch": "NO-GO",
         "founder_command": "NOT_USED",

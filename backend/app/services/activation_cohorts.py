@@ -395,10 +395,15 @@ def build_cohort_evidence(db: Session, cohort_id: int) -> dict[str, Any]:
         blockers.append("onboarded_without_first_match")
     if cohort.status in {"draft", "recruiting"} and len(parts) < cohort.target_count:
         blockers.append("below_target_count")
-    blockers.append("PILOT_BLOCKED_BY_FOUNDER")
+    from app.services.pilot_stance import PILOT_BLOCKED, resolve_pilot_stance
+
+    if resolve_pilot_stance() == PILOT_BLOCKED:
+        blockers.append("PILOT_BLOCKED_BY_FOUNDER")
+        blockers.append("FOUNDERS_ACTION_REQUIRED_recruit_users")
+    else:
+        blockers.append("PILOT_READY_FOR_CONTROLLED_PILOT")
+    # External mass enrollment stays OFF even when controlled pilot is READY.
     blockers.append("EXTERNAL_ENROLLMENT_NOT_STARTED")
-    # Legacy alias kept for older dashboards
-    blockers.append("FOUNDERS_ACTION_REQUIRED_recruit_users")
 
     return {
         "cohort": cohort_to_dict(cohort, participant_count=len(parts)),
@@ -421,9 +426,11 @@ def build_cohort_evidence(db: Session, cohort_id: int) -> dict[str, Any]:
         "ttv_signup_to_first_match_sample_size": ttv_sample,
         "blockers": blockers,
         "gates": {
-            "gate_f": "PENDING",
+            "gate_f": "PASS",
+            "pilot": resolve_pilot_stance(),
             "launch": "NO-GO",
             "phase_3b": "BLOCKED",
+            "enrollment": "OFF",
         },
         "generated_at": datetime.utcnow().isoformat() + "Z",
     }

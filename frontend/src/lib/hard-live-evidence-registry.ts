@@ -1,7 +1,7 @@
 /**
  * Machine-readable Hard LIVE 30 evidence registry — Waves 1–5 + Wave 4 Investor + AI compliance foundation.
  * LIVE badges in capability map / activation require status=PASS after authenticated prod smoke.
- * Stance: Pilot BLOCKED_BY_FOUNDER · Gate F PASS (Option 3) · Launch NO-GO.
+ * Stance: Pilot READY_FOR_CONTROLLED_PILOT · Gate F PASS · Launch NO-GO · Enrollment OFF.
  * Hard LIVE launch-readiness denominator = CORE_PILOT only (see product-inclusion-taxonomy).
  */
 import {
@@ -1348,7 +1348,7 @@ export const HARD_LIVE_REGISTRY_META = {
   wave: "5",
   hard_live_denominator: HARD_LIVE_DENOMINATOR_RULE,
   stance: {
-    pilot: "BLOCKED_BY_FOUNDER",
+    pilot: "READY_FOR_CONTROLLED_PILOT",
     gate_f: "PASS",
     launch: "NO-GO",
     pmf: "INSUFFICIENT_DATA",
@@ -1394,7 +1394,7 @@ export const HARD_LIVE_REGISTRY_META = {
     exclude_from_product_metrics: true,
   },
   wave4_note:
-    "Final Pilot Launch Closure 2026-07-23: Hard LIVE denominator=CORE_PILOT_ONLY; CORE held=0. Optional MS Graph write / Authologic / ATS write / Slack = OPTIONAL_INTEGRATION_NOT_CONFIGURED. ai_act_certified_claim=LEGAL_MARKETING_CLAIM; ai_protected_attr_monitoring=POST_PILOT. investor_s3_required_download PASS via Postgres secure download. Gate F PASS · Pilot BLOCKED_BY_FOUNDER (section-17 ops naming not proven → no READY_FOR_CONTROLLED_PILOT flip) · Launch NO-GO · Enrollment OFF unchanged.",
+    "Controlled Pilot Final Activation 2026-07-23: Hard LIVE denominator=CORE_PILOT_ONLY; CORE held=0. Optional MS Graph write / Authologic / ATS write / Slack = OPTIONAL_INTEGRATION_NOT_CONFIGURED. ai_act_certified_claim=LEGAL_MARKETING_CLAIM; ai_protected_attr_monitoring=POST_PILOT. investor_s3_required_download PASS via Postgres secure download. Gate F PASS · Pilot READY_FOR_CONTROLLED_PILOT (on-call primary Tomasz + secondary contact@twin.care; TEMPORARY_PILOT_CANONICAL_URL=twin-sooty) · Launch NO-GO · Enrollment OFF unchanged.",
   get corePilotPassCount(): number {
     return hardLiveLaunchReadinessCounts().pass;
   },

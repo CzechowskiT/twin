@@ -1,34 +1,33 @@
-# RC1 On-call roster — role placeholders only
+# RC1 On-call roster — controlled pilot ownership
 
 **Updated:** 2026-07-23  
-**Rule:** Never invent human names. Founder assigns real people to role IDs.
+**Rule:** Never invent human names. Contacts from Founder authorization + existing approved product mailbox only.
 
 | Role ID | Env var (Railway `twin` + worker) | Assigned |
 |---------|-----------------------------------|----------|
-| `PILOT_ON_CALL_PRIMARY` | `PILOT_ON_CALL_PRIMARY` | **UNASSIGNED** |
-| `PILOT_ON_CALL_SECONDARY` | `PILOT_ON_CALL_SECONDARY` | **UNASSIGNED** |
+| `PILOT_ON_CALL_PRIMARY` | `PILOT_ON_CALL_PRIMARY` | **CONFIGURED** — Tomasz Czechowski (masked `cz***@protonmail.ch`) |
+| `PILOT_ON_CALL_SECONDARY` | `PILOT_ON_CALL_SECONDARY` | **CONFIGURED** — role-based `co***@twin.care` (product support mailbox; escalates to primary) |
+| `PILOT_ESCALATION_OWNER` | `PILOT_ESCALATION_OWNER` | **CONFIGURED** — Tomasz Czechowski |
+| `PILOT_ROLLBACK_AUTHORITY` | `PILOT_ROLLBACK_AUTHORITY` | **CONFIGURED** — Tomasz Czechowski |
 
-## Founder business action (exact)
+## Escalation path
 
-1. Name one human as **PILOT_ON_CALL_PRIMARY** (24h window during controlled pilot).  
-2. Name one human as **PILOT_ON_CALL_SECONDARY** (backup).  
-3. Set Railway vars (no redeploy required for labels):
+1. Secondary (`contact@twin.care`) receives / monitors support + incident routes.  
+2. Escalate to **PILOT_ON_CALL_PRIMARY** / **PILOT_ESCALATION_OWNER** (Tomasz).  
+3. Rollback authority = same primary (Tomasz).
 
-```bash
-railway variables set --service twin --skip-deploys \
-  'PILOT_ON_CALL_PRIMARY=Name <email@domain>' \
-  'PILOT_ON_CALL_SECONDARY=Name <email@domain>'
-```
+## Temporary canonical URL
 
-4. Update this file’s Assigned column.  
-5. Re-run RC1 §24 checklist — only then may Pilot flip to `READY_FOR_CONTROLLED_PILOT`.
+`TEMPORARY_PILOT_CANONICAL_URL=https://twin-sooty.vercel.app` — used while Afternic NS parks `twin.care`. Custom DNS is desirable but **must not** block controlled pilot.
 
 ## Alert delivery (configured paths)
 
 | Channel | Status |
 |---------|--------|
 | Email / in-app notifications | CORE_PILOT path (existing) |
+| Support / privacy / security mailto | `contact@twin.care` → escalates to Tomasz |
 | Slack webhook | OPTIONAL — not required for RC1 |
 | Railway healthcheck | `/api/v1/health` on `twin` |
 
-Until roles are assigned, verdict remains **B** (technically ready; awaits support ownership).
+**Pilot stance:** `READY_FOR_CONTROLLED_PILOT`  
+**Frozen:** Launch **NO-GO** · Enrollment **OFF** · Phase 3B **BLOCKED**

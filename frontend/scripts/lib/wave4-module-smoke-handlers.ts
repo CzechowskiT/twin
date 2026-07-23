@@ -86,7 +86,7 @@ async function requireWave4Status(
   const body = await jsonOrNull(res.body);
   if (!body) return { ok: false, reason: "status_parse" };
   if (body.live_claim !== false) return { ok: false, reason: "live_claim_must_be_false" };
-  if (body.pilot_stance !== "BLOCKED_BY_FOUNDER") return { ok: false, reason: "pilot_not_blocked" };
+  if (body.pilot_stance !== "READY_FOR_CONTROLLED_PILOT") return { ok: false, reason: "pilot_not_ready" };
   if (body.gate_f !== "PENDING") return { ok: false, reason: "gate_f_not_pending" };
   if (body.launch !== "NO-GO") return { ok: false, reason: "launch_not_no_go" };
   if (body.external_pilot_enrollment_enabled !== false) {

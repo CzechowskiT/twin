@@ -2,15 +2,17 @@
  * Production action gates — hide/disable non-LIVE mutations outside demo/dev/internal.
  * Founder block 2026-07-20: no external pilot enrollment.
  * Gate F technical PASS (Option 3).
- * RC1: Pilot may become READY_FOR_CONTROLLED_PILOT only after §24 checklist
- * (including named on-call). Until then BLOCKED_BY_FOUNDER. Launch stays NO-GO.
+ * RC1: Pilot READY_FOR_CONTROLLED_PILOT after §24 (on-call + temporary canonical).
+ * Launch stays NO-GO · Enrollment OFF · Phase 3B BLOCKED.
  */
 export const EXTERNAL_PILOT_ENROLLMENT_ENABLED =
   process.env.NEXT_PUBLIC_EXTERNAL_PILOT_ENROLLMENT_ENABLED === "true";
 
 /** Allowed values: BLOCKED_BY_FOUNDER | READY_FOR_CONTROLLED_PILOT */
-export const PILOT_STANCE = "BLOCKED_BY_FOUNDER" as const;
+export const PILOT_STANCE = "READY_FOR_CONTROLLED_PILOT" as const;
 export type PilotStance = "BLOCKED_BY_FOUNDER" | "READY_FOR_CONTROLLED_PILOT";
+/** Stable Vercel production alias while twin.care Afternic NS parks apex. */
+export const TEMPORARY_PILOT_CANONICAL_URL = "https://twin-sooty.vercel.app" as const;
 export const GATE_F_STATUS = "PASS" as const;
 export const LAUNCH_STANCE_CANON = "NO-GO" as const;
 export const PMF_EVIDENCE = "INSUFFICIENT_DATA" as const;

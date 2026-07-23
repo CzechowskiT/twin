@@ -1,17 +1,17 @@
 # TWIN RC1 Controlled Pilot Pack — 2026-07-23
 
-**Verdict target:** A only if §24 complete; else B (support ownership / DNS).  
-**Frozen:** Launch NO-GO · Enrollment OFF · Phase 3B BLOCKED.
+**Verdict:** `A_CONTROLLED_PILOT_OPERATIONAL` — Pilot `READY_FOR_CONTROLLED_PILOT`.  
+**Frozen:** Launch NO-GO · Enrollment OFF · Phase 3B BLOCKED · Gate F PASS.
 
 ## Index
 
 | Doc | Role |
 |-----|------|
 | `docs/PRODUCTION_TOPOLOGY_RC1.json` | Machine topology + stance |
-| `docs/RC1_SECTION_24_CHECKLIST.md` | Flip gate |
-| `docs/RC1_ON_CALL_ROSTER.md` | Role placeholders |
+| `docs/RC1_SECTION_24_CHECKLIST.md` | Flip gate (§24 green) |
+| `docs/RC1_ON_CALL_ROSTER.md` | Primary Tomasz + secondary `contact@twin.care` |
 | `docs/RC1_SYNTHETIC_PILOT_IDENTITIES.md` | Invite-only identities |
-| `docs/RC1_DOMAIN_DNS_FOUNDER_ACTION.md` | Afternic → Vercel DNS |
+| `docs/RC1_DOMAIN_DNS_FOUNDER_ACTION.md` | Afternic → Vercel DNS (non-blocking) |
 | `docs/CONTROLLED_PILOT_OPERATING_MANUAL_2026-05-27.md` | Daily ops |
 | `docs/O7_RESTORE_DRILL_EVIDENCE_2026-07-23.md` | Backup/restore (staging) |
 | `docs/LAUNCH_DAY_MONITORING_ROLLBACK_RUNBOOK_2026-06-04.md` | Rollback |
@@ -21,13 +21,18 @@
 
 ## Operational URLs
 
-- FE: `https://twin-sooty.vercel.app`  
+- **TEMPORARY_PILOT_CANONICAL_URL / FE:** `https://twin-sooty.vercel.app`  
 - API: `https://twin-production-bcd9.up.railway.app`  
-- Preferred (blocked by Afternic): `https://twin.care` / `https://app.twin.care`
+- Preferred (Afternic NS parks apex — non-blocking): `https://twin.care` / `https://app.twin.care`
+
+## Ownership
+
+- Primary / escalation / rollback: Tomasz Czechowski  
+- Secondary: role-based monitored `contact@twin.care` → escalates to Tomasz
 
 ## Feedback channel
 
-Pilot feedback: mailto `contact@twin.care` + in-app notifications. No public signup form.
+Pilot feedback: mailto `contact@twin.care` + in-app notifications. Invite-only registration; no public signup / mass enrollment.
 
 ## Perf / a11y / browser
 

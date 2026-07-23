@@ -23,6 +23,7 @@ from app.database.models import (
     RoleDefinition,
     TenantMembership,
 )
+from app.services.pilot_stance import resolve_pilot_stance
 from app.services.platform_foundations import (
     enqueue_communication_draft,
     record_domain_event,
@@ -421,7 +422,7 @@ def list_hard_live_evidence(
         "wave": wave or "all",
         "persona": persona or "all",
         "live_claim_forbidden_until_smoke": True,
-        "pilot": "BLOCKED_BY_FOUNDER",
+        "pilot": resolve_pilot_stance(),
         "gate_f": "PENDING",
         "launch": "NO-GO",
         "items": [_serialize_evidence(r) for r in rows],
@@ -487,7 +488,7 @@ def wave3_status(db: Session) -> dict[str, Any]:
         "wave": "3",
         "name": "company_complete",
         "live_claim": False,
-        "pilot_stance": "BLOCKED_BY_FOUNDER",
+        "pilot_stance": resolve_pilot_stance(),
         "gate_f": "PENDING",
         "launch": "NO-GO",
         "pmf_evidence": "INSUFFICIENT_DATA",
@@ -1030,7 +1031,7 @@ def synthetic_onboarding_status(db: Session, *, company_slug: str) -> dict[str, 
             "rbac_matrix": len(matrix.get("roles") or []) >= 1,
             "team_ready": True,
         },
-        "pilot_stance": "BLOCKED_BY_FOUNDER",
+        "pilot_stance": resolve_pilot_stance(),
         "source": "live",
     }
 

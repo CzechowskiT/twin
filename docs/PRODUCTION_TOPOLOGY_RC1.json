@@ -1,10 +1,10 @@
 {
   "schema": "twin.production_topology.rc1/v1",
-  "updated_at": "2026-07-23T17:50:00Z",
+  "updated_at": "2026-07-23T20:05:00Z",
   "branch": "cursor/phase1-monorepo-scaffold",
   "hard_live_denominator": "CORE_PILOT_ONLY",
   "stance": {
-    "pilot": "BLOCKED_BY_FOUNDER",
+    "pilot": "READY_FOR_CONTROLLED_PILOT",
     "pilot_ready_token": "READY_FOR_CONTROLLED_PILOT",
     "gate_f": "PASS",
     "launch": "NO-GO",
@@ -17,10 +17,11 @@
   },
   "canonical_urls": {
     "operational_frontend": "https://twin-sooty.vercel.app",
+    "temporary_pilot_canonical_url": "https://twin-sooty.vercel.app",
     "preferred_public_frontend": "https://twin.care",
     "preferred_app_frontend": "https://app.twin.care",
     "api": "https://twin-production-bcd9.up.railway.app",
-    "note": "twin.care/app.twin.care attached to Vercel project twin but Afternic NS still park apex \u2014 operational URL remains twin-sooty until Founder moves NS to ns1/ns2.vercel-dns.com or A 76.76.21.21"
+    "note": "TEMPORARY_PILOT_CANONICAL_URL = twin-sooty.vercel.app. twin.care/app.twin.care attached to Vercel project twin but Afternic NS still park apex — custom DNS desirable but must NOT block controlled pilot."
   },
   "vercel": {
     "team": "twin",
@@ -54,7 +55,11 @@
   "on_call_roles": {
     "primary": "PILOT_ON_CALL_PRIMARY",
     "secondary": "PILOT_ON_CALL_SECONDARY",
-    "assignment": "UNASSIGNED",
+    "escalation": "PILOT_ESCALATION_OWNER",
+    "rollback": "PILOT_ROLLBACK_AUTHORITY",
+    "assignment": "CONFIGURED",
+    "primary_holder": "Tomasz Czechowski (masked contact via SCRAPE_OPS / Railway)",
+    "secondary_holder": "role-based contact@twin.care (monitored product mailbox; escalates to primary)",
     "never_invent_human_names": true
   },
   "synthetic_pilot_identities": {
@@ -62,6 +67,6 @@
     "candidate": "demo@twin.career",
     "recruiter_company_slug": "nova-hiring-pl"
   },
-  "verified_tip": "80f5dd88d8ac32e91882d69cae30edb490ebb6d0",
-  "verdict": "B_AWAITING_ON_CALL"
+  "verified_tip": "pending_post_deploy",
+  "verdict": "A_CONTROLLED_PILOT_OPERATIONAL"
 }

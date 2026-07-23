@@ -55,7 +55,7 @@ test("3 public-health aligned + enrollment gate off", async () => {
   assert.equal(en.status, 200);
   const body = JSON.parse(en.body) as { external_pilot_enrollment_enabled: boolean; pilot: string };
   assert.equal(body.external_pilot_enrollment_enabled, false);
-  assert.equal(body.pilot, "BLOCKED_BY_FOUNDER");
+  assert.equal(body.pilot, "READY_FOR_CONTROLLED_PILOT");
   const fe = await fetch(`${PROD_BASE}/api/public-health`, { signal: AbortSignal.timeout(15_000) });
   assert.equal(fe.status, 200);
   const ph = (await fe.json()) as { status: string; db_ok: boolean };

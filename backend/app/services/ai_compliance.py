@@ -35,6 +35,7 @@ from app.database.models import (
     HardLiveEvidenceRecord,
     User,
 )
+from app.services.pilot_stance import resolve_pilot_stance
 from app.services.platform_foundations import record_domain_event
 
 logger = logging.getLogger(__name__)
@@ -1088,7 +1089,7 @@ def list_hard_live_evidence(db: Session) -> dict[str, Any]:
     return {
         "wave": "ai_compliance",
         "live_claim_forbidden_until_smoke": True,
-        "pilot": "BLOCKED_BY_FOUNDER",
+        "pilot": resolve_pilot_stance(),
         "gate_f": "PENDING",
         "launch": "NO-GO",
         "items": [
@@ -1152,7 +1153,7 @@ def compliance_status(db: Session) -> dict[str, Any]:
         "name": "career_evidence_ai_compliance",
         "phase": "A",
         "live_claim": False,
-        "pilot_stance": "BLOCKED_BY_FOUNDER",
+        "pilot_stance": resolve_pilot_stance(),
         "gate_f": "PENDING",
         "launch": "NO-GO",
         "phase_3b": "UNCHANGED",

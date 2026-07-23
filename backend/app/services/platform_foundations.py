@@ -20,6 +20,7 @@ from app.database.models import (
     RoleDefinition,
     TenantMembership,
 )
+from app.services.pilot_stance import resolve_pilot_stance
 
 logger = logging.getLogger(__name__)
 
@@ -43,9 +44,9 @@ DEFAULT_PERMISSIONS: tuple[tuple[str, str], ...] = (
     ("ops_admin", "ops.admin.read"),
 )
 
-# Hard defaults — external enrollment OFF until Founder lifts BLOCKED_BY_FOUNDER.
+# Hard defaults — external mass enrollment OFF (controlled pilot invite-only is separate).
 FOUNDATION_FLAG_DEFAULTS: tuple[tuple[str, bool, str], ...] = (
-    ("EXTERNAL_PILOT_ENROLLMENT_ENABLED", False, "Founder block 2026-07-20 — no real invites"),
+    ("EXTERNAL_PILOT_ENROLLMENT_ENABLED", False, "Mass enrollment OFF — controlled pilot invite-only only"),
     ("PLATFORM_FOUNDATIONS_WAVE0", True, "Wave 0 foundations schema present"),
     ("STRIPE_PUBLIC_LAUNCH", False, "Hard ban — not public LIVE"),
     ("ATS_LIVE_SYNC", False, "Hard ban — connectors only"),
@@ -224,7 +225,7 @@ def foundations_status(db: Session) -> dict[str, Any]:
         "wave": "0",
         "name": "platform_foundations",
         "live_claim": False,
-        "pilot_stance": "BLOCKED_BY_FOUNDER",
+        "pilot_stance": resolve_pilot_stance(),
         "gate_f": "PENDING",
         "launch": "NO-GO",
         "pmf_evidence": "INSUFFICIENT_DATA",

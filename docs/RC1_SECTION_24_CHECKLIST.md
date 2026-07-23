@@ -23,14 +23,14 @@
 | 17 | Rollback runbook present | YES | launch-day + controlled pilot manuals |
 | 18 | Worker deployed same tip | YES | Railway worker commit |
 | 19 | Observability / health OK | YES | `/api/v1/health` |
-| 20 | On-call PRIMARY assigned | **NO** | `RC1_ON_CALL_ROSTER.md` UNASSIGNED |
-| 21 | On-call SECONDARY assigned | **NO** | UNASSIGNED |
-| 22 | Alert path for on-call | PARTIAL | email/in-app; Slack optional |
+| 20 | On-call PRIMARY assigned | YES | Tomasz Czechowski → `PILOT_ON_CALL_PRIMARY` |
+| 21 | On-call SECONDARY assigned | YES | `contact@twin.care` role mailbox → escalates to Tomasz |
+| 22 | Alert path for on-call | YES | support/privacy/security → secondary → primary |
 | 23 | Cohort prep docs | YES | synthetic + operating manual |
-| 24 | Founder accepts RC1 operational URL until DNS | YES/NO | business: accept sooty **or** fix NS |
+| 24 | Founder accepts RC1 operational URL until DNS | YES | `TEMPORARY_PILOT_CANONICAL_URL=https://twin-sooty.vercel.app` |
 
 ## Flip rule
 
 `PILOT_STANCE → READY_FOR_CONTROLLED_PILOT` **only if all rows YES** (including 9 **or** 24 accepts sooty as temporary operational canonical, **and** 20–21 assigned).
 
-If only 20–21 missing → **Verdict B**.
+**Status 2026-07-23:** §24 green via 24 (temporary canonical) + 20–21 assigned → Pilot **READY_FOR_CONTROLLED_PILOT**. Launch / Enrollment / Phase 3B remain frozen.

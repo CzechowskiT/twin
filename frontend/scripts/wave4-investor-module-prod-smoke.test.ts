@@ -101,7 +101,7 @@ test("2 public enrollment + policy still blocked", async () => {
   assert.equal(en.status, 200);
   const body = JSON.parse(en.body) as { external_pilot_enrollment_enabled: boolean; pilot: string };
   assert.equal(body.external_pilot_enrollment_enabled, false);
-  assert.equal(body.pilot, "BLOCKED_BY_FOUNDER");
+  assert.equal(body.pilot, "READY_FOR_CONTROLLED_PILOT");
 });
 
 test("3 per-module authenticated smoke (selected modules)", async (t) => {
@@ -140,7 +140,7 @@ test("3 per-module authenticated smoke (selected modules)", async (t) => {
     launch: string;
   };
   assert.equal(statusBody.live_claim, false);
-  assert.equal(statusBody.pilot_stance, "BLOCKED_BY_FOUNDER");
+  assert.equal(statusBody.pilot_stance, "READY_FOR_CONTROLLED_PILOT");
   assert.equal(statusBody.gate_f, "PENDING");
   assert.equal(statusBody.launch, "NO-GO");
 

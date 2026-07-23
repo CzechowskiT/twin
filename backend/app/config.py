@@ -457,6 +457,11 @@ class Settings(BaseSettings):
     # Role placeholders only — never invent human names in code.
     pilot_on_call_primary: str = "PILOT_ON_CALL_PRIMARY_UNASSIGNED"
     pilot_on_call_secondary: str = "PILOT_ON_CALL_SECONDARY_UNASSIGNED"
+    pilot_escalation_owner: str = "PILOT_ESCALATION_OWNER_UNASSIGNED"
+    pilot_rollback_authority: str = "PILOT_ROLLBACK_AUTHORITY_UNASSIGNED"
+    # BLOCKED_BY_FOUNDER | READY_FOR_CONTROLLED_PILOT (env PILOT_STANCE)
+    pilot_stance: str = "BLOCKED_BY_FOUNDER"
+    temporary_pilot_canonical_url: str = "https://twin-sooty.vercel.app"
 
     # --- TWIN Agent Dispatcher (Cursor Cloud Agents) ---
     # Production secret name for Cursor service-account API key (never commit the value):

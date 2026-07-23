@@ -25,8 +25,10 @@ test("PRODUCTION_TOPOLOGY_RC1.json exists and is valid", () => {
   assert.equal(doc.stance.enrollment, "OFF");
   assert.equal(doc.stance.phase_3b, "BLOCKED");
   assert.equal(doc.stance.gate_f, "PASS");
+  assert.equal(doc.stance.pilot, "READY_FOR_CONTROLLED_PILOT");
   assert.equal(doc.stance.external_pilot_enrollment_enabled, false);
   assert.equal(doc.canonical_urls.operational_frontend, "https://twin-sooty.vercel.app");
+  assert.equal(doc.canonical_urls.temporary_pilot_canonical_url, "https://twin-sooty.vercel.app");
   assert.equal(doc.canonical_urls.api, "https://twin-production-bcd9.up.railway.app");
   assert.equal(doc.vercel.project, "twin");
   assert.ok(doc.vercel.domains_attached.includes("twin.care"));
@@ -36,8 +38,12 @@ test("PRODUCTION_TOPOLOGY_RC1.json exists and is valid", () => {
   assert.equal(doc.railway.api_service, "twin");
   assert.equal(doc.railway.worker_service, "enthusiastic-encouragement");
   assert.equal(doc.on_call_roles.never_invent_human_names, true);
-  assert.equal(doc.on_call_roles.assignment, "UNASSIGNED");
-  assert.ok(doc.verdict === "B_AWAITING_ON_CALL" || doc.verdict === "A_READY");
+  assert.equal(doc.on_call_roles.assignment, "CONFIGURED");
+  assert.ok(
+    doc.verdict === "A_CONTROLLED_PILOT_OPERATIONAL" ||
+      doc.verdict === "A_READY" ||
+      doc.verdict === "B_AWAITING_ON_CALL",
+  );
 });
 
 test("canonical alias script still documents twin-sooty operational URL", () => {

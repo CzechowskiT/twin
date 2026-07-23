@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user, get_db
 from app.database.models import User
+from app.services.pilot_stance import resolve_pilot_stance
 from app.services import platform_foundations as foundations
 
 router = APIRouter()
@@ -39,10 +40,14 @@ def enrollment_gate(db: Session = Depends(get_db)) -> dict:
     enabled = foundations.is_external_pilot_enrollment_enabled(db)
     return {
         "external_pilot_enrollment_enabled": enabled,
-        "pilot": "BLOCKED_BY_FOUNDER" if not enabled else "FLAG_ENABLED_INTERNAL_ONLY",
+        "pilot": resolve_pilot_stance() if not enabled else "FLAG_ENABLED_INTERNAL_ONLY",
         "real_candidate_enrollment": "NOT_STARTED",
         "real_recruiter_enrollment": "NOT_STARTED",
-        "message": "Do not invite real users while pilot is BLOCKED_BY_FOUNDER.",
+        "message": (
+            "Controlled pilot READY — invite-only only; external mass enrollment remains OFF."
+            if not enabled
+            else "Enrollment flag enabled — internal only until Launch GO."
+        ),
     }
 
 
@@ -65,7 +70,7 @@ def enrollment_capability(db: Session = Depends(get_db)) -> dict:
         "external_pilot_enrollment_enabled": enabled,
         "capability_ready": True,
         "launch_stance": "OFF",
-        "pilot_stance": "BLOCKED_BY_FOUNDER",
+        "pilot_stance": resolve_pilot_stance(),
         "modules": {
             "rec_recruiter_onboarding": "READY_KILL_SWITCH_OFF",
             "rec_company_onboarding": "READY_KILL_SWITCH_OFF",
