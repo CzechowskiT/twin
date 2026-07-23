@@ -1,5 +1,6 @@
 /**
  * Wave 5 per-module calendar/integrations prod smoke.
+ * Email draft enqueue is idempotent on dedupe_key (re-smoke safe).
  *
  * Env:
  *   TWIN_PROD_TEST_JWT — required (fail-closed if missing)
