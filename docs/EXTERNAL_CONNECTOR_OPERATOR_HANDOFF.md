@@ -1,7 +1,7 @@
 # External Connector Operator Handoff
 
 **Branch:** `cursor/phase1-monorepo-scaffold`  
-**Last exhaustive audit:** 2026-07-23 (continuation) @ tip `c3cae1121342e3ede55127c0fe3d4af911dd1586`  
+**Last exhaustive audit:** 2026-07-23 (launch readiness handoff) @ tip `2418a9dba620f0320773bff0484487b458a497c6` (Slack still MISSING on API/worker)  
 **Purpose:** Credentials Cursor cannot create after exhaustive audit.  
 **Never paste secret values into tickets or chat. No fake secrets. No placeholders that look like real values.**
 

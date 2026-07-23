@@ -2,9 +2,10 @@
 
 **Type:** Founder decision package — **not launch approval**  
 **Branch:** `cursor/phase1-monorepo-scaffold`  
-**Canonical tip (verified continuation):** `c3cae1121342e3ede55127c0fe3d4af911dd1586`  
-**Ancestor baseline:** `8bc25388e76cccd14c61826079d37fdc65fb8132`  
-**Package date:** 2026-07-23
+**Canonical tip (verified continuation):** `2418a9dba620f0320773bff0484487b458a497c6`  
+**Ancestor baseline:** `c3cae1121342e3ede55127c0fe3d4af911dd1586`  
+**Package date:** 2026-07-23  
+**Note:** Tip advances after this handoff commit (execution pack + decision record); re-verify four-way alignment on the new HEAD.
 
 **Related:** [O7 evidence](./O7_RESTORE_DRILL_EVIDENCE_2026-07-23.md) · [Slack handoff](./EXTERNAL_CONNECTOR_OPERATOR_HANDOFF.md) · [Hard LIVE registry](./HARD_LIVE_EVIDENCE_REGISTRY.json) · [Pilot block](./PILOT_FOUNDER_BLOCK_DECISION_2026-07-20.md)
 
@@ -16,9 +17,9 @@ This pack does **not** set Gate F YES, Launch GO, Pilot GO, or enrollment ON.
 
 | Item | Verdict |
 |------|---------|
-| Strict SHA alignment | **PASS** — `repo = origin = FE = API = worker = c3cae112…` |
+| Strict SHA alignment | **PASS** (pre-handoff) — `repo = origin = FE = API = worker = 2418a9db…` |
 | Alembic | **PASS** — code + prod `096_connector_secret_hash_widen` |
-| CI (tip) | **success** @ `c3cae112` |
+| CI (tip) | **success** @ `2418a9db` (smoke run `29988958754`) |
 | Production smoke (prior Gate F) | Wave1–5 / gap-close / connectors / AI / Hard LIVE — **PASS** (Slack draft-only) |
 | Security | Prior High/Critical closed (SSRF, BOLA/IDOR, legal hold, Authologic, ATS, token log fingerprint) |
 | Open High/Critical (Cursor-fixable) | **none** identified in this closure |
@@ -30,8 +31,8 @@ This pack does **not** set Gate F YES, Launch GO, Pilot GO, or enrollment ON.
 
 | Evidence | Location / note |
 |----------|-----------------|
-| Canonical SHA | `c3cae112…` (strict four-way) |
-| CI run | smoke success on tip `c3cae112` |
+| Canonical SHA | `2418a9db…` (strict four-way at verification start) |
+| CI run | smoke success on tip `2418a9db` — run `29988958754` |
 | Production smoke | connector evidence `EXTERNAL_CONNECTOR_PROD_SMOKE_EVIDENCE_2026-07-23.md` |
 | Security fixes | Gate F verification line through `8bc25388` + realign |
 | BOLA/IDOR / SSRF / legal hold / Authologic / ATS / token logging | closed in prior Gate F commits |
