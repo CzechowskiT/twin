@@ -1,5 +1,6 @@
 /**
  * Founder Gate F final decision pack 2026-07-23 — static guard (no browser).
+ * After Option 3: Gate F technical PASS recorded; Pilot/Launch holds remain.
  */
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -9,6 +10,7 @@ import test from "node:test";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const PACK = "docs/FOUNDER_GATE_F_FINAL_DECISION_PACK_2026-07-23.md";
+const RECORD = "docs/FOUNDER_GATE_F_DECISION_RECORD_2026-07-23.md";
 const O7 = "docs/O7_RESTORE_DRILL_EVIDENCE_2026-07-23.md";
 const HANDOFF = "docs/EXTERNAL_CONNECTOR_OPERATOR_HANDOFF.md";
 
@@ -32,14 +34,15 @@ test("2 includes Options 1–3 matrix", () => {
   assert.match(doc, /Required action/i);
 });
 
-test("3 does not flip Gate F YES or Launch GO", () => {
+test("3 Option 3 Gate F PASS recorded; Launch remains NO-GO", () => {
   const doc = readRepo(PACK);
-  assert.match(doc, /Gate F.*PENDING/i);
+  assert.match(doc, /Option 3 approved/i);
+  assert.match(doc, /Gate F technical PASS|Gate F = YES \(technical\)/i);
   assert.match(doc, /Launch.*NO-GO/i);
-  assert.match(doc, /No Gate F YES decided/i);
-  assert.match(doc, /Gate F YES ≠ Launch GO/);
-  assert.doesNotMatch(doc, /\*\*Gate F:\*\* \*\*YES\*\*/);
-  assert.doesNotMatch(doc, /Founder choice \(record\):\s*YES/i);
+  assert.match(doc, /Gate F (technical )?PASS ≠ Launch GO|Gate F YES ≠ Launch GO/);
+  assert.doesNotMatch(doc, /Launch:\s*\*\*GO\*\*/i);
+  assert.doesNotMatch(doc, /set Launch GO, Pilot GO, or enrollment ON(?!\.)/i);
+  assert.match(doc, /does \*\*not\*\* set Launch GO, Pilot GO, or enrollment ON/i);
 });
 
 test("4 keeps Pilot BLOCKED_BY_FOUNDER", () => {
@@ -57,10 +60,12 @@ test("5 references O7 PASS and Slack BLOCKED", () => {
   readRepo(HANDOFF);
 });
 
-test("6 recommends Option 3 without applying stance", () => {
+test("6 Option 3 approved with firewall against Pilot/Launch auto-flip", () => {
   const doc = readRepo(PACK);
-  assert.match(doc, /Technical recommendation: Option 3|Recommend Option 3/i);
-  assert.match(doc, /does \*\*not\*\* set Gate F YES|Do \*\*not\*\* auto-flip Gate F YES/i);
+  assert.match(doc, /Option 3 approved/i);
+  assert.match(doc, /no automatic stance propagation|Slack connector not promoted/i);
+  assert.match(doc, /BLOCKED_BY_FOUNDER/);
+  assert.match(doc, /Launch remains \*\*NO-GO\*\*|Launch `NO-GO`/i);
 });
 
 test("7 Hard LIVE counts documented", () => {
@@ -89,4 +94,18 @@ test("9 handoff has §4 Slack sections", () => {
   assert.match(handoff, /## Security/);
   assert.match(handoff, /SLACK_INCOMING_WEBHOOK_URL/);
   assert.match(handoff, /TWIN_SLACK_WEBHOOK_URL/);
+});
+
+test("10 decision record records Option 3 formally", () => {
+  const record = readRepo(RECORD);
+  assert.match(record, /Option 3 approved/i);
+  assert.match(record, /☑ PASS/);
+  assert.match(record, /☑ ACCEPTED/);
+  assert.match(record, /☑ MAINTAIN/);
+  assert.match(record, /☑ BLOCKED/);
+  assert.match(record, /☑ NO-GO/);
+  assert.match(record, /☑ OFF/);
+  assert.match(record, /BLOCKED_EXTERNAL_CREDENTIALS/);
+  assert.match(record, /84a381d7742dd27b363ddc6ae5d9d6838a7a8a00/);
+  assert.match(record, /Gate F technical PASS ≠ Pilot APPROVED ≠ Launch GO/);
 });

@@ -2,9 +2,9 @@
 
 **Type:** Operational handoff for Founder decisions — **not** Pilot/Launch activation  
 **Branch:** `cursor/phase1-monorepo-scaffold`  
-**Related:** [Decision pack](./FOUNDER_GATE_F_FINAL_DECISION_PACK_2026-07-23.md) · [Decision record (blank)](./FOUNDER_GATE_F_DECISION_RECORD_2026-07-23.md) · [Slack handoff](./EXTERNAL_CONNECTOR_OPERATOR_HANDOFF.md) · [O7 evidence](./O7_RESTORE_DRILL_EVIDENCE_2026-07-23.md)
+**Related:** [Decision pack](./FOUNDER_GATE_F_FINAL_DECISION_PACK_2026-07-23.md) · [Decision record (Option 3)](./FOUNDER_GATE_F_DECISION_RECORD_2026-07-23.md) · [Slack handoff](./EXTERNAL_CONNECTOR_OPERATOR_HANDOFF.md) · [O7 evidence](./O7_RESTORE_DRILL_EVIDENCE_2026-07-23.md)
 
-This pack does **not** activate Pilot, flip Gate F, enable enrollment, or set Launch GO.
+This pack does **not** activate Pilot, enable enrollment, or set Launch GO. Founder Option 3 records Gate F **technical PASS** only.
 
 ---
 
@@ -21,7 +21,7 @@ This pack does **not** activate Pilot, flip Gate F, enable enrollment, or set La
 | O7 | **PASS** `o7-r020-20260723T065951Z` (isolated staging; prod untouched) |
 | Slack | `plat_slack_connector` **BLOCKED_EXTERNAL_CREDENTIALS** only — credentials MISSING on Railway API/worker |
 
-**Stance (unchanged):** Gate F **PENDING** · Pilot **BLOCKED_BY_FOUNDER** · Launch **NO-GO** · Enrollment **OFF** · Phase 3B **BLOCKED**
+**Stance after Founder Option 3:** Gate F technical **PASS** (Slack exception ACCEPTED) · Pilot **BLOCKED_BY_FOUNDER** · Launch **NO-GO** · Enrollment **OFF** · Phase 3B **BLOCKED** · Slack **BLOCKED_EXTERNAL_CREDENTIALS** · HELD_POLICY **30**
 
 ---
 
@@ -60,15 +60,16 @@ This pack does **not** activate Pilot, flip Gate F, enable enrollment, or set La
 
 Decide **separately** (use [decision record](./FOUNDER_GATE_F_DECISION_RECORD_2026-07-23.md)):
 
-| Decision | Current default |
-|----------|-----------------|
-| Gate F technical status | PENDING |
-| Slack credentials-only exception | undecided (ACCEPT / REJECT / DEFER) |
-| HELD_POLICY (30) | KEEP all |
-| Pilot | BLOCKED_BY_FOUNDER |
-| Launch | NO-GO |
-| Enrollment | OFF |
-| Phase 3B | BLOCKED |
+| Decision | Founder Option 3 (2026-07-23) |
+|----------|-------------------------------|
+| Gate F technical status | **PASS** |
+| Slack credentials-only exception | **ACCEPTED** |
+| O7 evidence | **ACCEPTED** (`o7-r020`) |
+| HELD_POLICY (30) | **MAINTAIN** all |
+| Pilot | BLOCKED_BY_FOUNDER (unchanged) |
+| Launch | NO-GO (unchanged) |
+| Enrollment | OFF (unchanged) |
+| Phase 3B | BLOCKED (unchanged) |
 
 ---
 
@@ -96,13 +97,13 @@ Decide **separately** (use [decision record](./FOUNDER_GATE_F_DECISION_RECORD_20
 - [x] CI smoke green on canonical tip  
 - [x] Hard LIVE 122/30/1/0/0 honesty  
 - [x] O7 PASS evidence  
-- [ ] Slack LIVE **or** Founder-accepted exception recorded  
+- [x] Slack LIVE **or** Founder-accepted exception recorded  
 
 ### Mandatory operational
 
-- [ ] Slack operator checklist complete **or** exception accepted  
+- [x] Slack operator checklist complete **or** exception accepted  
 - [ ] On-call / incident owner named for first 24h after any Pilot  
-- [ ] Rollback authority named  
+- [x] Rollback authority named (Founder)  
 
 ### Mandatory security
 
@@ -118,9 +119,9 @@ Decide **separately** (use [decision record](./FOUNDER_GATE_F_DECISION_RECORD_20
 
 ### Mandatory business
 
-- [ ] Gate F decision recorded  
-- [ ] Pilot decision recorded  
-- [ ] Launch decision recorded (default NO-GO)  
+- [x] Gate F decision recorded (Option 3 — technical PASS)  
+- [x] Pilot decision recorded (remains BLOCKED_BY_FOUNDER)  
+- [x] Launch decision recorded (default NO-GO)  
 
 ### Optional post-launch
 
@@ -151,14 +152,14 @@ Decide **separately** (use [decision record](./FOUNDER_GATE_F_DECISION_RECORD_20
 | Founder decision | Gate F YES (technical) + Slack exception ACCEPTED |
 | Rollback | Do not flip Pilot/Launch; Slack stays BLOCKED in registry |
 
-### Variant 3 — Gate F technical PASS; controlled Pilot later; Launch NO-GO *(recommended)*
+### Variant 3 — Gate F technical PASS; controlled Pilot later; Launch NO-GO *(recommended → selected)*
 
 | Field | Content |
 |-------|---------|
 | Risk | Low if separations recorded |
 | Owner | Founder |
-| Evidence | Variant 2 + Pilot block doc + this pack |
-| Founder decision | Gate F YES (technical); Pilot still BLOCKED until separate APPROVED; Launch NO-GO |
+| Evidence | Variant 2 + Pilot block doc + this pack + [decision record](./FOUNDER_GATE_F_DECISION_RECORD_2026-07-23.md) |
+| Founder decision | **Option 3 approved** — Gate F technical PASS; Pilot still BLOCKED until separate APPROVED; Launch NO-GO |
 | Rollback | Pilot never started → no user rollback; keep enrollment OFF |
 
 ---
@@ -194,4 +195,4 @@ Checklist only — **do not activate Pilot now:**
 
 ---
 
-**End of pack.** No Pilot started. No stance flipped by Cursor.
+**End of pack.** Founder Option 3 recorded. No Pilot started. Launch remains NO-GO. Slack not promoted.

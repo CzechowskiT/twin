@@ -2,14 +2,15 @@
 
 **Type:** Founder decision package — **not launch approval**  
 **Branch:** `cursor/phase1-monorepo-scaffold`  
-**Canonical tip (verified continuation):** `2418a9dba620f0320773bff0484487b458a497c6`  
+**Canonical tip (at pack creation):** `2418a9dba620f0320773bff0484487b458a497c6`  
 **Ancestor baseline:** `c3cae1121342e3ede55127c0fe3d4af911dd1586`  
+**Founder decision SHA:** `84a381d7742dd27b363ddc6ae5d9d6838a7a8a00`  
 **Package date:** 2026-07-23  
-**Note:** Tip advances after this handoff commit (execution pack + decision record); re-verify four-way alignment on the new HEAD.
+**Founder decision:** **Option 3 approved** — see [decision record](./FOUNDER_GATE_F_DECISION_RECORD_2026-07-23.md).
 
 **Related:** [O7 evidence](./O7_RESTORE_DRILL_EVIDENCE_2026-07-23.md) · [Slack handoff](./EXTERNAL_CONNECTOR_OPERATOR_HANDOFF.md) · [Hard LIVE registry](./HARD_LIVE_EVIDENCE_REGISTRY.json) · [Pilot block](./PILOT_FOUNDER_BLOCK_DECISION_2026-07-20.md)
 
-This pack does **not** set Gate F YES, Launch GO, Pilot GO, or enrollment ON.
+This pack recorded evidence and options. Founder later approved **Option 3** (Gate F technical PASS + Slack exception). This still does **not** set Launch GO, Pilot GO, or enrollment ON.
 
 ---
 
@@ -49,7 +50,7 @@ This pack does **not** set Gate F YES, Launch GO, Pilot GO, or enrollment ON.
 | Slack credentials | **Open** — human Slack app + Railway env only ([handoff](./EXTERNAL_CONNECTOR_OPERATOR_HANDOFF.md)) |
 | Fresh O7 restore drill | **Closed** — PASS `o7-r020` (not an operator gap) |
 | Founder policy holds | **30** `HELD_POLICY` unchanged |
-| Founder business decisions | Gate F / Pilot / Launch / Enrollment — blank below |
+| Founder business decisions | **Option 3 recorded** — Gate F technical PASS; Pilot/Launch/Enrollment/Phase 3B unchanged (see §F + decision record) |
 
 ---
 
@@ -120,54 +121,55 @@ Decide **separately** (do not bundle):
 
 ### F.1 Gate F technical status
 
-- [ ] Gate F = YES (technical)
+- [x] Gate F = YES (technical) — recorded as **PASS**
 - [ ] Gate F = NO
 - [ ] Gate F = PENDING (**default**)
 
-**Founder choice:** _________________________________
+**Founder choice:** **PASS** (Option 3) — 2026-07-23 @ `84a381d7…`
 
 ### F.2 Slack credentials-only exception
 
-- [ ] ACCEPT
+- [x] ACCEPT
 - [ ] REJECT (require Slack PASS before any Gate F YES)
 - [ ] DEFER
 
-**Founder choice:** _________________________________
+**Founder choice:** **ACCEPTED** — Slack stays `BLOCKED_EXTERNAL_CREDENTIALS` until credentials + provider smoke
 
 ### F.3 O7 evidence
 
-- [ ] ACCEPT PASS `o7-r020-20260723T065951Z`
+- [x] ACCEPT PASS `o7-r020-20260723T065951Z`
 - [ ] REQUIRE another founder-supervised drill
 - [ ] DEFER
 
-**Founder choice:** _________________________________
+**Founder choice:** **ACCEPTED**
 
 ### F.4 HELD_POLICY (30)
 
-- [ ] KEEP all 30
+- [x] KEEP all 30
 - [ ] Review subset (list IDs separately)
 
-**Founder choice:** _________________________________
+**Founder choice:** **MAINTAIN (30)**
 
 ### F.5 Pilot / Launch / Enrollment (independent)
 
 | Decision | Keep current | Other (write) |
 |----------|--------------|---------------|
-| Pilot (`BLOCKED_BY_FOUNDER`) | [ ] | _______ |
-| Launch (`NO-GO`) | [ ] | _______ |
-| Enrollment (OFF) | [ ] | _______ |
+| Pilot (`BLOCKED_BY_FOUNDER`) | [x] | _______ |
+| Launch (`NO-GO`) | [x] | _______ |
+| Enrollment (OFF) | [x] | _______ |
 
-**Founder choice:** _________________________________
+**Founder choice:** Keep all current holds. Phase 3B remains **BLOCKED**.
 
 ---
 
-## G. Recommended decision
+## G. Recommended decision → Founder outcome
 
-**Technical recommendation: Option 3.**
+**Technical recommendation was: Option 3.**  
+**Founder outcome (2026-07-23): Option 3 approved.**
 
-1. Gate F technical bar satisfiable with one external exception (Slack credentials).
-2. O7 closed (`o7-r020`).
-3. Keep Pilot `BLOCKED_BY_FOUNDER`, Launch `NO-GO`, enrollment OFF, and all 30 `HELD_POLICY` until separate Founder actions.
-4. Do **not** auto-flip Gate F YES in checklists/registry from this recommendation alone.
+1. Gate F technical bar accepted with one external exception (Slack credentials).
+2. O7 closed and ACCEPTED (`o7-r020`).
+3. Pilot remains `BLOCKED_BY_FOUNDER`, Launch `NO-GO`, enrollment OFF, Phase 3B BLOCKED, and all 30 `HELD_POLICY` until separate Founder actions.
+4. Slack connector not promoted; no automatic stance propagation beyond the Gate F canonical field.
 
-**Gate F YES ≠ Launch GO.** Launch remains **NO-GO**. No Gate F YES decided in this pack.
+**Gate F technical PASS ≠ Launch GO.** Launch remains **NO-GO**. Pilot remains **BLOCKED_BY_FOUNDER**.

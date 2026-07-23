@@ -31,7 +31,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
 test("stance remains Founder-blocked", () => {
   assert.equal(HARD_LIVE_REGISTRY_META.stance.pilot, "BLOCKED_BY_FOUNDER");
-  assert.equal(HARD_LIVE_REGISTRY_META.stance.gate_f, "PENDING");
+  assert.equal(HARD_LIVE_REGISTRY_META.stance.gate_f, "PASS");
   assert.equal(HARD_LIVE_REGISTRY_META.stance.launch, "NO-GO");
   assert.equal(HARD_LIVE_REGISTRY_META.stance.external_pilot_enrollment_enabled, false);
 });
@@ -165,7 +165,7 @@ test("docs registry JSON mirrors TS module ids and PASS smoke fields", () => {
   const raw = readFileSync(jsonPath, "utf8");
   const doc = JSON.parse(raw) as {
     modules: Array<{ module_id: string; status: string; smoke_sha?: string; wave?: string }>;
-    stance: { pilot: string; external_pilot_enrollment_enabled: boolean };
+    stance: { pilot: string; gate_f: string; external_pilot_enrollment_enabled: boolean };
     wave: string;
   };
   assert.equal(doc.modules.length, HARD_LIVE_EVIDENCE_REGISTRY.length);
@@ -174,6 +174,7 @@ test("docs registry JSON mirrors TS module ids and PASS smoke fields", () => {
     assert.ok(docIds.has(id), id);
   }
   assert.equal(doc.stance.pilot, "BLOCKED_BY_FOUNDER");
+  assert.equal(doc.stance.gate_f, "PASS");
   assert.equal(doc.stance.external_pilot_enrollment_enabled, false);
   assert.equal(doc.wave, "5");
   const passDocs = doc.modules.filter((m) => m.status === "PASS");
