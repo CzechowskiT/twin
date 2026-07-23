@@ -1,6 +1,6 @@
 {
   "schema": "twin.production_topology.rc1/v1",
-  "updated_at": "2026-07-23T20:05:00Z",
+  "updated_at": "2026-07-23T20:15:00Z",
   "branch": "cursor/phase1-monorepo-scaffold",
   "hard_live_denominator": "CORE_PILOT_ONLY",
   "stance": {
@@ -67,6 +67,6 @@
     "candidate": "demo@twin.career",
     "recruiter_company_slug": "nova-hiring-pl"
   },
-  "verified_tip": "pending_post_deploy",
+  "verified_tip": "b4b7e917abf2e8dad0ad675056dd42e5ee3d2246",
   "verdict": "A_CONTROLLED_PILOT_OPERATIONAL"
 }
