@@ -119,6 +119,10 @@ export default function AdminMetricsPage() {
         <Link href="/admin/cohorts" className="underline">
           Activation cohorts →
         </Link>
+        {" · "}
+        <Link href="/admin/pilot-os" className="underline">
+          Pilot OS →
+        </Link>
       </p>
       <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end">
         <input

@@ -1,6 +1,6 @@
 {
   "schema": "twin.production_topology.rc1/v1",
-  "updated_at": "2026-07-23T21:15:00Z",
+  "updated_at": "2026-07-23T21:40:00Z",
   "branch": "cursor/phase1-monorepo-scaffold",
   "hard_live_denominator": "CORE_PILOT_ONLY",
   "stance": {
@@ -75,7 +75,7 @@
     "launch_go_gate": "docs/LAUNCH_GO_EVIDENCE_GATE.json",
     "status_api": "/api/v1/admin/pilot-os/status"
   },
-  "verified_tip": "5e744d3eba9441e86e789b3e5233c99fa881e51f",
+  "verified_tip": "82c7d8ab22cd50c4c4f34e9f37ee56663df3e191",
   "verdict": "FIRST_CUSTOMER_READY_WAITING_FOR_APPROVED_ORG",
   "first_customer": {
     "checklists": "docs/FIRST_CUSTOMER_SUCCESS_CHECKLISTS.md",
