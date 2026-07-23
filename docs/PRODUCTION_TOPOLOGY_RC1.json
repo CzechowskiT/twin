@@ -1,6 +1,6 @@
 {
   "schema": "twin.production_topology.rc1/v1",
-  "updated_at": "2026-07-23T20:35:00Z",
+  "updated_at": "2026-07-23T20:40:00Z",
   "branch": "cursor/phase1-monorepo-scaffold",
   "hard_live_denominator": "CORE_PILOT_ONLY",
   "stance": {
@@ -75,6 +75,6 @@
     "launch_go_gate": "docs/LAUNCH_GO_EVIDENCE_GATE.json",
     "status_api": "/api/v1/admin/pilot-os/status"
   },
-  "verified_tip": "pending_os_deploy",
+  "verified_tip": "8a38fb01614e48392f42f62ccc5c98363ad86ffa",
   "verdict": "CONTROLLED_PILOT_OS_READY_AWAITING_FIRST_FOUNDER_APPROVED_ORG"
 }
