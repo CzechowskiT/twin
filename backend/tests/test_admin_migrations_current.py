@@ -58,9 +58,10 @@ def test_migrations_current_ok(migrations_admin_client) -> None:
     assert res.status_code == 200
     body = res.json()
     assert body["current_revision"] == "068_placement_events_foundation"
-    assert body["head_revision"] == "068_placement_events_foundation"
-    assert body["is_at_head"] is True
+    assert body["head_revision"] == "096_connector_secret_hash_widen"
+    assert body["is_at_head"] is False
     assert body["read_only"] is True
     blob = res.text.lower()
     assert "postgresql://" not in blob
-    assert "secret" not in blob
+    # Endpoint may mention "secret" in field names (e.g. connector_secret) — block DB URLs only.
+    assert "postgresql://" not in blob

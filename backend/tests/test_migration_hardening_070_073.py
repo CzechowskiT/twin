@@ -33,8 +33,10 @@ def test_070_to_072_linear_on_branch() -> None:
         prev = rev
 
 
-def test_072_is_head_on_partial_branch() -> None:
-    assert not (VERSIONS / "073_candidate_referrals.py").exists()
+def test_072_chain_continues_past_partial_branch() -> None:
+    """073+ exist on scaffold — partial-branch assumption no longer holds."""
+    assert (VERSIONS / "073_candidate_referrals.py").exists()
+    assert (VERSIONS / "096_connector_secret_hash_widen.py").exists()
 
 
 def test_wave_migrations_no_drop_table_in_upgrade() -> None:

@@ -148,7 +148,7 @@ def test_api_preview_endpoint(pool_api_client: TestClient, monkeypatch: pytest.M
     try:
         res = pool_api_client.post(
             "/api/v1/recruiter/talent-pool/import/preview",
-            params={"company_slug": "nova-hiring-pl", "token": "test-token"},
+            params={"company_slug": "nova-hiring-pl"}, headers={"X-Twin-Recruiter-Token": "test-token"},
             json={"csv_text": SAMPLE_CSV},
         )
         assert res.status_code == 200
@@ -164,17 +164,17 @@ def test_api_list_talent_pool(pool_api_client: TestClient, monkeypatch: pytest.M
     try:
         preview = pool_api_client.post(
             "/api/v1/recruiter/talent-pool/import/preview",
-            params={"company_slug": "nova-hiring-pl", "token": "test-token"},
+            params={"company_slug": "nova-hiring-pl"}, headers={"X-Twin-Recruiter-Token": "test-token"},
             json={"csv_text": SAMPLE_CSV},
         ).json()
         pool_api_client.post(
             "/api/v1/recruiter/talent-pool/import/commit",
-            params={"company_slug": "nova-hiring-pl", "token": "test-token"},
+            params={"company_slug": "nova-hiring-pl"}, headers={"X-Twin-Recruiter-Token": "test-token"},
             json={"import_id": preview["import_id"]},
         )
         res = pool_api_client.get(
             "/api/v1/recruiter/talent-pool",
-            params={"company_slug": "nova-hiring-pl", "token": "test-token"},
+            params={"company_slug": "nova-hiring-pl"}, headers={"X-Twin-Recruiter-Token": "test-token"},
         )
         assert res.status_code == 200
         body = res.json()

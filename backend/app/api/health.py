@@ -85,6 +85,7 @@ def celery_status() -> dict[str, str | bool | list[str]]:
     if s.celery_task_always_eager:
         out["worker_active"] = True
         out["mode"] = "eager"
+        out["worker_git_commit"] = _git_commit_sha() or "unknown"
         return out
     try:
         inspect = celery_app.control.inspect(timeout=4.0)
@@ -92,9 +93,22 @@ def celery_status() -> dict[str, str | bool | list[str]]:
         if ping:
             out["worker_active"] = True
             out["worker_nodes"] = list(ping.keys())
+            # Ask a live worker for its deploy SHA (strict Gate F alignment).
+            try:
+                from app.tasks.worker_identity import worker_identity
+
+                async_result = worker_identity.apply_async()
+                identity = async_result.get(timeout=3.0)
+                if isinstance(identity, dict) and identity.get("git_commit"):
+                    out["worker_git_commit"] = str(identity["git_commit"])[:64]
+            except Exception as identity_exc:
+                out["worker_git_commit"] = "unknown"
+                out["worker_identity_error"] = str(identity_exc)[:160]
         else:
             out["mode"] = "no_workers"
+            out["worker_git_commit"] = "unknown"
     except Exception as exc:
         out["error"] = str(exc)[:200]
         out["mode"] = "inspect_failed"
+        out["worker_git_commit"] = "unknown"
     return out

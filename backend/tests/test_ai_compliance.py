@@ -374,6 +374,57 @@ def test_prompt_rollback_preserves_audit(client: tuple[TestClient, Session]) -> 
     assert res.json()["audit_preserved"] is True
 
 
+def test_claim_idor_cross_user_denied(client: tuple[TestClient, Session]) -> None:
+    c, db = client
+    owner = _auth(db, email="owner-claim@twin.internal")
+    other = _auth(db, email="other-claim@twin.internal")
+    claim = c.post(
+        "/api/v1/platform/ai-compliance/claims",
+        headers=owner,
+        json={
+            "subject_type": "candidate",
+            "subject_id": "c1",
+            "claim_type": "skill",
+            "claim_key": "python",
+            "claim_value": "Python",
+            "status": "DECLARED",
+            "source_type": "self_declaration",
+            "visibility_scope": "tenant",
+        },
+    ).json()
+    cid = claim["claim_id"]
+    assert c.get(f"/api/v1/platform/ai-compliance/claims/{cid}", headers=other).status_code == 422
+    assert c.get(f"/api/v1/platform/ai-compliance/claims/{cid}/history", headers=other).status_code == 422
+    assert (
+        c.post(
+            f"/api/v1/platform/ai-compliance/claims/{cid}/transition",
+            headers=other,
+            json={"to_status": "EVIDENCE_BACKED"},
+        ).status_code
+        == 422
+    )
+    run = c.post(
+        "/api/v1/platform/ai-compliance/ai-runs",
+        headers=owner,
+        json={
+            "ai_system_id": "twin_match_ranker_v1",
+            "prompt_template_id": "match_explain_v1",
+            "prompt_version": "1.0.0",
+            "model_version": "1.0.0",
+            "output_type": "recommendation",
+            "decision_impact": "advisory_only",
+        },
+    ).json()
+    assert (
+        c.post(
+            "/api/v1/platform/ai-compliance/explanations",
+            headers=other,
+            json={"ai_run_id": run["ai_run_id"], "why": "stolen"},
+        ).status_code
+        == 422
+    )
+
+
 def test_transition_matrix_unit() -> None:
     with pytest.raises(ValueError):
         svc.validate_transition("AI_INFERRED", "EXTERNALLY_VERIFIED", has_evidence=True)

@@ -190,8 +190,11 @@ def get_claim(claim_id: str, db: Session = Depends(get_db), user: User = Depends
 
 
 @router.get("/claims/{claim_id}/history")
-def get_history(claim_id: str, db: Session = Depends(get_db), _user: User = Depends(get_current_user)) -> dict:
-    return svc.claim_history(db, claim_id)
+def get_history(claim_id: str, db: Session = Depends(get_db), user: User = Depends(get_current_user)) -> dict:
+    try:
+        return svc.claim_history(db, claim_id, user=user)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
 
 
 @router.post("/claims/{claim_id}/transition")
@@ -251,9 +254,9 @@ def post_run(body: AiRunIn, db: Session = Depends(get_db), user: User = Depends(
 
 
 @router.post("/explanations", status_code=status.HTTP_201_CREATED)
-def post_explanation(body: ExplanationIn, db: Session = Depends(get_db), _user: User = Depends(get_current_user)) -> dict:
+def post_explanation(body: ExplanationIn, db: Session = Depends(get_db), user: User = Depends(get_current_user)) -> dict:
     try:
-        return svc.create_explanation(db, **body.model_dump())
+        return svc.create_explanation(db, user=user, **body.model_dump())
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
 

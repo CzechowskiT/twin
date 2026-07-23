@@ -140,12 +140,12 @@ def test_recruiter_activation_api(monkeypatch) -> None:
         _seed_application(db, "Nova Hiring PL")
         r_inbox = client.get(
             "/api/v1/recruiter/inbox",
-            params={"token": "secret", "company_slug": "nova-hiring-pl"},
+            params={"company_slug": "nova-hiring-pl"}, headers={"X-Twin-Recruiter-Token": "secret"},
         )
         assert r_inbox.status_code == 200
         r_act = client.get(
             "/api/v1/recruiter/activation",
-            params={"token": "secret", "company_slug": "nova-hiring-pl"},
+            params={"company_slug": "nova-hiring-pl"}, headers={"X-Twin-Recruiter-Token": "secret"},
         )
         assert r_act.status_code == 200
         body = r_act.json()
@@ -176,17 +176,17 @@ def test_inbox_respond_records_activation(monkeypatch) -> None:
         app_row, slug = _seed_application(db)
         client.get(
             "/api/v1/recruiter/inbox",
-            params={"token": "secret", "company_slug": slug},
+            params={"company_slug": slug}, headers={"X-Twin-Recruiter-Token": "secret"},
         )
         r = client.post(
             f"/api/v1/recruiter/inbox/{app_row.id}/respond",
-            params={"token": "secret", "company_slug": slug},
+            params={"company_slug": slug}, headers={"X-Twin-Recruiter-Token": "secret"},
             json={"action": "accept"},
         )
         assert r.status_code == 200
         act = client.get(
             "/api/v1/recruiter/activation",
-            params={"token": "secret", "company_slug": slug},
+            params={"company_slug": slug}, headers={"X-Twin-Recruiter-Token": "secret"},
         ).json()
         assert act["first_decision"] is True
         assert act["activation_complete"] is True
@@ -214,7 +214,7 @@ def test_invalid_token_denied(monkeypatch) -> None:
     try:
         r = client.get(
             "/api/v1/recruiter/activation",
-            params={"token": "wrong", "company_slug": "nova-hiring-pl"},
+            params={"company_slug": "nova-hiring-pl"}, headers={"X-Twin-Recruiter-Token": "wrong"},
         )
         assert r.status_code == 401
     finally:

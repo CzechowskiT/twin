@@ -442,3 +442,53 @@ def test_greenhouse_oauth_callback_stores_tokens(mock_exchange: MagicMock) -> No
     finally:
         app.dependency_overrides.pop(get_db, None)
         db.close()
+
+
+def test_ats_hire_ignores_disputed_placement() -> None:
+    """Signed hire must not overwrite disputed → verified (Gate F integrity)."""
+    from datetime import datetime, timezone
+
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+    from sqlalchemy.pool import StaticPool
+
+    from app.api.integrations_ats import _apply_ats_hire
+    from app.database.models import Application, ApplicationStatus, Base, Candidate, Job, User
+    from app.services.placement_verification import PLACEMENT_DISPUTED, PLACEMENT_VERIFIED
+
+    engine = create_engine("sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool)
+    Base.metadata.create_all(engine)
+    db = sessionmaker(bind=engine)()
+    now = datetime.now(timezone.utc)
+    user = User(email="ats@example.com", hashed_password="x", gdpr_consent_at=now, is_active=True)
+    db.add(user)
+    db.flush()
+    cand = Candidate(user_id=user.id, name="A", skills="[]", preferred_job_titles="[]")
+    db.add(cand)
+    db.flush()
+    job = Job(
+        job_board="employer",
+        external_id="co-1",
+        title="Eng",
+        company="Co",
+        url="https://example.com/j",
+        is_validated=True,
+        scraped_at=now,
+    )
+    db.add(job)
+    db.flush()
+    app_row = Application(
+        candidate_id=cand.id,
+        job_id=job.id,
+        status=ApplicationStatus.APPLIED,
+        placement_state=PLACEMENT_DISPUTED,
+        external_ats_provider="greenhouse",
+        external_ats_id="ext-99",
+    )
+    db.add(app_row)
+    db.commit()
+
+    _apply_ats_hire(db, provider="greenhouse", external_id="ext-99")
+    db.refresh(app_row)
+    assert app_row.placement_state == PLACEMENT_DISPUTED
+    assert app_row.placement_state != PLACEMENT_VERIFIED

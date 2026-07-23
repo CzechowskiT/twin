@@ -199,17 +199,18 @@ def test_radar_href_present_without_pii(monkeypatch, api_client: TestClient) -> 
     try:
         preview = api_client.post(
             "/api/v1/recruiter/talent-pool/import/preview",
-            params={"company_slug": "nova-hiring-pl", "token": "secret"},
+            params={"company_slug": "nova-hiring-pl"}, headers={"X-Twin-Recruiter-Token": "secret"},
             json={"csv_text": SAMPLE_CSV},
         )
         import_id = preview.json()["import_id"]
         api_client.post(
             "/api/v1/recruiter/talent-pool/import/commit",
-            params={"company_slug": "nova-hiring-pl", "token": "secret"},
+            params={"company_slug": "nova-hiring-pl"}, headers={"X-Twin-Recruiter-Token": "secret"},
             json={"import_id": import_id},
         )
         res = api_client.get(
-            "/api/v1/company/talent-pool?company_slug=nova-hiring-pl&token=secret",
+            "/api/v1/company/talent-pool?company_slug=nova-hiring-pl",
+            headers={"X-Twin-Recruiter-Token": "secret"},
         )
         assert res.status_code == 200
         body = res.json()

@@ -24,6 +24,7 @@ def _client_with_db():
 
 def test_feedback_and_admin_flow(monkeypatch) -> None:
     monkeypatch.setenv("BETA_ADMIN_TOKEN", "ops-secret")
+    monkeypatch.setenv("OPS_ADMIN_TOKEN", "ops-secret")
     from app.config import get_settings
 
     get_settings.cache_clear()

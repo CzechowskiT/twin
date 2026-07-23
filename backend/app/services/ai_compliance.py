@@ -561,16 +561,24 @@ def create_claim(
     return _serialize_claim(row)
 
 
+def _assert_claim_owned(claim: CareerClaim | None, user: User) -> CareerClaim:
+    """Default-deny: only the claim owner may read or mutate. Missing → same as not found."""
+    if claim is None or claim.owner_user_id != user.id:
+        raise ValueError("claim_not_found")
+    return claim
+
+
+def _assert_run_owned(run: AiDecisionRun | None, user: User) -> AiDecisionRun:
+    if run is None or run.owner_user_id != user.id:
+        raise ValueError("ai_run_not_found")
+    return run
+
+
 def get_claim(db: Session, claim_id: str, *, user: User, tenant_id: int | None = None) -> dict[str, Any]:
     row = db.query(CareerClaim).filter(CareerClaim.claim_id == claim_id).one_or_none()
-    if row is None:
-        raise ValueError("claim_not_found")
+    row = _assert_claim_owned(row, user)
     if row.tenant_id is not None and tenant_id is not None and row.tenant_id != tenant_id:
         raise ValueError("cross_tenant_claim_denied")
-    if row.owner_user_id not in (None, user.id) and row.visibility_scope == "subject":
-        # allow owner; recruiters use shared visibility scopes
-        if row.visibility_scope == "subject" and row.owner_user_id != user.id:
-            raise ValueError("claim_visibility_denied")
     return _serialize_claim(row)
 
 
@@ -598,9 +606,10 @@ def transition_claim(
     dispute_resolved: bool = False,
     actor_type: str = "human",
 ) -> dict[str, Any]:
-    row = db.query(CareerClaim).filter(CareerClaim.claim_id == claim_id).one_or_none()
-    if row is None:
-        raise ValueError("claim_not_found")
+    row = _assert_claim_owned(
+        db.query(CareerClaim).filter(CareerClaim.claim_id == claim_id).one_or_none(),
+        user,
+    )
     if row.tenant_id is not None and tenant_id is not None and row.tenant_id != tenant_id:
         raise ValueError("cross_tenant_claim_denied")
     has_evidence = row.evidence_count > 0
@@ -714,9 +723,12 @@ def link_evidence(
     explicit_multi_link: bool = False,
     tenant_id: int | None = None,
 ) -> dict[str, Any]:
-    claim = db.query(CareerClaim).filter(CareerClaim.claim_id == claim_id).one_or_none()
+    claim = _assert_claim_owned(
+        db.query(CareerClaim).filter(CareerClaim.claim_id == claim_id).one_or_none(),
+        user,
+    )
     evidence = db.query(CareerEvidenceObject).filter(CareerEvidenceObject.evidence_id == evidence_id).one_or_none()
-    if claim is None or evidence is None:
+    if evidence is None or evidence.owner_user_id != user.id:
         raise ValueError("claim_or_evidence_not_found")
     if claim.tenant_id is not None and evidence.tenant_id is not None and claim.tenant_id != evidence.tenant_id:
         raise ValueError("cross_tenant_evidence_link_denied")
@@ -750,9 +762,10 @@ def raise_dispute(
 ) -> dict[str, Any]:
     if not flag_enabled(db, "CLAIM_DISPUTE_ENABLED", True):
         raise ValueError("claim_dispute_disabled")
-    claim = db.query(CareerClaim).filter(CareerClaim.claim_id == claim_id).one_or_none()
-    if claim is None:
-        raise ValueError("claim_not_found")
+    claim = _assert_claim_owned(
+        db.query(CareerClaim).filter(CareerClaim.claim_id == claim_id).one_or_none(),
+        user,
+    )
     dispute_id = _new_id("dsp")
     row = ClaimDispute(
         dispute_id=dispute_id,
@@ -798,6 +811,11 @@ def resolve_dispute(
     row = db.query(ClaimDispute).filter(ClaimDispute.dispute_id == dispute_id).one_or_none()
     if row is None:
         raise ValueError("dispute_not_found")
+    # Resolve only if caller owns the disputed claim (no cross-user dispute resolution).
+    _assert_claim_owned(
+        db.query(CareerClaim).filter(CareerClaim.claim_id == row.claim_id).one_or_none(),
+        user,
+    )
     row.status = "RESOLVED"
     row.resolution = resolution
     row.resolution_reason = resolution_reason
@@ -825,9 +843,10 @@ def supersede_claim(
     new_value: str,
     reason_code: str = "correction",
 ) -> dict[str, Any]:
-    old = db.query(CareerClaim).filter(CareerClaim.claim_id == claim_id).one_or_none()
-    if old is None:
-        raise ValueError("claim_not_found")
+    old = _assert_claim_owned(
+        db.query(CareerClaim).filter(CareerClaim.claim_id == claim_id).one_or_none(),
+        user,
+    )
     new = create_claim(
         db,
         user=user,
@@ -923,6 +942,7 @@ def record_ai_run(
 def create_explanation(
     db: Session,
     *,
+    user: User,
     ai_run_id: str,
     why: str,
     based_on: list[str] | None = None,
@@ -933,9 +953,10 @@ def create_explanation(
     confidence: float | None = None,
     completeness: str = "PARTIAL",
 ) -> dict[str, Any]:
-    run = db.query(AiDecisionRun).filter(AiDecisionRun.ai_run_id == ai_run_id).one_or_none()
-    if run is None:
-        raise ValueError("ai_run_not_found")
+    run = _assert_run_owned(
+        db.query(AiDecisionRun).filter(AiDecisionRun.ai_run_id == ai_run_id).one_or_none(),
+        user,
+    )
     explanation_id = _new_id("exp")
     row = AiExplanation(
         explanation_id=explanation_id,
@@ -981,9 +1002,10 @@ def human_review(
     assert_no_autonomous_employment(db, action="auto_hire" if final_outcome == "hire" else "advisory")
     if final_outcome in {"hire", "reject_binding", "auto_reject"}:
         raise ValueError("binding_employment_outcome_via_ai_path_forbidden")
-    run = db.query(AiDecisionRun).filter(AiDecisionRun.ai_run_id == ai_run_id).one_or_none()
-    if run is None:
-        raise ValueError("ai_run_not_found")
+    run = _assert_run_owned(
+        db.query(AiDecisionRun).filter(AiDecisionRun.ai_run_id == ai_run_id).one_or_none(),
+        user,
+    )
     review_id = _new_id("rev")
     row = AiHumanReview(
         review_id=review_id,
@@ -1024,7 +1046,11 @@ def human_review(
     }
 
 
-def claim_history(db: Session, claim_id: str) -> dict[str, Any]:
+def claim_history(db: Session, claim_id: str, *, user: User) -> dict[str, Any]:
+    _assert_claim_owned(
+        db.query(CareerClaim).filter(CareerClaim.claim_id == claim_id).one_or_none(),
+        user,
+    )
     rows = (
         db.query(ClaimStatusHistory)
         .filter(ClaimStatusHistory.claim_id == claim_id)

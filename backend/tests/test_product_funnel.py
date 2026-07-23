@@ -46,6 +46,7 @@ def test_funnel_taxonomy_stable() -> None:
 
 def test_register_and_onboarding_emit_funnel(monkeypatch) -> None:
     monkeypatch.setenv("BETA_ADMIN_TOKEN", "ops-secret")
+    monkeypatch.setenv("OPS_ADMIN_TOKEN", "ops-secret")
     monkeypatch.setenv("PRODUCT_FUNNEL_EVENTS_ENABLED", "true")
     monkeypatch.setenv("ACTIVATION_AUTO_MATCHING_ENABLED", "false")
     from app.config import get_settings

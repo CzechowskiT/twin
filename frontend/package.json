@@ -169,6 +169,8 @@
     "test:hardening-feature-flag-audit-guard": "npx --yes tsx scripts/hardening-feature-flag-audit-guard.test.ts",
     "test:production-action-gates-guard": "npx --yes tsx --test scripts/production-action-gates-guard.test.ts",
     "test:hard-live-evidence-guard": "npx --yes tsx --test scripts/hard-live-evidence-guard.test.ts",
+    "test:deploy-alignment-poller": "npx --yes tsx --test scripts/deploy-alignment-poller.test.ts",
+    "wait:strict-deploy-alignment": "npx --yes tsx scripts/wait-strict-deploy-alignment.ts",
     "test:wave1-candidate-trust-prod-smoke": "npx --yes tsx --test scripts/wave1-candidate-trust-prod-smoke.test.ts",
     "test:wave1-candidate-module-prod-smoke": "npx --yes tsx --test scripts/wave1-candidate-module-prod-smoke.test.ts",
     "test:wave1-module-smoke-handlers": "npx --yes tsx --test scripts/wave1-module-smoke-handlers.test.ts",

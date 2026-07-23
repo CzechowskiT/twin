@@ -98,20 +98,21 @@ def test_company_talent_pool_api_company_scoping(monkeypatch, recruiter_api_clie
     try:
         preview = recruiter_api_client.post(
             "/api/v1/recruiter/talent-pool/import/preview",
-            params={"company_slug": "nova-hiring-pl", "token": "secret"},
+            params={"company_slug": "nova-hiring-pl"}, headers={"X-Twin-Recruiter-Token": "secret"},
             json={"csv_text": SAMPLE_CSV},
         )
         assert preview.status_code == 200
         import_id = preview.json()["import_id"]
         commit = recruiter_api_client.post(
             "/api/v1/recruiter/talent-pool/import/commit",
-            params={"company_slug": "nova-hiring-pl", "token": "secret"},
+            params={"company_slug": "nova-hiring-pl"}, headers={"X-Twin-Recruiter-Token": "secret"},
             json={"import_id": import_id},
         )
         assert commit.status_code == 200
 
         res = recruiter_api_client.get(
-            "/api/v1/company/talent-pool?company_slug=nova-hiring-pl&token=secret",
+            "/api/v1/company/talent-pool?company_slug=nova-hiring-pl",
+            headers={"X-Twin-Recruiter-Token": "secret"},
         )
         assert res.status_code == 200
         body = res.json()

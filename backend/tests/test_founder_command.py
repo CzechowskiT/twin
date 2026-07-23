@@ -422,8 +422,8 @@ def test_create_analyze_command_no_manual_prompt_copy(founder_client):
     assert body["id"]
     assert body["plan"]["product_agent_prompt_present"] is True
     assert "product_agent_prompt" not in body["plan"]  # not exposed raw in public payload
-    assert body["live_summary"]["gate_f"] == "PASS"
-    assert body["live_summary"]["launch"] == "GO"
+    assert body["live_summary"]["gate_f"] == "PENDING"
+    assert body["live_summary"]["launch"] == "NO-GO"
     # Timeline proves planner ran without founder paste
     assert any("Plan" in (t.get("message") or "") or t.get("stage") == "plan" for t in body["timeline"]) or body[
         "plan"

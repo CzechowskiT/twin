@@ -59,6 +59,8 @@ def assert_public_https_url(
     """Validate HTTPS URL does not target private/metadata addresses.
 
     Raises ValueError with stable codes used by callers.
+    Re-checks after DNS resolution to mitigate naive hostname allowlists /
+    DNS rebinding to RFC1918 / link-local / metadata.
     """
     raw = (url or "").strip()
     parsed = urlparse(raw)
@@ -72,7 +74,15 @@ def assert_public_https_url(
         if raw.startswith(prefix.rstrip("/")):
             return raw
 
-    if host in {"localhost", "metadata.google.internal"} or host.endswith(".localhost"):
+    blocked_hosts = {
+        "localhost",
+        "metadata.google.internal",
+        "metadata.google",
+        "instance-data",
+    }
+    if host in blocked_hosts or host.endswith(".localhost") or host.endswith(".internal"):
+        raise ValueError("target_url_ssrf_blocked")
+    if host.startswith("169.254.") or host == "metadata":
         raise ValueError("target_url_ssrf_blocked")
 
     try:
@@ -85,6 +95,7 @@ def assert_public_https_url(
             raise ValueError("target_url_ssrf_blocked")
         return raw
 
+    # Always resolve — block if ANY A/AAAA is non-public (DNS rebinding defense).
     if _host_resolves_to_blocked_ip(host):
         raise ValueError("target_url_ssrf_blocked")
 

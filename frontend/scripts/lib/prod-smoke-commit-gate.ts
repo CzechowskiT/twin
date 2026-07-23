@@ -1,8 +1,11 @@
 /**
- * Prod smoke commit gate — compares Vercel frontend_commit to repo HEAD.
- * Docs-only drift between prod deploy and HEAD is acceptable; source changes are not.
+ * Prod smoke commit gate — strict Gate F four-way SHA alignment.
+ * repo_head === frontend_commit === api_commit === worker_commit required.
+ * Docs-only drift still allowed only when FE matches HEAD and worker/api match FE.
  */
 import { execSync } from "node:child_process";
+
+import { shasStrictlyAligned } from "./deploy-alignment-poller";
 
 const PROD_BASE = (process.env.TWIN_PROD_BASE_URL ?? "https://twin-sooty.vercel.app").replace(/\/$/, "");
 
@@ -11,6 +14,7 @@ export type ProdSmokeAlignmentStatus = "aligned" | "acceptable_docs_only_drift" 
 export type ProdSmokeCommitGate = {
   prod_frontend_commit: string;
   prod_api_commit: string;
+  prod_worker_commit: string;
   repo_head: string;
   commit_interpretation: string;
   docs_only_drift: boolean;
@@ -20,6 +24,7 @@ export type ProdSmokeCommitGate = {
 type PublicHealthPayload = {
   frontend_commit?: string;
   api_commit?: string;
+  worker_commit?: string;
   commit_interpretation?: string;
 };
 
@@ -64,9 +69,25 @@ export function resolveAlignmentStatus(
   prodFrontendCommit: string,
   head: string,
   changedPaths: readonly string[],
+  prodApiCommit?: string,
+  prodWorkerCommit?: string,
 ): ProdSmokeAlignmentStatus {
-  if (shasAligned(prodFrontendCommit, head)) return "aligned";
-  if (isDocsOnlyDrift(changedPaths)) return "acceptable_docs_only_drift";
+  // Legacy callers (unit tests) pass only FE vs HEAD.
+  if (prodApiCommit === undefined && prodWorkerCommit === undefined) {
+    if (shasAligned(prodFrontendCommit, head)) return "aligned";
+    if (isDocsOnlyDrift(changedPaths)) return "acceptable_docs_only_drift";
+    return "failed_alignment";
+  }
+  const fourWay = shasStrictlyAligned(
+    head,
+    prodFrontendCommit,
+    prodApiCommit || "unknown",
+    prodWorkerCommit || "unknown",
+  );
+  if (fourWay) return "aligned";
+  if (shasAligned(prodFrontendCommit, head) && isDocsOnlyDrift(changedPaths)) {
+    return "acceptable_docs_only_drift";
+  }
   return "failed_alignment";
 }
 
@@ -80,23 +101,31 @@ export async function evaluateProdSmokeCommitGate(base = PROD_BASE): Promise<Pro
   const health = await fetchPublicHealth(base);
   const prodFrontendCommit = String(health.frontend_commit ?? "unknown");
   const prodApiCommit = String(health.api_commit ?? "unknown");
+  const prodWorkerCommit = String(health.worker_commit ?? "unknown");
   const head = repoHead();
   const changed = changedPathsSinceProdCommit(prodFrontendCommit);
   const docsOnly = isDocsOnlyDrift(changed);
-  const alignmentStatus = resolveAlignmentStatus(prodFrontendCommit, head, changed);
+  const alignmentStatus = resolveAlignmentStatus(
+    prodFrontendCommit,
+    head,
+    changed,
+    prodApiCommit,
+    prodWorkerCommit,
+  );
   const baseInterpretation = String(
     health.commit_interpretation ??
-      "Compare scaffold HEAD, Vercel frontend_commit, and Railway api_commit separately.",
+      "Compare scaffold HEAD, Vercel frontend_commit, Railway api_commit, and worker_commit.",
   );
   let commitInterpretation = baseInterpretation;
   if (alignmentStatus === "acceptable_docs_only_drift") {
     commitInterpretation = `${baseInterpretation} Acceptable docs-only drift between prod frontend_commit and repo HEAD.`;
   } else if (alignmentStatus === "failed_alignment") {
-    commitInterpretation = `${baseInterpretation} Failed alignment — non-docs changes between prod frontend_commit and repo HEAD.`;
+    commitInterpretation = `${baseInterpretation} Failed alignment — require repo_head=frontend=api=worker exact match.`;
   }
   return {
     prod_frontend_commit: prodFrontendCommit,
     prod_api_commit: prodApiCommit,
+    prod_worker_commit: prodWorkerCommit,
     repo_head: head,
     commit_interpretation: commitInterpretation,
     docs_only_drift: docsOnly,
@@ -111,7 +140,7 @@ export function formatProdSmokeCommitGate(gate: ProdSmokeCommitGate): string {
 export function assertProdSmokeCommitGateAllowsRun(gate: ProdSmokeCommitGate): void {
   if (gate.alignment_status === "failed_alignment") {
     throw new Error(
-      `Prod smoke commit gate: failed alignment (prod_frontend_commit=${gate.prod_frontend_commit}, repo_head=${gate.repo_head})`,
+      `Prod smoke commit gate: failed alignment (fe=${gate.prod_frontend_commit} api=${gate.prod_api_commit} worker=${gate.prod_worker_commit} head=${gate.repo_head})`,
     );
   }
 }

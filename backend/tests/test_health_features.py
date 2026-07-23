@@ -78,7 +78,8 @@ def test_health_ops_includes_mail_and_calendar_flags(
     assert data.get("google_calendar_configured") is False
     assert data.get("microsoft_calendar_configured") is False
     assert data.get("stripe_checkout_ready") is False
-    assert data.get("scrape_worker_ready") is False
+    # Suite defaults CELERY_TASK_ALWAYS_EAGER=true → in-process scrape path is ready.
+    assert data.get("scrape_worker_ready") is True
     assert data.get("scrape_beat_enabled") is False
     assert data.get("linkedin_oauth_configured") is True
     assert data.get("validated_jobs") == 42

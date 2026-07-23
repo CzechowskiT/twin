@@ -36,6 +36,7 @@ def _client_with_db(monkeypatch):
     monkeypatch.setenv("ACTIVATION_TTV_ALERTS_ENABLED", "true")
     monkeypatch.setenv("CELERY_TASK_ALWAYS_EAGER", "true")
     monkeypatch.setenv("BETA_ADMIN_TOKEN", "ops-secret")
+    monkeypatch.setenv("OPS_ADMIN_TOKEN", "ops-secret")
     from app.config import get_settings
     from app.limiter import limiter
     from app.tasks.celery_app import apply_celery_runtime_config, celery_app

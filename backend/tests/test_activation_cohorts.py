@@ -20,12 +20,25 @@ from tests.test_auth_integration import _sqlite_session
 
 
 def _client_with_db(monkeypatch):
+    # ops_admin_token takes precedence over beta in _require_ops_admin — set both.
     monkeypatch.setenv("BETA_ADMIN_TOKEN", "ops-secret")
+    monkeypatch.setenv("OPS_ADMIN_TOKEN", "ops-secret")
     monkeypatch.setenv("PRODUCT_FUNNEL_EVENTS_ENABLED", "true")
     monkeypatch.setenv("ACTIVATION_AUTO_MATCHING_ENABLED", "false")
+    monkeypatch.setenv("CELERY_TASK_ALWAYS_EAGER", "true")
     from app.config import get_settings
 
     get_settings.cache_clear()
+    # Celery app may already be configured from a prior import — force eager for this process.
+    try:
+        from app.tasks.celery_app import celery_app
+
+        celery_app.conf.task_always_eager = True
+        celery_app.conf.task_eager_propagates = True
+        celery_app.conf.result_backend = None
+    except Exception:
+        pass
+
     db = _sqlite_session()
     bind = db.get_bind()
     for table in (

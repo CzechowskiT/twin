@@ -154,9 +154,22 @@ def internal_test_post(
         }
 
     try:
+        from app.services.url_safety import assert_public_https_url
+
+        assert_public_https_url(url)
+    except ValueError:
+        return {
+            **draft,
+            "ok": False,
+            "delivered": False,
+            "blocker": "BLOCKED_EXTERNAL_CREDENTIALS",
+            "reason": "webhook_url_ssrf_blocked",
+        }
+
+    try:
         import httpx
 
-        with httpx.Client(timeout=15.0) as client:
+        with httpx.Client(timeout=15.0, follow_redirects=False) as client:
             res = client.post(url, json=payload)
         ok = 200 <= res.status_code < 300
         db.add(

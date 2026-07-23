@@ -47,15 +47,32 @@ def issue_verification_email(db: Session, settings: Settings, user: User) -> Non
     )
     db.commit()
     url = _verify_url(settings, raw)
+    env = (settings.environment or "").strip().lower()
+    allow_raw_log = settings.debug or env == "development"
     if is_mail_configured(settings):
         try:
             send_email_verification_email(settings, to_email=user.email, verify_url=url)
         except Exception:
             logger.exception("Verification email failed user_id=%s", user.id)
-            if settings.debug or settings.environment.strip().lower() == "development":
+            if allow_raw_log:
                 logger.warning("Verify link (mail failed): %s", url)
+            else:
+                logger.warning(
+                    "Verification mail failed; token fingerprint=%s user_id=%s",
+                    hash_verification_token(raw)[:12],
+                    user.id,
+                )
     else:
-        logger.warning("Verify link (no mail configured): %s", url)
+        # Never log raw verify URLs outside development/debug — fingerprint only.
+        if allow_raw_log:
+            logger.warning("Verify link (no mail configured): %s", url)
+        else:
+            logger.warning(
+                "Verification mail not configured; token fingerprint=%s user_id=%s",
+                hash_verification_token(raw)[:12],
+                user.id,
+            )
+
 
 
 def verify_email_with_token(db: Session, raw_token: str) -> bool:
