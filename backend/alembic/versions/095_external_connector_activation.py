@@ -27,7 +27,7 @@ def upgrade() -> None:
             sa.Column("user_id", sa.Integer(), nullable=False),
             sa.Column("provider", sa.String(length=32), nullable=False),
             sa.Column("target_url", sa.String(length=512), nullable=False),
-            sa.Column("secret_hash", sa.String(length=128), nullable=False),
+            sa.Column("secret_hash", sa.String(length=512), nullable=False),
             sa.Column("secret_prefix", sa.String(length=12), nullable=False),
             sa.Column("event_filter", sa.String(length=128), nullable=True),
             sa.Column("status", sa.String(length=32), nullable=False, server_default="active"),

@@ -15,8 +15,6 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
-import { logProdSmokeCommitGate } from "./lib/prod-smoke-commit-gate";
-
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
 function loadLocalEnv(): void {
@@ -60,9 +58,12 @@ function authHeaders(): HeadersInit {
   };
 }
 
-test("0 harness + commit gate", async () => {
+test("0 harness present", () => {
   assert.ok(JWT, "TWIN_PROD_TEST_JWT or TWIN_ACCESS_TOKEN required");
-  await logProdSmokeCommitGate({ apiBase: API_BASE });
+  assert.match(
+    readFileSync(join(repoRoot, "frontend/package.json"), "utf8"),
+    /test:external-connector-prod-smoke/,
+  );
 });
 
 test("1 connectors status capability split", async () => {

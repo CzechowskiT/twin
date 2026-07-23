@@ -2299,7 +2299,7 @@ class ConnectorWebhookSubscription(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
     provider: Mapped[str] = mapped_column(String(32), index=True, default="zapier")
     target_url: Mapped[str] = mapped_column(String(512))
-    secret_hash: Mapped[str] = mapped_column(String(128))
+    secret_hash: Mapped[str] = mapped_column(String(512))
     secret_prefix: Mapped[str] = mapped_column(String(12))
     event_filter: Mapped[str | None] = mapped_column(String(128), nullable=True)
     status: Mapped[str] = mapped_column(String(32), default="active")
