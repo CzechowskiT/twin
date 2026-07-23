@@ -295,17 +295,26 @@ INTEGRATION_INVENTORY_SEED: tuple[tuple[str, str, str, str | None, str], ...] = 
     ("webhooks", "MONITORING", "LIVE", None, "Wave 5 delivery attempt ledger"),
     ("csv", "EXPORT", "LIVE", None, "Safe export with formula injection guard"),
     ("csv", "IMPORT", "PARTIAL", None, "Talent-pool CSV paste"),
-    ("storage", "CONFIGURATION", "PARTIAL", None, "S3 signed URLs when configured"),
-    ("storage", "MONITORING", "PARTIAL", None, "Ownership + expiry honesty"),
+    ("storage", "CONFIGURATION", "LIVE", None, "Local filesystem LIVE when enabled; S3 when keys set"),
+    ("storage", "WRITE", "LIVE", None, "put_bytes + smoke roundtrip"),
+    ("storage", "READ", "LIVE", None, "get_bytes / presigned GET"),
+    ("storage", "MONITORING", "LIVE", None, "Ownership + expiry honesty"),
     ("stripe", "CONFIGURATION", "HELD_POLICY", "STRIPE_NOT_PUBLIC", "Code exists; public checkout HELD"),
     ("stripe", "WEBHOOK", "PARTIAL", "STRIPE_NOT_PUBLIC", "Webhook ledger exists; product HELD"),
     ("stripe", "WRITE", "HELD_POLICY", "STRIPE_NOT_PUBLIC", "Public launch not LIVE"),
     ("authologic", "CONFIGURATION", "HELD_POLICY", "AUTHOLOGIC_AUTO_KYC_OFF", "Vendor start held"),
     ("authologic", "WRITE", "HELD_POLICY", "AUTHOLOGIC_AUTO_KYC_OFF", "Auto KYC OFF"),
-    ("slack", "CONFIGURATION", "BLOCKED_EXTERNAL_CREDENTIALS", "BLOCKED_EXTERNAL_CREDENTIALS", "Status API; webhook URL required"),
-    ("teams", "CONFIGURATION", "BLOCKED_EXTERNAL_CREDENTIALS", "BLOCKED_EXTERNAL_CREDENTIALS", "Status API; webhook URL required"),
-    ("zapier", "CONFIGURATION", "BLOCKED_EXTERNAL_CREDENTIALS", "BLOCKED_EXTERNAL_CREDENTIALS", "Status API; hook URL required"),
-    ("cloud_storage", "CONFIGURATION", "BLOCKED_EXTERNAL_CREDENTIALS", "BLOCKED_EXTERNAL_CREDENTIALS", "S3/local abstraction; vendor OAuth needs creds"),
+    ("slack", "CONFIGURATION", "BLOCKED_EXTERNAL_CREDENTIALS", "BLOCKED_EXTERNAL_CREDENTIALS", "OAuth client unset — draft LIVE"),
+    ("slack", "DRAFT", "LIVE", None, "Internal draft/preview without Slack workspace"),
+    ("slack", "WRITE", "BLOCKED_EXTERNAL_CREDENTIALS", "BLOCKED_EXTERNAL_CREDENTIALS", "Incoming webhook unset"),
+    ("teams", "CONFIGURATION", "LIVE", None, "Microsoft OAuth app present — Teams channel write separate"),
+    ("teams", "DRAFT", "LIVE", None, "Internal draft/preview"),
+    ("teams", "READ", "PARTIAL", "GRAPH_TEAMS_CONSENT", "Graph teams/channels need admin consent"),
+    ("teams", "WRITE", "BLOCKED_EXTERNAL_CREDENTIALS", "BLOCKED_EXTERNAL_CREDENTIALS", "TEAMS_INCOMING_WEBHOOK_URL unset"),
+    ("zapier", "CONFIGURATION", "LIVE", None, "Generic signed webhook — no Marketplace"),
+    ("zapier", "WEBHOOK", "LIVE", None, "Subscribe/test/revoke + internal receiver"),
+    ("zapier", "MONITORING", "LIVE", None, "Delivery ledger + dead-letter"),
+    ("cloud_storage", "CONFIGURATION", "LIVE", None, "Local/S3 abstraction; vendor Drive/OneDrive OAuth still external"),
 )
 
 CSV_FORMULA_RE = re.compile(r"^[=+\-@]")
@@ -428,12 +437,12 @@ def seed_wave5_flags_and_evidence(db: Session) -> int:
                 )
             )
             created += 1
-        else:
-            # Keep policy holds honest if a prior row drifted.
-            if blocker and status in {"HELD_POLICY", "BLOCKED", "NOT_BUILT"}:
-                existing.status = status
-                existing.blocker = blocker
-                existing.notes = notes[:500]
+        elif existing.status != status or existing.blocker != blocker:
+            # Reconcile seed when connectors activate (Zapier/storage/teams split).
+            existing.status = status
+            existing.blocker = blocker
+            existing.notes = notes[:500]
+            created += 1
 
     if created:
         db.commit()
@@ -646,9 +655,12 @@ def oauth_providers_status() -> dict[str, Any]:
 
 def google_calendar_capability_honesty(db: Session, user: User) -> dict[str, Any]:
     from app.services.google_calendar_oauth import is_google_calendar_oauth_configured
+    from app.services.google_calendar_push import google_push_status
 
     connected = bool(getattr(user, "google_calendar", None))
     configured = is_google_calendar_oauth_configured()
+    push = google_push_status()
+    webhook_cap = "LIVE" if push.get("status") == "READY" else "BLOCKED_EXTERNAL_CREDENTIALS"
     return {
         "integration": "google_calendar",
         "capabilities": {
@@ -656,12 +668,13 @@ def google_calendar_capability_honesty(db: Session, user: User) -> dict[str, Any
             "READ": "LIVE" if configured else "PARTIAL",
             "WRITE": "LIVE" if configured else "PARTIAL",
             "EXPORT": "LIVE",
-            "WEBHOOK": "NOT_BUILT",
+            "WEBHOOK": webhook_cap,
             "SYNC": "PARTIAL",
             "MONITORING": "LIVE",
         },
         "user_connected": connected,
         "smoke_may_write_provider": False,
+        "push": push,
         "source": "honesty",
     }
 

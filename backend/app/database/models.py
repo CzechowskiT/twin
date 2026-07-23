@@ -4,6 +4,7 @@ from datetime import date, datetime
 from enum import Enum as PyEnum
 
 from sqlalchemy import (
+    BigInteger,
     Boolean,
     Date,
     DateTime,
@@ -2285,6 +2286,68 @@ class WebhookDeliveryAttempt(Base):
     http_status: Mapped[int | None] = mapped_column(Integer, nullable=True)
     attempt_n: Mapped[int] = mapped_column(Integer, default=1)
     error_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    meta_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
+
+
+class ConnectorWebhookSubscription(Base):
+    """Generic signed outbound webhook subscription (Zapier-compatible, no Marketplace)."""
+
+    __tablename__ = "connector_webhook_subscriptions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    provider: Mapped[str] = mapped_column(String(32), index=True, default="zapier")
+    target_url: Mapped[str] = mapped_column(String(512))
+    secret_hash: Mapped[str] = mapped_column(String(128))
+    secret_prefix: Mapped[str] = mapped_column(String(12))
+    event_filter: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="active")
+    payload_version: Mapped[str] = mapped_column(String(16), default="v1")
+    last_delivery_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class GoogleCalendarPushChannel(Base):
+    """Google Calendar events.watch channel ownership + renewal metadata."""
+
+    __tablename__ = "google_calendar_push_channels"
+    __table_args__ = (UniqueConstraint("channel_id", name="uq_gcal_push_channel_id"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    channel_id: Mapped[str] = mapped_column(String(128))
+    resource_id: Mapped[str | None] = mapped_column(String(256), nullable=True)
+    calendar_id: Mapped[str] = mapped_column(String(256), default="primary")
+    expiration_ms: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    channel_token_hash: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="active")
+    last_notification_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class ConnectorTestReceiverEvent(Base):
+    """Internal signed webhook test receiver — Zapier smoke without public catch services."""
+
+    __tablename__ = "connector_test_receiver_events"
+    __table_args__ = (
+        UniqueConstraint("event_id", name="uq_connector_test_receiver_event_id"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    subscription_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    event_id: Mapped[str] = mapped_column(String(128))
+    provider: Mapped[str] = mapped_column(String(32))
+    signature_ok: Mapped[bool] = mapped_column(Boolean, default=False)
+    replay_rejected: Mapped[bool] = mapped_column(Boolean, default=False)
+    status: Mapped[str] = mapped_column(String(32))
     meta_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
 

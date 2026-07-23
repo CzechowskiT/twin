@@ -957,12 +957,28 @@ def google_push_watch_start(
 
 
 @router.post("/google/push/webhook")
-async def google_push_webhook(request: Request) -> dict:
+async def google_push_webhook(
+    request: Request,
+    db: Session = Depends(get_db),
+) -> dict:
     """Public Google Calendar push receiver — ack only; no secrets logged."""
     from app.services.google_calendar_push import handle_push_notification
+    from fastapi.responses import JSONResponse
 
     channel_id = request.headers.get("X-Goog-Channel-ID")
     resource_state = request.headers.get("X-Goog-Resource-State")
-    return handle_push_notification(channel_id=channel_id, resource_state=resource_state)
+    channel_token = request.headers.get("X-Goog-Channel-Token")
+    resource_id = request.headers.get("X-Goog-Resource-ID")
+    result = handle_push_notification(
+        db,
+        channel_id=channel_id,
+        resource_state=resource_state,
+        channel_token=channel_token,
+        resource_id=resource_id,
+    )
+    code = int(result.get("http_status") or 200)
+    if code != 200:
+        return JSONResponse(result, status_code=code)
+    return result
 
 

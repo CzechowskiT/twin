@@ -2,13 +2,26 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user, get_db
 from app.database.models import User
 from app.services import integrations_wave5 as wave5
+
+
+def _public_api_base() -> str | None:
+    import os
+
+    for key in ("API_URL", "RAILWAY_SERVICE_TWIN_URL"):
+        v = (os.environ.get(key) or "").strip().rstrip("/")
+        if v.startswith("https://"):
+            return v
+    domain = (os.environ.get("RAILWAY_PUBLIC_DOMAIN") or "").strip()
+    if domain:
+        return f"https://{domain}"
+    return None
 
 router = APIRouter()
 
@@ -238,7 +251,7 @@ def get_connectors_status(
     from app.services.object_storage import storage_backend_status
 
     return {
-        **all_connector_statuses(),
+        **all_connector_statuses(public_api_base=_public_api_base()),
         "storage": storage_backend_status(),
     }
 
@@ -250,3 +263,128 @@ def get_google_push_status(
     from app.services.google_calendar_push import google_push_status
 
     return google_push_status()
+
+
+class ConnectorDraftIn(BaseModel):
+    connector: str = Field(..., pattern=r"^(slack|teams)$")
+    title: str = Field("TWIN draft", max_length=120)
+    body: str = Field("preview", max_length=2000)
+    deliver: bool = False
+
+
+class ZapierSubscribeIn(BaseModel):
+    target_url: str = Field(..., min_length=12, max_length=512)
+    event_filter: str | None = Field("twin.connector.test", max_length=128)
+
+
+@router.post("/connectors/draft")
+def post_connector_draft(
+    body: ConnectorDraftIn,
+    db: Session = Depends(get_db),
+    _user: User = Depends(get_current_user),
+) -> dict:
+    from app.services.external_connectors import draft_notification, internal_test_post
+
+    if body.deliver:
+        return internal_test_post(
+            db, connector=body.connector, title=body.title, body=body.body
+        )
+    return draft_notification(connector=body.connector, title=body.title, body=body.body)
+
+
+@router.post("/connectors/zapier/subscriptions")
+def post_zapier_subscription(
+    body: ZapierSubscribeIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    from app.services.zapier_generic_webhook import create_subscription
+
+    try:
+        return create_subscription(
+            db,
+            user_id=user.id,
+            target_url=body.target_url,
+            event_filter=body.event_filter,
+            public_api_base=_public_api_base(),
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
+
+
+@router.post("/connectors/zapier/subscriptions/{subscription_id}/test")
+def post_zapier_test_event(
+    subscription_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+    force_fail: bool = Query(False),
+) -> dict:
+    from app.services.zapier_generic_webhook import deliver_test_event
+
+    try:
+        return deliver_test_event(
+            db, user_id=user.id, subscription_id=subscription_id, force_fail=force_fail
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
+
+
+@router.post("/connectors/zapier/subscriptions/{subscription_id}/rotate")
+def post_zapier_rotate(
+    subscription_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    from app.services.zapier_generic_webhook import rotate_secret
+
+    try:
+        return rotate_secret(db, user_id=user.id, subscription_id=subscription_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
+
+
+@router.post("/connectors/zapier/subscriptions/{subscription_id}/revoke")
+def post_zapier_revoke(
+    subscription_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    from app.services.zapier_generic_webhook import revoke_subscription
+
+    try:
+        return revoke_subscription(db, user_id=user.id, subscription_id=subscription_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
+
+
+@router.post("/connectors/test-receiver")
+async def post_connector_test_receiver(
+    request: Request,
+    db: Session = Depends(get_db),
+) -> dict:
+    """Public HTTPS internal Zapier smoke receiver — signature required."""
+    from app.services.zapier_generic_webhook import receive_test_event
+    from fastapi.responses import JSONResponse
+
+    raw = await request.body()
+    signature = request.headers.get("X-Twin-Signature")
+    event_id = request.headers.get("X-Twin-Event-Id")
+    sub_raw = request.headers.get("X-Twin-Subscription-Id")
+    subscription_id = int(sub_raw) if sub_raw and sub_raw.isdigit() else None
+    result = receive_test_event(
+        db,
+        raw_body=raw,
+        signature=signature,
+        event_id=event_id,
+        subscription_id=subscription_id,
+    )
+    return JSONResponse(result, status_code=int(result.get("http_status") or 200))
+
+
+@router.post("/connectors/storage/smoke")
+def post_storage_smoke(
+    user: User = Depends(get_current_user),
+) -> dict:
+    from app.services.object_storage import storage_smoke_roundtrip
+
+    return storage_smoke_roundtrip(tenant_id=f"user-{user.id}")

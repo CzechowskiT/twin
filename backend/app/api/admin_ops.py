@@ -30,7 +30,7 @@ def _require_ops_admin(settings: Settings, authorization: str | None) -> None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid admin token")
 
 
-EXPECTED_ALEMBIC_HEAD = "094_gap_close_dsr_sla_ics"
+EXPECTED_ALEMBIC_HEAD = "095_external_connector_activation"
 
 
 def _read_alembic_current(db: Session) -> str | None:

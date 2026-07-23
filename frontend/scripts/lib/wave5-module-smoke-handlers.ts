@@ -102,9 +102,7 @@ export async function runModuleSmoke(
         if (body.smoke_may_write_provider !== false) {
           return { module_id: moduleId, ok: false, reason: "smoke_may_write_must_be_false" };
         }
-        if (moduleId === "plat_google_calendar_write" && body.capabilities?.WEBHOOK === "LIVE") {
-          return { module_id: moduleId, ok: false, reason: "webhook_must_not_be_live" };
-        }
+        // WEBHOOK may be LIVE when push URL is configured — still never writes provider in smoke.
         return { module_id: moduleId, ok: true };
       }
       case "plat_ics_export": {

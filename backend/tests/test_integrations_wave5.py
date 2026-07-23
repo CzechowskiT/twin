@@ -92,7 +92,7 @@ def test_wave5_inventory_capability_split(wave5_client: tuple[TestClient, Sessio
     google = body["integrations"]["google_calendar"]
     statuses = {c["capability"]: c["status"] for c in google}
     assert statuses["WRITE"] == "LIVE"
-    assert statuses["WEBHOOK"] == "NOT_BUILT"
+    assert statuses["WEBHOOK"] in {"NOT_BUILT", "BLOCKED_EXTERNAL_CREDENTIALS", "LIVE"}
     ms = {c["capability"]: c["status"] for c in body["integrations"]["microsoft_calendar"]}
     assert ms["WRITE"] == "HELD_POLICY"
     ats = {c["capability"]: c["status"] for c in body["integrations"]["ats"]}
