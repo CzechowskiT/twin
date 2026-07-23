@@ -31,6 +31,7 @@ def _require_ops_admin(settings: Settings, authorization: str | None) -> None:
 
 
 # founder_completion_registry_align
+# blocker_elimination_registry_align
 EXPECTED_ALEMBIC_HEAD = "098_investor_external_attestations"
 
 
