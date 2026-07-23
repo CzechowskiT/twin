@@ -1,6 +1,6 @@
 {
   "schema": "twin.production_topology.rc1/v1",
-  "updated_at": "2026-07-23T17:40:00Z",
+  "updated_at": "2026-07-23T17:50:00Z",
   "branch": "cursor/phase1-monorepo-scaffold",
   "hard_live_denominator": "CORE_PILOT_ONLY",
   "stance": {
@@ -20,16 +20,26 @@
     "preferred_public_frontend": "https://twin.care",
     "preferred_app_frontend": "https://app.twin.care",
     "api": "https://twin-production-bcd9.up.railway.app",
-    "note": "twin.care/app.twin.care attached to Vercel project twin but Afternic NS still park apex — operational URL remains twin-sooty until Founder moves NS to ns1/ns2.vercel-dns.com or A 76.76.21.21"
+    "note": "twin.care/app.twin.care attached to Vercel project twin but Afternic NS still park apex \u2014 operational URL remains twin-sooty until Founder moves NS to ns1/ns2.vercel-dns.com or A 76.76.21.21"
   },
   "vercel": {
     "team": "twin",
     "project": "twin",
     "org_id": "team_kRoghq6m6ogPUxpuwDUongpN",
-    "domains_attached": ["twin.care", "www.twin.care", "app.twin.care"],
+    "domains_attached": [
+      "twin.care",
+      "www.twin.care",
+      "app.twin.care"
+    ],
     "dns_blocker": "afternic_nameservers",
-    "intended_nameservers": ["ns1.vercel-dns.com", "ns2.vercel-dns.com"],
-    "current_nameservers_observed": ["ns1.afternic.com", "ns2.afternic.com"]
+    "intended_nameservers": [
+      "ns1.vercel-dns.com",
+      "ns2.vercel-dns.com"
+    ],
+    "current_nameservers_observed": [
+      "ns1.afternic.com",
+      "ns2.afternic.com"
+    ]
   },
   "railway": {
     "project": "responsible-success",
@@ -51,5 +61,7 @@
     "doc": "docs/RC1_SYNTHETIC_PILOT_IDENTITIES.md",
     "candidate": "demo@twin.career",
     "recruiter_company_slug": "nova-hiring-pl"
-  }
+  },
+  "verified_tip": "80f5dd88d8ac32e91882d69cae30edb490ebb6d0",
+  "verdict": "B_AWAITING_ON_CALL"
 }
