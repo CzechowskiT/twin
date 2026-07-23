@@ -36,3 +36,5 @@ def temporary_pilot_canonical_url(settings: Settings | None = None) -> str:
 def on_call_assigned(value: str | None) -> bool:
     v = (value or "").strip()
     return bool(v) and not v.endswith("UNASSIGNED")
+
+# Controlled Pilot OS tip align 20260723T183908Z
