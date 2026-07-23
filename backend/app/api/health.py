@@ -1,4 +1,6 @@
 """Health check endpoints."""
+# Gate F operator closure realign 2026-07-23 (registry docs; force Railway SHA).
+
 
 import os
 
