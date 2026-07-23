@@ -41,6 +41,9 @@
     "founder_completion_script": "frontend/scripts/founder-completion-module-prod-smoke.test.ts",
     "founder_completion_sha": "998bae84a4fb569b2d776252e784aefbe7320130",
     "founder_completion_at": "2026-07-23T13:10:00Z",
+    "blocker_elimination_script": "frontend/scripts/founder-completion-module-prod-smoke.test.ts",
+    "blocker_elimination_sha": "e7c385c4e638968c9db959b7fd7dd6112fb8aa5d",
+    "blocker_elimination_at": "2026-07-23T14:22:00Z",
     "write": true,
     "exclude_from_product_metrics": true
   },
@@ -243,10 +246,12 @@
       "module_id": "plan_payments",
       "persona": "candidate",
       "wave": "1",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/dashboard/billing",
-      "blocker": "STRIPE_NOT_PUBLIC",
-      "owner": "candidate-squad"
+      "blocker": null,
+      "owner": "candidate-squad",
+      "smoke_sha": "e7c385c4e638968c9db959b7fd7dd6112fb8aa5d",
+      "smoke_at": "2026-07-23T14:22:00Z"
     },
     {
       "module_id": "cand_account_deletion",
@@ -998,10 +1003,12 @@
       "module_id": "investor_external_attestations",
       "persona": "investor",
       "wave": "4",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/investor/trust-proof",
-      "blocker": "NO_VERIFIED_CUSTOMER_CLAIMS",
-      "owner": "investor-squad"
+      "blocker": null,
+      "owner": "investor-squad",
+      "smoke_sha": "e7c385c4e638968c9db959b7fd7dd6112fb8aa5d",
+      "smoke_at": "2026-07-23T14:22:00Z"
     },
     {
       "module_id": "investor_s3_required_download",
@@ -1234,10 +1241,12 @@
       "module_id": "plat_ms_calendar_busy_read",
       "persona": "platform",
       "wave": "5",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/dashboard/calendar",
-      "blocker": "MICROSOFT_BUSY_READ_FLAG_OFF",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "e7c385c4e638968c9db959b7fd7dd6112fb8aa5d",
+      "smoke_at": "2026-07-23T14:22:00Z"
     },
     {
       "module_id": "plat_ats_live_sync_write",
@@ -1261,10 +1270,12 @@
       "module_id": "plat_stripe_public",
       "persona": "platform",
       "wave": "5",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/dashboard/billing",
-      "blocker": "STRIPE_NOT_PUBLIC",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "e7c385c4e638968c9db959b7fd7dd6112fb8aa5d",
+      "smoke_at": "2026-07-23T14:22:00Z"
     },
     {
       "module_id": "plat_authologic_auto_kyc",

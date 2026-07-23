@@ -172,3 +172,26 @@ Promoted after authenticated prod smoke (no Enrollment/Pilot/Launch/Phase 3B fli
 
 **Still external / legal / policy:** MS write + busy-read flag · ATS live WRITE · Stripe public · Authologic/S3/Slack creds · AI Act certified claim · protected-attr monitoring legal · investor external attestations.
 
+## External blocker elimination (2026-07-23)
+
+**Tip (smoke):** `e7c385c4e638968c9db959b7fd7dd6112fb8aa5d`  
+**Counts:** PASS **142** · HELD_POLICY **10** · BLOCKED_EXTERNAL **1**
+
+### Cleared by Cursor (operator-automatable)
+- `MICROSOFT_BUSY_READ_ENABLED=true` (OAuth already present) → `plat_ms_calendar_busy_read` PASS
+- `STRIPE_PRICE_ID_COMPANY_PILOT` set to existing sk_test price → real Checkout Session (`stripe_mode=test`) → `plan_payments` + `plat_stripe_public` PASS (public_launch=false)
+- MS/Stripe secrets propagated twin → worker
+- Investor HITL attestation queue (create PENDING) → `investor_external_attestations` PASS as queue LIVE; verified claims still false until Founder signs
+
+### Still Founder / external (non-technical list for Founder)
+1. **Slack** — create Slack Incoming Webhook (and optionally Slack app OAuth) → give Cursor/operator the values for `SLACK_INCOMING_WEBHOOK_URL` (± `SLACK_CLIENT_ID`/`SECRET`)
+2. **Authologic** — provide sandbox API login+key → `AUTHOLOGIC_API_BASE_URL`, `AUTHOLOGIC_API_LOGIN`, `AUTHOLOGIC_API_KEY`
+3. **Data-room S3** — create bucket + keys → `S3_BUCKET_NAME`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` (± `S3_ENDPOINT_URL`)
+4. **Greenhouse partner OAuth** — partner app credentials → `GREENHOUSE_CLIENT_ID`/`SECRET`/`GREENHOUSE_OAUTH_REDIRECT_URI`
+5. **Microsoft calendar WRITE** — authorize write allowlist + re-consent policy (do not enable casually)
+6. **ATS live write** — authorize flipping `ATS_LIVE_SYNC` after partner OAuth
+7. **Legal** — AI Act certification / protected-attribute monitoring legal basis (tech stays ready, claims stay false)
+8. **Optional product action** — open Investor Trust Proof and **sign** one diligence attestation (makes verified_customer_claims=true)
+
+Stance unchanged: Pilot BLOCKED_BY_FOUNDER · Launch NO-GO · Enrollment OFF · Phase 3B BLOCKED.
+

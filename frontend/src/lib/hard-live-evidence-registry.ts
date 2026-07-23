@@ -60,6 +60,10 @@ export const CONNECTOR_SMOKE_AT: string | null = "2026-07-23T11:52:00Z";
 export const FOUNDER_COMPLETION_SMOKE_SHA: string | null = "998bae84a4fb569b2d776252e784aefbe7320130";
 export const FOUNDER_COMPLETION_SMOKE_AT: string | null = "2026-07-23T13:10:00Z";
 
+/** External blocker elimination — MS busy-read ON + Stripe sandbox Checkout Session smoke. */
+export const BLOCKER_ELIMINATION_SMOKE_SHA: string | null = "e7c385c4e638968c9db959b7fd7dd6112fb8aa5d";
+export const BLOCKER_ELIMINATION_SMOKE_AT: string | null = "2026-07-23T14:22:00Z";
+
 
 function passModuleW1(
   module_id: string,
@@ -256,6 +260,14 @@ function withFounderCompletionSmoke<T extends HardLiveModuleEvidence>(row: T): T
   };
 }
 
+function withBlockerEliminationSmoke<T extends HardLiveModuleEvidence>(row: T): T {
+  return {
+    ...row,
+    smoke_sha: BLOCKER_ELIMINATION_SMOKE_SHA!,
+    smoke_at: BLOCKER_ELIMINATION_SMOKE_AT!,
+  };
+}
+
 export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE1: HardLiveModuleEvidence[] = [
   passModuleW1(
     "candidate_consent_receipt",
@@ -373,7 +385,14 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE1: HardLiveModuleEvidence[] = [
     "candidate-squad",
     "Gap-close — plan sandbox UI LIVE; public Stripe claim remains HELD.",
   ),
-  heldModuleW1("plan_payments", "/dashboard/billing", "candidate-squad", "STRIPE_NOT_PUBLIC", "Public Stripe payments HELD — Founder allowlist."),
+  withBlockerEliminationSmoke(
+    passModuleW1(
+      "plan_payments",
+      "/dashboard/billing",
+      "candidate-squad",
+      "External blocker elimination — Stripe sk_test Checkout Session LIVE (livemode=false); public_launch=false / STRIPE_NOT_PUBLIC_LAUNCH.",
+    ),
+  ),
   withGapCloseSmoke(
   passModuleW1(
     "cand_account_deletion",
@@ -896,12 +915,13 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE5: HardLiveModuleEvidence[] = [
     "MICROSOFT_WRITE_BLOCKED",
     "Microsoft Calendar WRITE remains policy-held.",
   ),
-  heldModuleW5(
-    "plat_ms_calendar_busy_read",
-    "/dashboard/calendar",
-    "platform",
-    "MICROSOFT_BUSY_READ_FLAG_OFF",
-    "Microsoft busy-read gated false on prod.",
+  withBlockerEliminationSmoke(
+    passModuleW5(
+      "plat_ms_calendar_busy_read",
+      "/dashboard/calendar",
+      "platform",
+      "External blocker elimination — MICROSOFT_BUSY_READ_ENABLED=true; readiness smoke product_gate_enabled; write gate still false.",
+    ),
   ),
   heldModuleW5(
     "plat_ats_live_sync_write",
@@ -917,12 +937,13 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE5: HardLiveModuleEvidence[] = [
     "ATS_LIVE_SYNC_BLOCKED",
     "ATS write SYNC blocked.",
   ),
-  heldModuleW5(
-    "plat_stripe_public",
-    "/dashboard/billing",
-    "platform",
-    "STRIPE_NOT_PUBLIC",
-    "Stripe public checkout NOT LIVE.",
+  withBlockerEliminationSmoke(
+    passModuleW5(
+      "plat_stripe_public",
+      "/dashboard/billing",
+      "platform",
+      "External blocker elimination — Stripe test Checkout Session LIVE; public_launch=false; no livemode charges.",
+    ),
   ),
   heldModuleW5(
     "plat_authologic_auto_kyc",
@@ -1058,12 +1079,13 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE4: HardLiveModuleEvidence[] = [
   passModuleW4("investor_calculator_wave4", "/investor/calculator", "investor-squad", "Auth prod smoke PASS — investor calculator reconfirm."),
   passModuleW4("investor_contact_wave4", "mailto:contact@twin.care", "investor-squad", "Auth prod smoke PASS — investor contact reconfirm."),
   passModuleW4("investor_product_proof_boundary", "/investor/product-proof", "investor-squad", "Auth prod smoke PASS — product proof boundary."),
-  heldModuleW4(
-    "investor_external_attestations",
-    "/investor/trust-proof",
-    "investor-squad",
-    "NO_VERIFIED_CUSTOMER_CLAIMS",
-    "No verified external customer attestations.",
+  withBlockerEliminationSmoke(
+    passModuleW4(
+      "investor_external_attestations",
+      "/investor/trust-proof",
+      "investor-squad",
+      "HITL founder-signed attestation queue LIVE; verified_customer_claims=false until Founder signs (≥1 SIGNED).",
+    ),
   ),
   heldModuleW4(
     "investor_s3_required_download",
@@ -1254,6 +1276,9 @@ export const HARD_LIVE_REGISTRY_META = {
     founder_completion_script: "frontend/scripts/founder-completion-module-prod-smoke.test.ts",
     founder_completion_sha: FOUNDER_COMPLETION_SMOKE_SHA,
     founder_completion_at: FOUNDER_COMPLETION_SMOKE_AT,
+    blocker_elimination_script: "frontend/scripts/founder-completion-module-prod-smoke.test.ts",
+    blocker_elimination_sha: BLOCKER_ELIMINATION_SMOKE_SHA,
+    blocker_elimination_at: BLOCKER_ELIMINATION_SMOKE_AT,
     write: true,
     exclude_from_product_metrics: true,
   },

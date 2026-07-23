@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 import test from "node:test";
 
 import {
+  BLOCKER_ELIMINATION_SMOKE_SHA,
   CONNECTOR_SMOKE_SHA,
   FOUNDER_COMPLETION_SMOKE_SHA,
   GAP_CLOSE_SMOKE_SHA,
@@ -41,7 +42,7 @@ test("stance remains Founder-blocked", () => {
 test("no PASS rows with missing criterion 25 or without smoke_sha", () => {
   assert.doesNotThrow(() => assertNoLivePassWithoutSmoke());
   const passed = HARD_LIVE_EVIDENCE_REGISTRY.filter((r) => r.status === "PASS");
-  assert.equal(passed.length, 138);
+  assert.equal(passed.length, 142);
   for (const row of passed) {
     assert.ok(!row.missing_criteria.includes(25), row.module_id);
     assert.ok(row.smoke_sha, row.module_id);
@@ -163,7 +164,7 @@ test("wave5 integrations modules PASS after smoke with policy holds intact", () 
   assert.ok(HARD_LIVE_EVIDENCE_REGISTRY_WAVE5.length >= 30);
   assert.equal(wave5PendingSmokeIds().length, 0);
   const passed = HARD_LIVE_EVIDENCE_REGISTRY_WAVE5.filter((r) => r.status === "PASS");
-  assert.equal(passed.length, 23);
+  assert.equal(passed.length, 25);
   assert.ok(
     passed.every((r) =>
       r.module_id === "plat_ics_import"
@@ -175,15 +176,18 @@ test("wave5 integrations modules PASS after smoke with policy holds intact", () 
             "plat_cloud_storage_connectors",
           ].includes(r.module_id)
           ? r.smoke_sha === CONNECTOR_SMOKE_SHA
+          : ["plat_ms_calendar_busy_read", "plat_stripe_public"].includes(r.module_id)
+            ? r.smoke_sha === BLOCKER_ELIMINATION_SMOKE_SHA
           : r.smoke_sha === "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
     ),
   );
   const held = HARD_LIVE_EVIDENCE_REGISTRY_WAVE5.filter((r) => r.status === "HELD_POLICY");
-  assert.equal(held.length, 6);
+  assert.equal(held.length, 4);
   assert.ok(held.some((r) => r.module_id === "plat_ms_calendar_write"));
   assert.ok(held.some((r) => r.module_id === "plat_ats_live_sync_write"));
-  assert.ok(held.some((r) => r.module_id === "plat_stripe_public"));
   assert.ok(held.some((r) => r.module_id === "plat_authologic_auto_kyc"));
+  assert.ok(!held.some((r) => r.module_id === "plat_ms_calendar_busy_read"));
+  assert.ok(!held.some((r) => r.module_id === "plat_stripe_public"));
   const blockedExt = HARD_LIVE_EVIDENCE_REGISTRY_WAVE5.filter(
     (r) => r.status === "BLOCKED_EXTERNAL_CREDENTIALS",
   );
@@ -214,7 +218,7 @@ test("docs registry JSON mirrors TS module ids and PASS smoke fields", () => {
   assert.equal(doc.stance.external_pilot_enrollment_enabled, false);
   assert.equal(doc.wave, "5");
   const passDocs = doc.modules.filter((m) => m.status === "PASS");
-  assert.equal(passDocs.length, 138);
+  assert.equal(passDocs.length, 142);
   for (const m of passDocs) {
     assert.ok(m.smoke_sha, m.module_id);
   }
@@ -282,12 +286,12 @@ test("Class D TECH_READY_NO_CLAIM modules never PASS in registry", () => {
 test("wave4 investor modules PASS after smoke with policy holds intact", () => {
   assert.equal(HARD_LIVE_EVIDENCE_REGISTRY_WAVE4.length, 15);
   const passed = HARD_LIVE_EVIDENCE_REGISTRY_WAVE4.filter((r) => r.status === "PASS");
-  assert.equal(passed.length, 13);
+  assert.equal(passed.length, 14);
   assert.equal(wave4PendingSmokeIds().length, 0);
   const held = HARD_LIVE_EVIDENCE_REGISTRY_WAVE4.filter((r) => r.status === "HELD_POLICY");
-  assert.equal(held.length, 2);
-  assert.ok(held.some((r) => r.module_id === "investor_external_attestations"));
+  assert.equal(held.length, 1);
   assert.ok(held.some((r) => r.module_id === "investor_s3_required_download"));
   assert.ok(passed.some((r) => r.module_id === "investor_self_serve_enrollment"));
+  assert.ok(passed.some((r) => r.module_id === "investor_external_attestations"));
   assert.match(HARD_LIVE_REGISTRY_META.wave4_note, /Connector activation 2026-07-23/);
 });
