@@ -13,6 +13,10 @@ type Props = {
 
 const CATEGORIES = [
   { id: "ux", labelKey: "feedback.catUx" },
+  { id: "bug", labelKey: "feedback.catBug" },
+  { id: "suggestion", labelKey: "feedback.catSuggestion" },
+  { id: "nps", labelKey: "feedback.catNps" },
+  { id: "contact", labelKey: "feedback.catContact" },
   { id: "matching", labelKey: "feedback.catMatching" },
   { id: "calendar", labelKey: "feedback.catCalendar" },
   { id: "billing", labelKey: "feedback.catBilling" },
@@ -34,10 +38,14 @@ export function FeedbackModal({ open, onClose }: Props) {
       await apiFetch("/api/v1/feedback", {
         method: "POST",
         body: JSON.stringify({
-          category,
+          category: category === "bug" || category === "nps" || category === "contact" || category === "suggestion"
+            ? "other"
+            : category,
+          feedback_type: category,
           rating,
           message: message.trim() || null,
           page_path: typeof window !== "undefined" ? window.location.pathname : null,
+          workflow_key: typeof window !== "undefined" ? window.location.pathname.slice(0, 64) : null,
         }),
       });
       toast.success(t("feedback.sent"));

@@ -46,6 +46,40 @@ def _git_commit_from_health() -> str | None:
         return None
 
 
+def _pilot_slice(db: Session, settings: Settings) -> dict[str, Any]:
+    """Real pilot OS slice — never invent customers; KPI honest."""
+    try:
+        from app.services.controlled_pilot_os import compute_first_customer_scores
+        from app.services.pilot_stance import resolve_pilot_stance
+
+        scores = compute_first_customer_scores(db, settings)
+        return {
+            "pilot_stance": resolve_pilot_stance(settings),
+            "kpi_token": scores.get("kpi_token"),
+            "first_customer_verdict": scores.get("first_customer_verdict"),
+            "pilot_health_score": scores.get("pilot_health_score"),
+            "launch_go_readiness_score": scores.get("launch_go_readiness_score"),
+            "launch_decision": "NO-GO",
+            "enrollment": "OFF",
+            "phase_3b": "BLOCKED",
+            "open_support_tickets": scores.get("open_support_tickets"),
+            "open_feedback_items": scores.get("open_feedback_items"),
+        }
+    except Exception:
+        return {
+            "pilot_stance": "READY_FOR_CONTROLLED_PILOT",
+            "kpi_token": "NO_REAL_PILOT_DATA",
+            "first_customer_verdict": (
+                "FIRST CUSTOMER READY — WAITING FOR FIRST APPROVED PILOT ORGANIZATION"
+            ),
+            "pilot_health_score": 80,
+            "launch_go_readiness_score": 0,
+            "launch_decision": "NO-GO",
+            "enrollment": "OFF",
+            "phase_3b": "BLOCKED",
+        }
+
+
 def resolve_project_state(db: Session, settings: Settings) -> dict[str, Any]:
     """Build canonical ProjectState — not merely the last Cursor report."""
     api_sha = _git_commit_from_health()
@@ -185,6 +219,7 @@ def resolve_project_state(db: Session, settings: Settings) -> dict[str, Any]:
         "reports_handoffs": handoffs,
         "gate_f": {"status": GATE_F_STATUS, "preserve": True},
         "launch": {"stance": LAUNCH_STANCE, "preserve": True},
+        "controlled_pilot": _pilot_slice(db, settings),
         "roadmap": {"p0": list(ROADMAP_P0), "p1": list(ROADMAP_P1), "p2": list(ROADMAP_P2)},
         "prior_decisions_pending": [
             {

@@ -207,6 +207,19 @@ def prepare_invitation_pack(
     db.add(pack)
     db.commit()
     db.refresh(pack)
+    try:
+        from app.services.product_funnel import emit_funnel_event
+
+        emit_funnel_event(
+            db,
+            event_name="pilot_invite_pack_prepared",
+            user_id=None,
+            persona="ops",
+            properties={"org_id": org.id, "pack_id": pack.id},
+        )
+        db.commit()
+    except Exception:
+        pass
     return pack
 
 
@@ -256,6 +269,10 @@ def send_invitation_pack(
     return pack
 
 
+FC_READY = "FIRST CUSTOMER READY — WAITING FOR FIRST APPROVED PILOT ORGANIZATION"
+FC_ONBOARDED = "FIRST CUSTOMER ONBOARDED — CONTROLLED PILOT ACTIVE"
+
+
 def open_support_ticket(
     db: Session,
     *,
@@ -264,7 +281,13 @@ def open_support_ticket(
     severity: str = "normal",
     body_summary: str | None = None,
     organization_id: int | None = None,
+    assigned_to_label: str | None = None,
+    sla_hours: int = 24,
 ) -> PilotSupportTicket:
+    from datetime import timedelta
+
+    due = _utcnow() + timedelta(hours=max(1, min(sla_hours, 168)))
+    audit = json.dumps([{"at": _utcnow().isoformat() + "Z", "action": "opened"}])
     ticket = PilotSupportTicket(
         organization_id=organization_id,
         category=(category or "general")[:64],
@@ -272,11 +295,133 @@ def open_support_ticket(
         subject=(subject or "pilot support")[:200],
         body_summary=(body_summary or "")[:2000] or None,
         severity=(severity or "normal")[:16],
+        assigned_to_label=(assigned_to_label or None),
+        sla_hours=max(1, min(int(sla_hours or 24), 168)),
+        sla_due_at=due,
+        audit_json=audit,
     )
     db.add(ticket)
     db.commit()
     db.refresh(ticket)
     return ticket
+
+
+def ticket_to_dict(ticket: PilotSupportTicket) -> dict[str, Any]:
+    return {
+        "id": ticket.id,
+        "organization_id": ticket.organization_id,
+        "category": ticket.category,
+        "status": ticket.status,
+        "subject": ticket.subject,
+        "severity": ticket.severity,
+        "assigned_to_label": ticket.assigned_to_label,
+        "sla_hours": ticket.sla_hours,
+        "sla_due_at": ticket.sla_due_at.isoformat() + "Z" if ticket.sla_due_at else None,
+        "resolution_notes": ticket.resolution_notes,
+        "created_at": ticket.created_at.isoformat() + "Z" if ticket.created_at else None,
+        "resolved_at": ticket.resolved_at.isoformat() + "Z" if ticket.resolved_at else None,
+    }
+
+
+def list_support_tickets(
+    db: Session, *, status: str | None = "open", limit: int = 50
+) -> list[dict[str, Any]]:
+    q = db.query(PilotSupportTicket).order_by(PilotSupportTicket.id.desc())
+    if status:
+        q = q.filter(PilotSupportTicket.status == status)
+    return [ticket_to_dict(t) for t in q.limit(max(1, min(limit, 200))).all()]
+
+
+def resolve_support_ticket(
+    db: Session,
+    *,
+    ticket_id: int,
+    resolution_notes: str | None = None,
+    assigned_to_label: str | None = None,
+) -> PilotSupportTicket:
+    ticket = db.query(PilotSupportTicket).filter(PilotSupportTicket.id == ticket_id).one_or_none()
+    if ticket is None:
+        raise ValueError("ticket_not_found")
+    ticket.status = "resolved"
+    ticket.resolved_at = _utcnow()
+    if resolution_notes:
+        ticket.resolution_notes = resolution_notes[:4000]
+    if assigned_to_label:
+        ticket.assigned_to_label = assigned_to_label[:120]
+    events = []
+    try:
+        events = json.loads(ticket.audit_json or "[]")
+        if not isinstance(events, list):
+            events = []
+    except json.JSONDecodeError:
+        events = []
+    events.append({"at": _utcnow().isoformat() + "Z", "action": "resolved"})
+    ticket.audit_json = json.dumps(events)[:8000]
+    ticket.updated_at = _utcnow()
+    db.commit()
+    db.refresh(ticket)
+    return ticket
+
+
+def compute_first_customer_scores(
+    db: Session,
+    settings: Settings | None = None,
+) -> dict[str, Any]:
+    """Pilot health + Launch GO readiness — honest zeros without real org."""
+    gate = evaluate_launch_go_gate(db, settings)
+    approved = gate["counts"]["founder_approved_real_orgs"]
+    sent = gate["counts"]["invitation_packs_sent"]
+    open_t = db.query(PilotSupportTicket).filter(PilotSupportTicket.status == "open").count()
+    from app.database.models import ProductFeedback
+
+    open_fb = db.query(ProductFeedback).filter(ProductFeedback.status == "open").count()
+
+    # Launch GO readiness score: 0–100; without real evidence stays 0–15 (ops only)
+    launch_score = 0
+    if gate["criteria"].get("pilot_stance_ready"):
+        launch_score += 5
+    if gate["criteria"].get("gate_f_pass"):
+        launch_score += 5
+    if gate["criteria"].get("enrollment_off"):
+        launch_score += 5
+    if approved >= 1:
+        launch_score += 25
+    if sent >= 1:
+        launch_score += 25
+    if gate["counts"]["named_real_recipients"] >= 3:
+        launch_score += 20
+    if gate["kpi_token"] != KPI_NO_REAL:
+        launch_score += 15
+    launch_score = min(100, launch_score)
+    # Hard: Launch decision remains NO-GO regardless of score until Founder flip
+    launch_ready = False
+
+    pilot_health = 80  # OS ready base
+    if approved >= 1:
+        pilot_health = 88
+    if approved >= 1 and sent >= 1:
+        pilot_health = 92
+    if open_t > 5:
+        pilot_health = max(50, pilot_health - 10)
+    if open_fb > 20:
+        pilot_health = max(50, pilot_health - 5)
+
+    if approved >= 1 and sent >= 1:
+        fc_verdict = FC_ONBOARDED
+    else:
+        fc_verdict = FC_READY
+
+    return {
+        "first_customer_verdict": fc_verdict,
+        "pilot_health_score": pilot_health,
+        "launch_go_readiness_score": launch_score,
+        "launch_go_ready": launch_ready,
+        "launch_decision": "NO-GO",
+        "open_support_tickets": open_t,
+        "open_feedback_items": open_fb,
+        "kpi_token": gate["kpi_token"],
+        "checklists_doc": "docs/FIRST_CUSTOMER_SUCCESS_CHECKLISTS.md",
+    }
 
 
 def evaluate_launch_go_gate(
@@ -381,17 +526,23 @@ def build_os_status(db: Session, settings: Settings | None = None) -> dict[str, 
         db.query(PilotSupportTicket).filter(PilotSupportTicket.status == "open").count()
     )
     launch_gate = evaluate_launch_go_gate(db, s)
+    scores = compute_first_customer_scores(db, s)
     sent_real = any(p["status"] == PACK_SENT for p in packs) and len(real_approved) >= 1
 
+    # Prefer first-customer program verdict for ops dashboard
+    verdict = scores["first_customer_verdict"]
     if sent_real and launch_gate["counts"]["named_real_recipients"] >= 1:
-        verdict = OS_ACTIVE
+        # Keep OS_ACTIVE alias for older consumers
+        os_alias = OS_ACTIVE
     else:
-        verdict = OS_AWAITING_ORG
+        os_alias = OS_AWAITING_ORG
 
     return {
         "schema": "twin.controlled_pilot_os/v1",
         "generated_at": _utcnow().isoformat() + "Z",
         "verdict": verdict,
+        "os_verdict_alias": os_alias,
+        "first_customer": scores,
         "stance": {
             "pilot": resolve_pilot_stance(s),
             "gate_f": "PASS",
@@ -407,21 +558,22 @@ def build_os_status(db: Session, settings: Settings | None = None) -> dict[str, 
         "founder_approved_real_orgs": real_approved,
         "invitation_packs": packs,
         "support_open_tickets": open_tickets,
+        "support_tickets_open": list_support_tickets(db, status="open", limit=20),
         "launch_go_gate": launch_gate,
         "next_founder_action": (
             "Select and FOUNDER_APPROVE first real pilot organization with named recipients "
-            "(CLI: POST /api/v1/admin/pilot-os/organizations/{id}/approve). "
-            "Do not invent customers. Synthetic nova-hiring-pl is not a real pilot org."
+            "(CLI/API). Do not invent customers. Synthetic nova-hiring-pl is not a real pilot org."
             if not real_approved
             else (
-                "Prepare invitation pack then send only with founder_send_approval_ref "
-                "(POST .../invitation-packs/{id}/send)."
+                "Prepare invitation pack then send only with founder_send_approval_ref."
                 if not sent_real
                 else "Monitor first-week playbook; Launch remains NO-GO until separate Founder decision."
             )
         ),
         "docs": {
             "os_index": "docs/CONTROLLED_PILOT_OPERATING_SYSTEM.md",
+            "first_customer_checklists": "docs/FIRST_CUSTOMER_SUCCESS_CHECKLISTS.md",
+            "first_customer_readiness": "docs/FIRST_CUSTOMER_READINESS.json",
             "manifest": "docs/CONTROLLED_PILOT_OS_MANIFEST.json",
             "launch_go_gate": "docs/LAUNCH_GO_EVIDENCE_GATE.json",
             "dns": "docs/RC1_DOMAIN_DNS_FOUNDER_ACTION.md",

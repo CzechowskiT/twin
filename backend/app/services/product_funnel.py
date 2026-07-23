@@ -46,6 +46,12 @@ FUNNEL_EVENTS = frozenset(
         "activation_matching_completed",
         "activation_matching_failed",
         "activation_first_match_created",
+        # First-customer activation (non-PII)
+        "feedback_submitted",
+        "recruiter_inbox_opened",
+        "company_home_opened",
+        "support_ticket_opened",
+        "pilot_invite_pack_prepared",
     }
 )
 

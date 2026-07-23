@@ -179,12 +179,51 @@ def create_support_ticket(
         body_summary=body.body_summary,
         organization_id=body.organization_id,
     )
-    return {
-        "ticket": {
-            "id": ticket.id,
-            "status": ticket.status,
-            "category": ticket.category,
-            "severity": ticket.severity,
-            "subject": ticket.subject,
-        }
-    }
+    return {"ticket": pilot_os.ticket_to_dict(ticket)}
+
+
+@router.get("/pilot-os/support-tickets")
+def list_support_tickets(
+    status: str | None = "open",
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    _require_ops_admin(settings, authorization)
+    return {"tickets": pilot_os.list_support_tickets(db, status=status)}
+
+
+class SupportResolveBody(BaseModel):
+    resolution_notes: str | None = Field(None, max_length=4000)
+    assigned_to_label: str | None = Field(None, max_length=120)
+
+
+@router.post("/pilot-os/support-tickets/{ticket_id}/resolve")
+def resolve_support_ticket(
+    ticket_id: int,
+    body: SupportResolveBody,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    _require_ops_admin(settings, authorization)
+    try:
+        ticket = pilot_os.resolve_support_ticket(
+            db,
+            ticket_id=ticket_id,
+            resolution_notes=body.resolution_notes,
+            assigned_to_label=body.assigned_to_label,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    return {"ticket": pilot_os.ticket_to_dict(ticket)}
+
+
+@router.get("/pilot-os/first-customer")
+def first_customer_scores(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    _require_ops_admin(settings, authorization)
+    return pilot_os.compute_first_customer_scores(db, settings)

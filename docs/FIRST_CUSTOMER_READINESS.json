@@ -1,0 +1,34 @@
+{
+  "schema": "twin.first_customer_readiness/v1",
+  "updated_at": "2026-07-23T21:00:00Z",
+  "expected_verdict_without_org": "FIRST CUSTOMER READY — WAITING FOR FIRST APPROVED PILOT ORGANIZATION",
+  "expected_verdict_with_onboarded": "FIRST CUSTOMER ONBOARDED — CONTROLLED PILOT ACTIVE",
+  "stance": {
+    "pilot": "READY_FOR_CONTROLLED_PILOT",
+    "gate_f": "PASS",
+    "launch": "NO-GO",
+    "enrollment": "OFF",
+    "phase_3b": "BLOCKED",
+    "kpi_default": "NO_REAL_PILOT_DATA"
+  },
+  "scores": {
+    "launch_go_max_without_real_data": 0,
+    "pilot_health_os_ready_base": 80,
+    "pilot_health_with_approved_org": 90,
+    "pilot_health_with_sent_and_login": 95
+  },
+  "checklists_doc": "docs/FIRST_CUSTOMER_SUCCESS_CHECKLISTS.md",
+  "surfaces": {
+    "admin_pilot_os": "/admin/pilot-os",
+    "status_api": "/api/v1/admin/pilot-os/status",
+    "feedback_admin": "/api/v1/admin/feedback",
+    "cli": "scripts/controlled-pilot-os-status.py"
+  },
+  "hard_bans": [
+    "no_launch_go",
+    "no_public_enrollment",
+    "no_live_stripe_public",
+    "no_invented_customers",
+    "no_fake_kpi"
+  ]
+}

@@ -1498,6 +1498,14 @@ class ProductFeedback(Base):
     rating: Mapped[int] = mapped_column(Integer)
     message: Mapped[str | None] = mapped_column(Text, nullable=True)
     page_path: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    # First-customer queue fields (additive; defaults keep old rows valid)
+    feedback_type: Mapped[str] = mapped_column(String(32), default="suggestion", index=True)
+    workflow_key: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    tags_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    priority: Mapped[str] = mapped_column(String(16), default="normal", index=True)
+    status: Mapped[str] = mapped_column(String(32), default="open", index=True)
+    assigned_to_label: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     user: Mapped["User"] = relationship(back_populates="product_feedback")
@@ -2938,6 +2946,11 @@ class PilotSupportTicket(Base):
     subject: Mapped[str] = mapped_column(String(200))
     body_summary: Mapped[str | None] = mapped_column(Text, nullable=True)
     severity: Mapped[str] = mapped_column(String(16), default="normal")
+    assigned_to_label: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    sla_hours: Mapped[int] = mapped_column(Integer, default=24)
+    sla_due_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    resolution_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    audit_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow

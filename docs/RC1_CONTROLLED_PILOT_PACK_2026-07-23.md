@@ -7,6 +7,9 @@
 
 | Doc | Role |
 |-----|------|
+| `docs/FIRST_CUSTOMER_SUCCESS_CHECKLISTS.md` | CS / Founder / customer checklists |
+| `docs/FIRST_CUSTOMER_READINESS.json` | Machine readiness scores contract |
+| `docs/FIRST_CUSTOMER_TROUBLESHOOTING.md` | Troubleshooting + release notes |
 | `docs/CONTROLLED_PILOT_OPERATING_SYSTEM.md` | **OS index** + exact Founder next action |
 | `docs/CONTROLLED_PILOT_OS_MANIFEST.json` | Machine OS manifest |
 | `docs/LAUNCH_GO_EVIDENCE_GATE.json` | Launch GO evidence gate (default NO-GO) |

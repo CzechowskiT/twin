@@ -58,11 +58,15 @@ def test_os_status_awaits_org(monkeypatch) -> None:
         )
         assert res.status_code == 200, res.text
         body = res.json()
-        assert "AWAITING FIRST FOUNDER-APPROVED" in body["verdict"]
+        assert "WAITING FOR FIRST APPROVED" in body["verdict"] or "AWAITING FIRST FOUNDER-APPROVED" in body["verdict"]
         assert body["stance"]["launch"] == "NO-GO"
         assert body["stance"]["enrollment"] == "OFF"
         assert body["kpi_token"] == "NO_REAL_PILOT_DATA"
         assert body["launch_go_gate"]["launch_decision"] == "NO-GO"
+        assert "first_customer" in body
+        assert body["first_customer"]["launch_decision"] == "NO-GO"
+        assert body["first_customer"]["pilot_health_score"] >= 70
+        assert body["first_customer"]["launch_go_readiness_score"] < 50
     finally:
         app.dependency_overrides.clear()
         get_settings.cache_clear()

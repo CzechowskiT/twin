@@ -48,6 +48,17 @@ test("production action gates keep Launch NO-GO and enrollment off", () => {
   assert.match(gates, /NO_REAL_PILOT_DATA/);
 });
 
+test("first customer checklists and readiness docs present", () => {
+  for (const rel of [
+    "docs/FIRST_CUSTOMER_SUCCESS_CHECKLISTS.md",
+    "docs/FIRST_CUSTOMER_READINESS.json",
+    "docs/FIRST_CUSTOMER_TROUBLESHOOTING.md",
+    "frontend/src/app/admin/pilot-os/page.tsx",
+  ]) {
+    assert.ok(existsSync(join(root, rel)), rel);
+  }
+});
+
 test("OS index + org workspace + invitation pack docs present", () => {
   for (const rel of [
     "docs/CONTROLLED_PILOT_OPERATING_SYSTEM.md",
@@ -63,9 +74,11 @@ test("OS index + org workspace + invitation pack docs present", () => {
 
 test("backend alembic 100 + service gate present", () => {
   assert.ok(existsSync(join(root, "backend/alembic/versions/100_controlled_pilot_os.py")));
+  assert.ok(existsSync(join(root, "backend/alembic/versions/101_first_customer_activation.py")));
   const svc = readFileSync(join(root, "backend/app/services/controlled_pilot_os.py"), "utf8");
   assert.match(svc, /FOUNDER_APPROVED/);
   assert.match(svc, /NO_REAL_PILOT_DATA/);
   assert.match(svc, /READY_UNSENT/);
+  assert.match(svc, /FIRST CUSTOMER READY/);
   assert.match(svc, /synthetic_org_cannot_be_founder_approved/);
 });
