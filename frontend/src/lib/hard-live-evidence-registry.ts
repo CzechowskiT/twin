@@ -654,7 +654,7 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE3: HardLiveModuleEvidence[] = [
     "/company/team",
     "company-squad",
     "EXTERNAL_ENROLLMENT_OFF",
-    "Invite dry-run only — real delivery HELD.",
+    "Outbox + Celery process_company_invite_outbox ready; real delivery HELD while enrollment OFF.",
   ),
   heldModuleW3(
     "rec_company_onboarding",

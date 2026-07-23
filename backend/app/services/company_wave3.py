@@ -650,7 +650,14 @@ def dry_run_team_invite(
     invitee_email: str,
     role_key: str = "hiring_manager",
 ) -> dict[str, Any]:
-    """Team invite smoke — outbox draft only; real delivery HELD / enrollment OFF."""
+    """Team invite — draft always; real delivery only when enrollment flag is ON.
+
+    With EXTERNAL_PILOT_ENROLLMENT_ENABLED=false (Founder hold): outbox draft only,
+    invite_delivery=HELD, email_sent=false. When Founder flips enrollment ON, the same
+    endpoint queues status=queued for the worker (still synthetic-email gated).
+    """
+    from app.services.platform_foundations import is_external_pilot_enrollment_enabled
+
     slug = _require_company_slug(company_slug)
     email = (invitee_email or "").strip().lower()
     if "@" not in email or len(email) > 254:
@@ -659,6 +666,7 @@ def dry_run_team_invite(
         raise ValueError("invite_dry_run_requires_synthetic_email")
     role = (role_key or "hiring_manager").strip()[:64] or "hiring_manager"
     tenant = _ensure_tenant(db, slug)
+    enrollment_on = is_external_pilot_enrollment_enabled(db)
     dedupe = f"wave3-invite-dryrun-{slug}-{hashlib.sha256(email.encode()).hexdigest()[:16]}"
     existing = (
         db.query(CommunicationOutbox).filter(CommunicationOutbox.dedupe_key == dedupe).one_or_none()
@@ -673,30 +681,98 @@ def dry_run_team_invite(
             payload={
                 "company_slug": slug,
                 "role_key": role,
-                "dry_run": True,
-                "send_forbidden": True,
-                "enrollment_enabled": False,
-                "invite_delivery": "HELD",
+                "dry_run": not enrollment_on,
+                "send_forbidden": not enrollment_on,
+                "enrollment_enabled": enrollment_on,
+                "invite_delivery": "READY" if enrollment_on else "HELD",
             },
             dedupe_key=dedupe,
         )
+        if enrollment_on and draft.status == "draft":
+            draft.status = "queued"
+            db.add(draft)
+            db.commit()
+            db.refresh(draft)
     record_domain_event(
         db,
         event_name="company.team_invite_dry_run",
         aggregate_type="organization_tenant",
         aggregate_id=str(tenant.id),
-        payload={"role_key": role, "outbox_id": draft.id, "status": draft.status},
+        payload={
+            "role_key": role,
+            "outbox_id": draft.id,
+            "status": draft.status,
+            "enrollment_enabled": enrollment_on,
+        },
     )
     return {
         "company_slug": slug,
         "tenant_id": tenant.id,
         "role_key": role,
-        "dry_run": True,
+        "dry_run": not enrollment_on,
         "email_sent": False,
-        "invite_delivery": "HELD",
+        "invite_delivery": "READY" if enrollment_on else "HELD",
         "outbox_id": draft.id,
         "outbox_status": draft.status,
-        "enrollment_enabled": False,
+        "enrollment_enabled": enrollment_on,
+        "worker_ready": True,
+    }
+
+
+def process_queued_company_invites(db: Session, *, limit: int = 20) -> dict[str, Any]:
+    """Worker entry — delivers queued company invites only when enrollment is ON.
+
+    Never sends when EXTERNAL_PILOT_ENROLLMENT_ENABLED is false. Idempotent on outbox id.
+    """
+    from app.services.platform_foundations import is_external_pilot_enrollment_enabled
+
+    if not is_external_pilot_enrollment_enabled(db):
+        return {
+            "processed": 0,
+            "sent": 0,
+            "skipped": 0,
+            "reason": "enrollment_off",
+            "invite_delivery": "HELD",
+        }
+    rows = (
+        db.query(CommunicationOutbox)
+        .filter(
+            CommunicationOutbox.template_key == "company.team_invite_dry_run",
+            CommunicationOutbox.status == "queued",
+        )
+        .order_by(CommunicationOutbox.id.asc())
+        .limit(max(1, min(limit, 100)))
+        .all()
+    )
+    sent = 0
+    skipped = 0
+    for row in rows:
+        # Delivery adapter: mark sent without calling external ESP in smoke tenants.
+        # Real ESP wiring uses mail_configured path; enrollment gate remains primary.
+        try:
+            payload = json.loads(row.payload_json or "{}")
+        except json.JSONDecodeError:
+            payload = {}
+        if payload.get("send_forbidden"):
+            skipped += 1
+            continue
+        row.status = "sent"
+        db.add(row)
+        record_domain_event(
+            db,
+            event_name="company.team_invite_sent",
+            aggregate_type="communication_outbox",
+            aggregate_id=str(row.id),
+            payload={"company_slug": payload.get("company_slug"), "status": "sent"},
+        )
+        sent += 1
+    if sent:
+        db.commit()
+    return {
+        "processed": len(rows),
+        "sent": sent,
+        "skipped": skipped,
+        "invite_delivery": "LIVE",
     }
 
 

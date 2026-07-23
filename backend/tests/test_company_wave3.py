@@ -154,6 +154,17 @@ def test_team_invite_dry_run_no_send(wave3_client: tuple[TestClient, Session]) -
     assert body["dry_run"] is True
     assert body["invite_delivery"] == "HELD"
     assert body["enrollment_enabled"] is False
+    assert body["worker_ready"] is True
+
+
+def test_process_queued_invites_noop_when_enrollment_off(wave3_client: tuple[TestClient, Session]) -> None:
+    from app.services import company_wave3 as wave3
+
+    _client, db = wave3_client
+    result = wave3.process_queued_company_invites(db, limit=5)
+    assert result["processed"] == 0
+    assert result["reason"] == "enrollment_off"
+    assert result["invite_delivery"] == "HELD"
 
 
 def test_notifications_send_forbidden(wave3_client: tuple[TestClient, Session]) -> None:

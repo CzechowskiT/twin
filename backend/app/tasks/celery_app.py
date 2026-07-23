@@ -27,6 +27,7 @@ celery_app.conf.update(
         "app.tasks.founder_command_tasks",
         "app.tasks.activation_matching_tasks",
         "app.tasks.worker_identity",
+        "app.tasks.company_invite_tasks",
     ),
 )
 
@@ -131,6 +132,12 @@ def _configure_beat_schedule() -> None:
             "schedule": float(fc_interval),
             "options": {"expires": fc_interval},
         }
+    # Safe no-op while enrollment OFF; delivers queued invites when Founder flips enrollment ON.
+    schedule["company-invite-outbox"] = {
+        "task": "app.tasks.company_invite_tasks.process_company_invite_outbox",
+        "schedule": crontab(minute="*/5"),
+        "options": {"expires": 240},
+    }
     celery_app.conf.beat_schedule = schedule
 
 

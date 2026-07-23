@@ -1,29 +1,28 @@
 # External Connector Operator Handoff
 
 **Branch:** `cursor/phase1-monorepo-scaffold`  
-**Last exhaustive audit:** 2026-07-23 (launch readiness handoff) @ tip `2418a9dba620f0320773bff0484487b458a497c6` (Slack still MISSING on API/worker)  
+**Last exhaustive audit:** 2026-07-23 Full Module Activation Program re-audit @ tip `1466fd6288a6f5f415e9f23c6be2fb4891959aa8` (pre-fix) then post-deploy tip (see activation report)  
 **Purpose:** Credentials Cursor cannot create after exhaustive audit.  
 **Never paste secret values into tickets or chat. No fake secrets. No placeholders that look like real values.**
 
-Stance unchanged: Pilot `BLOCKED_BY_FOUNDER` · Gate F `PENDING` · Launch `NO-GO` · Phase 3B `BLOCKED` · enrollment OFF.
+Stance unchanged: Pilot `BLOCKED_BY_FOUNDER` · Gate F `PASS` · Launch `NO-GO` · Phase 3B `BLOCKED` · enrollment OFF.
 
 `plat_slack_connector` remains **BLOCKED_EXTERNAL_CREDENTIALS** — code, tests, smoke harness, and this handoff are complete; only human operator action outside the repo is missing.
 
 ---
 
-## Audit summary (re-verified 2026-07-23 continuation)
+## Audit summary (re-verified 2026-07-23 Full Module Activation)
 
 | Source | Slack result |
 |--------|----------------|
-| Railway `twin` (API) | all Slack keys **MISSING** |
+| Railway `twin` (API) | all Slack keys **MISSING** (81 vars total; zero `SLACK*` / `TWIN_SLACK*`) |
 | Railway `enthusiastic-encouragement` (worker) | all Slack keys **MISSING** |
-| Vercel production env (CLI list) | no Slack-named vars — **MISSING** |
-| GitHub Actions secrets (`gh secret list` + API names) | no Slack-named — **MISSING** |
-| Local `.env` / `frontend/.env.local` / `backend/.env` / `.env.railway` | no `SLACK_*` / `TWIN_SLACK_*` keys |
-| `.env.example` / `.env.railway.example` | names documented only (empty comments) |
-| Malformed | none (keys absent, not bad URLs) |
+| Vercel / GitHub / local env | unchanged — **MISSING** (prior audit) |
+| Malformed | none |
 | Stale | none |
-| Inaccessible | none for Slack names this run (Vercel CLI accessible; listed) |
+| Inaccessible | none for Railway this run |
+
+Also re-checked related operator holds (presence only): `S3_BUCKET` **MISSING**, `AWS_ACCESS_KEY_ID` **MISSING**, `AUTHOLOGIC_API_URL` / `AUTHOLOGIC_API_KEY` **MISSING**.
 
 Aliases checked (code `_env`): `SLACK_CLIENT_ID`/`TWIN_SLACK_CLIENT_ID`, `SLACK_CLIENT_SECRET`/`TWIN_SLACK_CLIENT_SECRET`, `SLACK_INCOMING_WEBHOOK_URL`/`TWIN_SLACK_WEBHOOK_URL`. Also scanned `SLACK_SIGNING_SECRET`, `SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN`, `SLACK_WEBHOOK_URL` — all **MISSING**.
 
