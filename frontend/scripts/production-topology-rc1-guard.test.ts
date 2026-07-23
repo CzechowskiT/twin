@@ -37,6 +37,7 @@ test("PRODUCTION_TOPOLOGY_RC1.json exists and is valid", () => {
   assert.equal(doc.railway.worker_service, "enthusiastic-encouragement");
   assert.equal(doc.on_call_roles.never_invent_human_names, true);
   assert.equal(doc.on_call_roles.assignment, "UNASSIGNED");
+  assert.ok(doc.verdict === "B_AWAITING_ON_CALL" || doc.verdict === "A_READY");
 });
 
 test("canonical alias script still documents twin-sooty operational URL", () => {
