@@ -1,7 +1,7 @@
 {
   "definition": "docs/HARD_LIVE_DEFINITION_30.md",
   "wave": "5",
-  "updated": "2026-07-22",
+  "updated": "2026-07-23",
   "stance": {
     "pilot": "BLOCKED_BY_FOUNDER",
     "gate_f": "PENDING",
@@ -35,6 +35,9 @@
     "gap_close_script": "frontend/scripts/gap-close-module-prod-smoke.test.ts",
     "gap_close_sha": "193590f42f75fb3158415d93166c48e60e9be99e",
     "gap_close_at": "2026-07-22T19:24:00Z",
+    "connector_script": "frontend/scripts/external-connector-prod-smoke.test.ts",
+    "connector_sha": "6317d1569120ed889ef136b250c98ba3bf5b5510",
+    "connector_at": "2026-07-23T05:14:00Z",
     "write": true,
     "exclude_from_product_metrics": true
   },
@@ -1245,10 +1248,12 @@
       "module_id": "plat_google_calendar_push_webhook",
       "persona": "platform",
       "wave": "5",
-      "status": "BLOCKED_EXTERNAL_CREDENTIALS",
+      "status": "PASS",
       "route": "/dashboard/calendar",
-      "blocker": "BLOCKED_EXTERNAL_CREDENTIALS",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "6317d1569120ed889ef136b250c98ba3bf5b5510",
+      "smoke_at": "2026-07-23T05:14:00Z"
     },
     {
       "module_id": "plat_slack_connector",
@@ -1263,28 +1268,34 @@
       "module_id": "plat_teams_connector",
       "persona": "platform",
       "wave": "5",
-      "status": "BLOCKED_EXTERNAL_CREDENTIALS",
+      "status": "PASS",
       "route": "/company/integrations",
-      "blocker": "BLOCKED_EXTERNAL_CREDENTIALS",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "6317d1569120ed889ef136b250c98ba3bf5b5510",
+      "smoke_at": "2026-07-23T05:14:00Z"
     },
     {
       "module_id": "plat_zapier_connector",
       "persona": "platform",
       "wave": "5",
-      "status": "BLOCKED_EXTERNAL_CREDENTIALS",
+      "status": "PASS",
       "route": "/company/integrations",
-      "blocker": "BLOCKED_EXTERNAL_CREDENTIALS",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "6317d1569120ed889ef136b250c98ba3bf5b5510",
+      "smoke_at": "2026-07-23T05:14:00Z"
     },
     {
       "module_id": "plat_cloud_storage_connectors",
       "persona": "platform",
       "wave": "5",
-      "status": "BLOCKED_EXTERNAL_CREDENTIALS",
+      "status": "PASS",
       "route": "/company/integrations",
-      "blocker": "BLOCKED_EXTERNAL_CREDENTIALS",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "6317d1569120ed889ef136b250c98ba3bf5b5510",
+      "smoke_at": "2026-07-23T05:14:00Z"
     },
     {
       "module_id": "plat_ics_import",
@@ -1653,5 +1664,5 @@
       "smoke_at": "2026-07-22T19:24:00Z"
     }
   ],
-  "wave4_note": "Gap-close 2026-07-22+: DEMO_ONLY=0; connectors/push reclassed BLOCKED_EXTERNAL_CREDENTIALS; CV sandbox entitlement. Wave 4 Investor + Wave 5 + AI Phase A prior smoke retained. Pilot BLOCKED / Gate F PENDING / Launch NO-GO unchanged."
+  "wave4_note": "Connector activation 2026-07-23: Google push/Zapier/storage/Teams draft PASS @ 6317d156; Slack remains BLOCKED_EXTERNAL. DEMO_ONLY=0. Pilot BLOCKED / Gate F PENDING / Launch NO-GO unchanged."
 }

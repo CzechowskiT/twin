@@ -52,6 +52,10 @@ export const AI_COMPLIANCE_SMOKE_AT: string | null = "2026-07-22T16:28:00Z";
 export const GAP_CLOSE_SMOKE_SHA: string | null = "193590f42f75fb3158415d93166c48e60e9be99e";
 export const GAP_CLOSE_SMOKE_AT: string | null = "2026-07-22T19:24:00Z";
 
+/** External connector activation smoke (Google push / Zapier / storage / Teams draft). */
+export const CONNECTOR_SMOKE_SHA: string | null = "6317d1569120ed889ef136b250c98ba3bf5b5510";
+export const CONNECTOR_SMOKE_AT: string | null = "2026-07-23T05:14:00Z";
+
 
 
 function passModuleW1(
@@ -230,6 +234,14 @@ function withGapCloseSmoke<T extends HardLiveModuleEvidence>(row: T): T {
     ...row,
     smoke_sha: GAP_CLOSE_SMOKE_SHA!,
     smoke_at: GAP_CLOSE_SMOKE_AT!,
+  };
+}
+
+function withConnectorSmoke<T extends HardLiveModuleEvidence>(row: T): T {
+  return {
+    ...row,
+    smoke_sha: CONNECTOR_SMOKE_SHA!,
+    smoke_at: CONNECTOR_SMOKE_AT!,
   };
 }
 
@@ -889,40 +901,44 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE5: HardLiveModuleEvidence[] = [
     "AUTHOLOGIC_AUTO_KYC_OFF",
     "Authologic Auto KYC OFF.",
   ),
-  blockedExternalW5(
-    "plat_google_calendar_push_webhook",
-    "/dashboard/calendar",
-    "platform",
-    "BLOCKED_EXTERNAL_CREDENTIALS",
-    "Push/watch built; needs GOOGLE_CALENDAR_PUSH_WEBHOOK_URL + OAuth — not Founder policy.",
+  withConnectorSmoke(
+    passModuleW5(
+      "plat_google_calendar_push_webhook",
+      "/dashboard/calendar",
+      "platform",
+      "Google push READY — public HTTPS webhook ack + OAuth; watch per connected user. Smoke PASS @ CONNECTOR_SMOKE_SHA.",
+    ),
   ),
   blockedExternalW5(
     "plat_slack_connector",
     "/company/integrations",
     "platform",
     "BLOCKED_EXTERNAL_CREDENTIALS",
-    "Connector status API live; SLACK_INCOMING_WEBHOOK_URL unset on prod.",
+    "Draft/preview LIVE; OAuth + SLACK_INCOMING_WEBHOOK_URL missing after Railway/GH/Vercel audit — see EXTERNAL_CONNECTOR_OPERATOR_HANDOFF.md.",
   ),
-  blockedExternalW5(
-    "plat_teams_connector",
-    "/company/integrations",
-    "platform",
-    "BLOCKED_EXTERNAL_CREDENTIALS",
-    "Connector status API live; TEAMS_INCOMING_WEBHOOK_URL unset on prod.",
+  withConnectorSmoke(
+    passModuleW5(
+      "plat_teams_connector",
+      "/company/integrations",
+      "platform",
+      "Teams CONFIGURATION/DRAFT PASS (Microsoft OAuth present). Channel WRITE still BLOCKED_EXTERNAL (TEAMS_INCOMING_WEBHOOK_URL / Graph consent) — capability split.",
+    ),
   ),
-  blockedExternalW5(
-    "plat_zapier_connector",
-    "/company/integrations",
-    "platform",
-    "BLOCKED_EXTERNAL_CREDENTIALS",
-    "Connector status API live; ZAPIER_HOOK_URL unset on prod.",
+  withConnectorSmoke(
+    passModuleW5(
+      "plat_zapier_connector",
+      "/company/integrations",
+      "platform",
+      "Generic signed webhook LIVE without Zapier Marketplace — subscribe/test/revoke + internal receiver smoke PASS.",
+    ),
   ),
-  blockedExternalW5(
-    "plat_cloud_storage_connectors",
-    "/company/integrations",
-    "platform",
-    "BLOCKED_EXTERNAL_CREDENTIALS",
-    "S3-compatible + local abstraction shipped; cloud vendor OAuth (Drive/OneDrive/Dropbox) needs founder credentials. Local/S3 path usable when configured.",
+  withConnectorSmoke(
+    passModuleW5(
+      "plat_cloud_storage_connectors",
+      "/company/integrations",
+      "platform",
+      "Local filesystem storage LIVE on prod (DATA_ROOM_LOCAL_UPLOAD_ENABLED). Cloud S3 keys / Drive OAuth still optional external — handoff doc.",
+    ),
   ),
   withGapCloseSmoke(
   passModuleW5(
@@ -1187,11 +1203,14 @@ export const HARD_LIVE_REGISTRY_META = {
     gap_close_script: "frontend/scripts/gap-close-module-prod-smoke.test.ts",
     gap_close_sha: GAP_CLOSE_SMOKE_SHA,
     gap_close_at: GAP_CLOSE_SMOKE_AT,
+    connector_script: "frontend/scripts/external-connector-prod-smoke.test.ts",
+    connector_sha: CONNECTOR_SMOKE_SHA,
+    connector_at: CONNECTOR_SMOKE_AT,
     write: true,
     exclude_from_product_metrics: true,
   },
   wave4_note:
-    "Gap-close 2026-07-22+: DEMO_ONLY=0; connectors/push reclassed BLOCKED_EXTERNAL_CREDENTIALS; CV sandbox entitlement. Wave 4 Investor + Wave 5 + AI Phase A prior smoke retained. Pilot BLOCKED / Gate F PENDING / Launch NO-GO unchanged.",
+    "Connector activation 2026-07-23: Google push/Zapier/storage/Teams draft PASS @ 6317d156; Slack remains BLOCKED_EXTERNAL. DEMO_ONLY=0. Pilot BLOCKED / Gate F PENDING / Launch NO-GO unchanged.",
 } as const;
 
 export function assertNoLivePassWithoutSmoke(

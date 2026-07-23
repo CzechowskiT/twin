@@ -265,7 +265,7 @@ INTEGRATION_INVENTORY_SEED: tuple[tuple[str, str, str, str | None, str], ...] = 
     ("google_calendar", "WRITE", "LIVE", None, "Create/update/delete events when connected"),
     ("google_calendar", "EXPORT", "LIVE", None, "Per-interview ICS download"),
     ("google_calendar", "SYNC", "PARTIAL", "NO_BIDIRECTIONAL_PUSH", "Token refresh only; no push channels"),
-    ("google_calendar", "WEBHOOK", "BLOCKED_EXTERNAL_CREDENTIALS", "BLOCKED_EXTERNAL_CREDENTIALS", "Push handler+watch built; needs public webhook URL"),
+    ("google_calendar", "WEBHOOK", "LIVE", None, "Push handler+watch LIVE when GOOGLE_CALENDAR_PUSH_WEBHOOK_URL + OAuth set"),
     ("google_calendar", "MONITORING", "LIVE", None, "Provider health + readiness"),
     ("microsoft_calendar", "CONFIGURATION", "PARTIAL", "COMING_SOON_UI", "OAuth code present; product Coming Soon"),
     ("microsoft_calendar", "READ", "HELD_POLICY", "MICROSOFT_BUSY_READ_FLAG_OFF", "Busy-read gated false on prod"),

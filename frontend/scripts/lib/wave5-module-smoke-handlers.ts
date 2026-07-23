@@ -53,11 +53,7 @@ export const WAVE5_POLICY_HELD_MODULES = [
 ] as const;
 
 export const WAVE5_BLOCKED_EXTERNAL_MODULES = [
-  "plat_google_calendar_push_webhook",
   "plat_slack_connector",
-  "plat_teams_connector",
-  "plat_zapier_connector",
-  "plat_cloud_storage_connectors",
 ] as const;
 
 export type Wave5SmokeableModule = (typeof WAVE5_SMOKEABLE_MODULES)[number];

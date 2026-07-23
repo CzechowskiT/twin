@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 import test from "node:test";
 
 import {
+  CONNECTOR_SMOKE_SHA,
   GAP_CLOSE_SMOKE_SHA,
   HARD_LIVE_EVIDENCE_REGISTRY,
   HARD_LIVE_EVIDENCE_REGISTRY_WAVE1,
@@ -38,7 +39,7 @@ test("stance remains Founder-blocked", () => {
 test("no PASS rows with missing criterion 25 or without smoke_sha", () => {
   assert.doesNotThrow(() => assertNoLivePassWithoutSmoke());
   const passed = HARD_LIVE_EVIDENCE_REGISTRY.filter((r) => r.status === "PASS");
-  assert.equal(passed.length, 118);
+  assert.equal(passed.length, 122);
   for (const row of passed) {
     assert.ok(!row.missing_criteria.includes(25), row.module_id);
     assert.ok(row.smoke_sha, row.module_id);
@@ -126,12 +127,19 @@ test("wave5 integrations modules PASS after smoke with policy holds intact", () 
   assert.ok(HARD_LIVE_EVIDENCE_REGISTRY_WAVE5.length >= 30);
   assert.equal(wave5PendingSmokeIds().length, 0);
   const passed = HARD_LIVE_EVIDENCE_REGISTRY_WAVE5.filter((r) => r.status === "PASS");
-  assert.equal(passed.length, 19);
+  assert.equal(passed.length, 23);
   assert.ok(
     passed.every((r) =>
       r.module_id === "plat_ics_import"
         ? r.smoke_sha === GAP_CLOSE_SMOKE_SHA
-        : r.smoke_sha === "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
+        : [
+            "plat_google_calendar_push_webhook",
+            "plat_teams_connector",
+            "plat_zapier_connector",
+            "plat_cloud_storage_connectors",
+          ].includes(r.module_id)
+          ? r.smoke_sha === CONNECTOR_SMOKE_SHA
+          : r.smoke_sha === "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18",
     ),
   );
   const held = HARD_LIVE_EVIDENCE_REGISTRY_WAVE5.filter((r) => r.status === "HELD_POLICY");
@@ -143,9 +151,10 @@ test("wave5 integrations modules PASS after smoke with policy holds intact", () 
   const blockedExt = HARD_LIVE_EVIDENCE_REGISTRY_WAVE5.filter(
     (r) => r.status === "BLOCKED_EXTERNAL_CREDENTIALS",
   );
-  assert.equal(blockedExt.length, 5);
-  assert.ok(blockedExt.some((r) => r.module_id === "plat_google_calendar_push_webhook"));
+  assert.equal(blockedExt.length, 1);
   assert.ok(blockedExt.some((r) => r.module_id === "plat_slack_connector"));
+  assert.ok(passed.some((r) => r.module_id === "plat_zapier_connector"));
+  assert.ok(passed.some((r) => r.module_id === "plat_google_calendar_push_webhook"));
   assert.ok(passed.some((r) => r.module_id === "plat_ics_import"));
   assert.equal(HARD_LIVE_REGISTRY_META.wave, "5");
   assert.equal(HARD_LIVE_REGISTRY_META.smoke_evidence.wave5_sha, "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18");
@@ -168,7 +177,7 @@ test("docs registry JSON mirrors TS module ids and PASS smoke fields", () => {
   assert.equal(doc.stance.external_pilot_enrollment_enabled, false);
   assert.equal(doc.wave, "5");
   const passDocs = doc.modules.filter((m) => m.status === "PASS");
-  assert.equal(passDocs.length, 118);
+  assert.equal(passDocs.length, 122);
   for (const m of passDocs) {
     assert.ok(m.smoke_sha, m.module_id);
   }
@@ -184,10 +193,11 @@ test("docs registry JSON mirrors TS module ids and PASS smoke fields", () => {
   assert.match(raw, /plat_ics_import/);
   assert.match(raw, /plat_ms_calendar_write/);
   assert.match(raw, /rec_sla_tracking/);
-  assert.match(raw, /Gap-close 2026-07-22/);
+  assert.match(raw, /Connector activation 2026-07-23/);
   assert.doesNotMatch(raw, /Wave 4 Investor Complete was not shipped/);
   assert.match(raw, /2987e16804fcd7de19db3930f9b7184e465a1d18/);
   assert.match(raw, /b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18/);
+  assert.match(raw, /6317d1569120ed889ef136b250c98ba3bf5b5510/);
 });
 
 test("production action gates still block enrollment", () => {
@@ -215,5 +225,5 @@ test("wave4 investor modules PASS after smoke with policy holds intact", () => {
   const held = HARD_LIVE_EVIDENCE_REGISTRY_WAVE4.filter((r) => r.status === "HELD_POLICY");
   assert.equal(held.length, 3);
   assert.ok(held.some((r) => r.module_id === "investor_self_serve_enrollment"));
-  assert.match(HARD_LIVE_REGISTRY_META.wave4_note, /Gap-close 2026-07-22/);
+  assert.match(HARD_LIVE_REGISTRY_META.wave4_note, /Connector activation 2026-07-23/);
 });
