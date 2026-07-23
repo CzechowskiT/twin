@@ -9,6 +9,7 @@ import test from "node:test";
 
 import {
   CONNECTOR_SMOKE_SHA,
+  FOUNDER_COMPLETION_SMOKE_SHA,
   GAP_CLOSE_SMOKE_SHA,
   HARD_LIVE_EVIDENCE_REGISTRY,
   HARD_LIVE_EVIDENCE_REGISTRY_WAVE1,
@@ -40,7 +41,7 @@ test("stance remains Founder-blocked", () => {
 test("no PASS rows with missing criterion 25 or without smoke_sha", () => {
   assert.doesNotThrow(() => assertNoLivePassWithoutSmoke());
   const passed = HARD_LIVE_EVIDENCE_REGISTRY.filter((r) => r.status === "PASS");
-  assert.equal(passed.length, 122);
+  assert.equal(passed.length, 138);
   for (const row of passed) {
     assert.ok(!row.missing_criteria.includes(25), row.module_id);
     assert.ok(row.smoke_sha, row.module_id);
@@ -65,9 +66,17 @@ test("wave1 trust modules present and held policy modules blocked", () => {
     assert.ok(ids.has(id), id);
   }
   const held = HARD_LIVE_EVIDENCE_REGISTRY_WAVE1.filter((r) => r.status === "HELD_POLICY");
-  assert.ok(held.some((r) => r.module_id === "auto_apply"));
+  assert.ok(held.every((r) => r.module_id !== "auto_apply"));
   assert.ok(held.some((r) => r.module_id === "cand_ms_calendar"));
   assert.ok(held.every((r) => r.blocker));
+  assert.equal(
+    HARD_LIVE_EVIDENCE_REGISTRY_WAVE1.find((r) => r.module_id === "auto_apply")?.status,
+    "PASS",
+  );
+  assert.equal(
+    HARD_LIVE_EVIDENCE_REGISTRY_WAVE1.find((r) => r.module_id === "auto_apply")?.smoke_sha,
+    FOUNDER_COMPLETION_SMOKE_SHA,
+  );
   // Gap-close: CV sandbox entitlement LIVE for metrics-excluded accounts (public Stripe stays HELD).
   assert.equal(
     HARD_LIVE_EVIDENCE_REGISTRY_WAVE1.find((r) => r.module_id === "cand_cv_import")?.status,
@@ -91,19 +100,28 @@ test("wave2 recruiter modules PASS after smoke; demo journeys removed", () => {
   assert.ok(HARD_LIVE_EVIDENCE_REGISTRY_WAVE2.length >= 25);
   assert.equal(wave2PendingSmokeIds().length, 0);
   const passed = HARD_LIVE_EVIDENCE_REGISTRY_WAVE2.filter((r) => r.status === "PASS");
-  assert.equal(passed.length, 23);
+  assert.equal(passed.length, 28);
   const gapCloseW2 = new Set(["rec_sla_tracking", "rec_collaboration", "rec_candidate_comms"]);
+  const founderW2 = new Set([
+    "rec_interview_scheduling",
+    "recruiter_calendar",
+    "recruiter_integrations",
+    "investor_sor_proof_ats",
+    "rec_recruiter_onboarding",
+  ]);
   assert.ok(
     passed.every((r) =>
       gapCloseW2.has(r.module_id)
         ? r.smoke_sha === GAP_CLOSE_SMOKE_SHA
-        : r.smoke_sha === "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
+        : founderW2.has(r.module_id)
+          ? r.smoke_sha === FOUNDER_COMPLETION_SMOKE_SHA
+          : r.smoke_sha === "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
     ),
   );
   const held = HARD_LIVE_EVIDENCE_REGISTRY_WAVE2.filter((r) => r.status === "HELD_POLICY");
-  assert.ok(held.some((r) => r.module_id === "recruiter_calendar"));
-  assert.ok(held.some((r) => r.module_id === "recruiter_integrations"));
+  assert.equal(held.length, 0);
   assert.equal(HARD_LIVE_EVIDENCE_REGISTRY_WAVE2.filter((r) => r.status === "DEMO_ONLY").length, 0);
+  assert.ok(passed.some((r) => r.module_id === "recruiter_calendar"));
   assert.ok(passed.some((r) => r.module_id === "rec_sla_tracking"));
   assert.ok(passed.some((r) => r.module_id === "rec_collaboration"));
   assert.ok(passed.some((r) => r.module_id === "rec_candidate_comms"));
@@ -113,13 +131,30 @@ test("wave3 company modules PASS after smoke; demo journeys removed", () => {
   assert.ok(HARD_LIVE_EVIDENCE_REGISTRY_WAVE3.length >= 25);
   assert.equal(wave3PendingSmokeIds().length, 0);
   const passed = HARD_LIVE_EVIDENCE_REGISTRY_WAVE3.filter((r) => r.status === "PASS");
-  assert.equal(passed.length, 18);
-  assert.ok(passed.every((r) => r.smoke_sha === WAVE3_SMOKE_SHA));
+  assert.equal(passed.length, 25);
+  const founderW3 = new Set([
+    "company_integrations",
+    "rec_ats_sync",
+    "rec_vacancy_import",
+    "company_ats_import_readiness",
+    "company_billing_public_claim",
+    "company_invite_delivery",
+    "rec_company_onboarding",
+  ]);
+  assert.ok(
+    passed.every((r) =>
+      founderW3.has(r.module_id)
+        ? r.smoke_sha === FOUNDER_COMPLETION_SMOKE_SHA
+        : r.module_id === "company_billing" || r.module_id === "rec_subscription"
+          ? r.smoke_sha === WAVE3_SMOKE_SHA || r.smoke_sha === GAP_CLOSE_SMOKE_SHA
+          : r.smoke_sha === WAVE3_SMOKE_SHA,
+    ),
+  );
   const held = HARD_LIVE_EVIDENCE_REGISTRY_WAVE3.filter((r) => r.status === "HELD_POLICY");
-  assert.ok(held.some((r) => r.module_id === "company_integrations"));
-  assert.ok(held.some((r) => r.module_id === "company_billing_public_claim"));
+  assert.equal(held.length, 1);
   assert.ok(held.some((r) => r.module_id === "company_ms_calendar_write"));
   assert.equal(HARD_LIVE_EVIDENCE_REGISTRY_WAVE3.filter((r) => r.status === "DEMO_ONLY").length, 0);
+  assert.ok(passed.some((r) => r.module_id === "company_integrations"));
   assert.ok(passed.some((r) => r.module_id === "company_billing"));
   assert.ok(passed.some((r) => r.module_id === "rec_subscription"));
 });
@@ -179,7 +214,7 @@ test("docs registry JSON mirrors TS module ids and PASS smoke fields", () => {
   assert.equal(doc.stance.external_pilot_enrollment_enabled, false);
   assert.equal(doc.wave, "5");
   const passDocs = doc.modules.filter((m) => m.status === "PASS");
-  assert.equal(passDocs.length, 122);
+  assert.equal(passDocs.length, 138);
   for (const m of passDocs) {
     assert.ok(m.smoke_sha, m.module_id);
   }
@@ -201,6 +236,7 @@ test("docs registry JSON mirrors TS module ids and PASS smoke fields", () => {
   assert.match(raw, /b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18/);
   assert.match(raw, new RegExp(CONNECTOR_SMOKE_SHA!));
   assert.match(raw, new RegExp(WAVE3_SMOKE_SHA!));
+  assert.match(raw, new RegExp(FOUNDER_COMPLETION_SMOKE_SHA!));
 });
 
 test("production action gates still block enrollment", () => {
@@ -212,21 +248,26 @@ test("production action gates still block enrollment", () => {
 test("ai compliance modules PASS after smoke with policy holds intact", () => {
   assert.equal(HARD_LIVE_EVIDENCE_REGISTRY_AI_COMPLIANCE.length, 33);
   const passedAi = HARD_LIVE_EVIDENCE_REGISTRY_AI_COMPLIANCE.filter((r) => r.status === "PASS");
-  assert.equal(passedAi.length, 29);
+  assert.equal(passedAi.length, 31);
   assert.equal(aiCompliancePendingSmokeIds().length, 0);
   const held = HARD_LIVE_EVIDENCE_REGISTRY_AI_COMPLIANCE.filter((r) => r.status === "HELD_POLICY");
-  assert.equal(held.length, 4);
-  assert.ok(held.some((r) => r.module_id === "ai_autonomous_employment"));
+  assert.equal(held.length, 2);
+  assert.ok(held.some((r) => r.module_id === "ai_act_certified_claim"));
+  assert.ok(held.some((r) => r.module_id === "ai_protected_attr_monitoring"));
+  assert.ok(passedAi.some((r) => r.module_id === "ai_autonomous_employment"));
+  assert.ok(passedAi.some((r) => r.module_id === "ai_external_verification"));
   assert.ok(passedAi.some((r) => r.module_id === "ai_wave6_dsr_delete_export"));
 });
 
 test("wave4 investor modules PASS after smoke with policy holds intact", () => {
   assert.equal(HARD_LIVE_EVIDENCE_REGISTRY_WAVE4.length, 15);
   const passed = HARD_LIVE_EVIDENCE_REGISTRY_WAVE4.filter((r) => r.status === "PASS");
-  assert.equal(passed.length, 12);
+  assert.equal(passed.length, 13);
   assert.equal(wave4PendingSmokeIds().length, 0);
   const held = HARD_LIVE_EVIDENCE_REGISTRY_WAVE4.filter((r) => r.status === "HELD_POLICY");
-  assert.equal(held.length, 3);
-  assert.ok(held.some((r) => r.module_id === "investor_self_serve_enrollment"));
+  assert.equal(held.length, 2);
+  assert.ok(held.some((r) => r.module_id === "investor_external_attestations"));
+  assert.ok(held.some((r) => r.module_id === "investor_s3_required_download"));
+  assert.ok(passed.some((r) => r.module_id === "investor_self_serve_enrollment"));
   assert.match(HARD_LIVE_REGISTRY_META.wave4_note, /Connector activation 2026-07-23/);
 });

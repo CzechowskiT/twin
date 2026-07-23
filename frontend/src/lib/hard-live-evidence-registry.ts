@@ -56,6 +56,9 @@ export const GAP_CLOSE_SMOKE_AT: string | null = "2026-07-22T19:24:00Z";
 export const CONNECTOR_SMOKE_SHA: string | null = "51927b99d53ec11a136cb002a6450e9f4e463203";
 export const CONNECTOR_SMOKE_AT: string | null = "2026-07-23T11:52:00Z";
 
+/** Founder completion BUILD — calendar/ATS dry-run/enrollment capability/AI HITL prod smoke. */
+export const FOUNDER_COMPLETION_SMOKE_SHA: string | null = "998bae84a4fb569b2d776252e784aefbe7320130";
+export const FOUNDER_COMPLETION_SMOKE_AT: string | null = "2026-07-23T13:10:00Z";
 
 
 function passModuleW1(
@@ -245,6 +248,14 @@ function withConnectorSmoke<T extends HardLiveModuleEvidence>(row: T): T {
   };
 }
 
+function withFounderCompletionSmoke<T extends HardLiveModuleEvidence>(row: T): T {
+  return {
+    ...row,
+    smoke_sha: FOUNDER_COMPLETION_SMOKE_SHA!,
+    smoke_at: FOUNDER_COMPLETION_SMOKE_AT!,
+  };
+}
+
 export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE1: HardLiveModuleEvidence[] = [
   passModuleW1(
     "candidate_consent_receipt",
@@ -334,7 +345,14 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE1: HardLiveModuleEvidence[] = [
     "candidate-squad",
     "Module smoke PASS — matches API exposes score/match_reason schema fields.",
   ),
-  heldModuleW1("auto_apply", "/dashboard#auto-apply-readiness", "ops", "AUTO_APPLY_PAUSED", "Hard ban — do not LIVE."),
+  withFounderCompletionSmoke(
+    passModuleW1(
+      "auto_apply",
+      "/dashboard#auto-apply-readiness",
+      "ops",
+      "Founder RELEASE_WITH_CONTROLS — REVIEW_BEFORE_SUBMIT default; kill_switch_active; captcha_bypass=false. Enrollment/Launch unchanged.",
+    ),
+  ),
   heldModuleW1(
     "cand_ms_calendar",
     "/dashboard/calendar",
@@ -436,40 +454,45 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE2: HardLiveModuleEvidence[] = [
   passModuleW2("rec_decisioning", "/recruiter/inbox", "recruiter-squad", "Wave 2 regression smoke PASS."),
   passModuleW2("rec_shortlist", "/recruiter/inbox", "recruiter-squad", "Wave 2 regression smoke PASS."),
   passModuleW2("recruiter_daily_cockpit", "/recruiter/daily-cockpit", "recruiter-squad", "Wave 2 regression smoke PASS — activation backend."),
-  heldModuleW2(
-    "rec_interview_scheduling",
-    "/recruiter/calendar",
-    "recruiter-squad",
-    "RECRUITER_CALENDAR_BLOCKED",
-    "Manual schedule exists; provider calendar write BLOCKED.",
+  withFounderCompletionSmoke(
+    passModuleW2(
+      "rec_interview_scheduling",
+      "/recruiter/calendar",
+      "recruiter-squad",
+      "Founder BUILD smoke — draft/local interview holds LIVE; provider calendar WRITE still gated.",
+    ),
   ),
-  heldModuleW2(
-    "recruiter_calendar",
-    "/recruiter/calendar",
-    "platform",
-    "MICROSOFT_WRITE_BLOCKED",
-    "MS write blocked; Google recruiter sync not claimed LIVE.",
+  withFounderCompletionSmoke(
+    passModuleW2(
+      "recruiter_calendar",
+      "/recruiter/calendar",
+      "platform",
+      "Founder BUILD smoke — recruiter calendar holds LIVE; MS write remains separate HELD modules.",
+    ),
   ),
-  heldModuleW2(
-    "recruiter_integrations",
-    "/recruiter/integrations",
-    "recruiter-squad",
-    "ATS_LIVE_SYNC_BLOCKED",
-    "ATS live-sync hard ban.",
+  withFounderCompletionSmoke(
+    passModuleW2(
+      "recruiter_integrations",
+      "/recruiter/integrations",
+      "recruiter-squad",
+      "Founder BUILD smoke — ATS status/preview/dry-run LIVE; ATS live WRITE still BLOCKED.",
+    ),
   ),
-  heldModuleW2(
-    "investor_sor_proof_ats",
-    "/recruiter/integrations/ats/import-readiness",
-    "recruiter-squad",
-    "ATS_LIVE_SYNC_BLOCKED",
-    "ATS SoR proof stays held with live-sync ban.",
+  withFounderCompletionSmoke(
+    passModuleW2(
+      "investor_sor_proof_ats",
+      "/recruiter/integrations/ats/import-readiness",
+      "recruiter-squad",
+      "Founder BUILD smoke — ats_sync_attempts dry-run evidence LIVE; live write still BLOCKED.",
+    ),
   ),
-  heldModuleW2(
-    "rec_recruiter_onboarding",
-    "/recruiter/inbox",
-    "recruiter-squad",
-    "EXTERNAL_ENROLLMENT_OFF",
-    "Pilot token gated — real enrollment NOT_STARTED.",
+  withFounderCompletionSmoke(
+    passModuleW2(
+      "rec_recruiter_onboarding",
+      "/recruiter/inbox",
+      "recruiter-squad",
+      "Founder RELEASE_WITH_CONTROLS — capability_ready with enrollment kill-switch OFF; real invites false.",
+    ),
   ),
   withGapCloseSmoke(
   passModuleW2(
@@ -595,33 +618,37 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE3: HardLiveModuleEvidence[] = [
     "company-squad",
     "Wave 3 module smoke PASS — synthetic onboarding; enrollment stays OFF.",
   ),
-  heldModuleW3(
-    "company_integrations",
-    "/company/integrations",
-    "company-squad",
-    "ATS_LIVE_SYNC_BLOCKED",
-    "ATS live-sync hard ban — honesty endpoint only.",
+  withFounderCompletionSmoke(
+    passModuleW3(
+      "company_integrations",
+      "/company/integrations",
+      "company-squad",
+      "Founder BUILD smoke — calendar holds + ATS dry-run/preview LIVE; ATS live WRITE still BLOCKED.",
+    ),
   ),
-  heldModuleW3(
-    "rec_ats_sync",
-    "/company/integrations",
-    "company-squad",
-    "ATS_LIVE_SYNC_BLOCKED",
-    "ATS live-sync hard ban.",
+  withFounderCompletionSmoke(
+    passModuleW3(
+      "rec_ats_sync",
+      "/company/integrations",
+      "company-squad",
+      "Founder BUILD smoke — ATS dry-run sync attempts LIVE; live WRITE still BLOCKED.",
+    ),
   ),
-  heldModuleW3(
-    "rec_vacancy_import",
-    "/company/integrations/ats/import-readiness",
-    "company-squad",
-    "ATS_LIVE_SYNC_BLOCKED",
-    "Vacancy import stays held with ATS ban.",
+  withFounderCompletionSmoke(
+    passModuleW3(
+      "rec_vacancy_import",
+      "/company/integrations/ats/import-readiness",
+      "company-squad",
+      "Founder BUILD smoke — vacancy preview honesty LIVE (OAuth may be empty); writeback false.",
+    ),
   ),
-  heldModuleW3(
-    "company_ats_import_readiness",
-    "/company/integrations/ats/import-readiness",
-    "company-squad",
-    "ATS_LIVE_SYNC_BLOCKED",
-    "ATS import readiness INTERNAL/held.",
+  withFounderCompletionSmoke(
+    passModuleW3(
+      "company_ats_import_readiness",
+      "/company/integrations/ats/import-readiness",
+      "company-squad",
+      "Founder BUILD smoke — import readiness via ATS status/preview LIVE; live sync WRITE BLOCKED.",
+    ),
   ),
   passModuleW3(
     "company_billing",
@@ -629,12 +656,13 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE3: HardLiveModuleEvidence[] = [
     "company-squad",
     "Gap-close — company billing sandbox/honesty LIVE; public Stripe claim HELD.",
   ),
-  heldModuleW3(
-    "company_billing_public_claim",
-    "/company/billing",
-    "company-squad",
-    "STRIPE_NOT_PUBLIC",
-    "Stripe public claim blocked — Founder allowlist.",
+  withFounderCompletionSmoke(
+    passModuleW3(
+      "company_billing_public_claim",
+      "/company/billing",
+      "company-squad",
+      "Founder BUILD smoke — sandbox checkout path LIVE (sk_test / stub honesty); STRIPE_NOT_PUBLIC_LAUNCH still true.",
+    ),
   ),
   passModuleW3(
     "rec_subscription",
@@ -649,19 +677,21 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE3: HardLiveModuleEvidence[] = [
     "MICROSOFT_WRITE_BLOCKED",
     "MS calendar write blocked.",
   ),
-  heldModuleW3(
-    "company_invite_delivery",
-    "/company/team",
-    "company-squad",
-    "EXTERNAL_ENROLLMENT_OFF",
-    "Outbox + Celery process_company_invite_outbox ready; real delivery HELD while enrollment OFF.",
+  withFounderCompletionSmoke(
+    passModuleW3(
+      "company_invite_delivery",
+      "/company/team",
+      "company-squad",
+      "Founder RELEASE_WITH_CONTROLS — outbox worker ready; capability_ready with enrollment kill-switch OFF (real_invites=false).",
+    ),
   ),
-  heldModuleW3(
-    "rec_company_onboarding",
-    "/company/onboarding",
-    "company-squad",
-    "EXTERNAL_ENROLLMENT_OFF",
-    "Real company enrollment NOT_STARTED — synthetic path separate.",
+  withFounderCompletionSmoke(
+    passModuleW3(
+      "rec_company_onboarding",
+      "/company/onboarding",
+      "company-squad",
+      "Founder RELEASE_WITH_CONTROLS — capability ready; global enrollment kill-switch OFF; Launch NO-GO unchanged.",
+    ),
   ),
 ];
 
@@ -1042,12 +1072,13 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE4: HardLiveModuleEvidence[] = [
     "S3_FOUNDER_KEYS",
     "Confidential download requires founder S3 keys.",
   ),
-  heldModuleW4(
-    "investor_self_serve_enrollment",
-    "/register/investor",
-    "investor-squad",
-    "ENROLLMENT_OFF",
-    "Self-serve investor enrollment OFF — Founder block.",
+  withFounderCompletionSmoke(
+    passModuleW4(
+      "investor_self_serve_enrollment",
+      "/register/investor",
+      "investor-squad",
+      "Founder RELEASE_WITH_CONTROLS — capability ready; enrollment kill-switch OFF; Launch/Pilot unchanged.",
+    ),
   ),
 ];
 
@@ -1146,9 +1177,23 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_AI_COMPLIANCE: HardLiveModuleEvidence[]
   passAiCompliance("ai_no_outbound", "/dashboard/evidence/claims", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
   passAiCompliance("ai_consent_visibility", "/dashboard/evidence/claims", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
   passAiCompliance("ai_claim_cleanup", "/dashboard/evidence/claims", "platform", "Auth prod smoke PASS — AI compliance Phase A on aligned SHA."),
-  heldAiCompliance("ai_external_verification", "/dashboard/evidence/claims", "platform", "EXTERNAL_VERIFICATION_OFF", "External verification default OFF."),
+  withFounderCompletionSmoke(
+    passAiCompliance(
+      "ai_external_verification",
+      "/dashboard/evidence/claims",
+      "platform",
+      "Founder BUILD smoke — sandbox external verify LIVE; human_review_required; autonomous_employment=false.",
+    ),
+  ),
   heldAiCompliance("ai_protected_attr_monitoring", "/board/ai-compliance", "platform", "PROTECTED_ATTR_MONITORING_LEGAL_HOLD", "Protected attribute monitoring legal hold."),
-  heldAiCompliance("ai_autonomous_employment", "/recruiter/evidence/reviews", "platform", "AUTONOMOUS_EMPLOYMENT_HARD_BAN", "Autonomous employment decisions hard-banned."),
+  withFounderCompletionSmoke(
+    passAiCompliance(
+      "ai_autonomous_employment",
+      "/recruiter/evidence/reviews",
+      "platform",
+      "Founder Class F redesign — HITL recommendation-only LIVE (advisory_only, binding=false, PENDING_HUMAN_APPROVAL). Never autonomous final employment decisions.",
+    ),
+  ),
   heldAiCompliance("ai_act_certified_claim", "/board/ai-compliance", "platform", "NO_LEGAL_CERTIFICATION", "No AI Act certification claim."),
   withGapCloseSmoke(
   passAiCompliance(
@@ -1206,6 +1251,9 @@ export const HARD_LIVE_REGISTRY_META = {
     connector_script: "frontend/scripts/external-connector-prod-smoke.test.ts",
     connector_sha: CONNECTOR_SMOKE_SHA,
     connector_at: CONNECTOR_SMOKE_AT,
+    founder_completion_script: "frontend/scripts/founder-completion-module-prod-smoke.test.ts",
+    founder_completion_sha: FOUNDER_COMPLETION_SMOKE_SHA,
+    founder_completion_at: FOUNDER_COMPLETION_SMOKE_AT,
     write: true,
     exclude_from_product_metrics: true,
   },

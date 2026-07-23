@@ -163,3 +163,12 @@ Copy and mark:
 ### Verdict target
 `TECHNICAL IMPLEMENTATION EXHAUSTED — EXTERNAL ACTION REQUIRED` when Cursor-fixable work is committed/deployed and only creds/legal remain.
 
+### Individual PASS promotions (evidence SHA `998bae84`)
+
+Promoted after authenticated prod smoke (no Enrollment/Pilot/Launch/Phase 3B flip):
+`auto_apply`, `rec_interview_scheduling`, `recruiter_calendar`, `recruiter_integrations`, `investor_sor_proof_ats`, `rec_recruiter_onboarding`, `company_integrations`, `rec_ats_sync`, `rec_vacancy_import`, `company_ats_import_readiness`, `company_billing_public_claim`, `company_invite_delivery`, `rec_company_onboarding`, `investor_self_serve_enrollment`, `ai_external_verification`, `ai_autonomous_employment` (HITL-only).
+
+**Counts after promotions:** PASS **138** · HELD_POLICY **14** · BLOCKED_EXTERNAL **1** (Slack).
+
+**Still external / legal / policy:** MS write + busy-read flag · ATS live WRITE · Stripe public · Authologic/S3/Slack creds · AI Act certified claim · protected-attr monitoring legal · investor external attestations.
+

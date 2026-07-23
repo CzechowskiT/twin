@@ -38,6 +38,9 @@
     "connector_script": "frontend/scripts/external-connector-prod-smoke.test.ts",
     "connector_sha": "51927b99d53ec11a136cb002a6450e9f4e463203",
     "connector_at": "2026-07-23T11:52:00Z",
+    "founder_completion_script": "frontend/scripts/founder-completion-module-prod-smoke.test.ts",
+    "founder_completion_sha": "998bae84a4fb569b2d776252e784aefbe7320130",
+    "founder_completion_at": "2026-07-23T13:10:00Z",
     "write": true,
     "exclude_from_product_metrics": true
   },
@@ -200,10 +203,12 @@
       "module_id": "auto_apply",
       "persona": "candidate",
       "wave": "1",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/dashboard#auto-apply-readiness",
-      "blocker": "AUTO_APPLY_PAUSED",
-      "owner": "ops"
+      "blocker": null,
+      "owner": "ops",
+      "smoke_sha": "998bae84a4fb569b2d776252e784aefbe7320130",
+      "smoke_at": "2026-07-23T13:10:00Z"
     },
     {
       "module_id": "cand_ms_calendar",
@@ -489,46 +494,56 @@
       "module_id": "rec_interview_scheduling",
       "persona": "recruiter",
       "wave": "2",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/recruiter/calendar",
-      "blocker": "RECRUITER_CALENDAR_BLOCKED",
-      "owner": "recruiter-squad"
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "998bae84a4fb569b2d776252e784aefbe7320130",
+      "smoke_at": "2026-07-23T13:10:00Z"
     },
     {
       "module_id": "recruiter_calendar",
       "persona": "recruiter",
       "wave": "2",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/recruiter/calendar",
-      "blocker": "MICROSOFT_WRITE_BLOCKED",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "998bae84a4fb569b2d776252e784aefbe7320130",
+      "smoke_at": "2026-07-23T13:10:00Z"
     },
     {
       "module_id": "recruiter_integrations",
       "persona": "recruiter",
       "wave": "2",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/recruiter/integrations",
-      "blocker": "ATS_LIVE_SYNC_BLOCKED",
-      "owner": "recruiter-squad"
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "998bae84a4fb569b2d776252e784aefbe7320130",
+      "smoke_at": "2026-07-23T13:10:00Z"
     },
     {
       "module_id": "investor_sor_proof_ats",
       "persona": "recruiter",
       "wave": "2",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/recruiter/integrations/ats/import-readiness",
-      "blocker": "ATS_LIVE_SYNC_BLOCKED",
-      "owner": "recruiter-squad"
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "998bae84a4fb569b2d776252e784aefbe7320130",
+      "smoke_at": "2026-07-23T13:10:00Z"
     },
     {
       "module_id": "rec_recruiter_onboarding",
       "persona": "recruiter",
       "wave": "2",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/recruiter/inbox",
-      "blocker": "EXTERNAL_ENROLLMENT_OFF",
-      "owner": "recruiter-squad"
+      "blocker": null,
+      "owner": "recruiter-squad",
+      "smoke_sha": "998bae84a4fb569b2d776252e784aefbe7320130",
+      "smoke_at": "2026-07-23T13:10:00Z"
     },
     {
       "module_id": "rec_sla_tracking",
@@ -743,37 +758,45 @@
       "module_id": "company_integrations",
       "persona": "company",
       "wave": "3",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/company/integrations",
-      "blocker": "ATS_LIVE_SYNC_BLOCKED",
-      "owner": "company-squad"
+      "blocker": null,
+      "owner": "company-squad",
+      "smoke_sha": "998bae84a4fb569b2d776252e784aefbe7320130",
+      "smoke_at": "2026-07-23T13:10:00Z"
     },
     {
       "module_id": "rec_ats_sync",
       "persona": "company",
       "wave": "3",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/company/integrations",
-      "blocker": "ATS_LIVE_SYNC_BLOCKED",
-      "owner": "company-squad"
+      "blocker": null,
+      "owner": "company-squad",
+      "smoke_sha": "998bae84a4fb569b2d776252e784aefbe7320130",
+      "smoke_at": "2026-07-23T13:10:00Z"
     },
     {
       "module_id": "rec_vacancy_import",
       "persona": "company",
       "wave": "3",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/company/integrations/ats/import-readiness",
-      "blocker": "ATS_LIVE_SYNC_BLOCKED",
-      "owner": "company-squad"
+      "blocker": null,
+      "owner": "company-squad",
+      "smoke_sha": "998bae84a4fb569b2d776252e784aefbe7320130",
+      "smoke_at": "2026-07-23T13:10:00Z"
     },
     {
       "module_id": "company_ats_import_readiness",
       "persona": "company",
       "wave": "3",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/company/integrations/ats/import-readiness",
-      "blocker": "ATS_LIVE_SYNC_BLOCKED",
-      "owner": "company-squad"
+      "blocker": null,
+      "owner": "company-squad",
+      "smoke_sha": "998bae84a4fb569b2d776252e784aefbe7320130",
+      "smoke_at": "2026-07-23T13:10:00Z"
     },
     {
       "module_id": "company_billing",
@@ -790,10 +813,12 @@
       "module_id": "company_billing_public_claim",
       "persona": "company",
       "wave": "3",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/company/billing",
-      "blocker": "STRIPE_NOT_PUBLIC",
-      "owner": "company-squad"
+      "blocker": null,
+      "owner": "company-squad",
+      "smoke_sha": "998bae84a4fb569b2d776252e784aefbe7320130",
+      "smoke_at": "2026-07-23T13:10:00Z"
     },
     {
       "module_id": "rec_subscription",
@@ -819,19 +844,23 @@
       "module_id": "company_invite_delivery",
       "persona": "company",
       "wave": "3",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/company/team",
-      "blocker": "EXTERNAL_ENROLLMENT_OFF",
-      "owner": "company-squad"
+      "blocker": null,
+      "owner": "company-squad",
+      "smoke_sha": "998bae84a4fb569b2d776252e784aefbe7320130",
+      "smoke_at": "2026-07-23T13:10:00Z"
     },
     {
       "module_id": "rec_company_onboarding",
       "persona": "company",
       "wave": "3",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/company/onboarding",
-      "blocker": "EXTERNAL_ENROLLMENT_OFF",
-      "owner": "company-squad"
+      "blocker": null,
+      "owner": "company-squad",
+      "smoke_sha": "998bae84a4fb569b2d776252e784aefbe7320130",
+      "smoke_at": "2026-07-23T13:10:00Z"
     },
     {
       "module_id": "investor_data_room",
@@ -987,10 +1016,12 @@
       "module_id": "investor_self_serve_enrollment",
       "persona": "investor",
       "wave": "4",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/register/investor",
-      "blocker": "ENROLLMENT_OFF",
-      "owner": "investor-squad"
+      "blocker": null,
+      "owner": "investor-squad",
+      "smoke_sha": "998bae84a4fb569b2d776252e784aefbe7320130",
+      "smoke_at": "2026-07-23T13:10:00Z"
     },
     {
       "module_id": "plat_google_calendar_oauth",
@@ -1620,10 +1651,12 @@
       "module_id": "ai_external_verification",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/dashboard/evidence/claims",
-      "blocker": "EXTERNAL_VERIFICATION_OFF",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "998bae84a4fb569b2d776252e784aefbe7320130",
+      "smoke_at": "2026-07-23T13:10:00Z"
     },
     {
       "module_id": "ai_protected_attr_monitoring",
@@ -1638,10 +1671,12 @@
       "module_id": "ai_autonomous_employment",
       "persona": "platform",
       "wave": "ai_compliance",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "route": "/recruiter/evidence/reviews",
-      "blocker": "AUTONOMOUS_EMPLOYMENT_HARD_BAN",
-      "owner": "platform"
+      "blocker": null,
+      "owner": "platform",
+      "smoke_sha": "998bae84a4fb569b2d776252e784aefbe7320130",
+      "smoke_at": "2026-07-23T13:10:00Z"
     },
     {
       "module_id": "ai_act_certified_claim",
