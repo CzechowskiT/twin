@@ -21,7 +21,20 @@ This pack does **not** activate Pilot, enable enrollment, or set Launch GO. Foun
 | O7 | **PASS** `o7-r020-20260723T065951Z` (isolated staging; prod untouched) |
 | Slack | `plat_slack_connector` **BLOCKED_EXTERNAL_CREDENTIALS** only — credentials MISSING on Railway API/worker |
 
-**Stance after Founder Option 3:** Gate F technical **PASS** (Slack exception ACCEPTED) · Pilot **BLOCKED_BY_FOUNDER** · Launch **NO-GO** · Enrollment **OFF** · Phase 3B **BLOCKED** · Slack **BLOCKED_EXTERNAL_CREDENTIALS** · HELD_POLICY **30**
+**Stance after Founder Option 3:** Gate F technical **PASS** (Slack exception ACCEPTED) · Pilot **BLOCKED_BY_FOUNDER** · Launch **NO-GO** · Enrollment **OFF** · Phase 3B **BLOCKED**
+
+### Architecture reclass (Final Pilot Launch Closure — 2026-07-23)
+
+**Decision:** Hard LIVE launch-readiness denominator = **CORE_PILOT_ONLY** (truthful reclass; modules not deleted).
+
+| Inclusion | Modules (examples) | Effect on denominator |
+|-----------|--------------------|------------------------|
+| OPTIONAL_INTEGRATION | MS Graph write trio, Authologic duo, ATS write duo, Slack | Out — status `OPTIONAL_INTEGRATION_NOT_CONFIGURED` |
+| LEGAL_MARKETING_CLAIM | `ai_act_certified_claim` | Out — certification not claimed |
+| POST_PILOT | `ai_protected_attr_monitoring` | Out — post-pilot |
+| CORE_PILOT (temp held) | `investor_s3_required_download` | In — secure download BE TODO (provider-neutral) |
+
+**Unchanged:** Launch **NO-GO** · Enrollment **OFF** · Pilot **BLOCKED_BY_FOUNDER** · Phase 3B **BLOCKED**. Slack is optional (not counted as CORE Hard LIVE BLOCKED).
 
 ---
 

@@ -1,12 +1,13 @@
 /**
  * Production action gates — hide/disable non-LIVE mutations outside demo/dev/internal.
  * Founder block 2026-07-20: no external pilot enrollment.
+ * Gate F technical PASS (Option 3) — Pilot remains BLOCKED_BY_FOUNDER.
  */
 export const EXTERNAL_PILOT_ENROLLMENT_ENABLED =
   process.env.NEXT_PUBLIC_EXTERNAL_PILOT_ENROLLMENT_ENABLED === "true";
 
 export const PILOT_STANCE = "BLOCKED_BY_FOUNDER" as const;
-export const GATE_F_STATUS = "PENDING" as const;
+export const GATE_F_STATUS = "PASS" as const;
 export const LAUNCH_STANCE_CANON = "NO-GO" as const;
 export const PMF_EVIDENCE = "INSUFFICIENT_DATA" as const;
 export const REAL_CANDIDATE_ENROLLMENT = "NOT_STARTED" as const;

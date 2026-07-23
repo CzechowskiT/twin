@@ -2,15 +2,35 @@
  * Machine-readable Hard LIVE 30 evidence registry — Waves 1–5 + Wave 4 Investor + AI compliance foundation.
  * LIVE badges in capability map / activation require status=PASS after authenticated prod smoke.
  * Stance: Pilot BLOCKED_BY_FOUNDER · Gate F PASS (Option 3) · Launch NO-GO.
+ * Hard LIVE launch-readiness denominator = CORE_PILOT only (see product-inclusion-taxonomy).
  */
+import {
+  HARD_LIVE_DENOMINATOR_RULE,
+  type ProductInclusion,
+  isInHardLiveDenominator,
+  productInclusionFor,
+} from "./product-inclusion-taxonomy";
+
 export type HardLiveCriterionResult = "PASS" | "FAIL" | "N/A" | "PENDING";
+
+export type HardLiveModuleStatus =
+  | "PENDING_SMOKE"
+  | "PASS"
+  | "FAIL"
+  | "PARTIAL"
+  | "HELD_POLICY"
+  | "DEMO_ONLY"
+  | "BLOCKED_EXTERNAL_CREDENTIALS"
+  | "OPTIONAL_INTEGRATION_NOT_CONFIGURED"
+  | "LEGAL_MARKETING_CLAIM"
+  | "POST_PILOT";
 
 export type HardLiveModuleEvidence = {
   module_id: string;
   persona: "candidate" | "recruiter" | "company" | "platform" | "investor";
   wave: "1" | "2" | "3" | "4" | "5" | "ai" | "ai_compliance";
   /** Never claim product LIVE until PASS + docs update post-smoke. */
-  status: "PENDING_SMOKE" | "PASS" | "FAIL" | "PARTIAL" | "HELD_POLICY" | "DEMO_ONLY" | "BLOCKED_EXTERNAL_CREDENTIALS";
+  status: HardLiveModuleStatus;
   route: string;
   owner: string;
   blocker: string | null;
@@ -19,7 +39,12 @@ export type HardLiveModuleEvidence = {
   notes: string;
   smoke_sha?: string;
   smoke_at?: string;
+  /** Product inclusion class — defaults via taxonomy when omitted. */
+  product_inclusion?: ProductInclusion;
 };
+
+export type { ProductInclusion };
+export { HARD_LIVE_DENOMINATOR_RULE, isInHardLiveDenominator, productInclusionFor };
 
 const ALL_PENDING: Record<string, HardLiveCriterionResult> = Object.fromEntries(
   Array.from({ length: 30 }, (_, i) => [String(i + 1), "PENDING" as const]),
@@ -105,6 +130,32 @@ function heldModuleW1(
     missing_criteria: [13, 15, 28],
     criteria: { ...ALL_PENDING, "28": "FAIL" },
     notes,
+    product_inclusion: productInclusionFor(module_id),
+  };
+}
+
+/** Optional vendor integration — out of Hard LIVE CORE denominator; blocker kept for honesty. */
+function optionalIntegrationModule(
+  module_id: string,
+  persona: HardLiveModuleEvidence["persona"],
+  wave: HardLiveModuleEvidence["wave"],
+  route: string,
+  owner: string,
+  blocker: string,
+  notes: string,
+): HardLiveModuleEvidence {
+  return {
+    module_id,
+    persona,
+    wave,
+    status: "OPTIONAL_INTEGRATION_NOT_CONFIGURED",
+    route,
+    owner,
+    blocker,
+    missing_criteria: [13, 15, 28],
+    criteria: { ...ALL_PENDING, "28": "FAIL" },
+    notes,
+    product_inclusion: "OPTIONAL_INTEGRATION",
   };
 }
 
@@ -365,19 +416,23 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE1: HardLiveModuleEvidence[] = [
       "Founder RELEASE_WITH_CONTROLS — REVIEW_BEFORE_SUBMIT default; kill_switch_active; captcha_bypass=false. Enrollment/Launch unchanged.",
     ),
   ),
-  heldModuleW1(
+  optionalIntegrationModule(
     "cand_ms_calendar",
+    "candidate",
+    "1",
     "/dashboard/calendar",
     "platform",
     "MICROSOFT_WRITE_BLOCKED",
-    "MS write blocked; Google path remains approved LIVE separately.",
+    "OPTIONAL — Microsoft Graph WRITE not in CORE pilot. CORE calendar = ICS/holds + Google (already PASS). Blocker retained for honesty.",
   ),
-  heldModuleW1(
+  optionalIntegrationModule(
     "plat_identity_kyc",
+    "candidate",
+    "1",
     "/kyc",
     "candidate-squad",
     "AUTHOLOGIC_CONFIG_DEPENDENT",
-    "Provider KYC not claimed LIVE without configured Authologic + smoke.",
+    "OPTIONAL — Authologic vendor KYC. CORE = candidate_identity_verification (manual review PASS).",
   ),
   passModuleW1(
     "candidate_plan",
@@ -689,12 +744,14 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE3: HardLiveModuleEvidence[] = [
     "company-squad",
     "Gap-close — subscription sandbox path LIVE; public Stripe claim HELD.",
   ),
-  heldModuleW3(
+  optionalIntegrationModule(
     "company_ms_calendar_write",
+    "company",
+    "3",
     "/company/hiring-cockpit",
     "platform",
     "MICROSOFT_WRITE_BLOCKED",
-    "MS calendar write blocked.",
+    "OPTIONAL — Microsoft Graph WRITE not in CORE pilot. CORE = ICS/holds (already PASS).",
   ),
   withFounderCompletionSmoke(
     passModuleW3(
@@ -908,12 +965,14 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE5: HardLiveModuleEvidence[] = [
     "platform",
     "Webhook delivery attempt ledger MONITORING — Auth prod smoke PASS on aligned SHA.",
   ),
-  heldModuleW5(
+  optionalIntegrationModule(
     "plat_ms_calendar_write",
+    "platform",
+    "5",
     "/dashboard/calendar",
     "platform",
     "MICROSOFT_WRITE_BLOCKED",
-    "Microsoft Calendar WRITE remains policy-held.",
+    "OPTIONAL — Microsoft Graph WRITE not in CORE pilot. CORE = ICS/holds + busy-read (already PASS).",
   ),
   withBlockerEliminationSmoke(
     passModuleW5(
@@ -923,19 +982,23 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE5: HardLiveModuleEvidence[] = [
       "External blocker elimination — MICROSOFT_BUSY_READ_ENABLED=true; readiness smoke product_gate_enabled; write gate still false.",
     ),
   ),
-  heldModuleW5(
+  optionalIntegrationModule(
     "plat_ats_live_sync_write",
+    "platform",
+    "5",
     "/company/integrations",
     "platform",
     "ATS_LIVE_SYNC_BLOCKED",
-    "ATS live-sync WRITE blocked.",
+    "OPTIONAL — ATS live WRITE not in CORE pilot. CORE = dry-run/export/preview (already PASS).",
   ),
-  heldModuleW5(
+  optionalIntegrationModule(
     "plat_ats_write_sync",
+    "platform",
+    "5",
     "/company/integrations",
     "platform",
     "ATS_LIVE_SYNC_BLOCKED",
-    "ATS write SYNC blocked.",
+    "OPTIONAL — ATS write SYNC not in CORE pilot. CORE = dry-run evidence (already PASS).",
   ),
   withBlockerEliminationSmoke(
     passModuleW5(
@@ -945,12 +1008,14 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE5: HardLiveModuleEvidence[] = [
       "External blocker elimination — Stripe test Checkout Session LIVE; public_launch=false; no livemode charges.",
     ),
   ),
-  heldModuleW5(
+  optionalIntegrationModule(
     "plat_authologic_auto_kyc",
+    "platform",
+    "5",
     "/dashboard/identity",
     "platform",
     "AUTHOLOGIC_AUTO_KYC_OFF",
-    "Authologic Auto KYC OFF.",
+    "OPTIONAL — Authologic Auto KYC. CORE = candidate_identity_verification (manual review PASS).",
   ),
   withConnectorSmoke(
     passModuleW5(
@@ -960,12 +1025,14 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE5: HardLiveModuleEvidence[] = [
       "Google push READY — public HTTPS webhook ack + OAuth; watch per connected user. Smoke PASS @ CONNECTOR_SMOKE_SHA.",
     ),
   ),
-  blockedExternalW5(
+  optionalIntegrationModule(
     "plat_slack_connector",
+    "platform",
+    "5",
     "/company/integrations",
     "platform",
     "BLOCKED_EXTERNAL_CREDENTIALS",
-    "Draft/preview LIVE; OAuth + SLACK_INCOMING_WEBHOOK_URL missing after exhaustive Railway API+worker / GH / Vercel / local audit 2026-07-23 — see EXTERNAL_CONNECTOR_OPERATOR_HANDOFF.md.",
+    "OPTIONAL — Slack connector not in CORE pilot (email/in-app notifications are CORE). Credentials still missing; blocker retained for honesty — not counted as Hard LIVE BLOCKED in CORE denominator.",
   ),
   withConnectorSmoke(
     passModuleW5(
@@ -1039,6 +1106,7 @@ function heldModuleW4(
     missing_criteria: [13, 15, 25, 28],
     criteria: { ...ALL_PENDING, "28": "FAIL" },
     notes,
+    product_inclusion: productInclusionFor(module_id),
   };
 }
 
@@ -1091,8 +1159,8 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE4: HardLiveModuleEvidence[] = [
     "investor_s3_required_download",
     "/investor/data-room",
     "investor-squad",
-    "S3_FOUNDER_KEYS",
-    "Confidential download requires founder S3 keys.",
+    "SECURE_DOWNLOAD_BE_TODO",
+    "CORE_PILOT secure download (provider-neutral — not S3-branded). TODO: parent BE secure download path; remains HELD until ready. Metadata list already PASS via investor_data_room_list.",
   ),
   withFounderCompletionSmoke(
     passModuleW4(
@@ -1207,7 +1275,20 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_AI_COMPLIANCE: HardLiveModuleEvidence[]
       "Founder BUILD smoke — sandbox external verify LIVE; human_review_required; autonomous_employment=false.",
     ),
   ),
-  heldAiCompliance("ai_protected_attr_monitoring", "/board/ai-compliance", "platform", "PROTECTED_ATTR_MONITORING_LEGAL_HOLD", "Protected attribute monitoring legal hold."),
+  {
+    module_id: "ai_protected_attr_monitoring",
+    persona: "platform",
+    wave: "ai_compliance",
+    status: "POST_PILOT",
+    route: "/board/ai-compliance",
+    owner: "platform",
+    blocker: "PROTECTED_ATTR_MONITORING_LEGAL_HOLD",
+    missing_criteria: [25],
+    criteria: { ...ALL_PENDING },
+    notes:
+      "POST_PILOT — protected-attribute monitoring out of CORE pilot denominator. Legal hold retained; never claim CORE PASS.",
+    product_inclusion: "POST_PILOT",
+  },
   withFounderCompletionSmoke(
     passAiCompliance(
       "ai_autonomous_employment",
@@ -1216,7 +1297,20 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_AI_COMPLIANCE: HardLiveModuleEvidence[]
       "Founder Class F redesign — HITL recommendation-only LIVE (advisory_only, binding=false, PENDING_HUMAN_APPROVAL). Never autonomous final employment decisions.",
     ),
   ),
-  heldAiCompliance("ai_act_certified_claim", "/board/ai-compliance", "platform", "NO_LEGAL_CERTIFICATION", "No AI Act certification claim."),
+  {
+    module_id: "ai_act_certified_claim",
+    persona: "platform",
+    wave: "ai_compliance",
+    status: "LEGAL_MARKETING_CLAIM",
+    route: "/board/ai-compliance",
+    owner: "platform",
+    blocker: "NO_LEGAL_CERTIFICATION",
+    missing_criteria: [25],
+    criteria: { ...ALL_PENDING },
+    notes:
+      "LEGAL_MARKETING_CLAIM — AI Act certification not claimed (claim guard PASS honesty). Out of CORE pilot denominator.",
+    product_inclusion: "LEGAL_MARKETING_CLAIM",
+  },
   withGapCloseSmoke(
   passAiCompliance(
     "ai_wave6_dsr_delete_export",
@@ -1239,6 +1333,7 @@ export const HARD_LIVE_EVIDENCE_REGISTRY: HardLiveModuleEvidence[] = [
 export const HARD_LIVE_REGISTRY_META = {
   definition: "docs/HARD_LIVE_DEFINITION_30.md",
   wave: "5",
+  hard_live_denominator: HARD_LIVE_DENOMINATOR_RULE,
   stance: {
     pilot: "BLOCKED_BY_FOUNDER",
     gate_f: "PASS",
@@ -1283,20 +1378,81 @@ export const HARD_LIVE_REGISTRY_META = {
     exclude_from_product_metrics: true,
   },
   wave4_note:
-    "Connector activation 2026-07-23: Google push/Zapier/storage/Teams draft PASS @ 6317d156; Slack remains BLOCKED_EXTERNAL (exhaustive re-audit 2026-07-23 — credentials missing). O7 fresh PASS o7-r020 @ 8bc25388 / Alembic 096. DEMO_ONLY=0. Pilot BLOCKED / Gate F PENDING / Launch NO-GO unchanged.",
+    "Founder architecture reclass 2026-07-23: Hard LIVE denominator=CORE_PILOT_ONLY. Optional MS Graph write / Authologic / ATS write / Slack leave denominator (OPTIONAL_INTEGRATION_NOT_CONFIGURED). ai_act_certified_claim=LEGAL_MARKETING_CLAIM; ai_protected_attr_monitoring=POST_PILOT. investor_s3_required_download remains temporary CORE HELD (secure download BE TODO). Gate F PASS · Pilot BLOCKED_BY_FOUNDER · Launch NO-GO · Enrollment OFF unchanged.",
+  get corePilotPassCount(): number {
+    return hardLiveLaunchReadinessCounts().pass;
+  },
+  get corePilotHeldCount(): number {
+    return hardLiveLaunchReadinessCounts().held;
+  },
 } as const;
 
+export function resolveProductInclusion(row: HardLiveModuleEvidence): ProductInclusion {
+  return row.product_inclusion ?? productInclusionFor(row.module_id);
+}
+
+export function corePilotRegistryModules(
+  registry: HardLiveModuleEvidence[] = HARD_LIVE_EVIDENCE_REGISTRY,
+): HardLiveModuleEvidence[] {
+  return registry.filter((r) => isInHardLiveDenominator(r.module_id));
+}
+
+export function hardLiveLaunchReadinessCounts(
+  registry: HardLiveModuleEvidence[] = HARD_LIVE_EVIDENCE_REGISTRY,
+): {
+  pass: number;
+  held: number;
+  blocked: number;
+  optional_out: number;
+  legal_out: number;
+  post_pilot: number;
+  total_core: number;
+} {
+  const core = corePilotRegistryModules(registry);
+  const pass = core.filter((r) => r.status === "PASS").length;
+  const held = core.filter((r) => r.status === "HELD_POLICY").length;
+  const blocked = core.filter((r) => r.status === "BLOCKED_EXTERNAL_CREDENTIALS").length;
+  const optional_out = registry.filter(
+    (r) => resolveProductInclusion(r) === "OPTIONAL_INTEGRATION",
+  ).length;
+  const legal_out = registry.filter(
+    (r) => resolveProductInclusion(r) === "LEGAL_MARKETING_CLAIM",
+  ).length;
+  const post_pilot = registry.filter(
+    (r) => resolveProductInclusion(r) === "POST_PILOT",
+  ).length;
+  return {
+    pass,
+    held,
+    blocked,
+    optional_out,
+    legal_out,
+    post_pilot,
+    total_core: core.length,
+  };
+}
+
+/**
+ * Enforce smoke SHA only for CORE_PILOT rows that claim PASS.
+ * Optional / legal / post-pilot rows are out of the Hard LIVE denominator.
+ */
 export function assertNoLivePassWithoutSmoke(
   registry: HardLiveModuleEvidence[] = HARD_LIVE_EVIDENCE_REGISTRY,
 ): void {
   for (const row of registry) {
-    if (row.status === "PASS") {
+    const inclusion = resolveProductInclusion(row);
+    if (row.status === "PASS" && inclusion === "CORE_PILOT") {
       if (row.missing_criteria.includes(25)) {
         throw new Error(`Module ${row.module_id} cannot PASS with criterion 25 missing`);
       }
       if (!row.smoke_sha) {
         throw new Error(`Module ${row.module_id} PASS requires smoke_sha`);
       }
+    }
+    if (row.status === "PASS" && inclusion !== "CORE_PILOT") {
+      throw new Error(
+        `Module ${row.module_id} is ${inclusion} and must not claim PASS as CORE LIVE`,
+      );
     }
     if (row.status === "DEMO_ONLY" && (row.persona === "recruiter" || row.persona === "company")) {
       if (!row.blocker) {

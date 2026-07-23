@@ -1,6 +1,7 @@
 /**
  * Canonical module manifest presence guard.
- * Fails if any Hard LIVE HELD/BLOCKED module is missing from the manifest inventory.
+ * Fails if any Hard LIVE CORE HELD/BLOCKED module is missing from the manifest inventory.
+ * Also requires product-inclusion reclass rows to stay listed (truthful, not deleted).
  */
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
@@ -8,14 +9,19 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
-import { HARD_LIVE_EVIDENCE_REGISTRY } from "../src/lib/hard-live-evidence-registry";
+import {
+  HARD_LIVE_EVIDENCE_REGISTRY,
+  resolveProductInclusion,
+} from "../src/lib/hard-live-evidence-registry";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
-const HELD_OR_BLOCKED = new Set([
-  "HELD_POLICY",
-  "BLOCKED",
-  "BLOCKED_EXTERNAL_CREDENTIALS",
+const CORE_HELD_OR_BLOCKED = new Set(["HELD_POLICY", "BLOCKED_EXTERNAL_CREDENTIALS"]);
+
+const RECLASS_STATUSES = new Set([
+  "OPTIONAL_INTEGRATION_NOT_CONFIGURED",
+  "LEGAL_MARKETING_CLAIM",
+  "POST_PILOT",
 ]);
 
 test("canonical module manifest exists and references Hard LIVE registry", () => {
@@ -27,7 +33,9 @@ test("canonical module manifest exists and references Hard LIVE registry", () =>
   assert.match(doc, /MODULE/);
   assert.match(doc, /CAPABILITY/);
   assert.match(doc, /Do not delete MODULE rows/);
-  assert.match(doc, /Hard LIVE HELD \/ BLOCKED inventory/);
+  assert.match(doc, /CORE_PILOT_ONLY|product inclusion/i);
+  assert.match(doc, /Hard LIVE CORE held \/ blocked inventory/);
+  assert.match(doc, /Product inclusion reclass inventory/);
 });
 
 test("hard live registry still has no DEMO_ONLY / PENDING_SMOKE", () => {
@@ -36,14 +44,16 @@ test("hard live registry still has no DEMO_ONLY / PENDING_SMOKE", () => {
   assert.doesNotMatch(raw, /"status": "PENDING_SMOKE"/);
 });
 
-test("every Hard LIVE HELD/BLOCKED module is listed with class and blocker", () => {
+test("every CORE Hard LIVE HELD/BLOCKED module is listed with class and blocker", () => {
   const doc = readFileSync(join(root, "docs/CANONICAL_MODULE_MANIFEST.md"), "utf8");
-  const held = HARD_LIVE_EVIDENCE_REGISTRY.filter((r) => HELD_OR_BLOCKED.has(r.status));
-  assert.ok(held.length >= 1, "expected at least one held/blocked module");
+  const held = HARD_LIVE_EVIDENCE_REGISTRY.filter(
+    (r) =>
+      resolveProductInclusion(r) === "CORE_PILOT" && CORE_HELD_OR_BLOCKED.has(r.status),
+  );
+  assert.ok(held.length >= 1, "expected at least one CORE held/blocked module");
 
   const missing: string[] = [];
   for (const row of held) {
-    // Row format: | module_id | STATUS | class | blocker |
     const lineRe = new RegExp(
       `\\|\\s*${row.module_id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\|\\s*${row.status}\\s*\\|\\s*[A-F]\\s*\\|\\s*${(row.blocker || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\|`,
     );
@@ -54,15 +64,37 @@ test("every Hard LIVE HELD/BLOCKED module is listed with class and blocker", () 
   assert.equal(
     missing.length,
     0,
-    `Unmapped Hard LIVE HELD/BLOCKED modules missing from CANONICAL_MODULE_MANIFEST.md:\n${missing.join("\n")}`,
+    `Unmapped CORE Hard LIVE HELD/BLOCKED modules missing from CANONICAL_MODULE_MANIFEST.md:\n${missing.join("\n")}`,
+  );
+});
+
+test("every reclassified optional/legal/post-pilot module is listed", () => {
+  const doc = readFileSync(join(root, "docs/CANONICAL_MODULE_MANIFEST.md"), "utf8");
+  const reclass = HARD_LIVE_EVIDENCE_REGISTRY.filter((r) => RECLASS_STATUSES.has(r.status));
+  assert.ok(reclass.length >= 10, `expected reclass rows, got ${reclass.length}`);
+  const missing: string[] = [];
+  for (const row of reclass) {
+    const inclusion = resolveProductInclusion(row);
+    const lineRe = new RegExp(
+      `\\|\\s*${row.module_id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\|\\s*${row.status}\\s*\\|`,
+    );
+    if (!lineRe.test(doc) || !doc.includes(inclusion)) {
+      missing.push(`${row.module_id} (${row.status} / ${inclusion})`);
+    }
+  }
+  assert.equal(
+    missing.length,
+    0,
+    `Unmapped reclass modules missing from CANONICAL_MODULE_MANIFEST.md:\n${missing.join("\n")}`,
   );
 });
 
 test("manifest does not invent held modules absent from registry", () => {
   const doc = readFileSync(join(root, "docs/CANONICAL_MODULE_MANIFEST.md"), "utf8");
-  const inventoryStart = doc.indexOf("## Hard LIVE HELD / BLOCKED inventory");
+  const inventoryStart = doc.indexOf("## Hard LIVE CORE held / blocked inventory");
   assert.ok(inventoryStart >= 0);
-  const section = doc.slice(inventoryStart, doc.indexOf("\n## ", inventoryStart + 1));
+  const nextHeading = doc.indexOf("\n## ", inventoryStart + 1);
+  const section = doc.slice(inventoryStart, nextHeading > 0 ? nextHeading : undefined);
   const listed = [...section.matchAll(/^\|\s*([a-z0-9_]+)\s*\|/gm)].map((m) => m[1]);
   const registryIds = new Set(HARD_LIVE_EVIDENCE_REGISTRY.map((r) => r.module_id));
   const orphans = listed.filter((id) => id !== "module_id" && !registryIds.has(id));

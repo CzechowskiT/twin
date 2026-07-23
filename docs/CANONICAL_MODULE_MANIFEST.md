@@ -1,7 +1,7 @@
 # Canonical Product Module Manifest
 
 **Canonical.** One enforceable inventory for Hard LIVE + capability + activation.  
-**Updated:** 2026-07-23 (External Blocker Elimination — HITL attestations + Class D/manifest guards)  
+**Updated:** 2026-07-23 (Founder architecture reclass — Hard LIVE denominator = CORE_PILOT_ONLY)  
 **Branch:** `cursor/phase1-monorepo-scaffold`
 
 ## Vocabulary
@@ -14,6 +14,7 @@
 | ROUTE | Frontend App Router path |
 | API | Backend `/api/v1` surface |
 | WORKER | Celery task |
+| PRODUCT_INCLUSION | `CORE_PILOT` \| `POST_PILOT` \| `OPTIONAL_INTEGRATION` \| `LEGAL_MARKETING_CLAIM` \| … (`frontend/src/lib/product-inclusion-taxonomy.ts`) |
 
 ## Rules
 
@@ -21,44 +22,51 @@
 2. CAPABILITY LIVE requires MODULE PASS + smoke SHA on aligned deploy.
 3. Unmapped ROUTE/API/WORKER under product personas must appear here as PENDING_MAP or REJECTED.
 4. Guard: `frontend/scripts/canonical-module-manifest-guard.test.ts`
-5. Do not delete MODULE rows to lower HELD counts.
-6. Every Hard LIVE module with status `HELD_POLICY` or `BLOCKED*` must appear in **Hard LIVE HELD / BLOCKED inventory** below with **class** + **blocker**. Unmapped held modules fail CI.
+5. Do not delete MODULE rows to lower HELD counts — **reclassify** via product inclusion instead.
+6. Hard LIVE launch-readiness denominator = **CORE_PILOT only** (`HARD_LIVE_DENOMINATOR_RULE`).
+7. Every Hard LIVE module with status `HELD_POLICY` or `BLOCKED*` (CORE denominator) must appear in **Hard LIVE CORE held / blocked inventory** below with **class** + **blocker**. Reclassified optional/legal/post-pilot rows appear in **Product inclusion reclass inventory**.
 
 ## Sources of truth
 
 | Layer | Path |
 |-------|------|
 | Hard LIVE | `docs/HARD_LIVE_EVIDENCE_REGISTRY.json` |
+| Product inclusion | `frontend/src/lib/product-inclusion-taxonomy.ts` |
 | Capability | `docs/CANONICAL_PRODUCT_CAPABILITY_MAP.md` |
 | Activation | `frontend/src/lib/all-workspace-modules-activation.ts` |
 | This manifest | `docs/CANONICAL_MODULE_MANIFEST.md` |
 | Class decisions | `docs/FOUNDER_HELD_POLICY_RELEASE_DECISION_PACK.md` |
 
-## Hard LIVE HELD / BLOCKED inventory
+## Hard LIVE CORE held / blocked inventory
 
-Every non-PASS Hard LIVE row must be listed. Class letters follow Founder decision pack (A–F / C operator).
+Every non-PASS **CORE_PILOT** Hard LIVE row must be listed. Class letters follow Founder decision pack (A–F / C operator).
 
-| module_id | status | class | blocker |
-|-----------|--------|-------|---------|
-| cand_ms_calendar | HELD_POLICY | A | MICROSOFT_WRITE_BLOCKED |
-| plan_payments | HELD_POLICY | A | STRIPE_NOT_PUBLIC |
-| plat_ms_calendar_write | HELD_POLICY | A | MICROSOFT_WRITE_BLOCKED |
-| plat_ms_calendar_busy_read | HELD_POLICY | A | MICROSOFT_BUSY_READ_FLAG_OFF |
-| plat_stripe_public | HELD_POLICY | A | STRIPE_NOT_PUBLIC |
-| plat_authologic_auto_kyc | HELD_POLICY | A | AUTHOLOGIC_AUTO_KYC_OFF |
-| plat_identity_kyc | HELD_POLICY | C | AUTHOLOGIC_CONFIG_DEPENDENT |
-| investor_s3_required_download | HELD_POLICY | C | S3_FOUNDER_KEYS |
-| plat_slack_connector | BLOCKED_EXTERNAL_CREDENTIALS | C | BLOCKED_EXTERNAL_CREDENTIALS |
-| ai_act_certified_claim | HELD_POLICY | D | NO_LEGAL_CERTIFICATION |
-| ai_protected_attr_monitoring | HELD_POLICY | D | PROTECTED_ATTR_MONITORING_LEGAL_HOLD |
-| company_ms_calendar_write | HELD_POLICY | E | MICROSOFT_WRITE_BLOCKED |
-| plat_ats_live_sync_write | HELD_POLICY | E | ATS_LIVE_SYNC_BLOCKED |
-| plat_ats_write_sync | HELD_POLICY | E | ATS_LIVE_SYNC_BLOCKED |
-| investor_external_attestations | HELD_POLICY | F | NO_VERIFIED_CUSTOMER_CLAIMS |
+| module_id | status | class | blocker | product_inclusion |
+|-----------|--------|-------|---------|-------------------|
+| investor_s3_required_download | HELD_POLICY | C | SECURE_DOWNLOAD_BE_TODO | CORE_PILOT |
 
-**Class D note:** `TECH_READY_NO_CLAIM` — honesty may expose tech_ready=true while `ai_act_certified=false` and `protected_attr_monitoring_legal_gate_open=false`. Registry must never mark these PASS.
+**Note:** Temporary CORE held until provider-neutral secure download BE is ready (parent TODO). Metadata list already PASS via `investor_data_room_list`.
 
-**Class F HITL:** `investor_external_attestations` — founder-signed queue (`/api/v1/platform/wave4/attestations`); `verified_customer_claims` stays false until ≥1 SIGNED row.
+## Product inclusion reclass inventory
+
+Former HELD/BLOCKED rows **truthfully reclassified** out of the Hard LIVE denominator (not deleted).
+
+| module_id | status | class | blocker | product_inclusion | CORE counterpart (already PASS) |
+|-----------|--------|-------|---------|-------------------|----------------------------------|
+| cand_ms_calendar | OPTIONAL_INTEGRATION_NOT_CONFIGURED | A | MICROSOFT_WRITE_BLOCKED | OPTIONAL_INTEGRATION | ICS/holds + Google calendar |
+| company_ms_calendar_write | OPTIONAL_INTEGRATION_NOT_CONFIGURED | E | MICROSOFT_WRITE_BLOCKED | OPTIONAL_INTEGRATION | ICS/holds |
+| plat_ms_calendar_write | OPTIONAL_INTEGRATION_NOT_CONFIGURED | A | MICROSOFT_WRITE_BLOCKED | OPTIONAL_INTEGRATION | ICS/holds + busy-read |
+| plat_identity_kyc | OPTIONAL_INTEGRATION_NOT_CONFIGURED | C | AUTHOLOGIC_CONFIG_DEPENDENT | OPTIONAL_INTEGRATION | candidate_identity_verification |
+| plat_authologic_auto_kyc | OPTIONAL_INTEGRATION_NOT_CONFIGURED | A | AUTHOLOGIC_AUTO_KYC_OFF | OPTIONAL_INTEGRATION | candidate_identity_verification |
+| plat_ats_live_sync_write | OPTIONAL_INTEGRATION_NOT_CONFIGURED | E | ATS_LIVE_SYNC_BLOCKED | OPTIONAL_INTEGRATION | ATS dry-run/export/preview |
+| plat_ats_write_sync | OPTIONAL_INTEGRATION_NOT_CONFIGURED | E | ATS_LIVE_SYNC_BLOCKED | OPTIONAL_INTEGRATION | ATS dry-run evidence |
+| plat_slack_connector | OPTIONAL_INTEGRATION_NOT_CONFIGURED | C | BLOCKED_EXTERNAL_CREDENTIALS | OPTIONAL_INTEGRATION | email/in-app notifications |
+| ai_protected_attr_monitoring | POST_PILOT | D | PROTECTED_ATTR_MONITORING_LEGAL_HOLD | POST_PILOT | — (post-pilot) |
+| ai_act_certified_claim | LEGAL_MARKETING_CLAIM | D | NO_LEGAL_CERTIFICATION | LEGAL_MARKETING_CLAIM | claim guard honesty (not certified) |
+
+**Class D note:** `TECH_READY_NO_CLAIM` — honesty may expose tech_ready=true while `ai_act_certified=false` and `protected_attr_monitoring_legal_gate_open=false`. Registry must never mark these PASS / CORE.
+
+**Class F HITL:** `investor_external_attestations` — founder-signed queue (`/api/v1/platform/wave4/attestations`); `verified_customer_claims` stays false until ≥1 SIGNED row. (PASS / CORE_PILOT)
 
 ## Founder completion delta (prior batch)
 
@@ -70,6 +78,7 @@ Every non-PASS Hard LIVE row must be listed. Class letters follow Founder decisi
 | AI | Sandbox external verification + HITL employment ban retained |
 | Enrollment | Capability readiness API with kill-switch OFF |
 | Class A | Busy-read FE opt-out; auto-apply strip visible; MS coming-soon force off |
+| Architecture reclass | Hard LIVE denominator = CORE_PILOT_ONLY; optional vendors / legal claims leave denominator |
 
 ## Investor SOR proof ATS (`investor_sor_proof_ats`)
 

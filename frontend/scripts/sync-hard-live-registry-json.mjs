@@ -11,12 +11,18 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const {
   HARD_LIVE_EVIDENCE_REGISTRY,
   HARD_LIVE_REGISTRY_META,
+  resolveProductInclusion,
+  hardLiveLaunchReadinessCounts,
 } = await import("../src/lib/hard-live-evidence-registry.ts");
+
+const readiness = hardLiveLaunchReadinessCounts();
 
 const doc = {
   definition: HARD_LIVE_REGISTRY_META.definition,
   wave: HARD_LIVE_REGISTRY_META.wave,
   updated: new Date().toISOString().slice(0, 10),
+  hard_live_denominator: HARD_LIVE_REGISTRY_META.hard_live_denominator,
+  core_pilot_readiness: readiness,
   stance: {
     pilot: HARD_LIVE_REGISTRY_META.stance.pilot,
     gate_f: HARD_LIVE_REGISTRY_META.stance.gate_f,
@@ -35,6 +41,7 @@ const doc = {
     persona: m.persona,
     wave: m.wave,
     status: m.status,
+    product_inclusion: resolveProductInclusion(m),
     route: m.route,
     blocker: m.blocker,
     owner: m.owner,
@@ -49,4 +56,6 @@ writeFileSync(
   `${JSON.stringify(doc, null, 2)}\n`,
   "utf8",
 );
-console.log(`Wrote ${doc.modules.length} modules`);
+console.log(
+  `Wrote ${doc.modules.length} modules (CORE pass=${readiness.pass} held=${readiness.held} total_core=${readiness.total_core})`,
+);

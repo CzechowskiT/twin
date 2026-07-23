@@ -11,7 +11,7 @@ const root = join(process.cwd(), "src/lib/production-action-gates.ts");
 test("Founder pilot block constants present", () => {
   const src = readFileSync(root, "utf8");
   assert.match(src, /BLOCKED_BY_FOUNDER/);
-  assert.match(src, /GATE_F_STATUS = "PENDING"/);
+  assert.match(src, /GATE_F_STATUS = "PASS"/);
   assert.match(src, /LAUNCH_STANCE_CANON = "NO-GO"/);
   assert.match(src, /INSUFFICIENT_DATA/);
   assert.match(src, /REAL_CANDIDATE_ENROLLMENT = "NOT_STARTED"/);
