@@ -32,7 +32,7 @@ def _require_ops_admin(settings: Settings, authorization: str | None) -> None:
 
 # founder_completion_registry_align
 # blocker_elimination_registry_align
-EXPECTED_ALEMBIC_HEAD = "098_investor_external_attestations"
+EXPECTED_ALEMBIC_HEAD = "099_data_room_document_blobs"
 
 
 def _read_alembic_current(db: Session) -> str | None:

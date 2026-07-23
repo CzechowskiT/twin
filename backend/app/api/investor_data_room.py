@@ -1,8 +1,11 @@
-"""Investor data room uploads (post-NDA gate; S3 presign or local dev fallback)."""
+"""Investor data room uploads (post-NDA gate; Postgres blob CORE + optional S3)."""
 
 from __future__ import annotations
 
+from urllib.parse import quote
+
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from fastapi.responses import RedirectResponse, Response
 from sqlalchemy.orm import Session
 
 from app.config import Settings, get_settings
@@ -30,14 +33,19 @@ _UPLOAD_ERRORS = {
 def _storage_note(settings: Settings, *, mode: str) -> str:
     if mode == "s3_presigned_put":
         return "Upload the file with HTTP PUT to upload_url before the link expires."
+    if mode == "persistent_upload_slot":
+        return (
+            "Metadata validated. POST bytes to /data-room/uploads/{id}/file — "
+            "stored in persistent Postgres blob for authenticated download."
+        )
     if dr_upload.object_storage_enabled():
         return "Metadata recorded; configure client PUT to the presigned URL."
     if settings.data_room_local_upload_enabled:
         return (
-            "Metadata validated. Use POST /data-room/uploads/{id}/file for local dev storage "
-            "or configure S3_* env vars for presigned PUT."
+            "Metadata validated. Use POST /data-room/uploads/{id}/file for persistent storage "
+            "(Postgres blob; optional local mirror)."
         )
-    return "Metadata validated and queued; configure S3_* on the API for blob storage."
+    return "Metadata validated; enable DATA_ROOM_LOCAL_UPLOAD_ENABLED for persistent blob upload."
 
 
 def _upload_out(row: DataRoomDocumentMetadata, settings: Settings, *, mode: str, upload_url: str | None) -> DataRoomUploadOut:
@@ -57,13 +65,55 @@ def _upload_out(row: DataRoomDocumentMetadata, settings: Settings, *, mode: str,
     )
 
 
+def _attachment_headers(filename: str) -> dict[str, str]:
+    safe = quote(filename.encode("utf-8"))
+    return {"Content-Disposition": f"attachment; filename*=UTF-8''{safe}"}
+
+
 @router.get("/data-room/documents")
 def list_data_room_documents(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> dict:
-    """List authenticated user's data room document metadata (no blob download without S3)."""
+    """List authenticated user's data room documents (download when blob/S3 present)."""
     return wave4.list_data_room_documents(db, user=user)
+
+
+@router.get("/data-room/documents/{document_id}/download")
+def download_data_room_document(
+    document_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> Response:
+    """Authenticated CORE_PILOT secure download — Postgres blob or optional S3 redirect."""
+    row = (
+        db.query(DataRoomDocumentMetadata)
+        .filter(DataRoomDocumentMetadata.id == document_id, DataRoomDocumentMetadata.user_id == user.id)
+        .first()
+    )
+    if not row:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Document not found.")
+    body, redirect_url, mode = dr_upload.read_download_payload(db, row=row)
+    if redirect_url:
+        return RedirectResponse(url=redirect_url, status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+    if body is None:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            detail=f"Blob not available ({mode}). Upload via POST /data-room/uploads/{{id}}/file first.",
+        )
+    return Response(
+        content=body,
+        media_type=row.content_type or "application/octet-stream",
+        headers=_attachment_headers(row.filename),
+    )
+
+
+@router.get("/data-room/storage-status")
+def data_room_storage_status(
+    _user: User = Depends(get_current_user),
+) -> dict:
+    """Honest persistent storage status for investor data room (no secrets)."""
+    return dr_upload.storage_backend_status()
 
 
 @router.post("/data-room/uploads", response_model=DataRoomUploadOut, status_code=status.HTTP_201_CREATED)
@@ -96,16 +146,16 @@ def register_data_room_upload(
     "/data-room/uploads/{document_id}/file",
     response_model=DataRoomUploadOut,
 )
-def upload_data_room_file_local(
+def upload_data_room_file_persistent(
     document_id: int,
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
     settings: Settings = Depends(get_settings),
 ) -> DataRoomUploadOut:
-    """Dev fallback: store bytes on disk when S3 is not configured."""
+    """Store bytes in persistent Postgres blob (CORE_PILOT). S3 clients use presigned PUT instead."""
     if not settings.data_room_local_upload_enabled:
-        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail="Local upload is disabled.")
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail="Persistent upload is disabled.")
     if dr_upload.object_storage_enabled():
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST,
@@ -120,8 +170,9 @@ def upload_data_room_file_local(
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Upload slot not found.")
     data = file.file.read()
     try:
-        dr_upload.save_local_upload_bytes(
-            storage_key=row.storage_key,
+        dr_upload.save_persistent_upload_bytes(
+            db,
+            document_id=row.id,
             data=data,
             expected_size=row.size_bytes,
             expected_checksum=row.checksum_sha256,
@@ -129,7 +180,7 @@ def upload_data_room_file_local(
     except ValueError as exc:
         detail = _UPLOAD_ERRORS.get(str(exc), "Invalid upload.")
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=detail) from exc
-    row.status = "stored_local"
+    row.status = "stored_persistent"
     db.commit()
     db.refresh(row)
-    return _upload_out(row, settings, mode="local_file", upload_url=None)
+    return _upload_out(row, settings, mode="postgres_blob", upload_url=None)

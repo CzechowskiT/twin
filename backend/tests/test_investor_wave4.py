@@ -144,7 +144,8 @@ def test_wave4_data_room_documents(wave4_client: tuple[TestClient, Session]) -> 
     assert res.status_code == 200
     body = res.json()
     assert body["count"] == 1
-    assert body["metadata_only_honesty"] is True
+    assert body["secure_download_live"] is True
+    assert body["secure_download_held"] is False
     assert body["items"][0]["filename"] == "nda.pdf"
 
     investor = client.get("/api/v1/investor/data-room/documents", headers=headers)

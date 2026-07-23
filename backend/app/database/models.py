@@ -12,6 +12,7 @@ from sqlalchemy import (
     Float,
     ForeignKey,
     Integer,
+    LargeBinary,
     String,
     Text,
     UniqueConstraint,
@@ -491,6 +492,25 @@ class DataRoomDocumentMetadata(Base):
     checksum_sha256: Mapped[str | None] = mapped_column(String(64), nullable=True)
     storage_key: Mapped[str | None] = mapped_column(String(512), nullable=True)
     status: Mapped[str] = mapped_column(String(32), nullable=False, default="validated")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class DataRoomDocumentBlob(Base):
+    """Persistent provider-neutral blob (Postgres) for CORE_PILOT secure download.
+
+    Survives multi-replica API without shared ephemeral disk. Optional S3 remains
+    OPTIONAL_INTEGRATION for large objects / CDN.
+    """
+
+    __tablename__ = "data_room_document_blobs"
+
+    document_id: Mapped[int] = mapped_column(
+        ForeignKey("data_room_document_metadata.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    content: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
+    checksum_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
+    size_bytes: Mapped[int] = mapped_column(Integer, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 

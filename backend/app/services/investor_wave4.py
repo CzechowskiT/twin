@@ -572,6 +572,8 @@ def nda_status(db: Session, *, user: User) -> dict[str, Any]:
 
 def list_data_room_documents(db: Session, *, user: User) -> dict[str, Any]:
     seed_flags_and_evidence(db)
+    from app.services import data_room_upload as dr_upload
+
     rows = (
         db.query(DataRoomDocumentMetadata)
         .filter(DataRoomDocumentMetadata.user_id == user.id)
@@ -579,6 +581,7 @@ def list_data_room_documents(db: Session, *, user: User) -> dict[str, Any]:
         .all()
     )
     s3 = object_storage_configured()
+    backend = dr_upload.storage_backend_status()
     return {
         "items": [
             {
@@ -589,16 +592,23 @@ def list_data_room_documents(db: Session, *, user: User) -> dict[str, Any]:
                 "size_bytes": r.size_bytes,
                 "status": r.status,
                 "storage_key_present": bool(r.storage_key),
-                "download_available": s3 and r.status in {"stored", "validated"},
+                "download_available": dr_upload.document_download_available(db, row=r),
+                "download_path": f"/api/v1/investor/data-room/documents/{r.id}/download",
                 "created_at": _iso(r.created_at),
             }
             for r in rows
         ],
         "count": len(rows),
         "s3_configured": s3,
-        "secure_download_held": not s3,
-        "blocker_when_no_s3": "S3_FOUNDER_KEYS",
-        "metadata_only_honesty": True,
+        "s3_optional_integration": True,
+        "secure_download_held": False,
+        "secure_download_live": True,
+        "persistent_storage": backend,
+        "metadata_only_honesty": False,
+        "honesty": (
+            "CORE_PILOT secure download via authenticated GET + Postgres blob "
+            "(optional S3 when configured). Not ephemeral-only."
+        ),
     }
 
 

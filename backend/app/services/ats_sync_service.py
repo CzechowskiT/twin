@@ -406,3 +406,44 @@ def list_sync_attempts(
         ],
         "total": len(rows),
     }
+
+
+def export_sync_proposal(db: Session, *, attempt_id: int) -> dict[str, Any]:
+    """CORE_PILOT export of one ATS sync proposal for human approval.
+
+    Live Greenhouse/Lever write remains OPTIONAL_INTEGRATION — this returns the
+    dry-run payload only.
+    """
+    row = db.query(AtsSyncAttempt).filter(AtsSyncAttempt.id == attempt_id).one_or_none()
+    if row is None:
+        raise ValueError("attempt_not_found")
+    payload: Any = None
+    if row.payload_json:
+        try:
+            payload = json.loads(row.payload_json)
+        except json.JSONDecodeError:
+            payload = {"raw": row.payload_json}
+    return {
+        "module_id": "investor_sor_proof_ats",
+        "product_inclusion": "CORE_PILOT",
+        "export_kind": "ats_sync_proposal",
+        "live_partner_write": "OPTIONAL_INTEGRATION",
+        "ats_live_sync_enabled": is_ats_live_sync_enabled(db),
+        "attempt": {
+            "id": row.id,
+            "company_slug": row.company_slug,
+            "provider": row.provider,
+            "direction": row.direction,
+            "external_id": row.external_id,
+            "dry_run": row.dry_run,
+            "status": row.status,
+            "error_code": row.error_code,
+            "created_at": row.created_at.isoformat() + "Z" if row.created_at else None,
+            "payload": payload,
+        },
+        "approval_required_before_live_write": True,
+        "honesty": (
+            "Proposal/export for approval only. Greenhouse/Lever live write is optional "
+            "and blocked unless ATS_LIVE_SYNC is explicitly enabled."
+        ),
+    }

@@ -91,9 +91,48 @@ def test_prepare_upload_slot_metadata_only_when_s3_disabled(mock_store: MagicMoc
         content_type="application/pdf",
         size_bytes=2048,
     )
-    assert mode == "metadata_only"
+    assert mode == "persistent_upload_slot"
     assert url is None
     assert row.storage_key
+    db.close()
+
+
+def test_persistent_blob_roundtrip_download() -> None:
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    Base.metadata.create_all(engine)
+    Session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+    db = Session()
+    row = dr.record_upload_metadata(
+        db,
+        user_id=1,
+        category="legal",
+        filename="nda.pdf",
+        content_type="application/pdf",
+        size_bytes=11,
+        storage_key="data-room/1/abc/nda.pdf",
+    )
+    payload = b"hello-world"
+    digest = dr.save_persistent_upload_bytes(
+        db,
+        document_id=row.id,
+        data=payload,
+        expected_size=11,
+    )
+    row.status = "stored_persistent"
+    db.commit()
+    assert len(digest) == 64
+    assert dr.document_download_available(db, row=row) is True
+    body, redirect, mode = dr.read_download_payload(db, row=row)
+    assert mode == "postgres_blob"
+    assert redirect is None
+    assert body == payload
+    status = dr.storage_backend_status()
+    assert status["persistent"] is True
+    assert status["persistent_backend"] == "postgres_blob"
     db.close()
 
 

@@ -102,6 +102,18 @@ def sync_dry_run(
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
 
+@router.get("/sync/proposals/{attempt_id}")
+def sync_proposal_export(
+    attempt_id: int,
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    """CORE_PILOT ATS proposal export — dry-run evidence for approval; live write is OPTIONAL."""
+    try:
+        return ats.export_sync_proposal(db, attempt_id=attempt_id)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+
+
 @router.post("/sync/write", status_code=status.HTTP_201_CREATED)
 def sync_write(body: SyncIn, db: Session = Depends(get_db)) -> dict[str, Any]:
     try:
