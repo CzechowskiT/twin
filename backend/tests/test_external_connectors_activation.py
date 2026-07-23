@@ -215,3 +215,14 @@ def test_ssrf_blocks_localhost(conn_client) -> None:
         json={"target_url": "https://127.0.0.1/hook"},
     )
     assert res.status_code == 422
+
+
+def test_ssrf_blocks_private_rfc1918(conn_client) -> None:
+    client, db = conn_client
+    headers = _auth(db)
+    res = client.post(
+        "/api/v1/platform/wave5/connectors/zapier/subscriptions",
+        headers=headers,
+        json={"target_url": "https://10.0.0.8/hook"},
+    )
+    assert res.status_code == 422

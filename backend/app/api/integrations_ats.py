@@ -27,7 +27,11 @@ from app.services import ats_oauth
 from app.services.greenhouse_oauth import GreenhouseOAuthError
 from app.database.models import Application, ApplicationStatus
 from app.database.session import get_db
-from app.services.placement_verification import PLACEMENT_VERIFIED, record_placement_event
+from app.services.placement_verification import (
+    PLACEMENT_DISPUTED,
+    PLACEMENT_VERIFIED,
+    record_placement_event,
+)
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -186,18 +190,30 @@ def _apply_ats_hire(
     if not row:
         logger.info("ATS hire event for unknown external id=%s (%s)", external_id, provider)
         return
-    row.status = ApplicationStatus.HIRED
-    if row.placement_state != PLACEMENT_VERIFIED:
-        row.placement_state = PLACEMENT_VERIFIED
-        row.placement_verified_at = datetime.now(timezone.utc)
-        record_placement_event(
-            db,
-            application_id=row.id,
-            event_type="placement.ats_hire_confirmed",
-            actor="ats_webhook",
-            detail={"provider": provider, "external_id": external_id},
-            from_magic_link=True,
+    # Never auto-resolve disputes via webhook replay / hire events.
+    if row.placement_state == PLACEMENT_DISPUTED:
+        logger.warning(
+            "ATS hire ignored for disputed application %s (%s/%s)",
+            row.id,
+            provider,
+            external_id,
         )
+        return
+    row.status = ApplicationStatus.HIRED
+    if row.placement_state == PLACEMENT_VERIFIED:
+        # Idempotent replay — already verified.
+        db.commit()
+        return
+    row.placement_state = PLACEMENT_VERIFIED
+    row.placement_verified_at = datetime.now(timezone.utc)
+    record_placement_event(
+        db,
+        application_id=row.id,
+        event_type="placement.ats_hire_confirmed",
+        actor="ats_webhook",
+        detail={"provider": provider, "external_id": external_id},
+        from_magic_link=True,
+    )
     db.commit()
     logger.info("ATS webhook marked application %s hired (%s)", row.id, provider)
 

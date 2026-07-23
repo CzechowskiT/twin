@@ -83,9 +83,15 @@ def create_export_request(
     return _serialize(row)
 
 
-def list_export_requests(db: Session, *, candidate_id: str | None = None, limit: int = 50) -> dict[str, Any]:
+def list_export_requests(
+    db: Session,
+    *,
+    user_id: int,
+    candidate_id: str | None = None,
+    limit: int = 50,
+) -> dict[str, Any]:
     cap = max(1, min(limit, 100))
-    query = db.query(ExportRequest)
+    query = db.query(ExportRequest).filter(ExportRequest.created_by_user_id == user_id)
     if candidate_id:
         query = query.filter(ExportRequest.candidate_id == candidate_id.strip()[:64])
     rows = query.order_by(ExportRequest.created_at.desc()).limit(cap).all()

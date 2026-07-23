@@ -29,8 +29,7 @@ def get_export_requests(
     candidate_id: Annotated[str | None, Query()] = None,
     limit: Annotated[int, Query(ge=1, le=100)] = 50,
 ) -> dict:
-    _ = user
-    return list_export_requests(db, candidate_id=candidate_id, limit=limit)
+    return list_export_requests(db, user_id=user.id, candidate_id=candidate_id, limit=limit)
 
 
 @router.post("", status_code=201)

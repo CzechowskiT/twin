@@ -10,8 +10,6 @@ import secrets
 import time
 from datetime import datetime, timezone
 from typing import Any
-from urllib.parse import urlparse
-
 from sqlalchemy.orm import Session
 
 from app.database.models import (
@@ -23,7 +21,6 @@ from app.services.token_crypto import decrypt_secret, encrypt_secret
 
 logger = logging.getLogger(__name__)
 
-ALLOWED_SCHEMES = {"https"}
 MAX_RETRIES = 3
 INTERNAL_RECEIVER_PATH = "/api/v1/platform/wave5/connectors/test-receiver"
 
@@ -41,17 +38,12 @@ def _sign(secret: str, body: bytes) -> str:
 
 
 def _validate_target_url(url: str, *, public_api_base: str | None = None) -> str:
-    raw = (url or "").strip()
-    parsed = urlparse(raw)
-    if parsed.scheme not in ALLOWED_SCHEMES or not parsed.netloc:
-        raise ValueError("target_url_must_be_https")
-    host = (parsed.hostname or "").lower()
-    if host in {"metadata.google.internal"} or host.startswith("169.254."):
-        raise ValueError("target_url_ssrf_blocked")
-    if host in {"127.0.0.1", "localhost"}:
-        if not (public_api_base and raw.startswith(public_api_base.rstrip("/") + INTERNAL_RECEIVER_PATH)):
-            raise ValueError("target_url_ssrf_blocked")
-    return raw
+    from app.services.url_safety import assert_public_https_url
+
+    allow: tuple[str, ...] = ()
+    if public_api_base and public_api_base.startswith("https://"):
+        allow = (public_api_base.rstrip("/") + INTERNAL_RECEIVER_PATH,)
+    return assert_public_https_url(url, allow_localhost_prefixes=allow)
 
 
 def zapier_status(*, public_api_base: str | None = None) -> dict[str, Any]:

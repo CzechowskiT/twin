@@ -158,11 +158,15 @@ def create_placement_event(
 def list_placement_events(
     db: Session,
     *,
+    user_id: int,
     placement_id: str | None = None,
     limit: int = 50,
 ) -> dict[str, Any]:
     cap = max(1, min(limit, 100))
-    query = db.query(PlacementEvent).filter(PlacementEvent.placement_id.isnot(None))
+    query = db.query(PlacementEvent).filter(
+        PlacementEvent.placement_id.isnot(None),
+        PlacementEvent.created_by_user_id == user_id,
+    )
     if placement_id:
         query = query.filter(PlacementEvent.placement_id == placement_id.strip())
     rows = query.order_by(PlacementEvent.created_at.desc()).limit(cap).all()

@@ -87,14 +87,24 @@ def create_request_intake(
     return _serialize(row)
 
 
-def list_request_intake(db: Session, *, limit: int = 50) -> dict[str, Any]:
+def list_request_intake(db: Session, *, user_id: int, limit: int = 50) -> dict[str, Any]:
     cap = max(1, min(limit, 100))
-    rows = db.query(RequestIntakeItem).order_by(RequestIntakeItem.updated_at.desc()).limit(cap).all()
+    rows = (
+        db.query(RequestIntakeItem)
+        .filter(RequestIntakeItem.created_by_user_id == user_id)
+        .order_by(RequestIntakeItem.updated_at.desc())
+        .limit(cap)
+        .all()
+    )
     return {"items": [_serialize(r) for r in rows], "count": len(rows)}
 
 
 def patch_request_intake(db: Session, *, item_id: int, user_id: int, fields: dict[str, Any]) -> dict[str, Any]:
-    row = db.query(RequestIntakeItem).filter(RequestIntakeItem.id == item_id).first()
+    row = (
+        db.query(RequestIntakeItem)
+        .filter(RequestIntakeItem.id == item_id, RequestIntakeItem.created_by_user_id == user_id)
+        .first()
+    )
     if not row:
         raise ValueError("Intake item not found.")
     before = row.status

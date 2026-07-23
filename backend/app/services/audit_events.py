@@ -137,12 +137,13 @@ def create_audit_event(
 def list_audit_events(
     db: Session,
     *,
+    actor_id: str,
     target_type: str | None = None,
     target_id: str | None = None,
     limit: int = 50,
 ) -> dict[str, Any]:
     cap = max(1, min(limit, 100))
-    query = db.query(AuditEvent)
+    query = db.query(AuditEvent).filter(AuditEvent.actor_id == actor_id)
     if target_type:
         query = query.filter(AuditEvent.target_type == target_type.strip())
     if target_id:

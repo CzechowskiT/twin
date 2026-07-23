@@ -87,14 +87,24 @@ def create_review_queue_item(
     return _serialize(row)
 
 
-def list_review_queue(db: Session, *, limit: int = 50) -> dict[str, Any]:
+def list_review_queue(db: Session, *, user_id: int, limit: int = 50) -> dict[str, Any]:
     cap = max(1, min(limit, 100))
-    rows = db.query(ReviewQueueItem).order_by(ReviewQueueItem.updated_at.desc()).limit(cap).all()
+    rows = (
+        db.query(ReviewQueueItem)
+        .filter(ReviewQueueItem.created_by_user_id == user_id)
+        .order_by(ReviewQueueItem.updated_at.desc())
+        .limit(cap)
+        .all()
+    )
     return {"items": [_serialize(r) for r in rows], "count": len(rows)}
 
 
 def patch_review_queue_item(db: Session, *, item_id: int, user_id: int, fields: dict[str, Any]) -> dict[str, Any]:
-    row = db.query(ReviewQueueItem).filter(ReviewQueueItem.id == item_id).first()
+    row = (
+        db.query(ReviewQueueItem)
+        .filter(ReviewQueueItem.id == item_id, ReviewQueueItem.created_by_user_id == user_id)
+        .first()
+    )
     if not row:
         raise ValueError("Queue item not found.")
     before = row.status

@@ -80,12 +80,13 @@ def create_candidate_role_status(
 def list_candidate_role_statuses(
     db: Session,
     *,
+    user_id: int,
     candidate_ref: str | None = None,
     role_ref: str | None = None,
     limit: int = 50,
 ) -> dict[str, Any]:
     cap = max(1, min(limit, 100))
-    query = db.query(CandidateRoleStatus)
+    query = db.query(CandidateRoleStatus).filter(CandidateRoleStatus.updated_by_user_id == user_id)
     if candidate_ref:
         query = query.filter(CandidateRoleStatus.candidate_ref == candidate_ref.strip())
     if role_ref:
@@ -101,7 +102,11 @@ def patch_candidate_role_status(
     status: str,
     user_id: int,
 ) -> dict[str, Any]:
-    row = db.query(CandidateRoleStatus).filter(CandidateRoleStatus.id == row_id).first()
+    row = (
+        db.query(CandidateRoleStatus)
+        .filter(CandidateRoleStatus.id == row_id, CandidateRoleStatus.updated_by_user_id == user_id)
+        .first()
+    )
     if not row:
         raise ValueError("Status row not found.")
     before = row.status

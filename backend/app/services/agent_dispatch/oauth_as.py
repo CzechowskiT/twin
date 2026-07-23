@@ -426,11 +426,27 @@ def validate_client_redirect(settings: Settings, client_id: str, redirect_uri: s
 
 
 def _validate_cimd_redirect(client_id_url: str, redirect_uri: str) -> None:
+    """Fetch CIMD metadata only for allowlisted public hosts — no SSRF.
+
+    Fail closed on blocked hosts / private IPs. Redirect following disabled.
+    When metadata cannot be fetched safely, rely on ChatGPT redirect allowlist
+    already enforced by ``is_allowed_redirect``.
+    """
+    from app.services.url_safety import assert_public_https_url, hostname_is_cimd_allowlisted
+
+    parsed = urlparse(client_id_url)
+    host = (parsed.hostname or "").lower()
+    if not hostname_is_cimd_allowlisted(host):
+        # Do not server-fetch arbitrary client_id URLs (unauthenticated SSRF).
+        return
     try:
-        with httpx.Client(timeout=5.0, follow_redirects=True) as client:
+        assert_public_https_url(client_id_url)
+    except ValueError:
+        return
+    try:
+        with httpx.Client(timeout=5.0, follow_redirects=False) as client:
             res = client.get(client_id_url)
             if res.status_code != 200:
-                # Fall back to ChatGPT host allowlist already checked
                 return
             data = res.json()
     except Exception:

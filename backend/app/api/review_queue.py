@@ -32,8 +32,7 @@ class ReviewQueuePatchIn(BaseModel):
 
 @router.get("")
 def get_queue(db: Session = Depends(get_db), user: User = Depends(get_current_user), limit: Annotated[int, Query(ge=1, le=100)] = 50) -> dict:
-    _ = user
-    return list_review_queue(db, limit=limit)
+    return list_review_queue(db, user_id=user.id, limit=limit)
 
 
 @router.post("", status_code=201)

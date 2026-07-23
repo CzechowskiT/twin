@@ -717,6 +717,21 @@ def draft_company_notification(
         f"wave3-notif-{slug}-"
         f"{hashlib.sha256((tpl + preview).encode()).hexdigest()[:12]}"
     )
+    # Idempotent: identical draft payloads must not 409 on re-smoke.
+    existing = (
+        db.query(CommunicationOutbox)
+        .filter(CommunicationOutbox.dedupe_key == dedupe)
+        .first()
+    )
+    if existing is not None:
+        return {
+            "company_slug": slug,
+            "outbox_id": existing.id,
+            "status": existing.status,
+            "email_sent": False,
+            "send": False,
+            "idempotent": True,
+        }
     draft = enqueue_communication_draft(
         db,
         template_key=tpl,
