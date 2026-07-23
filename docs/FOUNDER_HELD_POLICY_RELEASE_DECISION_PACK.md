@@ -3,7 +3,7 @@
 **Type:** Blank Founder decision form — Cursor does **not** decide RELEASE.  
 **Branch:** `cursor/phase1-monorepo-scaffold`  
 **Prepared:** 2026-07-23  
-**Canonical SHA (at pack time):** see evidence table in activation report (fill after deploy)  
+**Canonical SHA (at pack time):** `51927b99d53ec11a136cb002a6450e9f4e463203` (activation FE/API/worker aligned)  
 **Hard LIVE stance (unchanged):** Gate F **PASS** · Pilot **BLOCKED_BY_FOUNDER** · Launch **NO-GO** · Enrollment **OFF** · Phase 3B **BLOCKED**
 
 This pack covers every `HELD_POLICY` and credential/legal hold that still blocks 100% PASS.  

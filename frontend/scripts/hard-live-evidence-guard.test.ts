@@ -18,6 +18,7 @@ import {
   HARD_LIVE_EVIDENCE_REGISTRY_WAVE5,
   HARD_LIVE_EVIDENCE_REGISTRY_AI_COMPLIANCE,
   HARD_LIVE_REGISTRY_META,
+  WAVE3_SMOKE_SHA,
   assertNoLivePassWithoutSmoke,
   registryModuleIds,
   wave2PendingSmokeIds,
@@ -113,7 +114,7 @@ test("wave3 company modules PASS after smoke; demo journeys removed", () => {
   assert.equal(wave3PendingSmokeIds().length, 0);
   const passed = HARD_LIVE_EVIDENCE_REGISTRY_WAVE3.filter((r) => r.status === "PASS");
   assert.equal(passed.length, 18);
-  assert.ok(passed.every((r) => r.smoke_sha === "e841dffc0db0faabef2ed9e067b2581559752a66"));
+  assert.ok(passed.every((r) => r.smoke_sha === WAVE3_SMOKE_SHA));
   const held = HARD_LIVE_EVIDENCE_REGISTRY_WAVE3.filter((r) => r.status === "HELD_POLICY");
   assert.ok(held.some((r) => r.module_id === "company_integrations"));
   assert.ok(held.some((r) => r.module_id === "company_billing_public_claim"));
@@ -198,7 +199,8 @@ test("docs registry JSON mirrors TS module ids and PASS smoke fields", () => {
   assert.doesNotMatch(raw, /Wave 4 Investor Complete was not shipped/);
   assert.match(raw, /2987e16804fcd7de19db3930f9b7184e465a1d18/);
   assert.match(raw, /b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18/);
-  assert.match(raw, /6317d1569120ed889ef136b250c98ba3bf5b5510/);
+  assert.match(raw, new RegExp(CONNECTOR_SMOKE_SHA!));
+  assert.match(raw, new RegExp(WAVE3_SMOKE_SHA!));
 });
 
 test("production action gates still block enrollment", () => {

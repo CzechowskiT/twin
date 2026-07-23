@@ -21,8 +21,8 @@
     "wave2_sha": "d64e9bbe812ae1ac0bfe73399b03a4b0162c3d55",
     "wave2_at": "2026-07-21T04:12:00Z",
     "wave3_script": "frontend/scripts/wave3-company-module-prod-smoke.test.ts",
-    "wave3_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
-    "wave3_at": "2026-07-22T07:00:00Z",
+    "wave3_sha": "51927b99d53ec11a136cb002a6450e9f4e463203",
+    "wave3_at": "2026-07-23T11:50:00Z",
     "wave4_script": "frontend/scripts/wave4-investor-module-prod-smoke.test.ts",
     "wave4_sha": "2987e16804fcd7de19db3930f9b7184e465a1d18",
     "wave4_at": "2026-07-22T16:28:00Z",
@@ -36,8 +36,8 @@
     "gap_close_sha": "193590f42f75fb3158415d93166c48e60e9be99e",
     "gap_close_at": "2026-07-22T19:24:00Z",
     "connector_script": "frontend/scripts/external-connector-prod-smoke.test.ts",
-    "connector_sha": "6317d1569120ed889ef136b250c98ba3bf5b5510",
-    "connector_at": "2026-07-23T05:14:00Z",
+    "connector_sha": "51927b99d53ec11a136cb002a6450e9f4e463203",
+    "connector_at": "2026-07-23T11:52:00Z",
     "write": true,
     "exclude_from_product_metrics": true
   },
@@ -571,8 +571,8 @@
       "route": "/company/dashboard",
       "blocker": null,
       "owner": "company-squad",
-      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
-      "smoke_at": "2026-07-22T07:00:00Z"
+      "smoke_sha": "51927b99d53ec11a136cb002a6450e9f4e463203",
+      "smoke_at": "2026-07-23T11:50:00Z"
     },
     {
       "module_id": "company_pipeline",
@@ -582,8 +582,8 @@
       "route": "/company/pipeline",
       "blocker": null,
       "owner": "company-squad",
-      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
-      "smoke_at": "2026-07-22T07:00:00Z"
+      "smoke_sha": "51927b99d53ec11a136cb002a6450e9f4e463203",
+      "smoke_at": "2026-07-23T11:50:00Z"
     },
     {
       "module_id": "company_roles",
@@ -593,8 +593,8 @@
       "route": "/company/roles",
       "blocker": null,
       "owner": "company-squad",
-      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
-      "smoke_at": "2026-07-22T07:00:00Z"
+      "smoke_sha": "51927b99d53ec11a136cb002a6450e9f4e463203",
+      "smoke_at": "2026-07-23T11:50:00Z"
     },
     {
       "module_id": "rec_vacancy_creation",
@@ -604,8 +604,8 @@
       "route": "/company/roles",
       "blocker": null,
       "owner": "company-squad",
-      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
-      "smoke_at": "2026-07-22T07:00:00Z"
+      "smoke_sha": "51927b99d53ec11a136cb002a6450e9f4e463203",
+      "smoke_at": "2026-07-23T11:50:00Z"
     },
     {
       "module_id": "company_hiring_cockpit",
@@ -615,8 +615,8 @@
       "route": "/company/hiring-cockpit",
       "blocker": null,
       "owner": "company-squad",
-      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
-      "smoke_at": "2026-07-22T07:00:00Z"
+      "smoke_sha": "51927b99d53ec11a136cb002a6450e9f4e463203",
+      "smoke_at": "2026-07-23T11:50:00Z"
     },
     {
       "module_id": "company_hiring_command_center",
@@ -626,8 +626,8 @@
       "route": "/company/hiring-command-center",
       "blocker": null,
       "owner": "company-squad",
-      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
-      "smoke_at": "2026-07-22T07:00:00Z"
+      "smoke_sha": "51927b99d53ec11a136cb002a6450e9f4e463203",
+      "smoke_at": "2026-07-23T11:50:00Z"
     },
     {
       "module_id": "company_talent_pool",
@@ -637,8 +637,8 @@
       "route": "/company/talent-pool",
       "blocker": null,
       "owner": "company-squad",
-      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
-      "smoke_at": "2026-07-22T07:00:00Z"
+      "smoke_sha": "51927b99d53ec11a136cb002a6450e9f4e463203",
+      "smoke_at": "2026-07-23T11:50:00Z"
     },
     {
       "module_id": "company_team",
@@ -648,8 +648,8 @@
       "route": "/company/team",
       "blocker": null,
       "owner": "company-squad",
-      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
-      "smoke_at": "2026-07-22T07:00:00Z"
+      "smoke_sha": "51927b99d53ec11a136cb002a6450e9f4e463203",
+      "smoke_at": "2026-07-23T11:50:00Z"
     },
     {
       "module_id": "company_candidate_trust_summary",
@@ -659,8 +659,8 @@
       "route": "/company/trust-summary",
       "blocker": null,
       "owner": "company-squad",
-      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
-      "smoke_at": "2026-07-22T07:00:00Z"
+      "smoke_sha": "51927b99d53ec11a136cb002a6450e9f4e463203",
+      "smoke_at": "2026-07-23T11:50:00Z"
     },
     {
       "module_id": "company_org_settings",
@@ -670,8 +670,8 @@
       "route": "/company/org-settings",
       "blocker": null,
       "owner": "company-squad",
-      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
-      "smoke_at": "2026-07-22T07:00:00Z"
+      "smoke_sha": "51927b99d53ec11a136cb002a6450e9f4e463203",
+      "smoke_at": "2026-07-23T11:50:00Z"
     },
     {
       "module_id": "company_permissions",
@@ -681,8 +681,8 @@
       "route": "/company/permissions",
       "blocker": null,
       "owner": "company-squad",
-      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
-      "smoke_at": "2026-07-22T07:00:00Z"
+      "smoke_sha": "51927b99d53ec11a136cb002a6450e9f4e463203",
+      "smoke_at": "2026-07-23T11:50:00Z"
     },
     {
       "module_id": "company_analytics",
@@ -692,8 +692,8 @@
       "route": "/company/hiring-command-center",
       "blocker": null,
       "owner": "company-squad",
-      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
-      "smoke_at": "2026-07-22T07:00:00Z"
+      "smoke_sha": "51927b99d53ec11a136cb002a6450e9f4e463203",
+      "smoke_at": "2026-07-23T11:50:00Z"
     },
     {
       "module_id": "company_audit_log",
@@ -703,8 +703,8 @@
       "route": "/company/audit-log",
       "blocker": null,
       "owner": "company-squad",
-      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
-      "smoke_at": "2026-07-22T07:00:00Z"
+      "smoke_sha": "51927b99d53ec11a136cb002a6450e9f4e463203",
+      "smoke_at": "2026-07-23T11:50:00Z"
     },
     {
       "module_id": "company_scorecards",
@@ -714,8 +714,8 @@
       "route": "/company/scorecards",
       "blocker": null,
       "owner": "company-squad",
-      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
-      "smoke_at": "2026-07-22T07:00:00Z"
+      "smoke_sha": "51927b99d53ec11a136cb002a6450e9f4e463203",
+      "smoke_at": "2026-07-23T11:50:00Z"
     },
     {
       "module_id": "company_notifications",
@@ -725,8 +725,8 @@
       "route": "/company/notifications",
       "blocker": null,
       "owner": "company-squad",
-      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
-      "smoke_at": "2026-07-22T07:00:00Z"
+      "smoke_sha": "51927b99d53ec11a136cb002a6450e9f4e463203",
+      "smoke_at": "2026-07-23T11:50:00Z"
     },
     {
       "module_id": "company_onboarding_synthetic",
@@ -736,8 +736,8 @@
       "route": "/company/onboarding",
       "blocker": null,
       "owner": "company-squad",
-      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
-      "smoke_at": "2026-07-22T07:00:00Z"
+      "smoke_sha": "51927b99d53ec11a136cb002a6450e9f4e463203",
+      "smoke_at": "2026-07-23T11:50:00Z"
     },
     {
       "module_id": "company_integrations",
@@ -783,8 +783,8 @@
       "route": "/company/billing",
       "blocker": null,
       "owner": "company-squad",
-      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
-      "smoke_at": "2026-07-22T07:00:00Z"
+      "smoke_sha": "51927b99d53ec11a136cb002a6450e9f4e463203",
+      "smoke_at": "2026-07-23T11:50:00Z"
     },
     {
       "module_id": "company_billing_public_claim",
@@ -803,8 +803,8 @@
       "route": "/company/billing",
       "blocker": null,
       "owner": "company-squad",
-      "smoke_sha": "e841dffc0db0faabef2ed9e067b2581559752a66",
-      "smoke_at": "2026-07-22T07:00:00Z"
+      "smoke_sha": "51927b99d53ec11a136cb002a6450e9f4e463203",
+      "smoke_at": "2026-07-23T11:50:00Z"
     },
     {
       "module_id": "company_ms_calendar_write",
@@ -1252,8 +1252,8 @@
       "route": "/dashboard/calendar",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "6317d1569120ed889ef136b250c98ba3bf5b5510",
-      "smoke_at": "2026-07-23T05:14:00Z"
+      "smoke_sha": "51927b99d53ec11a136cb002a6450e9f4e463203",
+      "smoke_at": "2026-07-23T11:52:00Z"
     },
     {
       "module_id": "plat_slack_connector",
@@ -1272,8 +1272,8 @@
       "route": "/company/integrations",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "6317d1569120ed889ef136b250c98ba3bf5b5510",
-      "smoke_at": "2026-07-23T05:14:00Z"
+      "smoke_sha": "51927b99d53ec11a136cb002a6450e9f4e463203",
+      "smoke_at": "2026-07-23T11:52:00Z"
     },
     {
       "module_id": "plat_zapier_connector",
@@ -1283,8 +1283,8 @@
       "route": "/company/integrations",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "6317d1569120ed889ef136b250c98ba3bf5b5510",
-      "smoke_at": "2026-07-23T05:14:00Z"
+      "smoke_sha": "51927b99d53ec11a136cb002a6450e9f4e463203",
+      "smoke_at": "2026-07-23T11:52:00Z"
     },
     {
       "module_id": "plat_cloud_storage_connectors",
@@ -1294,8 +1294,8 @@
       "route": "/company/integrations",
       "blocker": null,
       "owner": "platform",
-      "smoke_sha": "6317d1569120ed889ef136b250c98ba3bf5b5510",
-      "smoke_at": "2026-07-23T05:14:00Z"
+      "smoke_sha": "51927b99d53ec11a136cb002a6450e9f4e463203",
+      "smoke_at": "2026-07-23T11:52:00Z"
     },
     {
       "module_id": "plat_ics_import",

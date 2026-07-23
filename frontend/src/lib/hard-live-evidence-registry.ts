@@ -33,8 +33,8 @@ export const WAVE2_SMOKE_SHA: string | null = "d64e9bbe812ae1ac0bfe73399b03a4b01
 export const WAVE2_SMOKE_AT: string | null = "2026-07-21T04:12:00Z";
 
 /** Filled after Wave 3 authenticated prod smoke PASS — null until post-merge smoke. */
-export const WAVE3_SMOKE_SHA: string | null = "e841dffc0db0faabef2ed9e067b2581559752a66";
-export const WAVE3_SMOKE_AT: string | null = "2026-07-22T07:00:00Z";
+export const WAVE3_SMOKE_SHA: string | null = "51927b99d53ec11a136cb002a6450e9f4e463203";
+export const WAVE3_SMOKE_AT: string | null = "2026-07-23T11:50:00Z";
 
 /** Filled after Wave 5 authenticated prod smoke PASS — null until post-merge smoke. */
 export const WAVE5_SMOKE_SHA: string | null = "b3e2adecb6ef09f1aaf1c6be19a12ac74ca16a18";
@@ -53,8 +53,8 @@ export const GAP_CLOSE_SMOKE_SHA: string | null = "193590f42f75fb3158415d93166c4
 export const GAP_CLOSE_SMOKE_AT: string | null = "2026-07-22T19:24:00Z";
 
 /** External connector activation smoke (Google push / Zapier / storage / Teams draft). */
-export const CONNECTOR_SMOKE_SHA: string | null = "6317d1569120ed889ef136b250c98ba3bf5b5510";
-export const CONNECTOR_SMOKE_AT: string | null = "2026-07-23T05:14:00Z";
+export const CONNECTOR_SMOKE_SHA: string | null = "51927b99d53ec11a136cb002a6450e9f4e463203";
+export const CONNECTOR_SMOKE_AT: string | null = "2026-07-23T11:52:00Z";
 
 
 
