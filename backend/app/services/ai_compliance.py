@@ -116,7 +116,7 @@ FLAG_DEFAULTS: tuple[tuple[str, bool, str], ...] = (
     ("AI_PROHIBITED_USE_GUARD_ENABLED", True, "Prohibited-use hard blocks"),
     ("AI_PROMPT_REGISTRY_ENABLED", True, "Versioned prompt registry"),
     ("AI_MODEL_LIFECYCLE_ENABLED", True, "Model lifecycle / rollback audit"),
-    ("AI_EXTERNAL_VERIFICATION_ENABLED", False, "External verification providers — default OFF"),
+    ("AI_EXTERNAL_VERIFICATION_ENABLED", True, "Sandbox external verification — human review required"),
     ("AI_AUTONOMOUS_EMPLOYMENT_DECISIONS", False, "Hard ban — never autonomous hire/reject"),
     ("EXTERNAL_PILOT_ENROLLMENT_ENABLED", False, "Founder block — no real enrollment"),
     ("ATS_LIVE_SYNC", False, "Hard ban — ATS live-sync blocked"),
@@ -158,9 +158,12 @@ SMOKEABLE_MODULES: tuple[dict[str, str], ...] = (
 
 HELD_MODULES: tuple[dict[str, str], ...] = (
     {"module_id": "ai_external_verification", "blocker": "EXTERNAL_VERIFICATION_OFF", "owner": "platform", "route": "/dashboard/evidence/claims", "capability": "external_verify"},
+    # Class D: tech may be ready; marketing/legal claim gate stays closed (TECH_READY_NO_CLAIM).
     {"module_id": "ai_protected_attr_monitoring", "blocker": "PROTECTED_ATTR_MONITORING_LEGAL_HOLD", "owner": "platform", "route": "/board/ai-compliance", "capability": "bias_protected"},
-    {"module_id": "ai_autonomous_employment", "blocker": "AUTONOMOUS_EMPLOYMENT_HARD_BAN", "owner": "platform", "route": "/recruiter/evidence/reviews", "capability": "auto_decide"},
-    {"module_id": "ai_act_certified_claim", "blocker": "NO_LEGAL_CERTIFICATION", "owner": "platform", "route": "/board/ai-compliance", "capability": "legal"},
+    # Class F: hard ban on autonomous final decisions — HITL recommendation API only.
+    {"module_id": "ai_autonomous_employment", "blocker": "AUTONOMOUS_EMPLOYMENT_HARD_BAN", "owner": "platform", "route": "/recruiter/evidence/reviews", "capability": "hitl_recommendation_only"},
+    # Class D: never claimable as EU AI Act certified via product code.
+    {"module_id": "ai_act_certified_claim", "blocker": "NO_LEGAL_CERTIFICATION", "owner": "platform", "route": "/board/ai-compliance", "capability": "legal_no_claim"},
     {"module_id": "ai_wave6_dsr_delete_export", "blocker": "WAVE6_NOT_STARTED", "owner": "privacy", "route": "/dashboard/trust/revoke-delete", "capability": "dsr"},
 )
 
@@ -1117,6 +1120,10 @@ def mark_evidence_after_smoke(
     smoke_sha: str | None,
     notes: str | None = None,
 ) -> dict[str, Any]:
+    from app.services.truthful_claims import assert_certification_not_claimable
+
+    # Class D: tech PASS ≠ marketing / legal certification claim.
+    assert_certification_not_claimable(module_id, status=status)
     held_ids = {m["module_id"] for m in HELD_MODULES}
     if module_id in held_ids and status == "PASS":
         raise ValueError("policy_held_module_cannot_pass")
@@ -1136,8 +1143,11 @@ def mark_evidence_after_smoke(
 
 
 def compliance_status(db: Session) -> dict[str, Any]:
+    from app.services.truthful_claims import truthful_claims_honesty
+
     seed_flags_registry_and_evidence(db)
     evidence = list_hard_live_evidence(db)
+    claims = truthful_claims_honesty()
     return {
         "name": "career_evidence_ai_compliance",
         "phase": "A",
@@ -1150,9 +1160,14 @@ def compliance_status(db: Session) -> dict[str, Any]:
         "wave6": "NOT_STARTED",
         "external_pilot_enrollment_enabled": False,
         "ai_autonomous_employment_decisions": False,
-        "ai_external_verification_enabled": False,
+        "ai_autonomous_employment_stance": "HITL_RECOMMENDATION_ONLY",
+        "ai_external_verification_enabled": flag_enabled(db, "AI_EXTERNAL_VERIFICATION_ENABLED", False),
         "ai_protected_attribute_monitoring_enabled": False,
         "ai_act_certified": False,
+        "ai_act_certified_claimable": False,
+        "protected_attr_monitoring_tech_ready": claims["protected_attr_monitoring_tech_ready"],
+        "protected_attr_monitoring_legal_gate_open": False,
+        "claim_gate_split": claims["claim_gate_split"],
         "compliance_language": "readiness_and_control_coverage_only",
         "smokeable_module_ids": [m["module_id"] for m in SMOKEABLE_MODULES],
         "held_module_ids": [m["module_id"] for m in HELD_MODULES],

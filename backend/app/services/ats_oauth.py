@@ -73,7 +73,7 @@ def start_connect(
     elif pid == "lever" and lv_oauth.is_lever_oauth_configured():
         try:
             authorize_url = lv_oauth.build_lever_authorize_url(state=state)
-        except NotImplementedError:
+        except lv_oauth.LeverOAuthError:
             authorize_url = None
     return row, authorize_url
 

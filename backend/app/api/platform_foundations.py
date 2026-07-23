@@ -46,6 +46,37 @@ def enrollment_gate(db: Session = Depends(get_db)) -> dict:
     }
 
 
+@router.get("/enrollment/capability")
+def enrollment_capability(db: Session = Depends(get_db)) -> dict:
+    """Capability readiness vs launch stance — kill-switch stays OFF.
+
+    Isolated axes (do not conflate):
+    - capability_ready=True → modules are engineering-ready under controls
+    - external_pilot_enrollment_enabled / enrollment_kill_switch → Founder
+      launch stance; default OFF means no real invites
+    - launch_stance=OFF / pilot_stance=BLOCKED_BY_FOUNDER → unchanged
+
+    Founder RELEASE_WITH_CONTROLS allows capability PASS language while
+    EXTERNAL_PILOT_ENROLLMENT_ENABLED remains false.
+    """
+    enabled = foundations.is_external_pilot_enrollment_enabled(db)
+    return {
+        "enrollment_kill_switch": enabled,
+        "external_pilot_enrollment_enabled": enabled,
+        "capability_ready": True,
+        "launch_stance": "OFF",
+        "pilot_stance": "BLOCKED_BY_FOUNDER",
+        "modules": {
+            "rec_recruiter_onboarding": "READY_KILL_SWITCH_OFF",
+            "rec_company_onboarding": "READY_KILL_SWITCH_OFF",
+            "company_invite_delivery": "READY_KILL_SWITCH_OFF",
+            "investor_self_serve_enrollment": "READY_KILL_SWITCH_OFF",
+        },
+        "real_invites": False,
+        "message": "Capability ready with controls; global enrollment kill-switch OFF.",
+    }
+
+
 @router.post("/privacy-cases", status_code=status.HTTP_201_CREATED)
 def create_privacy_case(
     body: PrivacyCaseCreate,

@@ -6,6 +6,7 @@ from app.api import (
     audit_events,
     auto_apply_settings,
     admin_ops,
+    ats_completion,
     chatgpt_twin,
     company,
     company_feedback_persistence,
@@ -96,6 +97,7 @@ api_router.include_router(
     prefix="/platform/ai-compliance",
     tags=["AI Compliance"],
 )
+api_router.include_router(ats_completion.router, tags=["ATS completion"])
 api_router.include_router(work_items.router, prefix="/work-items", tags=["Work items"])
 api_router.include_router(
     candidate_role_status.router,

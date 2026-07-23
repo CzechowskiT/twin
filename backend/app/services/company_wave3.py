@@ -1048,12 +1048,20 @@ def billing_honesty(db: Session, *, company_slug: str) -> dict[str, Any]:
 
 
 def integrations_honesty(db: Session, *, company_slug: str) -> dict[str, Any]:
+    from app.config import get_settings
+    from app.services import ats_sync_service as ats
+
     slug = _require_company_slug(company_slug)
+    settings = get_settings()
+    status = ats.ats_connection_status(db)
     return {
         "company_slug": slug,
-        "ats_live_sync": "BLOCKED",
-        "microsoft_write": "BLOCKED",
-        "status": "HELD_POLICY",
-        "blocker": "ATS_LIVE_SYNC_BLOCKED",
+        "ats_live_sync": status["ats_live_sync"],
+        "ats_oauth_any_connected": status["any_connected"],
+        "vacancy_import": status["vacancy_import"],
+        "microsoft_write": "LIVE" if settings.microsoft_calendar_write_enabled else "BLOCKED",
+        "sync_dry_run": "READY",
+        "status": "PARTIAL" if status["ats_live_sync"] == "BLOCKED" else "LIVE",
+        "blocker": None if status["ats_live_sync"] == "LIVE" else "ATS_LIVE_SYNC_BLOCKED",
         "source": "honesty",
     }

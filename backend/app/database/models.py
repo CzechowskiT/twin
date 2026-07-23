@@ -2747,3 +2747,82 @@ class AiInAppNotification(Base):
     payload_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     read_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class AtsSyncAttempt(Base):
+    """Outbound/inbound ATS sync attempt ledger — dry-run by default."""
+
+    __tablename__ = "ats_sync_attempts"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    company_slug: Mapped[str] = mapped_column(String(80), index=True)
+    provider: Mapped[str] = mapped_column(String(32), index=True)
+    direction: Mapped[str] = mapped_column(String(16), default="write")
+    external_id: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
+    dry_run: Mapped[bool] = mapped_column(Boolean, default=True)
+    status: Mapped[str] = mapped_column(String(32), default="queued")
+    payload_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    error_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class CompanyCalendarConnection(Base):
+    """Employer-scoped calendar connection (MS/Google) — draft-first writes."""
+
+    __tablename__ = "company_calendar_connections"
+    __table_args__ = (UniqueConstraint("company_slug", "provider", name="uq_company_calendar_slug_provider"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    company_slug: Mapped[str] = mapped_column(String(80), index=True)
+    provider: Mapped[str] = mapped_column(String(32))
+    status: Mapped[str] = mapped_column(String(32), default="disconnected")
+    token_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
+    scopes: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class CompanyBillingAccount(Base):
+    """B2B Stripe sandbox account — checkout_enabled only with controls."""
+
+    __tablename__ = "company_billing_accounts"
+    __table_args__ = (UniqueConstraint("company_slug", name="uq_company_billing_slug"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    company_slug: Mapped[str] = mapped_column(String(80), index=True)
+    stripe_customer_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    plan_sku: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    checkout_enabled: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class CareerClaimExternalVerification(Base):
+    """External claim verification provider results — no auto-employment."""
+
+    __tablename__ = "career_claim_external_verifications"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    claim_id: Mapped[int] = mapped_column(Integer, index=True)
+    provider: Mapped[str] = mapped_column(String(64))
+    request_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    result_status: Mapped[str] = mapped_column(String(32), default="pending")
+    result_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CompanyCalendarHold(Base):
+    """Draft interview holds for company scheduling — provider write gated."""
+
+    __tablename__ = "company_calendar_holds"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    company_slug: Mapped[str] = mapped_column(String(80), index=True)
+    title: Mapped[str] = mapped_column(String(200))
+    starts_at: Mapped[datetime] = mapped_column(DateTime)
+    ends_at: Mapped[datetime] = mapped_column(DateTime)
+    provider: Mapped[str] = mapped_column(String(32), default="local")
+    status: Mapped[str] = mapped_column(String(32), default="draft")
+    provider_event_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

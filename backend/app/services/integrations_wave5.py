@@ -680,24 +680,34 @@ def google_calendar_capability_honesty(db: Session, user: User) -> dict[str, Any
 
 
 def ms_calendar_capability_honesty() -> dict[str, Any]:
+    """Microsoft calendar honesty — busy-read path exists; write remains gated.
+
+    Founder RELEASE_WITH_CONTROLS for plat_ms_calendar_busy_read: enable via
+    MICROSOFT_BUSY_READ_ENABLED. Write never implied by busy-read readiness.
+    """
     from app.services.microsoft_calendar_oauth import is_microsoft_calendar_oauth_configured
 
     settings = get_settings()
     configured = is_microsoft_calendar_oauth_configured()
+    busy_on = bool(settings.microsoft_busy_read_enabled)
+    write_on = bool(settings.microsoft_calendar_write_enabled)
     return {
         "integration": "microsoft_calendar",
         "capabilities": {
             "CONFIGURATION": "PARTIAL" if configured else "NOT_BUILT",
-            "READ": "HELD_POLICY",
-            "WRITE": "HELD_POLICY",
+            "READ": "LIVE" if busy_on and configured else ("PARTIAL" if configured else "HELD_POLICY"),
+            "BUSY_READ": "LIVE" if busy_on else "READY_FLAG_OFF",
+            "WRITE": "LIVE" if write_on else "HELD_POLICY",
             "SYNC": "NOT_BUILT",
             "WEBHOOK": "NOT_BUILT",
             "MONITORING": "PARTIAL",
         },
-        "microsoft_busy_read_enabled": bool(settings.microsoft_busy_read_enabled),
-        "microsoft_calendar_write_enabled": False,
-        "blocker_write": "MICROSOFT_WRITE_BLOCKED",
+        "microsoft_busy_read_enabled": busy_on,
+        "microsoft_calendar_write_enabled": write_on,
+        "blocker_write": None if write_on else "MICROSOFT_WRITE_BLOCKED",
         "smoke_may_write_provider": False,
+        "write_gated": not write_on,
+        "honesty": "busy_read_does_not_imply_write",
         "source": "honesty",
     }
 

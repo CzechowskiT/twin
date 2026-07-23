@@ -627,3 +627,154 @@ def company_integrations_honesty(
         company_slug_query=company_slug,
     )
     return wave3.integrations_honesty(db, company_slug=slug)
+
+
+@router.get("/calendar/status")
+def company_calendar_status(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    from app.services import company_calendar_service as cal
+
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token or token,
+        company_slug_query=company_slug,
+    )
+    return cal.calendar_status(db, company_slug=slug)
+
+
+@router.get("/calendar/holds")
+def company_calendar_holds_list(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    from app.services import company_calendar_service as cal
+
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token or token,
+        company_slug_query=company_slug,
+    )
+    return cal.list_holds(db, company_slug=slug)
+
+
+@router.post("/calendar/holds", status_code=status.HTTP_201_CREATED)
+def company_calendar_holds_create(
+    body: dict,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    from datetime import datetime
+
+    from app.services import company_calendar_service as cal
+
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token or token,
+        company_slug_query=company_slug,
+    )
+    try:
+        starts = datetime.fromisoformat(str(body.get("starts_at", "")).replace("Z", "+00:00")).replace(tzinfo=None)
+        ends = datetime.fromisoformat(str(body.get("ends_at", "")).replace("Z", "+00:00")).replace(tzinfo=None)
+        return cal.create_hold_draft(
+            db,
+            company_slug=slug,
+            title=str(body.get("title") or "Interview hold"),
+            starts_at=starts,
+            ends_at=ends,
+            provider=str(body.get("provider") or "local"),
+        )
+    except (ValueError, TypeError) as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/billing/checkout-session", status_code=status.HTTP_201_CREATED)
+def company_billing_checkout_session(
+    body: dict,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    token: Annotated[str | None, Query()] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    """B2B Stripe sandbox checkout — test-mode Session when keys present; else honest stub.
+
+    Never claims public launch. Live-mode Stripe keys are rejected.
+    """
+    from datetime import datetime, timezone
+
+    from app.database.models import CompanyBillingAccount
+    from app.services.company_stripe_sandbox import create_company_sandbox_checkout, stripe_key_mode
+    from app.services.platform_foundations import record_domain_event
+
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token or token,
+        company_slug_query=company_slug,
+    )
+    plan_sku = str(body.get("plan_sku") or "company_pilot")[:64]
+    mode = stripe_key_mode(getattr(settings, "stripe_secret_key", "") or "")
+    if mode == "live":
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="live_stripe_forbidden_in_completion_batch")
+
+    row = db.query(CompanyBillingAccount).filter(CompanyBillingAccount.company_slug == slug).one_or_none()
+    if row is None:
+        row = CompanyBillingAccount(
+            company_slug=slug,
+            stripe_customer_id=None,
+            plan_sku=plan_sku,
+            checkout_enabled=False,
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc),
+        )
+        db.add(row)
+        db.commit()
+        db.refresh(row)
+
+    result = create_company_sandbox_checkout(
+        settings,
+        company_slug=slug,
+        plan_sku=plan_sku,
+        account_id=int(row.id),
+    )
+    row.checkout_enabled = bool(result.get("checkout_enabled"))
+    row.plan_sku = plan_sku
+    row.updated_at = datetime.now(timezone.utc)
+    db.add(row)
+    db.commit()
+    record_domain_event(
+        db,
+        event_name="company.billing_checkout_sandbox",
+        aggregate_type="company_billing_account",
+        aggregate_id=str(row.id),
+        payload={
+            "stripe_mode": result.get("stripe_mode"),
+            "sandbox": result.get("sandbox"),
+            "livemode": result.get("livemode"),
+            "company_slug": slug,
+            "public_launch": False,
+        },
+    )
+    return result

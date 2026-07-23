@@ -39,6 +39,11 @@ class PlansPublicResponse(BaseModel):
         default="",
         description="Human-readable summary (English) of checkout methods for dashboards.",
     )
+    # Founder RELEASE_WITH_CONTROLS honesty — sandbox ≠ public launch.
+    stripe_sandbox_checkout_enabled: bool = True
+    stripe_not_public_launch: bool = True
+    public_launch: bool = False
+    stripe_mode: str = "unset"
 
 
 class CheckoutRequest(BaseModel):
@@ -47,6 +52,10 @@ class CheckoutRequest(BaseModel):
 
 class CheckoutResponse(BaseModel):
     url: str
+    stripe_sandbox_checkout_enabled: bool = True
+    stripe_not_public_launch: bool = True
+    public_launch: bool = False
+    stripe_mode: str = "unset"
 
 
 class PortalResponse(BaseModel):

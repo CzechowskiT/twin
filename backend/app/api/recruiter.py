@@ -686,6 +686,103 @@ def recruiter_inbox_schedule(
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
 
+@router.get("/calendar/interviews")
+def recruiter_calendar_interviews(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    """Live recruiter calendar list — manual schedules + holds (provider write gated)."""
+    from app.database.models import Application
+
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
+    apps = (
+        db.query(Application)
+        .filter(Application.recruiter_scheduling_status.isnot(None))
+        .order_by(Application.id.desc())
+        .limit(50)
+        .all()
+    )
+    interviews = []
+    for app in apps:
+        if getattr(app, "company_slug", None) and app.company_slug != slug:
+            continue
+        interviews.append(
+            {
+                "id": app.id,
+                "title": f"Application #{app.id}",
+                "status": app.recruiter_scheduling_status,
+                "starts_at": app.recruiter_manual_slot_at.isoformat() + "Z" if app.recruiter_manual_slot_at else None,
+                "source": "manual_schedule",
+            }
+        )
+    return {
+        "company_slug": slug,
+        "interviews": interviews,
+        "holds": [],
+        "microsoft_write_enabled": bool(settings.microsoft_calendar_write_enabled),
+        "live": True,
+    }
+
+
+@router.post("/calendar/holds", status_code=status.HTTP_201_CREATED)
+def recruiter_calendar_holds(
+    body: dict,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    """Create a local interview hold draft for the company tenant."""
+    from datetime import datetime
+
+    from app.services.platform_foundations import record_domain_event
+
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
+    title = str(body.get("title") or "Interview hold")[:200]
+    starts_at = body.get("starts_at")
+    ends_at = body.get("ends_at")
+    if not starts_at or not ends_at:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="starts_at_and_ends_at_required")
+    record_domain_event(
+        db,
+        event_name="recruiter.calendar_hold_draft",
+        aggregate_type="organization_tenant",
+        aggregate_id=slug,
+        payload={
+            "title": title,
+            "starts_at": starts_at,
+            "ends_at": ends_at,
+            "provider_write": False,
+            "microsoft_write_enabled": bool(settings.microsoft_calendar_write_enabled),
+        },
+    )
+    return {
+        "company_slug": slug,
+        "title": title,
+        "starts_at": starts_at,
+        "ends_at": ends_at,
+        "status": "draft",
+        "provider_write": False,
+        "created_at": datetime.utcnow().isoformat() + "Z",
+    }
+
+
 @router.get("/analytics")
 def recruiter_analytics(
     db: Session = Depends(get_db),

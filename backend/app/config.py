@@ -410,6 +410,20 @@ class Settings(BaseSettings):
     nightly_auto_apply_default_daily_limit: int = 10
     nightly_auto_apply_cooldown_seconds: int = 30
     nightly_auto_apply_supported_boards: str = "pracuj,pracuj.pl"
+    # Founder RELEASE_WITH_CONTROLS: default prepares packages for human review;
+    # never CAPTCHA bypass. AUTO_SUBMIT is ops-only and still respects kill switch.
+    nightly_auto_apply_submit_mode: str = "REVIEW_BEFORE_SUBMIT"
+    # Candidate Stripe honesty — sandbox checkout allowed; not public launch.
+    stripe_sandbox_checkout_enabled: bool = True
+    stripe_not_public_launch: bool = True
+    # Optional B2B company pilot Price id (test mode). Empty → honest sandbox_stub.
+    stripe_price_id_company_pilot: str = Field(
+        default="",
+        validation_alias=AliasChoices(
+            "STRIPE_PRICE_ID_COMPANY_PILOT",
+            "STRIPE_PRICE_COMPANY_PILOT",
+        ),
+    )
 
     # Outbound webhook after auto-apply (HMAC optional; empty URL disables).
     employer_webhook_url: str = ""

@@ -109,6 +109,13 @@ class ReviewIn(BaseModel):
     claim_id: str | None = Field(None, max_length=64)
 
 
+class EmploymentRecommendationIn(BaseModel):
+    subject_id: str = Field(..., min_length=1, max_length=128)
+    recommendation_kind: str = Field(..., min_length=2, max_length=64)
+    rationale: str = Field(..., min_length=2, max_length=4000)
+    confidence: float | None = Field(None, ge=0, le=1)
+
+
 class GuardProbeIn(BaseModel):
     kind: str = Field(..., pattern=r"^(prohibited_use|protected_attr|prompt_injection|autonomous_employment)$")
     use_key: str | None = Field(None, max_length=128)
@@ -269,6 +276,28 @@ def post_review(body: ReviewIn, db: Session = Depends(get_db), user: User = Depe
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
 
 
+@router.post("/employment/recommendations", status_code=status.HTTP_201_CREATED)
+def post_employment_recommendation(
+    body: EmploymentRecommendationIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    """HITL recommendation-only — never autonomous final employment decisions."""
+    from app.services import ai_employment_hitl as hitl
+
+    try:
+        return hitl.recommend_employment_action(
+            db,
+            user=user,
+            subject_id=body.subject_id,
+            recommendation_kind=body.recommendation_kind,
+            rationale=body.rationale,
+            confidence=body.confidence,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
+
+
 @router.post("/guards/probe")
 def post_guard(body: GuardProbeIn, db: Session = Depends(get_db), _user: User = Depends(get_current_user)) -> dict:
     try:
@@ -297,6 +326,25 @@ def post_rollback(body: RollbackPromptIn, db: Session = Depends(get_db), _user: 
         return svc.rollback_prompt_version(db, prompt_template_id=body.prompt_template_id, to_version=body.to_version)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
+
+
+@router.post("/claims/{claim_id}/external-verify", status_code=status.HTTP_201_CREATED)
+def post_external_verify(
+    claim_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    """Sandbox external verification — never autonomous employment."""
+    from app.services import ai_external_verification as ext
+
+    try:
+        svc.assert_smoke_user_safe(user)
+    except ValueError:
+        pass  # allow non-smoke authenticated users; still human_review_required
+    try:
+        return ext.verify_claim_external(db, claim_id=claim_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
 
 
 @router.post("/smoke/assert-exclusion")
