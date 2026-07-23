@@ -30,6 +30,7 @@ def _require_ops_admin(settings: Settings, authorization: str | None) -> None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid admin token")
 
 
+# founder_completion_registry_align
 EXPECTED_ALEMBIC_HEAD = "097_founder_completion_ats_calendar_billing"
 
 
