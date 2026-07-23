@@ -43,9 +43,9 @@ Every non-PASS **CORE_PILOT** Hard LIVE row must be listed. Class letters follow
 
 | module_id | status | class | blocker | product_inclusion |
 |-----------|--------|-------|---------|-------------------|
-| investor_s3_required_download | HELD_POLICY | C | SECURE_DOWNLOAD_BE_TODO | CORE_PILOT |
+| — | — | — | **none** (CORE held=0 / blocked=0) | — |
 
-**Note:** Temporary CORE held until provider-neutral secure download BE is ready (parent TODO). Metadata list already PASS via `investor_data_room_list`.
+**Note:** `investor_s3_required_download` promoted to PASS (provider-neutral Postgres secure download, tip `c91a21e1`). Optional vendor modules remain outside the denominator.
 
 ## Product inclusion reclass inventory
 

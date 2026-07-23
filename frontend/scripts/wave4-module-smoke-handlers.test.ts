@@ -18,13 +18,10 @@ test("wave4 smokeable set is sized for investor complete", () => {
   assert.ok(WAVE4_SMOKEABLE_MODULES.includes("board_implementation_tracker"));
 });
 
-test("policy modules are excluded from selection", () => {
+test("policy held set empty after pilot closure", () => {
+  assert.equal(WAVE4_POLICY_HELD_MODULES.length, 0);
   const selected = parseModuleSelection("all");
-  for (const id of WAVE4_POLICY_HELD_MODULES) {
-    assert.ok(!selected.includes(id as never), id);
-  }
-  assert.ok(WAVE4_POLICY_HELD_MODULES.includes("investor_self_serve_enrollment"));
-  assert.ok(WAVE4_POLICY_HELD_MODULES.includes("investor_s3_required_download"));
+  assert.equal(selected.length, WAVE4_SMOKEABLE_MODULES.length);
 });
 
 test("parseModuleSelection filters unknown and held ids", () => {

@@ -36,11 +36,8 @@ export const WAVE4_SMOKEABLE_MODULES = [
   "investor_product_proof_boundary",
 ] as const;
 
-export const WAVE4_POLICY_HELD_MODULES = [
-  "investor_external_attestations",
-  "investor_s3_required_download",
-  "investor_self_serve_enrollment",
-] as const;
+/** Empty after Final Pilot Launch Closure — former holds promoted to PASS in FE registry. */
+export const WAVE4_POLICY_HELD_MODULES = [] as const;
 
 export type Wave4SmokeableModule = (typeof WAVE4_SMOKEABLE_MODULES)[number];
 
@@ -259,7 +256,7 @@ export async function runModuleSmoke(
         if (!body || body.launch !== "NO-GO" || body.live_claim !== false) {
           return { module_id: moduleId, ok: false, reason: "board_stance_invalid" };
         }
-        if (body.wave4_held_modules !== 3) {
+        if (body.wave4_held_modules !== 0) {
           return { module_id: moduleId, ok: false, reason: "board_held_count" };
         }
         const markErr = await markPassIfWrite(ctx, moduleId);

@@ -20,6 +20,7 @@ import {
   HARD_LIVE_EVIDENCE_REGISTRY_WAVE5,
   HARD_LIVE_EVIDENCE_REGISTRY_AI_COMPLIANCE,
   HARD_LIVE_REGISTRY_META,
+  PILOT_CLOSURE_SMOKE_SHA,
   WAVE3_SMOKE_SHA,
   assertNoLivePassWithoutSmoke,
   corePilotRegistryModules,
@@ -54,29 +55,23 @@ test("stance remains Founder-blocked; Gate F PASS; Launch NO-GO; Enrollment OFF"
   assert.equal(HARD_LIVE_REGISTRY_META.hard_live_denominator, "CORE_PILOT_ONLY");
 });
 
-test("CORE_PILOT denominator: held=0 or only temporary investor secure download", () => {
+test("CORE_PILOT denominator: held=0 after secure download PASS", () => {
   const counts = hardLiveLaunchReadinessCounts();
   assert.equal(counts.total_core, corePilotRegistryModules().length);
-  assert.equal(counts.pass, 142);
+  assert.equal(counts.pass, 143);
+  assert.equal(counts.held, 0);
   assert.equal(counts.optional_out, 8);
   assert.equal(counts.legal_out, 1);
   assert.equal(counts.post_pilot, 1);
   assert.equal(counts.blocked, 0);
-  // Temporary CORE held until BE secure download (parent TODO)
-  const coreHeld = corePilotRegistryModules().filter((r) => r.status === "HELD_POLICY");
-  assert.equal(counts.held, coreHeld.length);
-  assert.ok(counts.held <= 1, `CORE held must be 0 or 1 temporary, got ${counts.held}`);
-  if (counts.held === 1) {
-    assert.equal(coreHeld[0]!.module_id, "investor_s3_required_download");
-  }
   assert.equal(HARD_LIVE_REGISTRY_META.corePilotPassCount, counts.pass);
-  assert.equal(HARD_LIVE_REGISTRY_META.corePilotHeldCount, counts.held);
+  assert.equal(HARD_LIVE_REGISTRY_META.corePilotHeldCount, 0);
 });
 
 test("no CORE PASS rows with missing criterion 25 or without smoke_sha", () => {
   assert.doesNotThrow(() => assertNoLivePassWithoutSmoke());
   const passed = HARD_LIVE_EVIDENCE_REGISTRY.filter((r) => r.status === "PASS");
-  assert.equal(passed.length, 142);
+  assert.equal(passed.length, 143);
   for (const row of passed) {
     assert.equal(resolveProductInclusion(row), "CORE_PILOT", row.module_id);
     assert.ok(!row.missing_criteria.includes(25), row.module_id);
@@ -309,10 +304,11 @@ test("docs registry JSON mirrors TS module ids, product_inclusion, CORE readines
   assert.equal(doc.wave, "5");
   assert.equal(doc.hard_live_denominator, "CORE_PILOT_ONLY");
   assert.ok(doc.core_pilot_readiness);
-  assert.equal(doc.core_pilot_readiness!.pass, 142);
+  assert.equal(doc.core_pilot_readiness!.pass, 143);
+  assert.equal(doc.core_pilot_readiness!.held, 0);
   assert.equal(doc.core_pilot_readiness!.blocked, 0);
   const passDocs = doc.modules.filter((m) => m.status === "PASS");
-  assert.equal(passDocs.length, 142);
+  assert.equal(passDocs.length, 143);
   for (const m of passDocs) {
     assert.ok(m.smoke_sha, m.module_id);
     assert.equal(m.product_inclusion, "CORE_PILOT", m.module_id);
@@ -324,10 +320,11 @@ test("docs registry JSON mirrors TS module ids, product_inclusion, CORE readines
   assert.doesNotMatch(raw, /"status": "DEMO_ONLY"/);
   assert.doesNotMatch(raw, /"status": "PENDING_SMOKE"/);
   assert.match(raw, /ai_claim_declared/);
-  assert.match(raw, /Founder architecture reclass/);
+  assert.match(raw, /Final Pilot Launch Closure|CORE held=0/);
   assert.match(raw, new RegExp(CONNECTOR_SMOKE_SHA!));
   assert.match(raw, new RegExp(WAVE3_SMOKE_SHA!));
   assert.match(raw, new RegExp(FOUNDER_COMPLETION_SMOKE_SHA!));
+  assert.match(raw, new RegExp(PILOT_CLOSURE_SMOKE_SHA!));
 });
 
 test("production action gates still block enrollment; Gate F PASS", () => {
@@ -376,17 +373,19 @@ test("Class D TECH_READY_NO_CLAIM modules never PASS in registry", () => {
   }
 });
 
-test("wave4 investor: secure download temporary CORE held", () => {
+test("wave4 investor: secure download CORE PASS; held=0", () => {
   assert.equal(HARD_LIVE_EVIDENCE_REGISTRY_WAVE4.length, 15);
   const passed = HARD_LIVE_EVIDENCE_REGISTRY_WAVE4.filter((r) => r.status === "PASS");
-  assert.equal(passed.length, 14);
+  assert.equal(passed.length, 15);
   assert.equal(wave4PendingSmokeIds().length, 0);
   const held = HARD_LIVE_EVIDENCE_REGISTRY_WAVE4.filter((r) => r.status === "HELD_POLICY");
-  assert.equal(held.length, 1);
-  assert.ok(held.some((r) => r.module_id === "investor_s3_required_download"));
-  assert.equal(resolveProductInclusion(held[0]!), "CORE_PILOT");
-  assert.match(held[0]!.notes, /provider-neutral|TODO/i);
+  assert.equal(held.length, 0);
+  const dl = HARD_LIVE_EVIDENCE_REGISTRY_WAVE4.find((r) => r.module_id === "investor_s3_required_download");
+  assert.ok(dl);
+  assert.equal(dl!.status, "PASS");
+  assert.equal(resolveProductInclusion(dl!), "CORE_PILOT");
+  assert.match(dl!.notes, /Postgres|secure download/i);
   assert.ok(passed.some((r) => r.module_id === "investor_self_serve_enrollment"));
   assert.ok(passed.some((r) => r.module_id === "investor_external_attestations"));
-  assert.match(HARD_LIVE_REGISTRY_META.wave4_note, /CORE_PILOT_ONLY|architecture reclass/);
+  assert.match(HARD_LIVE_REGISTRY_META.wave4_note, /CORE held=0|CORE_PILOT_ONLY/);
 });

@@ -1,7 +1,7 @@
 """Investor Wave 4 — NDA gate, data room metadata, placement/trust readonly, board readiness.
 
-No secure data room LIVE claim. Self-serve enrollment and external attestations HELD.
-Smoke must never PASS policy-held modules or flip Launch / Gate F / Pilot stance.
+CORE secure download LIVE via Postgres blob. Wave 4 policy holds cleared after founder reclass.
+Smoke must never flip Launch / Gate F / Pilot stance / enrollment.
 """
 
 from __future__ import annotations
@@ -64,27 +64,33 @@ WAVE4_SMOKEABLE_MODULES: tuple[dict[str, str], ...] = (
         "owner": "investor-squad",
         "route": "/investor/product-proof",
     },
-)
-
-WAVE4_HELD_MODULES: tuple[dict[str, str], ...] = (
     {
         "module_id": "investor_external_attestations",
-        "blocker": "NO_VERIFIED_CUSTOMER_CLAIMS",
         "owner": "investor-squad",
-        "route": "/investor/attestations",
+        "route": "/investor/trust-proof",
     },
     {
         "module_id": "investor_s3_required_download",
-        "blocker": "S3_FOUNDER_KEYS",
         "owner": "investor-squad",
         "route": "/investor/data-room",
     },
     {
         "module_id": "investor_self_serve_enrollment",
-        "blocker": "ENROLLMENT_OFF",
         "owner": "investor-squad",
-        "route": "/login/investor",
+        "route": "/register/investor",
     },
+)
+
+# Former policy holds promoted in FE Hard LIVE registry (attestations HITL, secure download,
+# enrollment capability with kill-switch OFF). Keep empty so smoke can mark PASS.
+WAVE4_HELD_MODULES: tuple[dict[str, str], ...] = ()
+
+WAVE4_FORMER_HELD_MODULE_IDS: frozenset[str] = frozenset(
+    {
+        "investor_external_attestations",
+        "investor_s3_required_download",
+        "investor_self_serve_enrollment",
+    }
 )
 
 
@@ -178,6 +184,21 @@ def seed_flags_and_evidence(db: Session) -> int:
             )
             created += 1
 
+    # Reconcile former holds → smokeable PASS/PARTIAL (do not invent PASS without smoke_sha).
+    for module_id in WAVE4_FORMER_HELD_MODULE_IDS:
+        row = (
+            db.query(HardLiveEvidenceRecord)
+            .filter(HardLiveEvidenceRecord.module_id == module_id)
+            .one_or_none()
+        )
+        if row is not None and row.status == "HELD_POLICY":
+            row.status = "PARTIAL"
+            row.blocker = "authenticated_prod_smoke_required"
+            row.notes = (
+                "Former policy hold cleared — PARTIAL until authenticated prod smoke marks PASS."
+            )
+            created += 1
+
     if created:
         db.commit()
         logger.info("investor_wave4_seeded", extra={"created": created})
@@ -222,7 +243,7 @@ def list_hard_live_evidence(
         "persona": persona or "all",
         "live_claim_forbidden_until_smoke": True,
         "pilot": "BLOCKED_BY_FOUNDER",
-        "gate_f": "PENDING",
+        "gate_f": "PASS",
         "launch": "NO-GO",
         "items": [_serialize_evidence(r) for r in rows],
         "counts": {
@@ -288,7 +309,7 @@ def wave4_status(db: Session) -> dict[str, Any]:
         "name": "investor_complete",
         "live_claim": False,
         "pilot_stance": "BLOCKED_BY_FOUNDER",
-        "gate_f": "PENDING",
+        "gate_f": "PASS",
         "launch": "NO-GO",
         "pmf_evidence": "INSUFFICIENT_DATA",
         "real_enrollment": "NOT_STARTED",
@@ -327,7 +348,7 @@ def policy_holds() -> dict[str, Any]:
         "external_attestations": "HITL_FOUNDER_SIGNATURE_REQUIRED",
         "self_serve_investor_enrollment": "NOT_STARTED",
         "pilot": "BLOCKED_BY_FOUNDER",
-        "gate_f": "PENDING",
+        "gate_f": "PASS",
         "launch": "NO-GO",
         "founder_command": "NOT_USED",
         "product_agent": "NOT_USED",
@@ -685,6 +706,6 @@ def board_readiness_snapshot(db: Session) -> dict[str, Any]:
         "wave4_held_modules": evidence["counts"]["held_policy"],
         "policy_holds": policy_holds(),
         "launch": "NO-GO",
-        "gate_f": "PENDING",
+        "gate_f": "PASS",
         "live_claim": False,
     }

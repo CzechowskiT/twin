@@ -4,8 +4,8 @@
   "updated": "2026-07-23",
   "hard_live_denominator": "CORE_PILOT_ONLY",
   "core_pilot_readiness": {
-    "pass": 142,
-    "held": 1,
+    "pass": 143,
+    "held": 0,
     "blocked": 0,
     "optional_out": 8,
     "legal_out": 1,
@@ -54,6 +54,9 @@
     "blocker_elimination_script": "frontend/scripts/founder-completion-module-prod-smoke.test.ts",
     "blocker_elimination_sha": "e7c385c4e638968c9db959b7fd7dd6112fb8aa5d",
     "blocker_elimination_at": "2026-07-23T14:22:00Z",
+    "pilot_closure_script": "prod investor data-room upload→download + ATS proposal export",
+    "pilot_closure_sha": "c91a21e14505cc5d617b07dff4849a5deb61a7d4",
+    "pilot_closure_at": "2026-07-23T16:50:00Z",
     "write": true,
     "exclude_from_product_metrics": true
   },
@@ -1112,11 +1115,13 @@
       "module_id": "investor_s3_required_download",
       "persona": "investor",
       "wave": "4",
-      "status": "HELD_POLICY",
+      "status": "PASS",
       "product_inclusion": "CORE_PILOT",
       "route": "/investor/data-room",
-      "blocker": "SECURE_DOWNLOAD_BE_TODO",
-      "owner": "investor-squad"
+      "blocker": null,
+      "owner": "investor-squad",
+      "smoke_sha": "c91a21e14505cc5d617b07dff4849a5deb61a7d4",
+      "smoke_at": "2026-07-23T16:50:00Z"
     },
     {
       "module_id": "investor_self_serve_enrollment",
@@ -1873,5 +1878,5 @@
       "smoke_at": "2026-07-22T19:24:00Z"
     }
   ],
-  "wave4_note": "Founder architecture reclass 2026-07-23: Hard LIVE denominator=CORE_PILOT_ONLY. Optional MS Graph write / Authologic / ATS write / Slack leave denominator (OPTIONAL_INTEGRATION_NOT_CONFIGURED). ai_act_certified_claim=LEGAL_MARKETING_CLAIM; ai_protected_attr_monitoring=POST_PILOT. investor_s3_required_download remains temporary CORE HELD (secure download BE TODO). Gate F PASS · Pilot BLOCKED_BY_FOUNDER · Launch NO-GO · Enrollment OFF unchanged."
+  "wave4_note": "Final Pilot Launch Closure 2026-07-23: Hard LIVE denominator=CORE_PILOT_ONLY; CORE held=0. Optional MS Graph write / Authologic / ATS write / Slack = OPTIONAL_INTEGRATION_NOT_CONFIGURED. ai_act_certified_claim=LEGAL_MARKETING_CLAIM; ai_protected_attr_monitoring=POST_PILOT. investor_s3_required_download PASS via Postgres secure download. Gate F PASS · Pilot BLOCKED_BY_FOUNDER (section-17 ops naming not proven → no READY_FOR_CONTROLLED_PILOT flip) · Launch NO-GO · Enrollment OFF unchanged."
 }

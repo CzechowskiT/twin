@@ -37,10 +37,7 @@ export const PRODUCT_INCLUSION_BY_MODULE_ID: Record<string, ProductInclusion> = 
   ai_protected_attr_monitoring: "POST_PILOT",
   /** Legal / marketing claim — certification not claimed (honesty PASS elsewhere). */
   ai_act_certified_claim: "LEGAL_MARKETING_CLAIM",
-  /**
-   * CORE secure download path (provider-neutral). Stays CORE_PILOT;
-   * registry may remain HELD until BE secure download is ready (parent TODO).
-   */
+  /** CORE provider-neutral secure download (Postgres blob; S3 optional). */
   investor_s3_required_download: "CORE_PILOT",
 
   // --- Wave 1 candidate (CORE) ---

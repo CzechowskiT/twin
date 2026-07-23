@@ -89,6 +89,10 @@ export const FOUNDER_COMPLETION_SMOKE_AT: string | null = "2026-07-23T13:10:00Z"
 export const BLOCKER_ELIMINATION_SMOKE_SHA: string | null = "e7c385c4e638968c9db959b7fd7dd6112fb8aa5d";
 export const BLOCKER_ELIMINATION_SMOKE_AT: string | null = "2026-07-23T14:22:00Z";
 
+/** Final Pilot Launch Closure — Postgres secure download + CORE denom held=0. */
+export const PILOT_CLOSURE_SMOKE_SHA: string | null = "c91a21e14505cc5d617b07dff4849a5deb61a7d4";
+export const PILOT_CLOSURE_SMOKE_AT: string | null = "2026-07-23T16:50:00Z";
+
 
 function passModuleW1(
   module_id: string,
@@ -316,6 +320,14 @@ function withBlockerEliminationSmoke<T extends HardLiveModuleEvidence>(row: T): 
     ...row,
     smoke_sha: BLOCKER_ELIMINATION_SMOKE_SHA!,
     smoke_at: BLOCKER_ELIMINATION_SMOKE_AT!,
+  };
+}
+
+function withPilotClosureSmoke<T extends HardLiveModuleEvidence>(row: T): T {
+  return {
+    ...row,
+    smoke_sha: PILOT_CLOSURE_SMOKE_SHA!,
+    smoke_at: PILOT_CLOSURE_SMOKE_AT!,
   };
 }
 
@@ -1155,12 +1167,13 @@ export const HARD_LIVE_EVIDENCE_REGISTRY_WAVE4: HardLiveModuleEvidence[] = [
       "HITL founder-signed attestation queue LIVE; verified_customer_claims=false until Founder signs (≥1 SIGNED).",
     ),
   ),
-  heldModuleW4(
-    "investor_s3_required_download",
-    "/investor/data-room",
-    "investor-squad",
-    "SECURE_DOWNLOAD_BE_TODO",
-    "CORE_PILOT secure download (provider-neutral — not S3-branded). TODO: parent BE secure download path; remains HELD until ready. Metadata list already PASS via investor_data_room_list.",
+  withPilotClosureSmoke(
+    passModuleW4(
+      "investor_s3_required_download",
+      "/investor/data-room",
+      "investor-squad",
+      "CORE_PILOT provider-neutral secure download LIVE — authenticated GET + persistent Postgres blob (S3 optional). Prod smoke upload→download round-trip PASS on tip c91a21e1.",
+    ),
   ),
   withFounderCompletionSmoke(
     passModuleW4(
@@ -1374,11 +1387,14 @@ export const HARD_LIVE_REGISTRY_META = {
     blocker_elimination_script: "frontend/scripts/founder-completion-module-prod-smoke.test.ts",
     blocker_elimination_sha: BLOCKER_ELIMINATION_SMOKE_SHA,
     blocker_elimination_at: BLOCKER_ELIMINATION_SMOKE_AT,
+    pilot_closure_script: "prod investor data-room upload→download + ATS proposal export",
+    pilot_closure_sha: PILOT_CLOSURE_SMOKE_SHA,
+    pilot_closure_at: PILOT_CLOSURE_SMOKE_AT,
     write: true,
     exclude_from_product_metrics: true,
   },
   wave4_note:
-    "Founder architecture reclass 2026-07-23: Hard LIVE denominator=CORE_PILOT_ONLY. Optional MS Graph write / Authologic / ATS write / Slack leave denominator (OPTIONAL_INTEGRATION_NOT_CONFIGURED). ai_act_certified_claim=LEGAL_MARKETING_CLAIM; ai_protected_attr_monitoring=POST_PILOT. investor_s3_required_download remains temporary CORE HELD (secure download BE TODO). Gate F PASS · Pilot BLOCKED_BY_FOUNDER · Launch NO-GO · Enrollment OFF unchanged.",
+    "Final Pilot Launch Closure 2026-07-23: Hard LIVE denominator=CORE_PILOT_ONLY; CORE held=0. Optional MS Graph write / Authologic / ATS write / Slack = OPTIONAL_INTEGRATION_NOT_CONFIGURED. ai_act_certified_claim=LEGAL_MARKETING_CLAIM; ai_protected_attr_monitoring=POST_PILOT. investor_s3_required_download PASS via Postgres secure download. Gate F PASS · Pilot BLOCKED_BY_FOUNDER (section-17 ops naming not proven → no READY_FOR_CONTROLLED_PILOT flip) · Launch NO-GO · Enrollment OFF unchanged.",
   get corePilotPassCount(): number {
     return hardLiveLaunchReadinessCounts().pass;
   },

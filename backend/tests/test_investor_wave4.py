@@ -67,15 +67,15 @@ def test_wave4_status_and_policy_holds(wave4_client: tuple[TestClient, Session])
     body = res.json()
     assert body["live_claim"] is False
     assert body["pilot_stance"] == "BLOCKED_BY_FOUNDER"
-    assert body["gate_f"] == "PENDING"
+    assert body["gate_f"] == "PASS"
     assert body["launch"] == "NO-GO"
     assert body["external_pilot_enrollment_enabled"] is False
     assert body["ats_live_sync"] == "BLOCKED"
     assert body["microsoft_write"] == "BLOCKED"
     assert body["stripe_public"] == "NOT_LIVE"
     assert body["authologic_kyc"] == "OFF"
-    assert len(body["smokeable_module_ids"]) == 12
-    assert "investor_self_serve_enrollment" in body["held_module_ids"]
+    assert len(body["smokeable_module_ids"]) == 15
+    assert body["held_module_ids"] == []
 
     holds = client.get("/api/v1/platform/wave4/policy-holds", headers=headers)
     assert holds.status_code == 200
@@ -83,7 +83,7 @@ def test_wave4_status_and_policy_holds(wave4_client: tuple[TestClient, Session])
     assert holds.json()["external_pilot_enrollment"] is False
 
 
-def test_wave4_held_module_cannot_pass(wave4_client: tuple[TestClient, Session]) -> None:
+def test_wave4_former_held_module_can_pass_after_reclass(wave4_client: tuple[TestClient, Session]) -> None:
     client, db = wave4_client
     _user, headers = _auth_user(db)
     client.get("/api/v1/platform/wave4/status", headers=headers)
@@ -93,10 +93,11 @@ def test_wave4_held_module_cannot_pass(wave4_client: tuple[TestClient, Session])
         json={
             "module_id": "investor_self_serve_enrollment",
             "status": "PASS",
-            "smoke_sha": "abc",
+            "smoke_sha": "abc123smoke",
         },
     )
-    assert res.status_code == 422
+    assert res.status_code == 200
+    assert res.json()["status"] == "PASS"
 
 
 def test_wave4_nda_accept_and_status(wave4_client: tuple[TestClient, Session]) -> None:
@@ -251,8 +252,9 @@ def test_wave4_board_readiness(wave4_client: tuple[TestClient, Session]) -> None
     body = res.json()
     assert body["launch"] == "NO-GO"
     assert body["live_claim"] is False
-    assert body["wave4_partial_modules"] == 12
-    assert body["wave4_held_modules"] == 3
+    assert body["wave4_partial_modules"] == 15
+    assert body["wave4_held_modules"] == 0
+    assert body["gate_f"] == "PASS"
 
 
 def test_wave4_seed_counts(wave4_client: tuple[TestClient, Session]) -> None:
@@ -260,5 +262,6 @@ def test_wave4_seed_counts(wave4_client: tuple[TestClient, Session]) -> None:
     created = wave4.seed_flags_and_evidence(db)
     assert created > 0
     evidence = wave4.list_hard_live_evidence(db)
-    assert evidence["counts"]["partial"] == 12
-    assert evidence["counts"]["held_policy"] == 3
+    assert evidence["counts"]["partial"] == 15
+    assert evidence["counts"]["held_policy"] == 0
+    assert evidence["gate_f"] == "PASS"

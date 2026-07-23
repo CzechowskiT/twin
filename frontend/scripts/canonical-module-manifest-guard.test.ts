@@ -50,7 +50,14 @@ test("every CORE Hard LIVE HELD/BLOCKED module is listed with class and blocker"
     (r) =>
       resolveProductInclusion(r) === "CORE_PILOT" && CORE_HELD_OR_BLOCKED.has(r.status),
   );
-  assert.ok(held.length >= 1, "expected at least one CORE held/blocked module");
+  if (held.length === 0) {
+    assert.match(
+      doc,
+      /CORE held=0|none.*CORE held|blocked=0/i,
+      "manifest must declare empty CORE held/blocked inventory when registry has none",
+    );
+    return;
+  }
 
   const missing: string[] = [];
   for (const row of held) {

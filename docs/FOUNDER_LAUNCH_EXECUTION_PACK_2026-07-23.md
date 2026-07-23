@@ -32,9 +32,9 @@ This pack does **not** activate Pilot, enable enrollment, or set Launch GO. Foun
 | OPTIONAL_INTEGRATION | MS Graph write trio, Authologic duo, ATS write duo, Slack | Out — status `OPTIONAL_INTEGRATION_NOT_CONFIGURED` |
 | LEGAL_MARKETING_CLAIM | `ai_act_certified_claim` | Out — certification not claimed |
 | POST_PILOT | `ai_protected_attr_monitoring` | Out — post-pilot |
-| CORE_PILOT (temp held) | `investor_s3_required_download` | In — secure download BE TODO (provider-neutral) |
+| CORE_PILOT | all other Hard LIVE modules (incl. `investor_s3_required_download` PASS) | In — launch readiness denominator |
 
-**Unchanged:** Launch **NO-GO** · Enrollment **OFF** · Pilot **BLOCKED_BY_FOUNDER** · Phase 3B **BLOCKED**. Slack is optional (not counted as CORE Hard LIVE BLOCKED).
+**Unchanged:** Launch **NO-GO** · Enrollment **OFF** · Pilot **BLOCKED_BY_FOUNDER** (no READY_FOR_CONTROLLED_PILOT until section-17 ops naming proven) · Phase 3B **BLOCKED**. Slack is optional (not counted as CORE Hard LIVE BLOCKED).
 
 ---
 
