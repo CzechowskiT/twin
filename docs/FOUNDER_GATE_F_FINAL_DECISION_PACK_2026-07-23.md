@@ -1,159 +1,172 @@
 # Founder Gate F — Final Decision Pack (2026-07-23)
 
-**Type:** Founder decision package (docs only) — **not launch approval**  
+**Type:** Founder decision package — **not launch approval**  
 **Branch:** `cursor/phase1-monorepo-scaffold`  
-**Baseline SHA:** `8bc25388e76cccd14c61826079d37fdc65fb8132`  
+**Canonical tip (verified continuation):** `c3cae1121342e3ede55127c0fe3d4af911dd1586`  
+**Ancestor baseline:** `8bc25388e76cccd14c61826079d37fdc65fb8132`  
 **Package date:** 2026-07-23
 
-**Related:** [O7 evidence 2026-07-23](./O7_RESTORE_DRILL_EVIDENCE_2026-07-23.md) · [Slack/connector handoff](./EXTERNAL_CONNECTOR_OPERATOR_HANDOFF.md) · [Hard LIVE registry](./HARD_LIVE_EVIDENCE_REGISTRY.json) · [Pilot block](./PILOT_FOUNDER_BLOCK_DECISION_2026-07-20.md)
+**Related:** [O7 evidence](./O7_RESTORE_DRILL_EVIDENCE_2026-07-23.md) · [Slack handoff](./EXTERNAL_CONNECTOR_OPERATOR_HANDOFF.md) · [Hard LIVE registry](./HARD_LIVE_EVIDENCE_REGISTRY.json) · [Pilot block](./PILOT_FOUNDER_BLOCK_DECISION_2026-07-20.md)
+
+This pack does **not** set Gate F YES, Launch GO, Pilot GO, or enrollment ON.
 
 ---
 
-## A. Canonical technical state (verified)
+## A. Technical verdict
 
-| Layer | Value |
-|-------|--------|
-| `repo_head` / `origin_head` | `8bc25388e76cccd14c61826079d37fdc65fb8132` |
-| Prod FE / API / worker | same SHA — **strict four-way PASS** |
-| Alembic code + prod | `096_connector_secret_hash_widen` |
-| Hard LIVE | PASS **122** · HELD_POLICY **30** · BLOCKED_EXTERNAL **1** (`plat_slack_connector`) · DEMO/PENDING **0** |
-| O7 restore | **PASS** — fresh drill `o7-r020-20260723T065951Z` |
-| Slack WRITE | **BLOCKED_EXTERNAL_CREDENTIALS** — no Cursor-recoverable secrets |
-
----
-
-## B. Stance framing (unchanged by this pack)
-
-| Stance | Status | Note |
-|--------|--------|------|
-| Pilot | **BLOCKED_BY_FOUNDER** | Not flipped by this pack |
-| Gate F | **PENDING** | Blank Founder choices below |
-| Launch | **NO-GO** | Gate F YES ≠ Launch GO |
-| Phase 3B | **BLOCKED** (policy) / product harness historically PASS | Not flipped |
-| Enrollment | **OFF** | Not flipped |
-| Auto-apply | **PAUSED** | Not flipped |
-| Delegated apply | **NOT LIVE** | Not flipped |
-
-This document records evidence and **blank Founder choices**. It does **not** set Gate F YES, Launch GO, Pilot GO, or enrollment ON.
+| Item | Verdict |
+|------|---------|
+| Strict SHA alignment | **PASS** — `repo = origin = FE = API = worker = c3cae112…` |
+| Alembic | **PASS** — code + prod `096_connector_secret_hash_widen` |
+| CI (tip) | **success** @ `c3cae112` |
+| Production smoke (prior Gate F) | Wave1–5 / gap-close / connectors / AI / Hard LIVE — **PASS** (Slack draft-only) |
+| Security | Prior High/Critical closed (SSRF, BOLA/IDOR, legal hold, Authologic, ATS, token log fingerprint) |
+| Open High/Critical (Cursor-fixable) | **none** identified in this closure |
+| Hard LIVE | PASS **122** · HELD_POLICY **30** · BLOCKED_EXTERNAL **1** · DEMO **0** · PENDING **0** |
 
 ---
 
-## C. Decision matrix — Options 1–3
+## B. Completed evidence
 
-### Option 1 — Keep Gate F PENDING until Slack PASS + O7 PASS
+| Evidence | Location / note |
+|----------|-----------------|
+| Canonical SHA | `c3cae112…` (strict four-way) |
+| CI run | smoke success on tip `c3cae112` |
+| Production smoke | connector evidence `EXTERNAL_CONNECTOR_PROD_SMOKE_EVIDENCE_2026-07-23.md` |
+| Security fixes | Gate F verification line through `8bc25388` + realign |
+| BOLA/IDOR / SSRF / legal hold / Authologic / ATS / token logging | closed in prior Gate F commits |
+| Deployment poller | `wait:strict-deploy-alignment` / deploy-alignment-poller |
+| O7 restore | **PASS** `o7-r020-20260723T065951Z` — `O7_RESTORE_DRILL_EVIDENCE_2026-07-23.md` |
+| Recovery documentation | O7 evidence + `BACKUP_RESTORE_DRILL_LOG.md` row |
+
+---
+
+## C. Remaining non-code items
+
+| Item | Status |
+|------|--------|
+| Slack credentials | **Open** — human Slack app + Railway env only ([handoff](./EXTERNAL_CONNECTOR_OPERATOR_HANDOFF.md)) |
+| Fresh O7 restore drill | **Closed** — PASS `o7-r020` (not an operator gap) |
+| Founder policy holds | **30** `HELD_POLICY` unchanged |
+| Founder business decisions | Gate F / Pilot / Launch / Enrollment — blank below |
+
+---
+
+## D. Hard LIVE status
+
+| Status | Count |
+|--------|------:|
+| PASS | 122 |
+| HELD_POLICY | 30 |
+| BLOCKED_EXTERNAL_CREDENTIALS | 1 (`plat_slack_connector` only) |
+| DEMO_ONLY | 0 |
+| PENDING_SMOKE | 0 |
+
+---
+
+## E. Founder decision matrix
+
+Do not decide for Founder. Variants:
+
+### Option 1
+
+Gate F remains **PENDING** until:
+
+- Slack PASS, and
+- fresh O7 restore drill PASS.
 
 | Field | Content |
 |-------|---------|
-| Meaning | Gate F stays PENDING until `plat_slack_connector` authenticated prod smoke PASS **and** O7 fresh PASS |
-| Consequences | O7 is **already PASS** (2026-07-23); only Slack credentials remain. Timeline blocked on human Slack app + Railway env |
-| Risk | Low technical risk; schedule risk if Slack is delayed indefinitely |
-| Required action | Founder/operator create Slack test app + set env → Cursor smoke → promote module |
-| Owner | Founder (credentials) → Cursor (smoke/registry) |
-| Evidence | O7 [PASS](./O7_RESTORE_DRILL_EVIDENCE_2026-07-23.md); Slack [handoff](./EXTERNAL_CONNECTOR_OPERATOR_HANDOFF.md) |
+| Consequences | O7 already PASS; only Slack blocks Option 1 exit |
+| Risk | Schedule slip waiting on Slack app |
+| Required action | Human Slack credentials → Cursor smoke → promote |
+| Owner | Founder (creds) → Cursor (smoke) |
+| Evidence | O7 PASS doc; Slack handoff |
 
-### Option 2 — Gate F technical PASS with accepted Slack credentials-only exception
+### Option 2
 
-| Field | Content |
-|-------|---------|
-| Meaning | Accept Gate F **technical** PASS while documenting Slack as sole external exception; O7 closed |
-| Consequences | Unblocks Gate F evidence bar without waiting for Slack; Slack remains honestly BLOCKED in registry |
-| Risk | Medium — Gate F YES could be misread as “all connectors LIVE”; must keep exception explicit |
-| Required action | Founder check Option 2 + Slack exception acceptance; docs refresh only after Founder mark |
-| Owner | Founder (decision) |
-| Evidence | Registry 122/30/1; O7 PASS; connector smoke 2026-07-23 (Slack draft-only) |
+Gate F **technical PASS** with accepted exceptions:
 
-### Option 3 — Gate F technical PASS; Pilot + Launch remain independently blocked
+- Slack credentials-only exception,
+- O7 operator evidence gap (**N/A — O7 PASS already**),
+- Founder holds unchanged.
 
 | Field | Content |
 |-------|---------|
-| Meaning | Same technical PASS as Option 2, with explicit separation: Pilot `BLOCKED_BY_FOUNDER` and Launch `NO-GO` stay regardless of Gate F |
-| Consequences | Cleanest stance hygiene; matches current Pilot block doc |
-| Risk | Low misuse risk if Founder records separations explicitly |
-| Required action | Founder check Option 3 + keep Pilot/Launch holds |
+| Consequences | Unblocks Gate F evidence bar; Slack stays honestly BLOCKED in registry |
+| Risk | Misread as “all connectors LIVE” if exception not recorded |
+| Required action | Founder accept Slack exception explicitly |
 | Owner | Founder |
-| Evidence | Same as Option 2 + [Pilot block](./PILOT_FOUNDER_BLOCK_DECISION_2026-07-20.md) |
+| Evidence | Registry 122/30/1; O7 PASS; connector smoke |
+
+### Option 3
+
+Gate F **technical PASS**, but Pilot and Launch remain independently blocked.
+
+| Field | Content |
+|-------|---------|
+| Consequences | Same technical bar as Option 2 + clearest Pilot/Launch firewall |
+| Risk | Low if separations recorded |
+| Required action | Founder mark Option 3; keep Pilot/Launch holds |
+| Owner | Founder |
+| Evidence | Option 2 evidence + Pilot block doc |
 
 ---
 
-## D. Explicit Founder decisions (check one per row — leave blank until Founder acts)
+## F. Explicit decisions required from Founder
 
-### D.1 Gate F technical status
+Decide **separately** (do not bundle):
 
-- [ ] **Gate F = YES** (technical) — accept evidence; authorize doc refresh only
-- [ ] **Gate F = NO** — blockers remain
-- [ ] **Gate F = PENDING** — no decision yet (**default**)
+### F.1 Gate F technical status
 
-**Founder choice (record):** _________________________________
+- [ ] Gate F = YES (technical)
+- [ ] Gate F = NO
+- [ ] Gate F = PENDING (**default**)
 
-### D.2 Slack credentials-only exception
+**Founder choice:** _________________________________
 
-- [ ] **ACCEPT** Slack as sole `BLOCKED_EXTERNAL` exception for Gate F technical bar
-- [ ] **REJECT** — require Slack PASS before any Gate F YES
-- [ ] **DEFER**
+### F.2 Slack credentials-only exception
 
-**Founder choice (record):** _________________________________
+- [ ] ACCEPT
+- [ ] REJECT (require Slack PASS before any Gate F YES)
+- [ ] DEFER
 
-### D.3 O7 restore evidence
+**Founder choice:** _________________________________
 
-- [ ] **ACCEPT** fresh O7 PASS `o7-r020-20260723T065951Z`
-- [ ] **REQUIRE another founder-supervised drill**
-- [ ] **DEFER**
+### F.3 O7 evidence
 
-**Founder choice (record):** _________________________________
+- [ ] ACCEPT PASS `o7-r020-20260723T065951Z`
+- [ ] REQUIRE another founder-supervised drill
+- [ ] DEFER
 
-### D.4 HELD_POLICY (30 modules)
+**Founder choice:** _________________________________
 
-- [ ] **KEEP all 30** Founder hard holds
-- [ ] **Review subset** (list IDs separately — do not bulk-lift here)
+### F.4 HELD_POLICY (30)
 
-**Founder choice (record):** _________________________________
+- [ ] KEEP all 30
+- [ ] Review subset (list IDs separately)
 
-### D.5 Pilot / Launch / Enrollment (separate — do not bundle with Gate F)
+**Founder choice:** _________________________________
 
-| Decision | Choices (Founder only) |
-|----------|------------------------|
-| Pilot | [ ] keep BLOCKED_BY_FOUNDER · [ ] other (write) _______ |
-| Launch | [ ] keep NO-GO · [ ] other _______ |
-| Enrollment | [ ] keep OFF · [ ] other _______ |
+### F.5 Pilot / Launch / Enrollment (independent)
 
-**Founder choice (record):** _________________________________
+| Decision | Keep current | Other (write) |
+|----------|--------------|---------------|
+| Pilot (`BLOCKED_BY_FOUNDER`) | [ ] | _______ |
+| Launch (`NO-GO`) | [ ] | _______ |
+| Enrollment (OFF) | [ ] | _______ |
 
----
-
-## E. Non-negotiable framing
-
-| Statement | Stance |
-|-----------|--------|
-| **Gate F YES ≠ Launch GO** | Gate F is evidence/harness acceptance only |
-| **Launch GO** | Separate Founder decision |
-| **Pilot GO** | Separate Founder decision (`BLOCKED_BY_FOUNDER` today) |
-| **Slack BLOCKED ≠ product failure** | Credentials-only; draft/preview already LIVE |
-| **No fake PASS** | Do not promote `plat_slack_connector` without authenticated write smoke on test workspace |
-| **No stance flips in this pack** | Docs record choices; system stance unchanged until Founder marks |
+**Founder choice:** _________________________________
 
 ---
 
-## F. Recommended technical decision (advisory only)
+## G. Recommended decision
 
-**Recommend Option 3** (equivalent technical bar to Option 2, clearer Pilot/Launch firewall):
+**Technical recommendation: Option 3.**
 
-1. Treat Gate F **technical** bar as satisfiable with **one** accepted external exception: Slack credentials.
-2. Record O7 as **PASS** on current Alembic `096` / aligned SHA.
-3. Keep Pilot **BLOCKED_BY_FOUNDER**, Launch **NO-GO**, enrollment **OFF**, and all **30** `HELD_POLICY` until separate Founder actions.
-4. Do **not** auto-set Gate F YES in registry or checklists from this recommendation alone.
+1. Gate F technical bar satisfiable with one external exception (Slack credentials).
+2. O7 closed (`o7-r020`).
+3. Keep Pilot `BLOCKED_BY_FOUNDER`, Launch `NO-GO`, enrollment OFF, and all 30 `HELD_POLICY` until separate Founder actions.
+4. Do **not** auto-flip Gate F YES in checklists/registry from this recommendation alone.
 
-**Not recommended as default:** Option 1 if Founder wants Gate F technical closure soon — Slack is human-only and already exhaustively audited missing.
-
----
-
-## G. Operator follow-ups (not Founder stance)
-
-| Item | Owner | Status |
-|------|-------|--------|
-| Create Slack test app + Railway env | Founder/operator | Open — see handoff |
-| Slack authenticated prod smoke + registry promote | Cursor after creds | Blocked on creds |
-| Quarterly O7 re-drill | Operator | Next after major migration train |
-
----
-
-**End of pack.** No Gate F YES decided. Launch remains NO-GO. Pilot remains BLOCKED_BY_FOUNDER.
+**Gate F YES ≠ Launch GO.** Launch remains **NO-GO**. No Gate F YES decided in this pack.

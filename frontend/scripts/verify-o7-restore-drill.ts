@@ -49,7 +49,7 @@ function main(): void {
     const pack = readFileSync(decisionPackPath, "utf8");
     push("decision_options", /Option 1/.test(pack) && /Option 2/.test(pack) && /Option 3/.test(pack), "options 1–3");
     push("no_gate_f_yes_declared", /No Gate F YES decided/i.test(pack), "no Gate F YES flip");
-    push("recommend_only", /Recommended technical decision/i.test(pack), "advisory recommendation present");
+    push("recommend_only", /## G\. Recommended decision|Technical recommendation: Option 3/i.test(pack), "advisory recommendation present");
   }
 
   let failed = 0;

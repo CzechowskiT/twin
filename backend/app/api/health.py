@@ -1,5 +1,5 @@
 """Health check endpoints."""
-# Gate F operator closure realign 2026-07-23 (registry docs; force Railway SHA).
+# Gate F operator closure continuation 2026-07-23 (handoff/decision-pack §4/§8; force Railway SHA).
 
 
 import os

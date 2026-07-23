@@ -59,13 +59,34 @@ test("5 references O7 PASS and Slack BLOCKED", () => {
 
 test("6 recommends Option 3 without applying stance", () => {
   const doc = readRepo(PACK);
-  assert.match(doc, /Recommend Option 3/i);
-  assert.match(doc, /advisory only/i);
+  assert.match(doc, /Technical recommendation: Option 3|Recommend Option 3/i);
+  assert.match(doc, /does \*\*not\*\* set Gate F YES|Do \*\*not\*\* auto-flip Gate F YES/i);
 });
 
 test("7 Hard LIVE counts documented", () => {
   const doc = readRepo(PACK);
-  assert.match(doc, /PASS \*\*122\*\*/);
-  assert.match(doc, /HELD_POLICY \*\*30\*\*/);
-  assert.match(doc, /BLOCKED_EXTERNAL \*\*1\*\*/);
+  assert.match(doc, /PASS \*\*122\*\*|PASS \| 122/);
+  assert.match(doc, /HELD_POLICY \*\*30\*\*|HELD_POLICY \| 30/);
+  assert.match(doc, /BLOCKED_EXTERNAL \*\*1\*\*|BLOCKED_EXTERNAL_CREDENTIALS \| 1/);
+});
+
+test("8 pack has §8 sections A–G", () => {
+  const doc = readRepo(PACK);
+  assert.match(doc, /## A\. Technical verdict/);
+  assert.match(doc, /## B\. Completed evidence/);
+  assert.match(doc, /## C\. Remaining non-code items/);
+  assert.match(doc, /## D\. Hard LIVE status/);
+  assert.match(doc, /## E\. Founder decision matrix/);
+  assert.match(doc, /## F\. Explicit decisions required from Founder/);
+  assert.match(doc, /## G\. Recommended decision/);
+});
+
+test("9 handoff has §4 Slack sections", () => {
+  const handoff = readRepo(HANDOFF);
+  assert.match(handoff, /## Slack app setup/);
+  assert.match(handoff, /## Environment variables/);
+  assert.match(handoff, /## Validation/);
+  assert.match(handoff, /## Security/);
+  assert.match(handoff, /SLACK_INCOMING_WEBHOOK_URL/);
+  assert.match(handoff, /TWIN_SLACK_WEBHOOK_URL/);
 });

@@ -98,6 +98,10 @@ Dump already at scaffold head `096`. **No** `alembic upgrade` / **no** `alembic 
 - Does **not** authorize production volume restore or migration downgrade.
 - Prior 2026-07-15 PASS stands; this row is the **fresh** post-`096` re-drill.
 
+## Residual vs maximal §6 app-layer checklist (not a failed drill)
+
+Staging env contains **Postgres-HE2P only** (no staging API/worker). Therefore this PASS is **SQL restore + count/schema/alembic** evidence, not a full app boot against the clone. Residual (operator optional, non-blocking for O7 PASS row): wire ephemeral staging API to clone for `/health`, worker/broker reconnect demos. **Do not** re-declare O7 as operator gap — drill executed and PASS.
+
 ## Verdict
 
 **O7 = PASS** for run `o7-r020-20260723T065951Z`.
