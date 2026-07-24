@@ -1,6 +1,6 @@
 {
   "schema": "twin.production_topology.rc1/v1",
-  "updated_at": "2026-07-24T16:25:00Z",
+  "updated_at": "2026-07-24T18:20:00Z",
   "branch": "cursor/phase1-monorepo-scaffold",
   "hard_live_denominator": "CORE_PILOT_ONLY",
   "stance": {
@@ -78,17 +78,17 @@
     "status_api": "/api/v1/admin/pilot-os/status",
     "send_safety_api": "/api/v1/admin/pilot-os/invitation-packs/{id}/send-safety"
   },
-  "verified_runtime_commit": "f64c0775c6ca0558f9702c275b9723d8fb3767a1",
+  "verified_runtime_commit": "d8102012733d48b8d511676a3fb75c4b3410b875",
   "alignment": {
-    "repo_head": "47ef494d0b8e3e7779d4ae37c4a059c39f9443e6",
-    "prod_api_commit": "f64c0775c6ca0558f9702c275b9723d8fb3767a1",
-    "prod_frontend_commit": "f64c0775c6ca0558f9702c275b9723d8fb3767a1",
-    "prod_worker_commit": "f64c0775c6ca0558f9702c275b9723d8fb3767a1",
+    "repo_head": "d8102012733d48b8d511676a3fb75c4b3410b875",
+    "prod_api_commit": "d8102012733d48b8d511676a3fb75c4b3410b875",
+    "prod_frontend_commit": "d8102012733d48b8d511676a3fb75c4b3410b875",
+    "prod_worker_commit": "d8102012733d48b8d511676a3fb75c4b3410b875",
     "alignment_status": "ALIGNED",
     "docs_only_drift": true,
-    "note": "Runtime four-way ALIGNED at f64c0775; docs tip records alignment"
+    "note": "Runtime four-way ALIGNED at d8102012 (FCS Phase 1); subsequent docs tip may advance with docs_only_drift"
   },
-  "verdict": "AI CANDIDATE INTELLIGENCE REAL-CUSTOMER VALIDATION READY — AWAITING FOUNDER-APPROVED PILOT ORGANIZATION",
+  "verdict": "FIRST REAL CUSTOMER SUCCESS SYSTEM READY — AWAITING FOUNDER-APPROVED PILOT ORGANIZATION",
   "activation": {
     "approved_real_orgs": 0,
     "invitations_sent": 0,
@@ -97,8 +97,7 @@
     "missing_inputs": [
       "founder_approved_real_organization",
       "legal_name",
-      "sponsor_label",
-      "founder_org_approval_ref",
+      "sponsor_label",      "founder_org_approval_ref",
       "named_recipient_emails",
       "approved_by_label",
       "organization_candidate_record"
@@ -130,7 +129,8 @@
     "approved_real_orgs": 0,
     "invites_sent": 0
   },
-  "verified_tip": "f64c0775c6ca0558f9702c275b9723d8fb3767a1",
+  "verified_tip": "d8102012733d48b8d511676a3fb75c4b3410b875",
+  "ci_smoke_run": "30116227452",
   "ai_candidate_intelligence": {
     "doc": "docs/AI_CANDIDATE_INTELLIGENCE.json",
     "real_validation_doc": "docs/AI_CANDIDATE_INTELLIGENCE_REAL_VALIDATION.json",
