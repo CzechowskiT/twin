@@ -22,7 +22,7 @@
     "preferred_public_frontend": "https://twin.care",
     "preferred_app_frontend": "https://app.twin.care",
     "api": "https://twin-production-bcd9.up.railway.app",
-    "note": "TEMPORARY_PILOT_CANONICAL_URL = twin-sooty.vercel.app. twin.care Afternic NS parks apex — non-blocking for controlled pilot OS."
+    "note": "TEMPORARY_PILOT_CANONICAL_URL = twin-sooty.vercel.app. twin.care Afternic NS parks apex \u2014 non-blocking for controlled pilot OS."
   },
   "vercel": {
     "team": "twin",
@@ -80,7 +80,7 @@
   },
   "verified_runtime_commit": "03e1f985740973254417a1291e37309582fc4497",
   "alignment": {
-    "repo_head": "TO_BE_SET_AFTER_DOCS_COMMIT",
+    "repo_head": "f2a36ac3435d99fa4024fafe819283ab5e0c4616",
     "prod_api_commit": "03e1f985740973254417a1291e37309582fc4497",
     "prod_frontend_commit": "03e1f985740973254417a1291e37309582fc4497",
     "prod_worker_commit": "03e1f985740973254417a1291e37309582fc4497",
@@ -88,7 +88,7 @@
     "docs_only_drift": true,
     "note": "Runtime FE/API/worker aligned at 03e1f985; tip may be docs-ahead after topology stamp"
   },
-  "verdict": "FIRST REAL PILOT ORGANIZATION APPROVAL REQUIRED — ACTIVATION SYSTEM READY",
+  "verdict": "FIRST REAL PILOT ORGANIZATION APPROVAL REQUIRED \u2014 ACTIVATION SYSTEM READY",
   "activation": {
     "approved_real_orgs": 0,
     "invitations_sent": 0,
@@ -122,5 +122,6 @@
     "readiness": "docs/FIRST_CUSTOMER_READINESS.json",
     "admin_ui": "/admin/pilot-os",
     "kpi": "NO_REAL_PILOT_DATA"
-  }
+  },
+  "verified_tip": "f2a36ac3435d99fa4024fafe819283ab5e0c4616"
 }
