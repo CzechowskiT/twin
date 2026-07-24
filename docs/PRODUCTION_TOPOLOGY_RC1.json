@@ -1,6 +1,6 @@
 {
   "schema": "twin.production_topology.rc1/v1",
-  "updated_at": "2026-07-24T09:10:00Z",
+  "updated_at": "2026-07-24T09:45:00Z",
   "branch": "cursor/phase1-monorepo-scaffold",
   "hard_live_denominator": "CORE_PILOT_ONLY",
   "stance": {
@@ -67,7 +67,8 @@
     "doc": "docs/RC1_SYNTHETIC_PILOT_IDENTITIES.md",
     "candidate": "demo@twin.career",
     "recruiter_company_slug": "nova-hiring-pl",
-    "not_founder_approved_real_org": true
+    "not_founder_approved_real_org": true,
+    "schema_probe_only": "ops-intake-schema-probe"
   },
   "controlled_pilot_os": {
     "manifest": "docs/CONTROLLED_PILOT_OS_MANIFEST.json",
@@ -77,7 +78,16 @@
     "status_api": "/api/v1/admin/pilot-os/status",
     "send_safety_api": "/api/v1/admin/pilot-os/invitation-packs/{id}/send-safety"
   },
-  "verified_tip": "PLACEHOLDER_AFTER_PUSH",
+  "verified_runtime_commit": "03e1f985740973254417a1291e37309582fc4497",
+  "alignment": {
+    "repo_head": "TO_BE_SET_AFTER_DOCS_COMMIT",
+    "prod_api_commit": "03e1f985740973254417a1291e37309582fc4497",
+    "prod_frontend_commit": "03e1f985740973254417a1291e37309582fc4497",
+    "prod_worker_commit": "03e1f985740973254417a1291e37309582fc4497",
+    "alignment_status": "acceptable_docs_only_drift",
+    "docs_only_drift": true,
+    "note": "Runtime FE/API/worker aligned at 03e1f985; tip may be docs-ahead after topology stamp"
+  },
   "verdict": "FIRST REAL PILOT ORGANIZATION APPROVAL REQUIRED — ACTIVATION SYSTEM READY",
   "activation": {
     "approved_real_orgs": 0,
@@ -104,7 +114,8 @@
     "hard_live_core_pass_technical": 143,
     "hard_live_is_technical_only": true,
     "evidence_tier": "production_smoked_synthetic",
-    "real_customer_validated": false
+    "real_customer_validated": false,
+    "synthetic_smoke": "19/19"
   },
   "first_customer": {
     "checklists": "docs/FIRST_CUSTOMER_SUCCESS_CHECKLISTS.md",
