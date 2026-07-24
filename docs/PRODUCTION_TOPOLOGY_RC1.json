@@ -1,6 +1,6 @@
 {
   "schema": "twin.production_topology.rc1/v1",
-  "updated_at": "2026-07-24T08:10:00Z",
+  "updated_at": "2026-07-24T09:10:00Z",
   "branch": "cursor/phase1-monorepo-scaffold",
   "hard_live_denominator": "CORE_PILOT_ONLY",
   "stance": {
@@ -75,7 +75,7 @@
     "launch_go_gate": "docs/LAUNCH_GO_EVIDENCE_GATE.json",
     "status_api": "/api/v1/admin/pilot-os/status"
   },
-  "verified_tip": "47c3bff02d4584ed2dee62d98e43f857c36eb64a",
+  "verified_tip": "4500ace44b5143f6db7e79bceee8dc01837a244e",
   "verdict": "CUSTOMER-USABLE MULTI-ROLE PILOT JOURNEY COMPLETE — READY FOR FIRST APPROVED ORGANIZATION",
   "customer_usable": {
     "definition": "docs/CUSTOMER_USABLE_DEFINITION.md",
