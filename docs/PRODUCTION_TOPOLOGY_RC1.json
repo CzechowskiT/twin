@@ -1,6 +1,6 @@
 {
   "schema": "twin.production_topology.rc1/v1",
-  "updated_at": "2026-07-24T12:50:00Z",
+  "updated_at": "2026-07-24T12:55:00Z",
   "branch": "cursor/phase1-monorepo-scaffold",
   "hard_live_denominator": "CORE_PILOT_ONLY",
   "stance": {
@@ -78,15 +78,15 @@
     "status_api": "/api/v1/admin/pilot-os/status",
     "send_safety_api": "/api/v1/admin/pilot-os/invitation-packs/{id}/send-safety"
   },
-  "verified_runtime_commit": "6d8f4376d5b7e98f79015dac32ac10ea55dd66d2",
+  "verified_runtime_commit": "c9209a180a89d480c39cd7e42a05bfa2cc75e7f2",
   "alignment": {
-    "repo_head": "6d8f4376d5b7e98f79015dac32ac10ea55dd66d2",
-    "prod_api_commit": "6d8f4376d5b7e98f79015dac32ac10ea55dd66d2",
-    "prod_frontend_commit": "6d8f4376d5b7e98f79015dac32ac10ea55dd66d2",
-    "prod_worker_commit": "6d8f4376d5b7e98f79015dac32ac10ea55dd66d2",
+    "repo_head": "c9209a180a89d480c39cd7e42a05bfa2cc75e7f2",
+    "prod_api_commit": "c9209a180a89d480c39cd7e42a05bfa2cc75e7f2",
+    "prod_frontend_commit": "c9209a180a89d480c39cd7e42a05bfa2cc75e7f2",
+    "prod_worker_commit": "c9209a180a89d480c39cd7e42a05bfa2cc75e7f2",
     "alignment_status": "ALIGNED",
     "docs_only_drift": false,
-    "note": "Verdict A CU promotion tip; WS20 evidence base 687d43f8; multi-role 19/19 green on tip"
+    "note": "WS20 evidence 687d43f8; CU tip 6d8f4376; Pilot OS flag tip c9209a18"
   },
   "verdict": "AI CANDIDATE INTELLIGENCE CUSTOMER-USABLE \u2014 EXPLAINABLE CV SCREENING PRODUCTION-READY",
   "activation": {
@@ -123,7 +123,7 @@
     "admin_ui": "/admin/pilot-os",
     "kpi": "NO_REAL_PILOT_DATA"
   },
-  "verified_tip": "6d8f4376d5b7e98f79015dac32ac10ea55dd66d2",
+  "verified_tip": "c9209a180a89d480c39cd7e42a05bfa2cc75e7f2",
   "ai_candidate_intelligence": {
     "doc": "docs/AI_CANDIDATE_INTELLIGENCE.json",
     "alembic": "103_candidate_intelligence",
