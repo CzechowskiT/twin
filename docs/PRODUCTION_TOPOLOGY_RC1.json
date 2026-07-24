@@ -1,6 +1,6 @@
 {
   "schema": "twin.production_topology.rc1/v1",
-  "updated_at": "2026-07-24T09:45:00Z",
+  "updated_at": "2026-07-24T12:10:00Z",
   "branch": "cursor/phase1-monorepo-scaffold",
   "hard_live_denominator": "CORE_PILOT_ONLY",
   "stance": {
@@ -51,7 +51,7 @@
     "worker_service": "enthusiastic-encouragement",
     "postgres": "Postgres",
     "redis": "Redis",
-    "alembic_head_expected": "102_first_real_pilot_intake"
+    "alembic_head_expected": "103_candidate_intelligence"
   },
   "on_call_roles": {
     "primary": "PILOT_ON_CALL_PRIMARY",
@@ -78,15 +78,14 @@
     "status_api": "/api/v1/admin/pilot-os/status",
     "send_safety_api": "/api/v1/admin/pilot-os/invitation-packs/{id}/send-safety"
   },
-  "verified_runtime_commit": "03e1f985740973254417a1291e37309582fc4497",
+  "verified_runtime_commit": "pending_deploy",
   "alignment": {
-    "repo_head": "39aba88103ec140fe015e20fb8c14cb9c48d20f9",
-    "prod_api_commit": "03e1f985740973254417a1291e37309582fc4497",
-    "prod_frontend_commit": "03e1f985740973254417a1291e37309582fc4497",
-    "prod_worker_commit": "03e1f985740973254417a1291e37309582fc4497",
-    "alignment_status": "acceptable_docs_only_drift",
-    "docs_only_drift": true,
-    "note": "Runtime FE/API/worker at 03e1f985; tip 39aba88103ec140fe015e20fb8c14cb9c48d20f9 docs-only ahead"
+    "repo_head": "dee840e60411d8db71afc991d8c6c966b1c42767",
+    "prod_api_commit": "pending",
+    "prod_frontend_commit": "pending",
+    "alignment_status": "deploying",
+    "docs_only_drift": false,
+    "note": "AI Candidate Intelligence dee840e6 deploying"
   },
   "verdict": "FIRST REAL PILOT ORGANIZATION APPROVAL REQUIRED \u2014 ACTIVATION SYSTEM READY",
   "activation": {
@@ -123,5 +122,10 @@
     "admin_ui": "/admin/pilot-os",
     "kpi": "NO_REAL_PILOT_DATA"
   },
-  "verified_tip": "39aba88103ec140fe015e20fb8c14cb9c48d20f9"
+  "verified_tip": "39aba88103ec140fe015e20fb8c14cb9c48d20f9",
+  "ai_candidate_intelligence": {
+    "doc": "docs/AI_CANDIDATE_INTELLIGENCE.json",
+    "alembic": "103_candidate_intelligence",
+    "customer_usable_promoted": false
+  }
 }
