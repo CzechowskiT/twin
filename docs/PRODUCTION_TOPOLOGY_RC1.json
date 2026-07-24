@@ -1,6 +1,6 @@
 {
   "schema": "twin.production_topology.rc1/v1",
-  "updated_at": "2026-07-24T12:10:00Z",
+  "updated_at": "2026-07-24T12:25:00Z",
   "branch": "cursor/phase1-monorepo-scaffold",
   "hard_live_denominator": "CORE_PILOT_ONLY",
   "stance": {
@@ -78,16 +78,17 @@
     "status_api": "/api/v1/admin/pilot-os/status",
     "send_safety_api": "/api/v1/admin/pilot-os/invitation-packs/{id}/send-safety"
   },
-  "verified_runtime_commit": "pending_deploy",
+  "verified_runtime_commit": "2cd032788a63389412f1290cce88a09dfdf298d8",
   "alignment": {
-    "repo_head": "dee840e60411d8db71afc991d8c6c966b1c42767",
-    "prod_api_commit": "pending",
-    "prod_frontend_commit": "pending",
-    "alignment_status": "deploying",
-    "docs_only_drift": false,
-    "note": "AI Candidate Intelligence dee840e6 deploying"
+    "repo_head": "2cd032788a63389412f1290cce88a09dfdf298d8",
+    "prod_api_commit": "2cd032788a63389412f1290cce88a09dfdf298d8",
+    "prod_frontend_commit": "deploying_or_docs_ahead",
+    "prod_worker_commit": "2cd032788a63389412f1290cce88a09dfdf298d8",
+    "alignment_status": "acceptable_docs_only_drift",
+    "docs_only_drift": true,
+    "note": "API/worker at intelligence tip; FE catching Vercel queue; CU intel modules not promoted"
   },
-  "verdict": "FIRST REAL PILOT ORGANIZATION APPROVAL REQUIRED \u2014 ACTIVATION SYSTEM READY",
+  "verdict": "AI CANDIDATE INTELLIGENCE INCOMPLETE \u2014 EXACT PRODUCTION BLOCKERS",
   "activation": {
     "approved_real_orgs": 0,
     "invitations_sent": 0,
@@ -126,6 +127,9 @@
   "ai_candidate_intelligence": {
     "doc": "docs/AI_CANDIDATE_INTELLIGENCE.json",
     "alembic": "103_candidate_intelligence",
-    "customer_usable_promoted": false
+    "customer_usable_promoted": false,
+    "unit_tests": "5/5",
+    "route_smoke": "PASS",
+    "multi_role": "19/19"
   }
 }

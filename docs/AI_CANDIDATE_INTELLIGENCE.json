@@ -1,39 +1,45 @@
 {
   "schema": "twin.ai_candidate_intelligence/v1",
-  "updated_at": "2026-07-24T12:00:00Z",
+  "updated_at": "2026-07-24T12:20:00Z",
   "branch": "cursor/phase1-monorepo-scaffold",
-  "verdict_candidates": [
-    "AI CANDIDATE INTELLIGENCE CUSTOMER-USABLE — EXPLAINABLE CV SCREENING PRODUCTION-READY",
-    "AI CANDIDATE INTELLIGENCE INCOMPLETE — EXACT PRODUCTION BLOCKERS"
-  ],
+  "final_verdict": "AI CANDIDATE INTELLIGENCE INCOMPLETE — EXACT PRODUCTION BLOCKERS",
   "fit_bands": ["MATCH", "NO_MATCH", "UNKNOWN"],
   "human_review_required": true,
   "autonomous_employment_decision": false,
   "alembic": "103_candidate_intelligence",
-  "modules": {
-    "candidate_intelligence_profile": "TECHNICAL_PASS_PENDING_PROD_SMOKE",
-    "candidate_recruiter_brief": "TECHNICAL_PASS_PENDING_PROD_SMOKE",
-    "candidate_employment_timeline": "TECHNICAL_PASS_PENDING_PROD_SMOKE",
-    "candidate_role_match": "TECHNICAL_PASS_PENDING_PROD_SMOKE",
-    "candidate_match_explanation": "TECHNICAL_PASS_PENDING_PROD_SMOKE",
-    "candidate_intelligence_signals": "TECHNICAL_PASS_PENDING_PROD_SMOKE",
-    "candidate_missing_information": "TECHNICAL_PASS_PENDING_PROD_SMOKE",
-    "candidate_intelligence_evidence": "TECHNICAL_PASS_PENDING_PROD_SMOKE",
-    "candidate_intelligence_corrections": "TECHNICAL_PASS_PENDING_PROD_SMOKE",
-    "recruiter_clarification_draft": "TECHNICAL_PASS_PENDING_PROD_SMOKE"
-  },
+  "unit_tests": {"path": "tests/test_candidate_intelligence.py", "result": "5/5 PASS"},
+  "prod_route_smoke": {"path": "scripts/candidate-intelligence-prod-smoke.py", "result": "PASS"},
+  "multi_role_smoke": {"result": "19/19 PASS", "regression": false},
+  "customer_usable_promoted_count": 0,
+  "modules_status": "TECHNICAL_PASS_ONLY",
+  "exact_production_blockers": [
+    "full_workstream20_prod_synthetic_cv_e2e_not_completed",
+    "inbox_pipeline_company_compact_intelligence_cards_incomplete",
+    "company_approved_subset_view_not_shipped",
+    "evaluation_framework_synthetic_dataset_minimal",
+    "cu_module_promotion_blocked_until_full_prod_e2e"
+  ],
+  "shipped": [
+    "canonical_models_alembic_103",
+    "async_celery_pipeline",
+    "structured_profile_timeline_signals_missing_brief",
+    "deterministic_MATCH_NO_MATCH_UNKNOWN",
+    "human_corrections_authoritative",
+    "match_override_audited",
+    "clarification_draft_never_autosend",
+    "protected_attribute_scrub",
+    "prompt_injection_scan",
+    "recruiter_detail_ui_panel",
+    "pilot_os_ai_metrics_stub"
+  ],
   "frozen": {
     "launch": "NO-GO",
     "enrollment": "OFF",
-    "phase_3b": "BLOCKED"
+    "phase_3b": "BLOCKED",
+    "pilot": "READY_FOR_CONTROLLED_PILOT"
   },
   "kpi": {
-    "synthetic_excluded_from_real_kpi": true,
-    "token": "NO_REAL_PILOT_DATA"
-  },
-  "protected_attributes_excluded": true,
-  "prompt_injection_scanned": true,
-  "unit_tests": "tests/test_candidate_intelligence.py",
-  "prod_smoke": "scripts/candidate-intelligence-prod-smoke.py",
-  "docs": "docs/AI_CANDIDATE_INTELLIGENCE.md"
+    "token": "NO_REAL_PILOT_DATA",
+    "synthetic_excluded_from_real_kpi": true
+  }
 }
