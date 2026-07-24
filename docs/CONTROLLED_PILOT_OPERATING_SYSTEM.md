@@ -1,33 +1,43 @@
 # Controlled Pilot Operating System — index
 
-**Updated:** 2026-07-23  
-**Expected verdict (no approved real org):**  
+**Updated:** 2026-07-24  
+**Primary activation verdict (no complete Founder approval):**  
+`FIRST REAL PILOT ORGANIZATION APPROVAL REQUIRED — ACTIVATION SYSTEM READY`  
+
+**OS alias (compat):**  
 `CONTROLLED PILOT OPERATING SYSTEM READY — AWAITING FIRST FOUNDER-APPROVED PILOT ORGANIZATION`
 
 **Frozen stance:** Pilot `READY_FOR_CONTROLLED_PILOT` · Gate F `PASS` · Launch `NO-GO` · Enrollment `OFF` · Phase 3B `BLOCKED`
 
+See also: `docs/FIRST_REAL_PILOT_ACTIVATION.json` · UI `/admin/pilot-os`
+
 ## Exact next Founder action
 
-1. Select a **real** employer/org (not `nova-hiring-pl` / demo).  
-2. Name recipients (emails).  
-3. Approve via CLI (ops Bearer):
+1. Open `/admin/pilot-os` (ops Bearer) **or** use curl below.  
+2. Submit **complete** intake for a **real** employer (not `nova-hiring-pl` / demo):  
+   `legal_name`, `sponsor_label`, `approved_by_label`, `founder_org_approval_ref` (≥8), named `recipient_emails`.  
+3. Do **not** authorize send until pack is `READY_UNSENT` and send-safety PASS.
 
 ```bash
-# create candidate (optional)
+# create candidate
 curl -sS -X POST "$API/api/v1/admin/pilot-os/organizations" \
   -H "Authorization: Bearer $OPS_ADMIN_TOKEN" -H "Content-Type: application/json" \
-  -d '{"slug":"acme-pl","display_name":"Acme PL","recipient_emails":["r1@acme.example","r2@acme.example","r3@acme.example"]}'
+  -d '{"slug":"acme-pl","display_name":"Acme PL","legal_name":"Acme Sp. z o.o.","sponsor_label":"Founder Sponsor","recipient_emails":["r1@acme.example"]}'
 
-# FOUNDER_APPROVE
+# FOUNDER_APPROVE (requires org approval ref)
 curl -sS -X POST "$API/api/v1/admin/pilot-os/organizations/ID/approve" \
   -H "Authorization: Bearer $OPS_ADMIN_TOKEN" -H "Content-Type: application/json" \
-  -d '{"approved_by_label":"Tomasz Czechowski"}'
+  -d '{"approved_by_label":"Tomasz Czechowski","founder_org_approval_ref":"FOUNDER-ORG-REF-YYYYMMDD","sponsor_label":"Founder Sponsor","legal_name":"Acme Sp. z o.o."}'
 
 # prepare pack (stays READY_UNSENT)
 curl -sS -X POST "$API/api/v1/admin/pilot-os/organizations/ID/invitation-packs" \
   -H "Authorization: Bearer $OPS_ADMIN_TOKEN" -H "Content-Type: application/json" -d '{}'
 
-# send ONLY with explicit approval ref
+# preflight (does not send)
+curl -sS "$API/api/v1/admin/pilot-os/invitation-packs/PACK_ID/send-safety" \
+  -H "Authorization: Bearer $OPS_ADMIN_TOKEN"
+
+# send ONLY with explicit send approval ref (never as a test against real recipients)
 curl -sS -X POST "$API/api/v1/admin/pilot-os/invitation-packs/PACK_ID/send" \
   -H "Authorization: Bearer $OPS_ADMIN_TOKEN" -H "Content-Type: application/json" \
   -d '{"founder_send_approval_ref":"FOUNDER_SEND_YYYYMMDD_ref"}'

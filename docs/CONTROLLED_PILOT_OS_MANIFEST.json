@@ -1,9 +1,11 @@
 {
   "schema": "twin.controlled_pilot_os.manifest/v1",
-  "updated_at": "2026-07-23T20:30:00Z",
+  "updated_at": "2026-07-24T09:30:00Z",
   "branch": "cursor/phase1-monorepo-scaffold",
-  "verdict_expected_without_approved_org": "CONTROLLED PILOT OPERATING SYSTEM READY — AWAITING FIRST FOUNDER-APPROVED PILOT ORGANIZATION",
-  "verdict_with_sent_invites": "CONTROLLED PILOT ACTIVE — FIRST REAL USERS ONBOARDED",
+  "verdict_expected_without_approved_org": "FIRST REAL PILOT ORGANIZATION APPROVAL REQUIRED — ACTIVATION SYSTEM READY",
+  "verdict_alias_os_without_approved_org": "CONTROLLED PILOT OPERATING SYSTEM READY — AWAITING FIRST FOUNDER-APPROVED PILOT ORGANIZATION",
+  "verdict_with_sent_invites_awaiting_activation": "FIRST REAL PILOT ORGANIZATION INVITATIONS SENT — AWAITING USER ACTIVATION",
+  "verdict_with_sent_invites_legacy_alias": "CONTROLLED PILOT ACTIVE — FIRST REAL USERS ONBOARDED",
   "stance": {
     "pilot": "READY_FOR_CONTROLLED_PILOT",
     "gate_f": "PASS",
@@ -25,9 +27,12 @@
   "surfaces": {
     "status_api": "GET /api/v1/admin/pilot-os/status",
     "launch_go_gate_api": "GET /api/v1/admin/pilot-os/launch-go-gate",
+    "send_safety_api": "GET /api/v1/admin/pilot-os/invitation-packs/{id}/send-safety",
     "orgs_api": "/api/v1/admin/pilot-os/organizations",
+    "pilot_os_ui": "/admin/pilot-os",
     "cli": "scripts/controlled-pilot-os-status.py",
-    "alembic": "100_controlled_pilot_os"
+    "alembic": "102_first_real_pilot_intake",
+    "activation_doc": "docs/FIRST_REAL_PILOT_ACTIVATION.json"
   },
   "hard_bans": [
     "no_launch_go_without_real_evidence",
@@ -36,14 +41,17 @@
     "no_invented_customers",
     "no_auto_mass_outreach",
     "no_captcha_bypass",
-    "no_false_logo_quotes"
+    "no_false_logo_quotes",
+    "no_send_without_founder_send_approval_ref"
   ],
   "modules": [
     "docs_drift_classification",
     "dns_temporary_canonical",
     "cohort_model",
     "org_selection_founder_approved_gate",
+    "first_real_pilot_intake",
     "invitation_pack_unsent_default",
+    "send_safety_gate",
     "legal_consent_gates",
     "onboarding_workflow",
     "tenant_templates",

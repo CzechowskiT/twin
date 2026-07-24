@@ -51,7 +51,7 @@
     "worker_service": "enthusiastic-encouragement",
     "postgres": "Postgres",
     "redis": "Redis",
-    "alembic_head_expected": "101_first_customer_activation"
+    "alembic_head_expected": "102_first_real_pilot_intake"
   },
   "on_call_roles": {
     "primary": "PILOT_ON_CALL_PRIMARY",
@@ -73,10 +73,27 @@
     "manifest": "docs/CONTROLLED_PILOT_OS_MANIFEST.json",
     "index": "docs/CONTROLLED_PILOT_OPERATING_SYSTEM.md",
     "launch_go_gate": "docs/LAUNCH_GO_EVIDENCE_GATE.json",
-    "status_api": "/api/v1/admin/pilot-os/status"
+    "first_real_activation": "docs/FIRST_REAL_PILOT_ACTIVATION.json",
+    "status_api": "/api/v1/admin/pilot-os/status",
+    "send_safety_api": "/api/v1/admin/pilot-os/invitation-packs/{id}/send-safety"
   },
-  "verified_tip": "4500ace44b5143f6db7e79bceee8dc01837a244e",
-  "verdict": "CUSTOMER-USABLE MULTI-ROLE PILOT JOURNEY COMPLETE — READY FOR FIRST APPROVED ORGANIZATION",
+  "verified_tip": "PLACEHOLDER_AFTER_PUSH",
+  "verdict": "FIRST REAL PILOT ORGANIZATION APPROVAL REQUIRED — ACTIVATION SYSTEM READY",
+  "activation": {
+    "approved_real_orgs": 0,
+    "invitations_sent": 0,
+    "real_customer_validated": false,
+    "kpi_token": "NO_REAL_PILOT_DATA",
+    "missing_inputs": [
+      "founder_approved_real_organization",
+      "legal_name",
+      "sponsor_label",
+      "founder_org_approval_ref",
+      "named_recipient_emails",
+      "approved_by_label",
+      "organization_candidate_record"
+    ]
+  },
   "customer_usable": {
     "definition": "docs/CUSTOMER_USABLE_DEFINITION.md",
     "readiness": "docs/CUSTOMER_USABLE_READINESS.json",
