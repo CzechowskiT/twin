@@ -80,13 +80,13 @@
   },
   "verified_runtime_commit": "03e1f985740973254417a1291e37309582fc4497",
   "alignment": {
-    "repo_head": "f2a36ac3435d99fa4024fafe819283ab5e0c4616",
+    "repo_head": "39aba88103ec140fe015e20fb8c14cb9c48d20f9",
     "prod_api_commit": "03e1f985740973254417a1291e37309582fc4497",
     "prod_frontend_commit": "03e1f985740973254417a1291e37309582fc4497",
     "prod_worker_commit": "03e1f985740973254417a1291e37309582fc4497",
     "alignment_status": "acceptable_docs_only_drift",
     "docs_only_drift": true,
-    "note": "Runtime FE/API/worker aligned at 03e1f985; tip may be docs-ahead after topology stamp"
+    "note": "Runtime FE/API/worker at 03e1f985; tip 39aba88103ec140fe015e20fb8c14cb9c48d20f9 docs-only ahead"
   },
   "verdict": "FIRST REAL PILOT ORGANIZATION APPROVAL REQUIRED \u2014 ACTIVATION SYSTEM READY",
   "activation": {
@@ -123,5 +123,5 @@
     "admin_ui": "/admin/pilot-os",
     "kpi": "NO_REAL_PILOT_DATA"
   },
-  "verified_tip": "f2a36ac3435d99fa4024fafe819283ab5e0c4616"
+  "verified_tip": "39aba88103ec140fe015e20fb8c14cb9c48d20f9"
 }
