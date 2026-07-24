@@ -1,6 +1,6 @@
 {
   "schema": "twin.production_topology.rc1/v1",
-  "updated_at": "2026-07-24T18:20:00Z",
+  "updated_at": "2026-07-24T18:57:00Z",
   "branch": "cursor/phase1-monorepo-scaffold",
   "hard_live_denominator": "CORE_PILOT_ONLY",
   "stance": {
@@ -78,17 +78,17 @@
     "status_api": "/api/v1/admin/pilot-os/status",
     "send_safety_api": "/api/v1/admin/pilot-os/invitation-packs/{id}/send-safety"
   },
-  "verified_runtime_commit": "d8102012733d48b8d511676a3fb75c4b3410b875",
+  "verified_runtime_commit": "b8c1a019dfa704acc4cb497f2bec0556965efa25",
   "alignment": {
-    "repo_head": "d8102012733d48b8d511676a3fb75c4b3410b875",
-    "prod_api_commit": "d8102012733d48b8d511676a3fb75c4b3410b875",
-    "prod_frontend_commit": "d8102012733d48b8d511676a3fb75c4b3410b875",
-    "prod_worker_commit": "d8102012733d48b8d511676a3fb75c4b3410b875",
+    "repo_head": "b8c1a019dfa704acc4cb497f2bec0556965efa25",
+    "prod_api_commit": "b8c1a019dfa704acc4cb497f2bec0556965efa25",
+    "prod_frontend_commit": "b8c1a019dfa704acc4cb497f2bec0556965efa25",
+    "prod_worker_commit": "b8c1a019dfa704acc4cb497f2bec0556965efa25",
     "alignment_status": "ALIGNED",
     "docs_only_drift": true,
-    "note": "Runtime four-way ALIGNED at d8102012 (FCS Phase 1); subsequent docs tip may advance with docs_only_drift"
+    "note": "Runtime four-way ALIGNED at b8c1a019 (pack-prep gate); docs tip may advance"
   },
-  "verdict": "FIRST REAL CUSTOMER SUCCESS SYSTEM READY — AWAITING FOUNDER-APPROVED PILOT ORGANIZATION",
+  "verdict": "PACK PREPARATION BLOCKED — COMPLETE FOUNDER ORGANIZATION INTAKE REQUIRED",
   "activation": {
     "approved_real_orgs": 0,
     "invitations_sent": 0,
@@ -129,8 +129,8 @@
     "approved_real_orgs": 0,
     "invites_sent": 0
   },
-  "verified_tip": "d8102012733d48b8d511676a3fb75c4b3410b875",
-  "ci_smoke_run": "30116227452",
+  "verified_tip": "b8c1a019dfa704acc4cb497f2bec0556965efa25",
+  "ci_smoke_run": "30118723247",
   "ai_candidate_intelligence": {
     "doc": "docs/AI_CANDIDATE_INTELLIGENCE.json",
     "real_validation_doc": "docs/AI_CANDIDATE_INTELLIGENCE_REAL_VALIDATION.json",
