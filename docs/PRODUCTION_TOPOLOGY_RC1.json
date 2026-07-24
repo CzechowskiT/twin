@@ -1,6 +1,6 @@
 {
   "schema": "twin.production_topology.rc1/v1",
-  "updated_at": "2026-07-24T16:20:00Z",
+  "updated_at": "2026-07-24T16:25:00Z",
   "branch": "cursor/phase1-monorepo-scaffold",
   "hard_live_denominator": "CORE_PILOT_ONLY",
   "stance": {
@@ -78,15 +78,15 @@
     "status_api": "/api/v1/admin/pilot-os/status",
     "send_safety_api": "/api/v1/admin/pilot-os/invitation-packs/{id}/send-safety"
   },
-  "verified_runtime_commit": "fd6e20c5fbcdd35c207d0f9ac5b9aaec27191bab",
+  "verified_runtime_commit": "f64c0775c6ca0558f9702c275b9723d8fb3767a1",
   "alignment": {
-    "repo_head": "fd6e20c5fbcdd35c207d0f9ac5b9aaec27191bab",
-    "prod_api_commit": "fd6e20c5fbcdd35c207d0f9ac5b9aaec27191bab",
-    "prod_frontend_commit": "95cdcdd1c97c9ac90fe8cc10a7b747c42b03af2d",
-    "prod_worker_commit": "fd6e20c5fbcdd35c207d0f9ac5b9aaec27191bab",
-    "alignment_status": "PARTIAL",
+    "repo_head": "f64c0775c6ca0558f9702c275b9723d8fb3767a1",
+    "prod_api_commit": "f64c0775c6ca0558f9702c275b9723d8fb3767a1",
+    "prod_frontend_commit": "f64c0775c6ca0558f9702c275b9723d8fb3767a1",
+    "prod_worker_commit": "f64c0775c6ca0558f9702c275b9723d8fb3767a1",
+    "alignment_status": "ALIGNED",
     "docs_only_drift": false,
-    "note": "AI real-validation OS live; approval NO_COMPLETE; Railway recovered after snapshot failure"
+    "note": "Ops leftovers closed: FE/API/worker f64c0775; alembic 104 is_at_head; smoke 30108386485 success"
   },
   "verdict": "AI CANDIDATE INTELLIGENCE REAL-CUSTOMER VALIDATION READY — AWAITING FOUNDER-APPROVED PILOT ORGANIZATION",
   "activation": {
@@ -123,7 +123,7 @@
     "admin_ui": "/admin/pilot-os",
     "kpi": "NO_REAL_PILOT_DATA"
   },
-  "verified_tip": "fd6e20c5fbcdd35c207d0f9ac5b9aaec27191bab",
+  "verified_tip": "f64c0775c6ca0558f9702c275b9723d8fb3767a1",
   "ai_candidate_intelligence": {
     "doc": "docs/AI_CANDIDATE_INTELLIGENCE.json",
     "real_validation_doc": "docs/AI_CANDIDATE_INTELLIGENCE_REAL_VALIDATION.json",
