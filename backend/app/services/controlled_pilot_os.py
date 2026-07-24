@@ -256,16 +256,24 @@ def prepare_invitation_pack(
     emails = _parse_emails(org.recipient_emails_json)
     if not emails:
         raise ValueError("recipients_required")
+    from app.services import ai_intel_validation as aiv
+
+    ai_section = aiv.ai_invitation_section()
+    note_parts = [
+        notes or "Prepared — awaiting Founder send approval (not sent)",
+        "AI_SECTION=" + json.dumps(ai_section, separators=(",", ":"))[:1500],
+    ]
     pack = PilotInvitationPack(
         organization_id=org.id,
         status=PACK_READY_UNSENT,
         recipients_json=json.dumps(emails),
         prepared_at=_utcnow(),
-        notes=notes or "Prepared — awaiting Founder send approval (not sent)",
+        notes=" | ".join(note_parts)[:2000],
     )
     db.add(pack)
     db.commit()
     db.refresh(pack)
+    aiv.ensure_plan_for_org(db, org_id=org.id)
     try:
         from app.services.product_funnel import emit_funnel_event
 
@@ -274,7 +282,7 @@ def prepare_invitation_pack(
             event_name="pilot_invite_pack_prepared",
             user_id=None,
             persona="ops",
-            properties={"org_id": org.id, "pack_id": pack.id},
+            properties={"org_id": org.id, "pack_id": pack.id, "ai_section": True},
         )
         db.commit()
     except Exception:
@@ -826,7 +834,29 @@ def build_os_status(db: Session, settings: Settings | None = None) -> dict[str, 
             "verdict": "AI CANDIDATE INTELLIGENCE CUSTOMER-USABLE — EXPLAINABLE CV SCREENING PRODUCTION-READY",
             "note": "production_smoked_synthetic≠real_customer_validated≠real_pilot_data",
         },
+        "ai_real_validation": _ai_real_validation_block(db),
     }
+
+
+def _ai_real_validation_block(db: Session) -> dict[str, Any]:
+    from app.services import ai_intel_validation as aiv
+
+    try:
+        return aiv.build_ai_validation_os_payload(db)
+    except Exception as exc:  # pragma: no cover — defensive for missing migration
+        return {
+            "verdict": aiv.VERDICT_AWAITING_ORG,
+            "error": type(exc).__name__,
+            "approval_search": {"result": aiv.APPROVAL_NO_COMPLETE},
+            "evidence_tier": aiv.TIER_READY,
+            "kpi": {
+                "token": "NO_REAL_PILOT_DATA",
+                "real_pilot_data_started": False,
+                "real_customer_validated": False,
+                "synthetic_excluded": True,
+            },
+            "next_action": "Submit complete Founder intake + approve non-synthetic org",
+        }
 
 
 def load_customer_usable_readiness() -> dict[str, Any]:

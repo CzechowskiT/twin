@@ -2958,6 +2958,41 @@ class PilotSupportTicket(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
+
+
+class PilotAiValidationPlan(Base):
+    """Per-org AI validation plan — created only for FOUNDER_APPROVED non-synthetic orgs."""
+
+    __tablename__ = "pilot_ai_validation_plans"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    organization_id: Mapped[int] = mapped_column(
+        ForeignKey("pilot_organizations.id", ondelete="CASCADE"), unique=True, index=True
+    )
+    status: Mapped[str] = mapped_column(String(32), default="DRAFT", index=True)
+    plan_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class PilotAiValidationEvent(Base):
+    """Non-PII real-user AI validation events — synthetic flagged separately from KPI."""
+
+    __tablename__ = "pilot_ai_validation_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    organization_id: Mapped[int | None] = mapped_column(
+        ForeignKey("pilot_organizations.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    tenant_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
+    event_name: Mapped[str] = mapped_column(String(64), index=True)
+    persona: Mapped[str] = mapped_column(String(32), default="recruiter")
+    workflow_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    is_synthetic: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+    metadata_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, index=True)
     resolved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
 

@@ -34,7 +34,7 @@ test("PRODUCTION_TOPOLOGY_RC1.json exists and is valid", () => {
   assert.ok(doc.vercel.domains_attached.includes("twin.care"));
   assert.ok(doc.vercel.domains_attached.includes("app.twin.care"));
   assert.equal(doc.vercel.dns_blocker, "afternic_nameservers");
-  assert.equal(doc.railway.alembic_head_expected, "103_candidate_intelligence");
+  assert.equal(doc.railway.alembic_head_expected, "104_ai_intel_validation");
   assert.equal(doc.railway.api_service, "twin");
   assert.equal(doc.railway.worker_service, "enthusiastic-encouragement");
   assert.equal(doc.on_call_roles.never_invent_human_names, true);
@@ -47,6 +47,7 @@ test("PRODUCTION_TOPOLOGY_RC1.json exists and is valid", () => {
       verdict === "CONTROLLED_PILOT_OS_READY_AWAITING_FIRST_FOUNDER_APPROVED_ORG" ||
       verdict === "FIRST_CUSTOMER_READY_WAITING_FOR_APPROVED_ORG" ||
       verdict.includes("AI CANDIDATE INTELLIGENCE CUSTOMER-USABLE") ||
+      verdict.includes("AI CANDIDATE INTELLIGENCE REAL-CUSTOMER VALIDATION READY") ||
       verdict.includes("FIRST CUSTOMER READY") ||
       verdict.includes("CONTROLLED PILOT"),
   );

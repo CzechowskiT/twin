@@ -8,8 +8,14 @@
     "invitation_pack_sent_ge_1",
     "named_real_recipients_ge_3",
     "kpi_not_no_real_pilot_data",
-    "no_fake_customer_claims"
+    "no_fake_customer_claims",
+    "ai_real_customer_validated_optional_not_sufficient_alone"
   ],
+  "ai_candidate_intelligence_validation": {
+    "note": "Real AI validation evidence may increase launch readiness score only after REAL_CUSTOMER_VALIDATED; one org is insufficient for Launch GO. AI never flips Launch independently.",
+    "doc": "docs/AI_CANDIDATE_INTELLIGENCE_REAL_VALIDATION.json",
+    "launch_flip_allowed": false
+  },
   "frozen_axes": {
     "enrollment": "OFF",
     "phase_3b": "BLOCKED",

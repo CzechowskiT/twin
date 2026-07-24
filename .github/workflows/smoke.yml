@@ -47,6 +47,7 @@ jobs:
             tests/test_nightly_auto_apply_mail.py \
             tests/test_ops_demo_refresh.py \
             tests/test_candidate_intelligence.py \
+            tests/test_ai_intel_validation.py \
             -q
       - name: Candidate intelligence offline eval harness
         working-directory: ${{ github.workspace }}

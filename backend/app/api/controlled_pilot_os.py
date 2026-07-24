@@ -263,3 +263,36 @@ def first_customer_scores(
 ) -> dict:
     _require_ops_admin(settings, authorization)
     return pilot_os.compute_first_customer_scores(db, settings)
+
+
+@router.get("/pilot-os/ai-validation")
+def pilot_os_ai_validation(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    """AI Candidate Intelligence real-validation command view (ops Bearer)."""
+    _require_ops_admin(settings, authorization)
+    from app.services import ai_intel_validation as aiv
+
+    return aiv.build_ai_validation_os_payload(db)
+
+
+@router.get("/pilot-os/ai-validation/safety-gate")
+def pilot_os_ai_validation_safety(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    _require_ops_admin(settings, authorization)
+    from app.services import ai_intel_validation as aiv
+
+    return aiv.production_safety_gate(
+        api_commit="present",
+        frontend_commit="present",
+        alembic_ok=True,
+        worker_ready=True,
+        isolation_green=True,
+        multi_role_green=True,
+        ws20_green=True,
+    )

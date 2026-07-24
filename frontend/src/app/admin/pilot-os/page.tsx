@@ -53,6 +53,32 @@ type Activation = {
   kpi_token?: string;
 };
 
+type AiRealValidation = {
+  verdict?: string;
+  evidence_tier?: string;
+  approval_search?: { result?: string; approved_count?: number };
+  scores?: Record<string, number | string>;
+  kpi?: {
+    token?: string;
+    real_pilot_data_started?: boolean;
+    real_customer_validated?: boolean;
+    synthetic_excluded?: boolean;
+  };
+  next_action?: string;
+  cvs_processed?: number;
+  analyses_completed?: number;
+  corrections?: number;
+  overrides?: number;
+  evidence_views?: number;
+  feedback?: number;
+  support_incidents_open?: number;
+  unsupported_claims?: number;
+  protected_attribute_violations?: number;
+  packs_ready_unsent?: number;
+  packs_sent?: number;
+  production_safety_gate?: { pass?: boolean; blockers?: string[] };
+};
+
 type OsStatus = {
   verdict?: string;
   kpi_token?: string;
@@ -74,6 +100,7 @@ type OsStatus = {
     multi_role_journey_id?: string;
     verdict?: string;
   };
+  ai_real_validation?: AiRealValidation;
 };
 
 function authHeaders(token: string): HeadersInit {
@@ -229,6 +256,75 @@ export default function AdminPilotOsPage() {
               </ul>
             ) : null}
           </div>
+
+          {status.ai_real_validation ? (
+            <div
+              className="rounded border border-emerald-200 bg-emerald-50/30 p-4"
+              data-testid="pilot-os-ai-validation-command"
+            >
+              <h2 className="font-medium">AI Candidate Intelligence — real validation</h2>
+              <p className="mt-1 text-sm">{status.ai_real_validation.verdict}</p>
+              <p className="mt-1 text-xs text-neutral-600">
+                Tier: {status.ai_real_validation.evidence_tier} · Approval:{" "}
+                {status.ai_real_validation.approval_search?.result || "—"}
+              </p>
+              <p className="mt-2 text-sm text-neutral-700">
+                Next: {status.ai_real_validation.next_action}
+              </p>
+              <dl className="mt-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
+                <div>
+                  <dt className="text-neutral-500">CVs processed</dt>
+                  <dd className="font-semibold">{status.ai_real_validation.cvs_processed ?? 0}</dd>
+                </div>
+                <div>
+                  <dt className="text-neutral-500">Corrections</dt>
+                  <dd className="font-semibold">{status.ai_real_validation.corrections ?? 0}</dd>
+                </div>
+                <div>
+                  <dt className="text-neutral-500">Feedback</dt>
+                  <dd className="font-semibold">{status.ai_real_validation.feedback ?? 0}</dd>
+                </div>
+                <div>
+                  <dt className="text-neutral-500">AI support open</dt>
+                  <dd className="font-semibold">
+                    {status.ai_real_validation.support_incidents_open ?? 0}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-neutral-500">Real adoption score</dt>
+                  <dd className="font-semibold">
+                    {status.ai_real_validation.scores?.AI_REAL_USER_ADOPTION_SCORE ?? 0}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-neutral-500">Real value score</dt>
+                  <dd className="font-semibold">
+                    {status.ai_real_validation.scores?.AI_REAL_CUSTOMER_VALUE_SCORE ?? 0}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-neutral-500">Protected-attr violations</dt>
+                  <dd className="font-semibold">
+                    {status.ai_real_validation.protected_attribute_violations ?? 0}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-neutral-500">Unsupported claims</dt>
+                  <dd className="font-semibold">
+                    {status.ai_real_validation.unsupported_claims ?? 0}
+                  </dd>
+                </div>
+              </dl>
+              <p className="mt-2 text-xs text-neutral-500">
+                KPI {status.ai_real_validation.kpi?.token} · synthetic excluded:{" "}
+                {String(status.ai_real_validation.kpi?.synthetic_excluded)} · safety:{" "}
+                {status.ai_real_validation.production_safety_gate?.pass ? "PASS" : "BLOCK"}
+              </p>
+              <p className="mt-1 text-[11px] text-neutral-500">
+                Launch stays NO-GO. Real scores stay 0 until Founder-approved non-synthetic activity.
+              </p>
+            </div>
+          ) : null}
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="rounded border border-neutral-200 p-4">

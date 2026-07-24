@@ -32,10 +32,22 @@ Zapraszamy do **kontrolowanego pilota** TWIN (to nie jest publiczny launch).
 
 Rejestracja publiczna i masowa enrollment pozostają **WYŁĄCZONE**.
 
+## AI Candidate Intelligence section (EN)
+
+TWIN includes **explainable CV screening** during this pilot:
+
+**It does:** structure CV facts (profile, timeline, skills, missing info); produce a recruiter brief separating facts from inferences; compare to a specific role with MATCH / NO_MATCH / UNKNOWN; link material conclusions to evidence; let you correct facts and override match (audited).
+
+**It does not:** make hire/reject decisions; auto-send candidate messages; infer protected attributes; claim bias-free or AI Act certification; guarantee perfect parsing or time savings; sync live to ATS.
+
+Humans make all employment decisions. Feedback and support are available. Candidate correction requests remain available via product trust paths.
+
+Unavailable in this pilot: ATS live write, mass outreach, autonomous apply, public enrollment.
+
 ## Send rules
 
 1. Org must be `FOUNDER_APPROVED` and non-synthetic.  
-2. Pack prepared → `READY_UNSENT` (no email sent yet).  
+2. Pack prepared → `READY_UNSENT` (no email sent yet). AI section is attached but **unsent**.  
 3. Send requires `founder_send_approval_ref` (≥8 chars).  
 4. Outbox rows created as **draft** then marked pack `SENT`.  
 5. Never auto-send from CI or smoke.

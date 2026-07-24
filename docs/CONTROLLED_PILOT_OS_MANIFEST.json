@@ -90,6 +90,7 @@
     "docs_set",
     "ci_policy_guards",
     "ai_candidate_intelligence_ws20",
-    "ai_candidate_intelligence_eval_harness"
+    "ai_candidate_intelligence_eval_harness",
+    "ai_candidate_intelligence_real_validation_os"
   ]
 }

@@ -1,0 +1,41 @@
+{
+  "schema": "twin.ai_candidate_intelligence.real_validation/v1",
+  "updated_at": "2026-07-24T16:00:00Z",
+  "branch": "cursor/phase1-monorepo-scaffold",
+  "final_verdict": "AI CANDIDATE INTELLIGENCE REAL-CUSTOMER VALIDATION READY — AWAITING FOUNDER-APPROVED PILOT ORGANIZATION",
+  "approval_search": "NO_COMPLETE_APPROVAL",
+  "evidence_tier": "READY_FOR_REAL_CUSTOMER_VALIDATION",
+  "cu_technical_verdict": "AI CANDIDATE INTELLIGENCE CUSTOMER-USABLE — EXPLAINABLE CV SCREENING PRODUCTION-READY",
+  "scores": {
+    "AI_TECHNICAL_READINESS_SCORE": 100,
+    "AI_SYNTHETIC_VALIDATION_SCORE": 100,
+    "AI_REAL_USER_ADOPTION_SCORE": 0,
+    "AI_REAL_CUSTOMER_VALUE_SCORE": 0,
+    "AI_PUBLIC_LAUNCH_EVIDENCE_SCORE": 15
+  },
+  "kpi": {
+    "token": "NO_REAL_PILOT_DATA",
+    "real_pilot_data_started": false,
+    "real_customer_validated": false,
+    "synthetic_excluded": true
+  },
+  "ws20": "PASS 30/30",
+  "multi_role": "PASS 19/19",
+  "alembic": "104_ai_intel_validation",
+  "frozen": {
+    "launch": "NO-GO",
+    "enrollment": "OFF",
+    "phase_3b": "BLOCKED"
+  },
+  "provisioned_real_org": false,
+  "invitations_sent": false,
+  "real_cv_processed": false,
+  "next_founder_action": "Submit complete Founder intake (legal_name, sponsor, approval_ref≥8, named recipients) and approve non-synthetic org via /admin/pilot-os",
+  "surfaces": {
+    "service": "backend/app/services/ai_intel_validation.py",
+    "api": "GET /api/v1/admin/pilot-os/ai-validation",
+    "safety_gate": "GET /api/v1/admin/pilot-os/ai-validation/safety-gate",
+    "ui": "/admin/pilot-os",
+    "invitation_ai_section": "docs/PILOT_INVITATION_PACK_TEMPLATE.md"
+  }
+}

@@ -1,6 +1,6 @@
 {
   "schema": "twin.production_topology.rc1/v1",
-  "updated_at": "2026-07-24T12:55:00Z",
+  "updated_at": "2026-07-24T16:00:00Z",
   "branch": "cursor/phase1-monorepo-scaffold",
   "hard_live_denominator": "CORE_PILOT_ONLY",
   "stance": {
@@ -22,7 +22,7 @@
     "preferred_public_frontend": "https://twin.care",
     "preferred_app_frontend": "https://app.twin.care",
     "api": "https://twin-production-bcd9.up.railway.app",
-    "note": "TEMPORARY_PILOT_CANONICAL_URL = twin-sooty.vercel.app. twin.care Afternic NS parks apex \u2014 non-blocking for controlled pilot OS."
+    "note": "TEMPORARY_PILOT_CANONICAL_URL = twin-sooty.vercel.app. twin.care Afternic NS parks apex — non-blocking for controlled pilot OS."
   },
   "vercel": {
     "team": "twin",
@@ -51,7 +51,7 @@
     "worker_service": "enthusiastic-encouragement",
     "postgres": "Postgres",
     "redis": "Redis",
-    "alembic_head_expected": "103_candidate_intelligence"
+    "alembic_head_expected": "104_ai_intel_validation"
   },
   "on_call_roles": {
     "primary": "PILOT_ON_CALL_PRIMARY",
@@ -88,7 +88,7 @@
     "docs_only_drift": false,
     "note": "WS20 evidence 687d43f8; CU tip 6d8f4376; Pilot OS flag tip c9209a18"
   },
-  "verdict": "AI CANDIDATE INTELLIGENCE CUSTOMER-USABLE \u2014 EXPLAINABLE CV SCREENING PRODUCTION-READY",
+  "verdict": "AI CANDIDATE INTELLIGENCE REAL-CUSTOMER VALIDATION READY — AWAITING FOUNDER-APPROVED PILOT ORGANIZATION",
   "activation": {
     "approved_real_orgs": 0,
     "invitations_sent": 0,
@@ -126,7 +126,8 @@
   "verified_tip": "c9209a180a89d480c39cd7e42a05bfa2cc75e7f2",
   "ai_candidate_intelligence": {
     "doc": "docs/AI_CANDIDATE_INTELLIGENCE.json",
-    "alembic": "103_candidate_intelligence",
+    "real_validation_doc": "docs/AI_CANDIDATE_INTELLIGENCE_REAL_VALIDATION.json",
+    "alembic": "104_ai_intel_validation",
     "customer_usable_promoted": true,
     "customer_usable_promoted_count": 6,
     "unit_tests": "5/5",
@@ -135,6 +136,8 @@
     "ws20_evidence_sha": "687d43f8dc4acc7635b5ddcf30b18389fba17cbd",
     "eval_harness": "PASS",
     "multi_role": "19/19",
-    "verdict": "AI CANDIDATE INTELLIGENCE CUSTOMER-USABLE \u2014 EXPLAINABLE CV SCREENING PRODUCTION-READY"
+    "approval_search": "NO_COMPLETE_APPROVAL",
+    "real_validation_verdict": "AI CANDIDATE INTELLIGENCE REAL-CUSTOMER VALIDATION READY — AWAITING FOUNDER-APPROVED PILOT ORGANIZATION",
+    "verdict": "AI CANDIDATE INTELLIGENCE CUSTOMER-USABLE — EXPLAINABLE CV SCREENING PRODUCTION-READY"
   }
 }
