@@ -2901,6 +2901,9 @@ class PilotOrganization(Base):
     )
     approved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     approved_by_label: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    legal_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    sponsor_label: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    founder_org_approval_ref: Mapped[str | None] = mapped_column(String(128), nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(

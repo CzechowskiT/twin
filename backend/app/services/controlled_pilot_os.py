@@ -59,6 +59,31 @@ OS_AWAITING_ORG = (
 )
 OS_ACTIVE = "CONTROLLED PILOT ACTIVE — FIRST REAL USERS ONBOARDED"
 
+# First real pilot organization activation outcomes (evidence-gated; never invent orgs).
+ACTIVATION_APPROVAL_REQUIRED = (
+    "FIRST REAL PILOT ORGANIZATION APPROVAL REQUIRED — ACTIVATION SYSTEM READY"
+)
+ACTIVATION_APPROVED_PACK_UNSENT = (
+    "FIRST REAL PILOT ORGANIZATION APPROVED — ACTIVATION PACK READY AND UNSENT"
+)
+ACTIVATION_INVITES_SENT_AWAITING = (
+    "FIRST REAL PILOT ORGANIZATION INVITATIONS SENT — AWAITING USER ACTIVATION"
+)
+ACTIVATION_ACTIVE = "FIRST REAL PILOT ORGANIZATION ACTIVATED — CONTROLLED PILOT ACTIVE"
+ACTIVATION_BLOCKED_REGRESSION = (
+    "FIRST REAL PILOT ORGANIZATION ACTIVATION BLOCKED — CUSTOMER-USABLE JOURNEY REGRESSION"
+)
+
+INTAKE_REQUIRED_FIELDS = (
+    "slug",
+    "display_name",
+    "legal_name",
+    "sponsor_label",
+    "approved_by_label",
+    "founder_org_approval_ref",
+    "recipient_emails",
+)
+
 _SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]{1,78}[a-z0-9]$")
 _SYNTHETIC_SLUGS = frozenset({"nova-hiring-pl", "demo-company", "twin-demo"})
 
@@ -93,6 +118,9 @@ def org_to_dict(org: PilotOrganization, *, mask: bool = True) -> dict[str, Any]:
         "id": org.id,
         "slug": org.slug,
         "display_name": org.display_name,
+        "legal_name": getattr(org, "legal_name", None),
+        "sponsor_label": getattr(org, "sponsor_label", None),
+        "founder_org_approval_ref": getattr(org, "founder_org_approval_ref", None),
         "market": org.market,
         "approval_status": org.approval_status,
         "is_synthetic": bool(org.is_synthetic),
@@ -139,6 +167,8 @@ def create_organization_candidate(
     recipient_emails: list[str] | None = None,
     notes: str | None = None,
     is_synthetic: bool = False,
+    legal_name: str | None = None,
+    sponsor_label: str | None = None,
 ) -> PilotOrganization:
     slug_n = slug.strip().lower()
     if not _SLUG_RE.match(slug_n):
@@ -151,6 +181,8 @@ def create_organization_candidate(
     org = PilotOrganization(
         slug=slug_n,
         display_name=display_name.strip()[:200],
+        legal_name=(legal_name or "").strip()[:200] or None,
+        sponsor_label=(sponsor_label or "").strip()[:120] or None,
         market=(market or "PL")[:64],
         approval_status=APPROVAL_CANDIDATE,
         is_synthetic=is_synthetic,
@@ -172,6 +204,9 @@ def founder_approve_organization(
     approved_by_label: str,
     recipient_emails: list[str] | None = None,
     notes: str | None = None,
+    founder_org_approval_ref: str | None = None,
+    legal_name: str | None = None,
+    sponsor_label: str | None = None,
 ) -> PilotOrganization:
     org = db.query(PilotOrganization).filter(PilotOrganization.id == org_id).one_or_none()
     if org is None:
@@ -181,9 +216,21 @@ def founder_approve_organization(
     emails = recipient_emails if recipient_emails is not None else _parse_emails(org.recipient_emails_json)
     if len(emails) < 1:
         raise ValueError("recipients_required")
+    ref = (founder_org_approval_ref or org.founder_org_approval_ref or "").strip()
+    if len(ref) < 8:
+        raise ValueError("founder_org_approval_ref_required")
+    sponsor = (sponsor_label or org.sponsor_label or "").strip()
+    if len(sponsor) < 2:
+        raise ValueError("sponsor_label_required")
+    legal = (legal_name or org.legal_name or org.display_name or "").strip()
+    if len(legal) < 2:
+        raise ValueError("legal_name_required")
     org.approval_status = APPROVAL_FOUNDER_APPROVED
     org.approved_at = _utcnow()
     org.approved_by_label = (approved_by_label or "Founder")[:120]
+    org.founder_org_approval_ref = ref[:128]
+    org.sponsor_label = sponsor[:120]
+    org.legal_name = legal[:200]
     org.recipient_emails_json = json.dumps([e.strip().lower() for e in emails if e.strip()])
     if notes:
         org.notes = notes
@@ -525,6 +572,166 @@ def evaluate_launch_go_gate(
     }
 
 
+def evaluate_send_safety_gate(
+    db: Session,
+    settings: Settings | None = None,
+    *,
+    pack_id: int,
+    founder_send_approval_ref: str | None = None,
+) -> dict[str, Any]:
+    """Pre-send checklist — never auto-approves send.
+
+    ``allowed`` is True only when pack/org gates pass AND an explicit
+    ``founder_send_approval_ref`` (≥8) is supplied at evaluation time.
+    """
+    _ = settings  # reserved for future enrollment / provider checks
+    pack = db.query(PilotInvitationPack).filter(PilotInvitationPack.id == pack_id).one_or_none()
+    if pack is None:
+        return {
+            "ok": False,
+            "allowed": False,
+            "can_send": False,
+            "blockers": ["pack_not_found"],
+            "requires_founder_send_approval_ref": True,
+            "min_ref_length": 8,
+        }
+    org = (
+        db.query(PilotOrganization)
+        .filter(PilotOrganization.id == pack.organization_id)
+        .one_or_none()
+    )
+    blockers: list[str] = []
+    if pack.status != PACK_READY_UNSENT:
+        blockers.append("pack_not_ready_unsent")
+    if org is None:
+        blockers.append("org_not_found")
+    else:
+        if org.is_synthetic:
+            blockers.append("synthetic_org_blocked")
+        if org.approval_status != APPROVAL_FOUNDER_APPROVED:
+            blockers.append("org_not_founder_approved")
+        if not (org.founder_org_approval_ref or "").strip():
+            blockers.append("founder_org_approval_ref_missing")
+        if not (org.sponsor_label or "").strip():
+            blockers.append("sponsor_label_missing")
+        if not (org.legal_name or "").strip():
+            blockers.append("legal_name_missing")
+        if len(_parse_emails(org.recipient_emails_json)) < 1:
+            blockers.append("recipients_required")
+    cu = load_customer_usable_readiness()
+    if not cu.get("multi_role_journey_customer_usable", True):
+        blockers.append("customer_usable_journey_regression")
+    ref = (founder_send_approval_ref or "").strip()
+    if len(ref) < 8:
+        blockers.append("founder_send_approval_ref_required_at_send_time")
+    allowed = len(blockers) == 0
+    return {
+        "ok": allowed,
+        "allowed": allowed,
+        "can_send": allowed,
+        "blockers": blockers,
+        "requires_founder_send_approval_ref": True,
+        "min_ref_length": 8,
+        "pack": pack_to_dict(pack),
+        "organization": org_to_dict(org) if org else None,
+        "frozen": {
+            "launch": "NO-GO",
+            "enrollment": "OFF",
+            "phase_3b": "BLOCKED",
+            "mass_outreach": "FORBIDDEN",
+        },
+    }
+
+
+def resolve_first_real_pilot_activation(
+    db: Session,
+    settings: Settings | None = None,
+    *,
+    multi_role_customer_usable: bool | None = None,
+) -> dict[str, Any]:
+    """Truthful activation outcome — never invents orgs or send events."""
+    s = settings or get_settings()
+    cu = load_customer_usable_readiness()
+    journey_ok = (
+        multi_role_customer_usable
+        if multi_role_customer_usable is not None
+        else bool(cu.get("multi_role_journey_customer_usable", True))
+    )
+    if not journey_ok:
+        return {
+            "outcome": ACTIVATION_BLOCKED_REGRESSION,
+            "evidence_tier": "blocked",
+            "missing_inputs": ["multi_role_customer_usable_journey"],
+            "approved_real_orgs": 0,
+            "packs_ready_unsent": 0,
+            "packs_sent": 0,
+            "real_customer_validated": False,
+            "kpi_token": KPI_NO_REAL,
+        }
+
+    orgs = list_organizations(db, include_synthetic=True)
+    real_approved = [
+        o for o in orgs if o["approval_status"] == APPROVAL_FOUNDER_APPROVED and not o["is_synthetic"]
+    ]
+    packs = [pack_to_dict(p) for p in db.query(PilotInvitationPack).order_by(PilotInvitationPack.id).all()]
+    packs_unsent = [p for p in packs if p["status"] == PACK_READY_UNSENT]
+    packs_sent = [p for p in packs if p["status"] == PACK_SENT]
+    candidates = [o for o in orgs if o["approval_status"] == APPROVAL_CANDIDATE and not o["is_synthetic"]]
+
+    missing: list[str] = []
+    if not real_approved:
+        missing.extend(
+            [
+                "founder_approved_real_organization",
+                "legal_name",
+                "sponsor_label",
+                "founder_org_approval_ref",
+                "named_recipient_emails",
+                "approved_by_label",
+            ]
+        )
+        if not candidates:
+            missing.append("organization_candidate_record")
+        outcome = ACTIVATION_APPROVAL_REQUIRED
+        evidence_tier = "activation_system_ready_awaiting_founder"
+    elif packs_sent:
+        # Sent ≠ activated users observed; do not claim ACTIVE without activation signals.
+        outcome = ACTIVATION_INVITES_SENT_AWAITING
+        evidence_tier = "invitations_sent_awaiting_activation"
+    elif packs_unsent or real_approved:
+        # Approved; pack may still need prepare — treat as A when pack READY_UNSENT exists,
+        # else still APPROVAL path completed with pack action pending.
+        if packs_unsent:
+            outcome = ACTIVATION_APPROVED_PACK_UNSENT
+            evidence_tier = "approved_pack_ready_unsent"
+        else:
+            outcome = ACTIVATION_APPROVED_PACK_UNSENT
+            evidence_tier = "approved_awaiting_pack_prepare"
+            missing.append("invitation_pack_prepare")
+    else:
+        outcome = ACTIVATION_APPROVAL_REQUIRED
+        evidence_tier = "activation_system_ready_awaiting_founder"
+
+    gate = evaluate_launch_go_gate(db, s)
+    return {
+        "outcome": outcome,
+        "evidence_tier": evidence_tier,
+        "missing_inputs": missing,
+        "intake_required_fields": list(INTAKE_REQUIRED_FIELDS),
+        "approved_real_orgs": len(real_approved),
+        "candidate_orgs": len(candidates),
+        "packs_ready_unsent": len(packs_unsent),
+        "packs_sent": len(packs_sent),
+        "real_customer_validated": False,  # requires observed activation, not just send
+        "real_pilot_data": gate["kpi_token"] != KPI_NO_REAL,
+        "kpi_token": gate["kpi_token"],
+        "launch_decision": "NO-GO",
+        "canonical_url": temporary_pilot_canonical_url(s),
+        "synthetic_blocked_slugs": sorted(_SYNTHETIC_SLUGS),
+        "note": "synthetic≠real; do not invent org/sponsor/recipients/approval/send",
+    }
+
+
 def build_os_status(db: Session, settings: Settings | None = None) -> dict[str, Any]:
     s = settings or get_settings()
     orgs = list_organizations(db, include_synthetic=True)
@@ -540,19 +747,20 @@ def build_os_status(db: Session, settings: Settings | None = None) -> dict[str, 
     launch_gate = evaluate_launch_go_gate(db, s)
     scores = compute_first_customer_scores(db, s)
     sent_real = any(p["status"] == PACK_SENT for p in packs) and len(real_approved) >= 1
+    activation = resolve_first_real_pilot_activation(db, s)
 
-    # Prefer first-customer program verdict for ops dashboard
-    verdict = scores["first_customer_verdict"]
+    # Prefer activation outcome for ops; keep first_customer nested for compatibility
+    verdict = activation["outcome"]
     if sent_real and launch_gate["counts"]["named_real_recipients"] >= 1:
-        # Keep OS_ACTIVE alias for older consumers
         os_alias = OS_ACTIVE
     else:
         os_alias = OS_AWAITING_ORG
 
     return {
-        "schema": "twin.controlled_pilot_os/v1",
+        "schema": "twin.controlled_pilot_os/v2",
         "generated_at": _utcnow().isoformat() + "Z",
         "verdict": verdict,
+        "activation": activation,
         "os_verdict_alias": os_alias,
         "first_customer": scores,
         "stance": {
@@ -574,22 +782,36 @@ def build_os_status(db: Session, settings: Settings | None = None) -> dict[str, 
         "launch_go_gate": launch_gate,
         "customer_usable": load_customer_usable_readiness(),
         "next_founder_action": (
-            "Select and FOUNDER_APPROVE first real pilot organization with named recipients "
-            "(CLI/API). Do not invent customers. Synthetic nova-hiring-pl is not a real pilot org."
-            if not real_approved
+            "Submit complete Founder intake (legal name, sponsor, approval ref, named recipients) "
+            "via /admin/pilot-os — do not invent customers. Synthetic nova-hiring-pl is blocked."
+            if activation["outcome"] == ACTIVATION_APPROVAL_REQUIRED
             else (
-                "Prepare invitation pack then send only with founder_send_approval_ref."
-                if not sent_real
-                else "Monitor first-week playbook; Launch remains NO-GO until separate Founder decision."
+                "Prepare invitation pack (READY_UNSENT). Send only with separate founder_send_approval_ref."
+                if activation["outcome"] == ACTIVATION_APPROVED_PACK_UNSENT
+                and activation.get("packs_ready_unsent", 0) == 0
+                else (
+                    "Send only with founder_send_approval_ref ≥8 chars after safety gate PASS. "
+                    "Do not mass-outreach. Launch stays NO-GO."
+                    if activation["outcome"] == ACTIVATION_APPROVED_PACK_UNSENT
+                    else (
+                        "Observe activation — do not impersonate users. First-week playbook applies. "
+                        "Launch remains NO-GO."
+                        if activation["outcome"]
+                        in {ACTIVATION_INVITES_SENT_AWAITING, ACTIVATION_ACTIVE}
+                        else "Repair customer-usable multi-role journey before activating a real org."
+                    )
+                )
             )
         ),
         "docs": {
             "os_index": "docs/CONTROLLED_PILOT_OPERATING_SYSTEM.md",
             "first_customer_checklists": "docs/FIRST_CUSTOMER_SUCCESS_CHECKLISTS.md",
             "first_customer_readiness": "docs/FIRST_CUSTOMER_READINESS.json",
+            "first_real_pilot_activation": "docs/FIRST_REAL_PILOT_ACTIVATION.json",
             "manifest": "docs/CONTROLLED_PILOT_OS_MANIFEST.json",
             "launch_go_gate": "docs/LAUNCH_GO_EVIDENCE_GATE.json",
             "dns": "docs/RC1_DOMAIN_DNS_FOUNDER_ACTION.md",
+            "org_workspace": "docs/PILOT_ORG_SELECTION_WORKSPACE.md",
         },
     }
 

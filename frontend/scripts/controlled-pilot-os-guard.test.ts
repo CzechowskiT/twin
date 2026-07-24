@@ -23,7 +23,7 @@ test("OS manifest exists and freezes Launch NO-GO", () => {
   assert.equal(doc.stance.phase_3b, "BLOCKED");
   assert.equal(doc.stance.pilot, "READY_FOR_CONTROLLED_PILOT");
   assert.equal(doc.kpi_default, "NO_REAL_PILOT_DATA");
-  assert.match(doc.verdict_expected_without_approved_org, /AWAITING FIRST FOUNDER-APPROVED/);
+  assert.match(doc.verdict_expected_without_approved_org, /APPROVAL REQUIRED|AWAITING FIRST FOUNDER-APPROVED/);
   assert.ok(doc.synthetic_not_real.includes("nova-hiring-pl"));
 });
 
@@ -53,6 +53,7 @@ test("first customer checklists and readiness docs present", () => {
     "docs/FIRST_CUSTOMER_SUCCESS_CHECKLISTS.md",
     "docs/FIRST_CUSTOMER_READINESS.json",
     "docs/FIRST_CUSTOMER_TROUBLESHOOTING.md",
+    "docs/FIRST_REAL_PILOT_ACTIVATION.json",
     "frontend/src/app/admin/pilot-os/page.tsx",
   ]) {
     assert.ok(existsSync(join(root, rel)), rel);
@@ -75,11 +76,15 @@ test("OS index + org workspace + invitation pack docs present", () => {
 test("backend alembic 100 + service gate present", () => {
   assert.ok(existsSync(join(root, "backend/alembic/versions/100_controlled_pilot_os.py")));
   assert.ok(existsSync(join(root, "backend/alembic/versions/101_first_customer_activation.py")));
+  assert.ok(existsSync(join(root, "backend/alembic/versions/102_first_real_pilot_intake.py")));
   const svc = readFileSync(join(root, "backend/app/services/controlled_pilot_os.py"), "utf8");
   assert.match(svc, /FOUNDER_APPROVED/);
   assert.match(svc, /NO_REAL_PILOT_DATA/);
   assert.match(svc, /READY_UNSENT/);
   assert.match(svc, /FIRST CUSTOMER READY/);
+  assert.match(svc, /APPROVAL REQUIRED — ACTIVATION SYSTEM READY/);
+  assert.match(svc, /evaluate_send_safety_gate/);
+  assert.match(svc, /founder_org_approval_ref/);
   assert.match(svc, /synthetic_org_cannot_be_founder_approved/);
   assert.match(svc, /customer_usable/);
   assert.match(svc, /hard_live_is_technical_only/);
