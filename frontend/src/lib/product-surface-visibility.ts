@@ -9,6 +9,7 @@ import {
   splitByActivationHubSection,
   type ActivationHubSlice,
 } from "@/lib/all-workspace-modules-activation";
+import { isModuleHiddenFromPilot } from "@/lib/customer-usable-readiness";
 import type { MarketingPersona } from "@/lib/marketing-persona";
 import type { SystemOfRecordRouteEntry } from "@/lib/system-of-record-routes";
 import type { WorkspaceModuleDef, WorkspaceModuleStatus } from "@/lib/workspace-module-status";
@@ -74,7 +75,13 @@ export function classifyProductSurfaceTier(
 }
 
 export function shouldHideFromDefaultHub(persona: MarketingPersona, moduleId: string): boolean {
-  return isInternalModule(persona, moduleId);
+  if (isInternalModule(persona, moduleId)) return true;
+  if (isModuleHiddenFromPilot(moduleId)) return true;
+  if (moduleId === "team" || moduleId === "company_team") return isModuleHiddenFromPilot("company_team");
+  if (moduleId === "auto_apply" || moduleId.includes("auto-apply") || moduleId.includes("auto_apply")) {
+    return isModuleHiddenFromPilot("auto_apply");
+  }
+  return false;
 }
 
 export function shouldShowAsRoadmap(persona: MarketingPersona, moduleId: string): boolean {

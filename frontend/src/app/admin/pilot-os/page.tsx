@@ -29,6 +29,13 @@ type OsStatus = {
   founder_approved_real_orgs?: unknown[];
   support_open_tickets?: number;
   launch_go_gate?: { launch_decision?: string; reason?: string; counts?: Record<string, number> };
+  customer_usable?: {
+    customer_usable_pass?: number;
+    hard_live_core_pass_technical?: number;
+    hard_live_is_technical_only?: boolean;
+    minimal_journey_id?: string;
+    verdict?: string;
+  };
 };
 
 export default function AdminPilotOsPage() {
@@ -137,6 +144,23 @@ export default function AdminPilotOsPage() {
               <p className="text-neutral-500">Open feedback</p>
               <p className="text-2xl font-semibold">{fc?.open_feedback_items ?? 0}</p>
             </div>
+          </div>
+          <div className="rounded border border-neutral-200 p-4">
+            <h2 className="font-medium">Customer-usable vs Hard LIVE</h2>
+            <ul className="mt-2 list-inside list-disc text-neutral-700">
+              <li>
+                Customer-usable PASS:{" "}
+                {status.customer_usable?.customer_usable_pass ?? "—"} (explicit registry)
+              </li>
+              <li>
+                Hard LIVE CORE technical:{" "}
+                {status.customer_usable?.hard_live_core_pass_technical ?? 143} (existence only)
+              </li>
+              <li>Journey: {status.customer_usable?.minimal_journey_id || "—"}</li>
+              <li className="text-xs text-neutral-500">
+                {status.customer_usable?.verdict || "—"}
+              </li>
+            </ul>
           </div>
           <div className="rounded border border-neutral-200 p-4">
             <h2 className="font-medium">Stance (frozen)</h2>

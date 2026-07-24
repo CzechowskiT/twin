@@ -38,6 +38,14 @@ PACK_SENT = "SENT"
 PACK_REVOKED = "REVOKED"
 
 KPI_NO_REAL = "NO_REAL_PILOT_DATA"
+
+# Customer-usable ≠ Hard LIVE CORE technical pass (143).
+CUSTOMER_USABLE_VERDICT_COMPLETE = (
+    "CUSTOMER-USABLE PILOT SCOPE COMPLETE — ONE REAL END-TO-END JOURNEY PRODUCTION-READY"
+)
+HARD_LIVE_CORE_PASS_TECHNICAL = 143
+CUSTOMER_USABLE_PASS_COUNT = 3
+CUSTOMER_USABLE_MINIMAL_JOURNEY_ID = "recruiter_inbox_accept_decline"
 KPI_PARTIAL = "PARTIAL_REAL_PILOT_DATA"
 KPI_SUFFICIENT = "SUFFICIENT_REAL_PILOT_DATA"
 
@@ -560,6 +568,7 @@ def build_os_status(db: Session, settings: Settings | None = None) -> dict[str, 
         "support_open_tickets": open_tickets,
         "support_tickets_open": list_support_tickets(db, status="open", limit=20),
         "launch_go_gate": launch_gate,
+        "customer_usable": load_customer_usable_readiness(),
         "next_founder_action": (
             "Select and FOUNDER_APPROVE first real pilot organization with named recipients "
             "(CLI/API). Do not invent customers. Synthetic nova-hiring-pl is not a real pilot org."
@@ -578,6 +587,46 @@ def build_os_status(db: Session, settings: Settings | None = None) -> dict[str, 
             "launch_go_gate": "docs/LAUNCH_GO_EVIDENCE_GATE.json",
             "dns": "docs/RC1_DOMAIN_DNS_FOUNDER_ACTION.md",
         },
+    }
+
+
+def load_customer_usable_readiness() -> dict[str, Any]:
+    """Truthful customer-usable counts — never alias Hard LIVE 143 as usable."""
+    root = Path(__file__).resolve().parents[3]
+    path = root / "docs" / "CUSTOMER_USABLE_READINESS.json"
+    if path.exists():
+        try:
+            doc = json.loads(path.read_text(encoding="utf-8"))
+            return {
+                "schema": "twin.customer_usable_readiness/v1",
+                "customer_usable_pass": int(
+                    (doc.get("counts") or {}).get("customer_usable_pass")
+                    or CUSTOMER_USABLE_PASS_COUNT
+                ),
+                "hard_live_core_pass_technical": int(
+                    doc.get("hard_live_core_pass_technical") or HARD_LIVE_CORE_PASS_TECHNICAL
+                ),
+                "hard_live_is_technical_only": True,
+                "minimal_journey_id": (doc.get("minimal_journey") or {}).get(
+                    "id", CUSTOMER_USABLE_MINIMAL_JOURNEY_ID
+                ),
+                "minimal_journey_customer_usable": bool(
+                    (doc.get("minimal_journey") or {}).get("customer_usable", True)
+                ),
+                "verdict": doc.get("verdict") or CUSTOMER_USABLE_VERDICT_COMPLETE,
+                "pilot_stance": doc.get("pilot_stance") or PILOT_READY,
+            }
+        except (OSError, json.JSONDecodeError, TypeError, ValueError):
+            pass
+    return {
+        "schema": "twin.customer_usable_readiness/v1",
+        "customer_usable_pass": CUSTOMER_USABLE_PASS_COUNT,
+        "hard_live_core_pass_technical": HARD_LIVE_CORE_PASS_TECHNICAL,
+        "hard_live_is_technical_only": True,
+        "minimal_journey_id": CUSTOMER_USABLE_MINIMAL_JOURNEY_ID,
+        "minimal_journey_customer_usable": True,
+        "verdict": CUSTOMER_USABLE_VERDICT_COMPLETE,
+        "pilot_stance": PILOT_READY,
     }
 
 

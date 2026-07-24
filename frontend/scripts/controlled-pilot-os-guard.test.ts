@@ -81,4 +81,7 @@ test("backend alembic 100 + service gate present", () => {
   assert.match(svc, /READY_UNSENT/);
   assert.match(svc, /FIRST CUSTOMER READY/);
   assert.match(svc, /synthetic_org_cannot_be_founder_approved/);
+  assert.match(svc, /customer_usable/);
+  assert.match(svc, /hard_live_is_technical_only/);
+  assert.match(svc, /CUSTOMER-USABLE PILOT SCOPE COMPLETE/);
 });

@@ -66,6 +66,9 @@ export const DEMO_SAMPLE_MODULE_IDS = new Set([
 /** Security-sensitive, incomplete, or demo-theater modules — never shown in persona hubs. */
 export const INTERNAL_MODULE_IDS = new Set([
   "auto_apply",
+  "company_team",
+  "team",
+  "recruiter_analytics",
   "plan_payments",
   "candidate_plan",
   "recruiter_hub",

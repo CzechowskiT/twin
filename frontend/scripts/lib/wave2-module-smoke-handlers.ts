@@ -207,12 +207,56 @@ export async function runModuleSmoke(
         return { module_id: moduleId, ok: true };
       }
       case "recruiter_inbox":
-      case "rec_decisioning":
       case "rec_shortlist": {
         const res = await ctx.fetchApi(`/api/v1/recruiter/inbox?${q(ctx.companySlug)}&limit=10`, {
           headers: ctx.headers,
         });
         if (res.status !== 200) return { module_id: moduleId, ok: false, reason: `inbox ${res.status}` };
+        return { module_id: moduleId, ok: true };
+      }
+      case "rec_decisioning": {
+        // Technical Hard LIVE may still GET-only; customer-usable requires write mutate.
+        const inbox = await ctx.fetchApi(`/api/v1/recruiter/inbox?${q(ctx.companySlug)}&limit=25`, {
+          headers: ctx.headers,
+        });
+        if (inbox.status !== 200) return { module_id: moduleId, ok: false, reason: `inbox ${inbox.status}` };
+        if (!ctx.write) {
+          // Read path alone is TECHNICAL_PASS_ONLY — not customer-usable evidence.
+          return { module_id: moduleId, ok: true };
+        }
+        const items = (JSON.parse(inbox.body) as { items?: Array<{ application_id?: number; status?: string }> })
+          .items;
+        if (!items?.length) return { module_id: moduleId, ok: false, reason: "inbox_empty_for_write" };
+        const rejected = items.find((i) => (i.status || "").toLowerCase() === "rejected");
+        const applied = items.find((i) => ["applied", "pending"].includes((i.status || "").toLowerCase()));
+        const target = rejected ?? applied;
+        const appId = target?.application_id;
+        if (!appId) return { module_id: moduleId, ok: false, reason: "no_mutable_application" };
+        const accept = await ctx.fetchApi(
+          `/api/v1/recruiter/inbox/${appId}/respond?${q(ctx.companySlug)}`,
+          {
+            method: "POST",
+            headers: ctx.headers,
+            body: JSON.stringify({ action: "accept" }),
+          },
+        );
+        if (accept.status !== 200) {
+          return { module_id: moduleId, ok: false, reason: `respond accept ${accept.status}` };
+        }
+        const decline = await ctx.fetchApi(
+          `/api/v1/recruiter/inbox/${appId}/respond?${q(ctx.companySlug)}`,
+          {
+            method: "POST",
+            headers: ctx.headers,
+            body: JSON.stringify({
+              action: "decline",
+              decline_note: "wave2_rec_decisioning_customer_usable_smoke",
+            }),
+          },
+        );
+        if (decline.status !== 200) {
+          return { module_id: moduleId, ok: false, reason: `respond decline ${decline.status}` };
+        }
         return { module_id: moduleId, ok: true };
       }
       case "recruiter_pipeline": {

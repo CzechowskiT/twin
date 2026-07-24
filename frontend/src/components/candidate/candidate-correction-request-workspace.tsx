@@ -267,14 +267,16 @@ function CorrectionRequestContent({
                 </li>
               ))}
             </ul>
-            <button
-              type="button"
-              disabled
-              className="twin-btn-secondary twin-touch-target cursor-not-allowed opacity-50"
-              data-testid={CANDIDATE_CORRECTION_REQUEST_MARKERS.submitDisabled}
-            >
-              {t("candidateCorrectionRequest.submitDisabledCta")}
-            </button>
+            {livePath ? null : (
+              <button
+                type="button"
+                disabled
+                className="twin-btn-secondary twin-touch-target cursor-not-allowed opacity-50"
+                data-testid={CANDIDATE_CORRECTION_REQUEST_MARKERS.submitDisabled}
+              >
+                {t("candidateCorrectionRequest.submitDisabledCta")}
+              </button>
+            )}
           </>,
         )}
 

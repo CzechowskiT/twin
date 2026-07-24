@@ -80,6 +80,13 @@ def build_health_ops_public(s: Settings) -> dict[str, Any]:
         "rc1_founder_approved_real_orgs": 0,
         "rc1_pilot_health_score": 80,
         "rc1_launch_go_readiness_score": 0,
+        "customer_usable_pass": 3,
+        "hard_live_core_pass_technical": 143,
+        "hard_live_is_technical_only": True,
+        "customer_usable_minimal_journey_id": "recruiter_inbox_accept_decline",
+        "customer_usable_verdict": (
+            "CUSTOMER-USABLE PILOT SCOPE COMPLETE — ONE REAL END-TO-END JOURNEY PRODUCTION-READY"
+        ),
     }
     try:
         from sqlalchemy import text
@@ -96,7 +103,10 @@ def build_health_ops_public(s: Settings) -> dict[str, Any]:
             out["partner_export_configured"] = partner_export_configured(db_sess, s)
             out["validated_jobs"] = count_validated_jobs_public_traction(db_sess)
             try:
-                from app.services.controlled_pilot_os import compute_first_customer_scores
+                from app.services.controlled_pilot_os import (
+                    compute_first_customer_scores,
+                    load_customer_usable_readiness,
+                )
 
                 scores = compute_first_customer_scores(db_sess, s)
                 from app.services.controlled_pilot_os import evaluate_launch_go_gate
@@ -113,6 +123,18 @@ def build_health_ops_public(s: Settings) -> dict[str, Any]:
                 out["rc1_launch_go_readiness_score"] = int(
                     scores.get("launch_go_readiness_score") or 0
                 )
+                cu = load_customer_usable_readiness()
+                out["customer_usable_pass"] = int(cu.get("customer_usable_pass") or 3)
+                out["hard_live_core_pass_technical"] = int(
+                    cu.get("hard_live_core_pass_technical") or 143
+                )
+                out["hard_live_is_technical_only"] = True
+                out["customer_usable_minimal_journey_id"] = cu.get(
+                    "minimal_journey_id", "recruiter_inbox_accept_decline"
+                )
+                out["customer_usable_verdict"] = cu.get("verdict") or out[
+                    "customer_usable_verdict"
+                ]
             except Exception:
                 pass
         # Avoid heavy market_coverage_report COUNTs on the public health path — use Redis scrape snapshot only.

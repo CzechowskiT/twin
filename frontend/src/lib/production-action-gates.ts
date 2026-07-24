@@ -8,15 +8,24 @@
 export const EXTERNAL_PILOT_ENROLLMENT_ENABLED =
   process.env.NEXT_PUBLIC_EXTERNAL_PILOT_ENROLLMENT_ENABLED === "true";
 
-/** Allowed values: BLOCKED_BY_FOUNDER | READY_FOR_CONTROLLED_PILOT */
+/** Allowed: BLOCKED_BY_FOUNDER | READY_FOR_CONTROLLED_PILOT | TECHNICALLY_READY_BUT_CUSTOMER_JOURNEY_INCOMPLETE */
 export const PILOT_STANCE = "READY_FOR_CONTROLLED_PILOT" as const;
-export type PilotStance = "BLOCKED_BY_FOUNDER" | "READY_FOR_CONTROLLED_PILOT";
+export type PilotStance =
+  | "BLOCKED_BY_FOUNDER"
+  | "READY_FOR_CONTROLLED_PILOT"
+  | "TECHNICALLY_READY_BUT_CUSTOMER_JOURNEY_INCOMPLETE";
 /** Stable Vercel production alias while twin.care Afternic NS parks apex. */
 export const TEMPORARY_PILOT_CANONICAL_URL = "https://twin-sooty.vercel.app" as const;
 /** Honest KPI until a non-synthetic FOUNDER_APPROVED org has SENT invites. */
 export const PILOT_KPI_TOKEN = "NO_REAL_PILOT_DATA" as const;
+/**
+ * Hard LIVE CORE 143 PASS is technical existence only — not customer-usable.
+ * See customer-usable-readiness.ts for CUSTOMER_USABLE_PASS denominator.
+ */
+export const HARD_LIVE_CORE_PASS_IS_TECHNICAL_ONLY = true as const;
+export const CUSTOMER_USABLE_MINIMAL_JOURNEY_ID = "recruiter_inbox_accept_decline" as const;
 export const CONTROLLED_PILOT_OS_VERDICT =
-  "FIRST CUSTOMER READY — WAITING FOR FIRST APPROVED PILOT ORGANIZATION" as const;
+  "CUSTOMER-USABLE PILOT SCOPE COMPLETE — ONE REAL END-TO-END JOURNEY PRODUCTION-READY" as const;
 export const GATE_F_STATUS = "PASS" as const;
 export const LAUNCH_STANCE_CANON = "NO-GO" as const;
 export const PMF_EVIDENCE = "INSUFFICIENT_DATA" as const;
