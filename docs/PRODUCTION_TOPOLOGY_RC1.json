@@ -1,6 +1,6 @@
 {
   "schema": "twin.production_topology.rc1/v1",
-  "updated_at": "2026-07-24T16:15:00Z",
+  "updated_at": "2026-07-24T16:20:00Z",
   "branch": "cursor/phase1-monorepo-scaffold",
   "hard_live_denominator": "CORE_PILOT_ONLY",
   "stance": {
@@ -78,15 +78,15 @@
     "status_api": "/api/v1/admin/pilot-os/status",
     "send_safety_api": "/api/v1/admin/pilot-os/invitation-packs/{id}/send-safety"
   },
-  "verified_runtime_commit": "c9209a180a89d480c39cd7e42a05bfa2cc75e7f2",
+  "verified_runtime_commit": "fd6e20c5fbcdd35c207d0f9ac5b9aaec27191bab",
   "alignment": {
-    "repo_head": "95cdcdd1c97c9ac90fe8cc10a7b747c42b03af2d",
-    "prod_api_commit": "c9209a180a89d480c39cd7e42a05bfa2cc75e7f2",
+    "repo_head": "fd6e20c5fbcdd35c207d0f9ac5b9aaec27191bab",
+    "prod_api_commit": "fd6e20c5fbcdd35c207d0f9ac5b9aaec27191bab",
     "prod_frontend_commit": "95cdcdd1c97c9ac90fe8cc10a7b747c42b03af2d",
-    "prod_worker_commit": "c9209a180a89d480c39cd7e42a05bfa2cc75e7f2",
-    "alignment_status": "API_DEPLOY_LAGGING",
+    "prod_worker_commit": "fd6e20c5fbcdd35c207d0f9ac5b9aaec27191bab",
+    "alignment_status": "PARTIAL",
     "docs_only_drift": false,
-    "note": "FE at validation OS tip; Railway twin BUILDING stuck on failed snapshot fetch (external). API still c9209a18. Retrigger empty commit queued."
+    "note": "AI real-validation OS live; approval NO_COMPLETE; Railway recovered after snapshot failure"
   },
   "verdict": "AI CANDIDATE INTELLIGENCE REAL-CUSTOMER VALIDATION READY — AWAITING FOUNDER-APPROVED PILOT ORGANIZATION",
   "activation": {
@@ -123,7 +123,7 @@
     "admin_ui": "/admin/pilot-os",
     "kpi": "NO_REAL_PILOT_DATA"
   },
-  "verified_tip": "c9209a180a89d480c39cd7e42a05bfa2cc75e7f2",
+  "verified_tip": "fd6e20c5fbcdd35c207d0f9ac5b9aaec27191bab",
   "ai_candidate_intelligence": {
     "doc": "docs/AI_CANDIDATE_INTELLIGENCE.json",
     "real_validation_doc": "docs/AI_CANDIDATE_INTELLIGENCE_REAL_VALIDATION.json",
