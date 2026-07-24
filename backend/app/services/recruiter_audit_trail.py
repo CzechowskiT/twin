@@ -21,6 +21,7 @@ RECRUITER_AUDIT_ACTION_TYPES = frozenset(
         "radar_dismissed",
         "radar_draft_prepared",
         "radar_review_card_opened",
+        "pool_assigned_to_role",
     }
 )
 RECRUITER_CLIENT_AUDIT_ACTION_TYPES = frozenset({"review_opened"})
@@ -35,6 +36,8 @@ ALLOWED_META_KEYS = frozenset(
         "job_id",
         "radar_score_snapshot",
         "radar_fit_label_snapshot",
+        "record_id",
+        "synthetic",
     }
 )
 _FORBIDDEN_META_KEYS = frozenset(

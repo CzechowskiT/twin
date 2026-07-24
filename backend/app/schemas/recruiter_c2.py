@@ -15,6 +15,11 @@ class TalentPoolAddIn(BaseModel):
     candidate_id: str | None = Field(None, max_length=64)
     pipeline_status: str | None = Field("review", max_length=32)
     idempotency_key: str | None = Field(None, max_length=128)
+    job_id: int | None = Field(None, ge=1, description="When set, create inbox Application for this role")
+
+
+class TalentPoolAssignIn(BaseModel):
+    job_id: int = Field(..., ge=1)
 
 
 class TrustReviewDecisionIn(BaseModel):

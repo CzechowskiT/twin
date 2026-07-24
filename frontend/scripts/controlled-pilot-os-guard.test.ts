@@ -21,7 +21,7 @@ test("OS manifest exists and freezes Launch NO-GO", () => {
   assert.equal(doc.stance.launch, "NO-GO");
   assert.equal(doc.stance.enrollment, "OFF");
   assert.equal(doc.stance.phase_3b, "BLOCKED");
-  assert.equal(doc.stance.pilot, "READY_FOR_CONTROLLED_PILOT");
+  assert.equal(doc.stance.pilot, "TECHNICALLY_READY_BUT_CUSTOMER_JOURNEY_INCOMPLETE");
   assert.equal(doc.kpi_default, "NO_REAL_PILOT_DATA");
   assert.match(doc.verdict_expected_without_approved_org, /AWAITING FIRST FOUNDER-APPROVED/);
   assert.ok(doc.synthetic_not_real.includes("nova-hiring-pl"));
@@ -43,7 +43,7 @@ test("Launch GO evidence gate defaults NO-GO and forbids shortcuts", () => {
 test("production action gates keep Launch NO-GO and enrollment off", () => {
   const gates = readFileSync(join(root, "frontend/src/lib/production-action-gates.ts"), "utf8");
   assert.match(gates, /LAUNCH_STANCE_CANON = "NO-GO"/);
-  assert.match(gates, /READY_FOR_CONTROLLED_PILOT/);
+  assert.match(gates, /TECHNICALLY_READY_BUT_CUSTOMER_JOURNEY_INCOMPLETE/);
   assert.doesNotMatch(gates, /EXTERNAL_PILOT_ENROLLMENT_ENABLED\s*=\s*true/);
   assert.match(gates, /NO_REAL_PILOT_DATA/);
 });
@@ -83,5 +83,5 @@ test("backend alembic 100 + service gate present", () => {
   assert.match(svc, /synthetic_org_cannot_be_founder_approved/);
   assert.match(svc, /customer_usable/);
   assert.match(svc, /hard_live_is_technical_only/);
-  assert.match(svc, /CUSTOMER-USABLE PILOT SCOPE COMPLETE/);
+  assert.match(svc, /MULTI-ROLE PILOT JOURNEY/);
 });

@@ -1,24 +1,42 @@
 {
-  "schema": "twin.customer_usable_readiness/v1",
-  "updated_at": "2026-07-24T07:45:00Z",
+  "schema": "twin.customer_usable_readiness/v2",
+  "updated_at": "2026-07-24T08:40:00Z",
   "definition": "CUSTOMER_USABLE_PASS ≠ Hard LIVE technical PASS",
   "hard_live_core_pass_technical": 143,
   "hard_live_note": "143/0/0 is technical existence only — not customer-usable count",
+  "evidence_label": "production_smoked_synthetic≠real_customer_validated≠real_pilot_data",
   "minimal_journey": {
     "id": "recruiter_inbox_accept_decline",
     "customer_usable": true,
-    "label": "Recruiter inbox → accept/decline decision",
+    "evidence_tier": "production_smoked_synthetic",
+    "label": "Recruiter inbox → accept/decline (thin; insufficient alone for B2B Pilot READY)",
     "evidence_smoke": "scripts/customer-usable-minimal-journey-smoke.py"
+  },
+  "multi_role_journey": {
+    "id": "company_recruiter_candidate_pipeline",
+    "customer_usable": false,
+    "evidence_tier": "production_smoked_synthetic",
+    "real_customer_validated": false,
+    "real_pilot_data": false,
+    "label": "Company role → import → inbox → decision → company visibility → audit → feedback",
+    "evidence_smoke": "scripts/customer-usable-multirole-journey-smoke.py",
+    "blockers_until_smoke": [
+      "Await deploy of pool→Application bridge on API tip",
+      "Await scripts/customer-usable-multirole-journey-smoke.py PASS on production"
+    ]
   },
   "counts": {
     "customer_usable_pass": 3,
-    "technical_pass_only": 3,
-    "hidden_from_pilot": 3,
-    "roadmap": 6,
-    "internal_demo_only": 3
+    "note": "After multi-role smoke PASS expect ~10–12 synthetic CU modules"
   },
-  "verdict": "CUSTOMER-USABLE PILOT SCOPE COMPLETE — ONE REAL END-TO-END JOURNEY PRODUCTION-READY",
-  "pilot_stance": "READY_FOR_CONTROLLED_PILOT",
+  "scores": {
+    "technical_existence_score": 100,
+    "customer_usable_synthetic_score": 25,
+    "real_customer_validation_score": 0,
+    "launch_go_readiness_score_cap": 15
+  },
+  "verdict": "CUSTOMER-USABLE MULTI-ROLE PILOT JOURNEY INCOMPLETE — EXACT BLOCKERS",
+  "pilot_stance": "TECHNICALLY_READY_BUT_CUSTOMER_JOURNEY_INCOMPLETE",
   "frozen": {
     "launch": "NO-GO",
     "enrollment": "OFF",

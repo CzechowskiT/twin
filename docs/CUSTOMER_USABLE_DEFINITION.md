@@ -19,7 +19,22 @@
 
 **Recruiter inbox → accept/decline** (`recruiter_inbox_accept_decline`)
 
-Evidence: `scripts/customer-usable-minimal-journey-smoke.py` (session → inbox → accept → decline → persisted reload).
+Evidence (thin): `scripts/customer-usable-minimal-journey-smoke.py`.
+
+## Expanded multi-role journey (B2B bar)
+
+**Company role → CSV/manual import → inbox → decision → company visibility → audit → feedback**
+(`company_recruiter_candidate_pipeline`)
+
+Evidence: `scripts/customer-usable-multirole-journey-smoke.py` on two synthetic tenants with isolation checks.
+
+## Evidence tiers (do not conflate)
+
+| Tier | Meaning |
+|------|---------|
+| `production_smoked_synthetic` | Writable path smoked on prod with synthetic tenants |
+| `real_customer_validated` | Founder-approved real org completed the path |
+| `real_pilot_data` | KPI may leave `NO_REAL_PILOT_DATA` |
 
 ## Machine contract
 

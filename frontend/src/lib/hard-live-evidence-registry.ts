@@ -1,7 +1,7 @@
 /**
  * Machine-readable Hard LIVE 30 evidence registry — Waves 1–5 + Wave 4 Investor + AI compliance foundation.
  * LIVE badges in capability map / activation require status=PASS after authenticated prod smoke.
- * Stance: Pilot READY_FOR_CONTROLLED_PILOT · Gate F PASS · Launch NO-GO · Enrollment OFF.
+ * Stance: Pilot TECHNICALLY_READY_BUT_CUSTOMER_JOURNEY_INCOMPLETE · Gate F PASS · Launch NO-GO · Enrollment OFF.
  * Hard LIVE launch-readiness denominator = CORE_PILOT only (see product-inclusion-taxonomy).
  */
 import {
@@ -1348,7 +1348,7 @@ export const HARD_LIVE_REGISTRY_META = {
   wave: "5",
   hard_live_denominator: HARD_LIVE_DENOMINATOR_RULE,
   stance: {
-    pilot: "READY_FOR_CONTROLLED_PILOT",
+    pilot: "TECHNICALLY_READY_BUT_CUSTOMER_JOURNEY_INCOMPLETE",
     gate_f: "PASS",
     launch: "NO-GO",
     pmf: "INSUFFICIENT_DATA",

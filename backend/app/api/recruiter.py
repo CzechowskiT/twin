@@ -45,7 +45,12 @@ from app.services.recruiter_trust_review_persistence import (
     list_trust_review_queue,
     record_trust_review_decision,
 )
-from app.schemas.recruiter_c2 import TalentPoolAddIn, TrustReviewDecisionIn
+from app.schemas.recruiter_c2 import TalentPoolAddIn, TalentPoolAssignIn, TrustReviewDecisionIn
+from app.services.recruiter_pool_to_pipeline import (
+    assign_pool_record_to_role,
+    commit_import_and_assign,
+    create_manual_candidate_for_role,
+)
 from app.schemas.recruiter_notification_prefs import (
     RecruiterNotificationPrefsOut,
     RecruiterNotificationPrefsPatchIn,
@@ -1223,6 +1228,11 @@ class RecruiterTalentPoolImportPreviewIn(BaseModel):
 
 class RecruiterTalentPoolImportCommitIn(BaseModel):
     import_id: int = Field(..., ge=1)
+    job_id: int | None = Field(
+        None,
+        ge=1,
+        description="When set, create inbox Applications for each imported record on this role",
+    )
 
 
 @router.get("/talent-pool")
@@ -1296,6 +1306,18 @@ def recruiter_talent_pool_add_candidate(
         company_slug_query=company_slug,
     )
     try:
+        if body.job_id is not None:
+            return create_manual_candidate_for_role(
+                db,
+                company_slug=slug,
+                job_id=body.job_id,
+                display_name=body.display_name,
+                job_title=body.job_title,
+                location=body.location,
+                seniority=body.seniority,
+                skills=body.skills,
+                external_ats_id=body.external_ats_id,
+            )
         return add_talent_pool_record(
             db,
             company_slug=slug,
@@ -1308,6 +1330,34 @@ def recruiter_talent_pool_add_candidate(
             candidate_id=body.candidate_id,
             pipeline_status=body.pipeline_status,
             idempotency_key=body.idempotency_key,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/talent-pool/{record_id}/assign-to-role")
+@limiter.limit("30/minute", key_func=recruiter_token_key)
+def recruiter_talent_pool_assign_to_role(
+    request: Request,
+    record_id: int,
+    body: TalentPoolAssignIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    """Promote a talent-pool record into an inbox Application for a company role."""
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
+    try:
+        return assign_pool_record_to_role(
+            db, company_slug=slug, record_id=record_id, job_id=body.job_id
         )
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
@@ -1520,6 +1570,13 @@ def recruiter_talent_pool_import_commit(
         company_slug_query=company_slug,
     )
     try:
+        if body.job_id is not None:
+            return commit_import_and_assign(
+                db,
+                company_slug=slug,
+                import_id=body.import_id,
+                job_id=body.job_id,
+            )
         return commit_talent_pool_import(
             db,
             company_slug=slug,

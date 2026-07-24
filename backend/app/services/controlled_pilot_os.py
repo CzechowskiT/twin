@@ -41,11 +41,15 @@ KPI_NO_REAL = "NO_REAL_PILOT_DATA"
 
 # Customer-usable ≠ Hard LIVE CORE technical pass (143).
 CUSTOMER_USABLE_VERDICT_COMPLETE = (
-    "CUSTOMER-USABLE PILOT SCOPE COMPLETE — ONE REAL END-TO-END JOURNEY PRODUCTION-READY"
+    "CUSTOMER-USABLE MULTI-ROLE PILOT JOURNEY COMPLETE — READY FOR FIRST APPROVED ORGANIZATION"
+)
+CUSTOMER_USABLE_VERDICT_INCOMPLETE = (
+    "CUSTOMER-USABLE MULTI-ROLE PILOT JOURNEY INCOMPLETE — EXACT BLOCKERS"
 )
 HARD_LIVE_CORE_PASS_TECHNICAL = 143
 CUSTOMER_USABLE_PASS_COUNT = 3
 CUSTOMER_USABLE_MINIMAL_JOURNEY_ID = "recruiter_inbox_accept_decline"
+CUSTOMER_USABLE_MULTI_ROLE_JOURNEY_ID = "company_recruiter_candidate_pipeline"
 KPI_PARTIAL = "PARTIAL_REAL_PILOT_DATA"
 KPI_SUFFICIENT = "SUFFICIENT_REAL_PILOT_DATA"
 
@@ -597,11 +601,13 @@ def load_customer_usable_readiness() -> dict[str, Any]:
     if path.exists():
         try:
             doc = json.loads(path.read_text(encoding="utf-8"))
+            counts = doc.get("counts") or {}
+            multi = doc.get("multi_role_journey") or {}
+            scores = doc.get("scores") or {}
             return {
-                "schema": "twin.customer_usable_readiness/v1",
+                "schema": "twin.customer_usable_readiness/v2",
                 "customer_usable_pass": int(
-                    (doc.get("counts") or {}).get("customer_usable_pass")
-                    or CUSTOMER_USABLE_PASS_COUNT
+                    counts.get("customer_usable_pass") or CUSTOMER_USABLE_PASS_COUNT
                 ),
                 "hard_live_core_pass_technical": int(
                     doc.get("hard_live_core_pass_technical") or HARD_LIVE_CORE_PASS_TECHNICAL
@@ -610,23 +616,52 @@ def load_customer_usable_readiness() -> dict[str, Any]:
                 "minimal_journey_id": (doc.get("minimal_journey") or {}).get(
                     "id", CUSTOMER_USABLE_MINIMAL_JOURNEY_ID
                 ),
+                "multi_role_journey_id": multi.get("id", CUSTOMER_USABLE_MULTI_ROLE_JOURNEY_ID),
                 "minimal_journey_customer_usable": bool(
                     (doc.get("minimal_journey") or {}).get("customer_usable", True)
                 ),
-                "verdict": doc.get("verdict") or CUSTOMER_USABLE_VERDICT_COMPLETE,
-                "pilot_stance": doc.get("pilot_stance") or PILOT_READY,
+                "multi_role_journey_customer_usable": bool(multi.get("customer_usable", False)),
+                "real_customer_validated": bool(multi.get("real_customer_validated", False)),
+                "real_pilot_data": bool(multi.get("real_pilot_data", False)),
+                "evidence_label": doc.get("evidence_label")
+                or "production_smoked_synthetic≠real_customer_validated≠real_pilot_data",
+                "scores": {
+                    "technical_existence_score": int(scores.get("technical_existence_score") or 100),
+                    "customer_usable_synthetic_score": int(
+                        scores.get("customer_usable_synthetic_score") or 0
+                    ),
+                    "real_customer_validation_score": int(
+                        scores.get("real_customer_validation_score") or 0
+                    ),
+                    "launch_go_readiness_score_cap": int(
+                        scores.get("launch_go_readiness_score_cap") or 15
+                    ),
+                },
+                "verdict": doc.get("verdict") or CUSTOMER_USABLE_VERDICT_INCOMPLETE,
+                "pilot_stance": doc.get("pilot_stance") or "TECHNICALLY_READY_BUT_CUSTOMER_JOURNEY_INCOMPLETE",
             }
         except (OSError, json.JSONDecodeError, TypeError, ValueError):
             pass
     return {
-        "schema": "twin.customer_usable_readiness/v1",
+        "schema": "twin.customer_usable_readiness/v2",
         "customer_usable_pass": CUSTOMER_USABLE_PASS_COUNT,
         "hard_live_core_pass_technical": HARD_LIVE_CORE_PASS_TECHNICAL,
         "hard_live_is_technical_only": True,
         "minimal_journey_id": CUSTOMER_USABLE_MINIMAL_JOURNEY_ID,
+        "multi_role_journey_id": CUSTOMER_USABLE_MULTI_ROLE_JOURNEY_ID,
         "minimal_journey_customer_usable": True,
-        "verdict": CUSTOMER_USABLE_VERDICT_COMPLETE,
-        "pilot_stance": PILOT_READY,
+        "multi_role_journey_customer_usable": False,
+        "real_customer_validated": False,
+        "real_pilot_data": False,
+        "evidence_label": "production_smoked_synthetic≠real_customer_validated≠real_pilot_data",
+        "scores": {
+            "technical_existence_score": 100,
+            "customer_usable_synthetic_score": 25,
+            "real_customer_validation_score": 0,
+            "launch_go_readiness_score_cap": 15,
+        },
+        "verdict": CUSTOMER_USABLE_VERDICT_INCOMPLETE,
+        "pilot_stance": "TECHNICALLY_READY_BUT_CUSTOMER_JOURNEY_INCOMPLETE",
     }
 
 
