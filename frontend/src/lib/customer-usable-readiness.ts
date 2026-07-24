@@ -214,7 +214,7 @@ export const CUSTOMER_USABLE_REGISTRY: readonly CustomerUsableModule[] = [
     disposition: "BUILD_TO_CUSTOMER_USABLE",
     route: "/recruiter/candidates/[id]",
     note: "Structured profile + timeline + brief; promote after prod intelligence smoke",
-    evidence_tier: "unit_tested",
+    evidence_tier: "none",
   },
   {
     module_id: "candidate_recruiter_brief",
@@ -223,7 +223,7 @@ export const CUSTOMER_USABLE_REGISTRY: readonly CustomerUsableModule[] = [
     disposition: "BUILD_TO_CUSTOMER_USABLE",
     route: "/recruiter/candidates/[id]",
     note: "Factual vs inferred brief; human review required",
-    evidence_tier: "unit_tested",
+    evidence_tier: "none",
   },
   {
     module_id: "candidate_role_match",
@@ -232,7 +232,7 @@ export const CUSTOMER_USABLE_REGISTRY: readonly CustomerUsableModule[] = [
     disposition: "BUILD_TO_CUSTOMER_USABLE",
     route: "/recruiter/candidates/[id]",
     note: "MATCH|NO_MATCH|UNKNOWN with strengths/gaps/unknowns",
-    evidence_tier: "unit_tested",
+    evidence_tier: "none",
   },
   {
     module_id: "recruiter_clarification_draft",
@@ -240,7 +240,7 @@ export const CUSTOMER_USABLE_REGISTRY: readonly CustomerUsableModule[] = [
     status: "TECHNICAL_PASS_ONLY",
     disposition: "BUILD_TO_CUSTOMER_USABLE",
     note: "Draft only — never auto-send",
-    evidence_tier: "unit_tested",
+    evidence_tier: "none",
   },
 
   // --- Not in multi-role CU set ---
