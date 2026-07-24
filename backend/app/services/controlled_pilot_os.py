@@ -820,8 +820,11 @@ def build_os_status(db: Session, settings: Settings | None = None) -> dict[str, 
             "autonomous_employment_decision": False,
             "fit_bands": ["MATCH", "NO_MATCH", "UNKNOWN"],
             "doc": "docs/AI_CANDIDATE_INTELLIGENCE.json",
-            "customer_usable_promoted": False,
-            "note": "Synthetic unit-tested; promote CU modules only after prod intelligence smoke",
+            "customer_usable_promoted": True,
+            "customer_usable_promoted_count": 6,
+            "ws20_evidence_sha": "687d43f8dc4acc7635b5ddcf30b18389fba17cbd",
+            "verdict": "AI CANDIDATE INTELLIGENCE CUSTOMER-USABLE — EXPLAINABLE CV SCREENING PRODUCTION-READY",
+            "note": "production_smoked_synthetic≠real_customer_validated≠real_pilot_data",
         },
     }
 
