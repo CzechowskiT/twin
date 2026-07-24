@@ -80,13 +80,13 @@
   },
   "verified_runtime_commit": "f64c0775c6ca0558f9702c275b9723d8fb3767a1",
   "alignment": {
-    "repo_head": "f64c0775c6ca0558f9702c275b9723d8fb3767a1",
+    "repo_head": "47ef494d0b8e3e7779d4ae37c4a059c39f9443e6",
     "prod_api_commit": "f64c0775c6ca0558f9702c275b9723d8fb3767a1",
     "prod_frontend_commit": "f64c0775c6ca0558f9702c275b9723d8fb3767a1",
     "prod_worker_commit": "f64c0775c6ca0558f9702c275b9723d8fb3767a1",
     "alignment_status": "ALIGNED",
-    "docs_only_drift": false,
-    "note": "Ops leftovers closed: FE/API/worker f64c0775; alembic 104 is_at_head; smoke 30108386485 success"
+    "docs_only_drift": true,
+    "note": "Runtime four-way ALIGNED at f64c0775; docs tip records alignment"
   },
   "verdict": "AI CANDIDATE INTELLIGENCE REAL-CUSTOMER VALIDATION READY — AWAITING FOUNDER-APPROVED PILOT ORGANIZATION",
   "activation": {
