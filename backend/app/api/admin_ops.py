@@ -30,9 +30,8 @@ def _require_ops_admin(settings: Settings, authorization: str | None) -> None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid admin token")
 
 
-# founder_completion_registry_align
-# blocker_elimination_registry_align
-EXPECTED_ALEMBIC_HEAD = "101_first_customer_activation"
+# Keep in sync with alembic head (104_ai_intel_validation).
+EXPECTED_ALEMBIC_HEAD = "104_ai_intel_validation"
 
 
 def _read_alembic_current(db: Session) -> str | None:
