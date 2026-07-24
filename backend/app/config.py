@@ -121,6 +121,8 @@ class Settings(BaseSettings):
     anthropic_model: str = "claude-sonnet-4-6"
     cv_upload_dir: str = "data/cvs"
     cv_max_bytes: int = 5 * 1024 * 1024
+    # Kill switch for AI Candidate Intelligence pipeline (async extract + brief).
+    candidate_intelligence_enabled: bool = True
 
     # Comma-separated board ids matching scraper registry (empty = all). Controls scrape-all + /jobs/boards list.
     scrape_enabled_board_ids: str = ""

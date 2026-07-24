@@ -7,6 +7,7 @@ from app.api import (
     auto_apply_settings,
     admin_ops,
     ats_completion,
+    candidate_intelligence,
     chatgpt_twin,
     company,
     company_feedback_persistence,
@@ -132,6 +133,9 @@ api_router.include_router(beta_waitlist.router, prefix="/beta", tags=["Beta wait
 api_router.include_router(billing.router, prefix="/billing", tags=["Billing"])
 api_router.include_router(kyc.router, prefix="/kyc", tags=["KYC"])
 api_router.include_router(candidates.router, prefix="/candidates", tags=["Candidates"])
+api_router.include_router(
+    candidate_intelligence.router, prefix="", tags=["Candidate Intelligence"]
+)
 api_router.include_router(profile_import.router, prefix="/profile", tags=["Profile import"])
 api_router.include_router(opportunities.router, prefix="/opportunities", tags=["Opportunities"])
 api_router.include_router(gamification.router, prefix="/gamification", tags=["Gamification"])

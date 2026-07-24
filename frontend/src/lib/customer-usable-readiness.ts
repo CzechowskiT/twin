@@ -206,6 +206,43 @@ export const CUSTOMER_USABLE_REGISTRY: readonly CustomerUsableModule[] = [
     evidence_tier: "production_smoked_synthetic",
   },
 
+  // --- AI Candidate Intelligence (explainable screening) ---
+  {
+    module_id: "candidate_intelligence_profile",
+    persona: "recruiter",
+    status: "TECHNICAL_PASS_ONLY",
+    disposition: "BUILD_TO_CUSTOMER_USABLE",
+    route: "/recruiter/candidates/[id]",
+    note: "Structured profile + timeline + brief; promote after prod intelligence smoke",
+    evidence_tier: "unit_tested",
+  },
+  {
+    module_id: "candidate_recruiter_brief",
+    persona: "recruiter",
+    status: "TECHNICAL_PASS_ONLY",
+    disposition: "BUILD_TO_CUSTOMER_USABLE",
+    route: "/recruiter/candidates/[id]",
+    note: "Factual vs inferred brief; human review required",
+    evidence_tier: "unit_tested",
+  },
+  {
+    module_id: "candidate_role_match",
+    persona: "recruiter",
+    status: "TECHNICAL_PASS_ONLY",
+    disposition: "BUILD_TO_CUSTOMER_USABLE",
+    route: "/recruiter/candidates/[id]",
+    note: "MATCH|NO_MATCH|UNKNOWN with strengths/gaps/unknowns",
+    evidence_tier: "unit_tested",
+  },
+  {
+    module_id: "recruiter_clarification_draft",
+    persona: "recruiter",
+    status: "TECHNICAL_PASS_ONLY",
+    disposition: "BUILD_TO_CUSTOMER_USABLE",
+    note: "Draft only — never auto-send",
+    evidence_tier: "unit_tested",
+  },
+
   // --- Not in multi-role CU set ---
   {
     module_id: "candidate_matches_prepare",

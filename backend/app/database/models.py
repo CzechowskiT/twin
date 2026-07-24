@@ -2959,3 +2959,159 @@ class PilotSupportTicket(Base):
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
     resolved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateIntelligenceProfile(Base):
+    """Structured AI-assisted CV profile — never an autonomous employment decision."""
+
+    __tablename__ = "candidate_intelligence_profiles"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), unique=True, index=True
+    )
+    tenant_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
+    source_document_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    source_version: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    extraction_status: Mapped[str] = mapped_column(String(32), default="pending", index=True)
+    extraction_model: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    extraction_version: Mapped[str] = mapped_column(String(32), default="v1")
+    extraction_started_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    extraction_completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    current_role: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    current_employer: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    seniority: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    total_experience_months: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    relevant_experience_months: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    primary_domains_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    normalized_skills_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    education_summary: Mapped[str | None] = mapped_column(Text, nullable=True)
+    language_summary: Mapped[str | None] = mapped_column(Text, nullable=True)
+    location_summary: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    availability_summary: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    profile_confidence: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    warnings_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    human_corrections_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    cost_tokens_estimate: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidateEmploymentTimelineEntry(Base):
+    __tablename__ = "candidate_employment_timeline_entries"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    profile_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_intelligence_profiles.id", ondelete="CASCADE"), index=True
+    )
+    employer: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    title: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    normalized_title: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    start_date: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    end_date: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    date_precision: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    duration_months: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    employment_type: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    responsibilities_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    achievements_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    technologies_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    domains_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    leadership_scope: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    evidence_reference: Mapped[str | None] = mapped_column(Text, nullable=True)
+    confidence: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    sort_order: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateIntelligenceSignal(Base):
+    __tablename__ = "candidate_intelligence_signals"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    profile_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_intelligence_profiles.id", ondelete="CASCADE"), index=True
+    )
+    signal_type: Mapped[str] = mapped_column(String(64), index=True)
+    category: Mapped[str] = mapped_column(String(64), default="career")
+    explanation: Mapped[str] = mapped_column(Text)
+    evidence_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    confidence: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    role_specific: Mapped[bool] = mapped_column(Boolean, default=False)
+    human_review_required: Mapped[bool] = mapped_column(Boolean, default=False)
+    dismissed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateRoleMatch(Base):
+    """Explainable role fit — MATCH|NO_MATCH|UNKNOWN; human review required."""
+
+    __tablename__ = "candidate_role_matches"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    role_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
+    job_id: Mapped[int | None] = mapped_column(
+        ForeignKey("jobs.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    tenant_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
+    overall_fit_band: Mapped[str] = mapped_column(String(16), index=True)  # MATCH|NO_MATCH|UNKNOWN
+    numeric_score: Mapped[float | None] = mapped_column(Float, nullable=True)
+    score_version: Mapped[str] = mapped_column(String(32), default="intel_v1")
+    dimensions_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    strengths_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    gaps_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    unknowns_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    evidence_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    confidence: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    generated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    stale_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    recruiter_override: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    recruiter_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    override_audit_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    human_review_required: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidateMissingInformation(Base):
+    __tablename__ = "candidate_missing_information"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    profile_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_intelligence_profiles.id", ondelete="CASCADE"), index=True
+    )
+    role_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    field: Mapped[str] = mapped_column(String(128))
+    status: Mapped[str] = mapped_column(String(32), default="open", index=True)
+    reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    importance: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    source_evidence: Mapped[str | None] = mapped_column(Text, nullable=True)
+    recruiter_resolution: Mapped[str | None] = mapped_column(Text, nullable=True)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateRecruiterBrief(Base):
+    __tablename__ = "candidate_recruiter_briefs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    profile_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_intelligence_profiles.id", ondelete="CASCADE"), index=True
+    )
+    role_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    brief: Mapped[str] = mapped_column(Text)
+    factual_points_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    inferred_points_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    warnings_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    evidence_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    model_version: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    generated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

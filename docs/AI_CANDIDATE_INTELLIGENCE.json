@@ -1,0 +1,39 @@
+{
+  "schema": "twin.ai_candidate_intelligence/v1",
+  "updated_at": "2026-07-24T12:00:00Z",
+  "branch": "cursor/phase1-monorepo-scaffold",
+  "verdict_candidates": [
+    "AI CANDIDATE INTELLIGENCE CUSTOMER-USABLE — EXPLAINABLE CV SCREENING PRODUCTION-READY",
+    "AI CANDIDATE INTELLIGENCE INCOMPLETE — EXACT PRODUCTION BLOCKERS"
+  ],
+  "fit_bands": ["MATCH", "NO_MATCH", "UNKNOWN"],
+  "human_review_required": true,
+  "autonomous_employment_decision": false,
+  "alembic": "103_candidate_intelligence",
+  "modules": {
+    "candidate_intelligence_profile": "TECHNICAL_PASS_PENDING_PROD_SMOKE",
+    "candidate_recruiter_brief": "TECHNICAL_PASS_PENDING_PROD_SMOKE",
+    "candidate_employment_timeline": "TECHNICAL_PASS_PENDING_PROD_SMOKE",
+    "candidate_role_match": "TECHNICAL_PASS_PENDING_PROD_SMOKE",
+    "candidate_match_explanation": "TECHNICAL_PASS_PENDING_PROD_SMOKE",
+    "candidate_intelligence_signals": "TECHNICAL_PASS_PENDING_PROD_SMOKE",
+    "candidate_missing_information": "TECHNICAL_PASS_PENDING_PROD_SMOKE",
+    "candidate_intelligence_evidence": "TECHNICAL_PASS_PENDING_PROD_SMOKE",
+    "candidate_intelligence_corrections": "TECHNICAL_PASS_PENDING_PROD_SMOKE",
+    "recruiter_clarification_draft": "TECHNICAL_PASS_PENDING_PROD_SMOKE"
+  },
+  "frozen": {
+    "launch": "NO-GO",
+    "enrollment": "OFF",
+    "phase_3b": "BLOCKED"
+  },
+  "kpi": {
+    "synthetic_excluded_from_real_kpi": true,
+    "token": "NO_REAL_PILOT_DATA"
+  },
+  "protected_attributes_excluded": true,
+  "prompt_injection_scanned": true,
+  "unit_tests": "tests/test_candidate_intelligence.py",
+  "prod_smoke": "scripts/candidate-intelligence-prod-smoke.py",
+  "docs": "docs/AI_CANDIDATE_INTELLIGENCE.md"
+}
