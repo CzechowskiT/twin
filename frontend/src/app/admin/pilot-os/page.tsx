@@ -116,6 +116,14 @@ type OsStatus = {
     daily_summary?: { message?: string; next_action?: string };
     time_to_value?: { median_hours?: number | null; note?: string };
   };
+  pack_preparation?: {
+    verdict?: string;
+    complete_approval?: boolean;
+    missing_business_fields?: string[];
+    packs_ready_unsent?: number;
+    invites_sent?: number;
+    can_prepare_pack?: boolean;
+  };
 };
 
 function authHeaders(token: string): HeadersInit {
@@ -399,6 +407,31 @@ export default function AdminPilotOsPage() {
             </div>
           ) : null}
 
+          {status.pack_preparation ? (
+            <div
+              className="rounded border border-orange-200 bg-orange-50/40 p-4"
+              data-testid="pilot-os-pack-preparation"
+            >
+              <h2 className="font-medium">Pack preparation gate</h2>
+              <p className="mt-1 text-sm">{status.pack_preparation.verdict}</p>
+              <p className="mt-1 text-xs text-neutral-600">
+                READY_UNSENT packs: {status.pack_preparation.packs_ready_unsent ?? 0} · Invites sent:{" "}
+                {status.pack_preparation.invites_sent ?? 0} · Can prepare:{" "}
+                {String(status.pack_preparation.can_prepare_pack)}
+              </p>
+              {(status.pack_preparation.missing_business_fields || []).length > 0 ? (
+                <ul className="mt-2 list-inside list-disc text-xs text-amber-900">
+                  {(status.pack_preparation.missing_business_fields || []).map((f) => (
+                    <li key={f}>{f}</li>
+                  ))}
+                </ul>
+              ) : null}
+              <p className="mt-1 text-[11px] text-neutral-500">
+                This gate never sends. Separate founder_send_approval_ref required later.
+              </p>
+            </div>
+          ) : null}
+
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="rounded border border-neutral-200 p-4">
               <p className="text-neutral-500">Pilot health</p>
@@ -506,7 +539,8 @@ export default function AdminPilotOsPage() {
           <div className="rounded border border-amber-200 bg-amber-50/40 p-4">
             <h2 className="font-medium">2. Founder-approve organization</h2>
             <p className="mt-1 text-xs text-neutral-600">
-              Requires founder_org_approval_ref ≥8, sponsor, legal name, named recipients.
+              Requires founder_org_approval_ref ≥8, sponsor, legal name, named recipients,
+              data_processing_basis_ref, success_criteria_ref. No send.
             </p>
             <div className="mt-3 grid gap-2">
               <input
@@ -547,22 +581,27 @@ export default function AdminPilotOsPage() {
               />
               <input
                 className="rounded border px-2 py-1"
-                placeholder="success_criteria_ref (optional label)"
+                placeholder="success_criteria_ref (≥4)"
                 value={successCriteriaRef}
                 onChange={(e) => setSuccessCriteriaRef(e.target.value)}
               />
               <button
                 type="button"
                 className="rounded bg-neutral-800 px-3 py-2 text-white disabled:opacity-50"
-                disabled={busy || !approveOrgId.trim()}
+                disabled={
+                  busy ||
+                  !approveOrgId.trim() ||
+                  dataBasisRef.trim().length < 4 ||
+                  successCriteriaRef.trim().length < 4
+                }
                 onClick={() =>
                   void postJson(`/api/v1/admin/pilot-os/organizations/${approveOrgId.trim()}/approve`, {
                     approved_by_label: approvedBy,
                     founder_org_approval_ref: orgApprovalRef,
                     sponsor_label: sponsor || null,
                     legal_name: legalName || null,
-                    data_processing_basis_ref: dataBasisRef || null,
-                    success_criteria_ref: successCriteriaRef || null,
+                    data_processing_basis_ref: dataBasisRef,
+                    success_criteria_ref: successCriteriaRef,
                   })
                 }
               >

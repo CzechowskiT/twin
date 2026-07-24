@@ -39,8 +39,8 @@ class OrgApproveBody(BaseModel):
     legal_name: str | None = Field(None, max_length=200)
     recipient_emails: list[str] | None = None
     notes: str | None = Field(None, max_length=2000)
-    data_processing_basis_ref: str | None = Field(None, min_length=4, max_length=128)
-    success_criteria_ref: str | None = Field(None, max_length=200)
+    data_processing_basis_ref: str = Field(..., min_length=4, max_length=128)
+    success_criteria_ref: str = Field(..., min_length=4, max_length=200)
 
 
 class PackPrepareBody(BaseModel):
@@ -344,3 +344,14 @@ def pilot_os_provisioning_dry_run(
     from app.services import first_customer_success as fcs
 
     return fcs.synthetic_provisioning_dry_run()
+
+
+@router.get("/pilot-os/pack-preparation")
+def pilot_os_pack_preparation(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    """Pack preparation gate — lists missing intake fields; never sends."""
+    _require_ops_admin(settings, authorization)
+    return pilot_os.evaluate_pack_preparation_gate(db)

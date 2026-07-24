@@ -151,6 +151,15 @@ def bilingual_invitation_pack() -> dict[str, Any]:
                 "Record a human decision",
                 "Leave feedback if friction",
             ],
+            "first_week_checklist": [
+                "Day 1–2: complete first human pipeline decision",
+                "Day 3–5: review 5+ candidates with evidence",
+                "Day 7: weekly review + feedback",
+            ],
+            "draft_message": (
+                "DRAFT ONLY — not sent: Welcome to the TWIN controlled pilot. "
+                "Use the invite link on twin-sooty.vercel.app. Humans decide; AI assists."
+            ),
             "support": "contact@twin.care (escalates to on-call)",
         },
         "pl": {
@@ -173,6 +182,15 @@ def bilingual_invitation_pack() -> dict[str, Any]:
             "ai_disclosure": (
                 "AI wspomaga screening z dowodami i pasmami pewności. "
                 "Decyzje zatrudnienia podejmuje człowiek. Atrybuty chronione są wykluczone."
+            ),
+            "first_week_checklist": [
+                "Dzień 1–2: pierwsza decyzja pipeline po AI",
+                "Dzień 3–5: przegląd ≥5 kandydatów z evidence",
+                "Dzień 7: weekly review + feedback",
+            ],
+            "draft_message": (
+                "SZKIC — nie wysłano: Witamy w kontrolowanym pilocie TWIN. "
+                "Link na twin-sooty.vercel.app. Decyduje człowiek; AI wspomaga."
             ),
             "support": "contact@twin.care (eskalaacja do on-call)",
         },

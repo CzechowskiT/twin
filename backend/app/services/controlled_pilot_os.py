@@ -82,10 +82,21 @@ INTAKE_REQUIRED_FIELDS = (
     "approved_by_label",
     "founder_org_approval_ref",
     "recipient_emails",
+    "data_processing_basis_ref",
+    "success_criteria_ref",
+)
+
+PACK_PREP_BLOCKED_INTAKE = (
+    "PACK PREPARATION BLOCKED — COMPLETE FOUNDER ORGANIZATION INTAKE REQUIRED"
+)
+PACK_PREP_READY_UNSENT = (
+    "FIRST REAL PILOT ACTIVATION PACK READY_UNSENT — AWAITING FOUNDER SEND AUTHORIZATION"
 )
 
 _SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]{1,78}[a-z0-9]$")
-_SYNTHETIC_SLUGS = frozenset({"nova-hiring-pl", "demo-company", "twin-demo"})
+_SYNTHETIC_SLUGS = frozenset(
+    {"nova-hiring-pl", "demo-company", "twin-demo", "ops-intake-schema-probe"}
+)
 
 
 def _utcnow() -> datetime:
@@ -110,6 +121,145 @@ def _parse_emails(raw: str | None) -> list[str]:
     except json.JSONDecodeError:
         pass
     return [x.strip().lower() for x in raw.split(",") if x.strip()]
+
+
+def _note_field(notes: str | None, key: str) -> str | None:
+    """Extract key=value fragments stored in org.notes during Founder approve."""
+    raw = (notes or "").strip()
+    if not raw:
+        return None
+    prefix = f"{key}="
+    for part in raw.split("|"):
+        part = part.strip()
+        if part.startswith(prefix):
+            val = part[len(prefix) :].strip()
+            return val or None
+    return None
+
+
+def approval_completeness(org: PilotOrganization | None) -> dict[str, Any]:
+    """Business-field gate for pack preparation — never invents orgs."""
+    missing: list[str] = []
+    if org is None:
+        missing = [
+            "founder_approved_real_organization",
+            "slug",
+            "display_name",
+            "legal_name",
+            "sponsor_label",
+            "approved_by_label",
+            "founder_org_approval_ref",
+            "named_recipients",
+            "data_processing_basis_ref",
+            "success_criteria_ref",
+            "is_synthetic_false",
+            "status_FOUNDER_APPROVED",
+        ]
+        return {
+            "complete": False,
+            "missing_business_fields": missing,
+            "verdict": PACK_PREP_BLOCKED_INTAKE,
+            "organization": None,
+        }
+    if org.is_synthetic or org.slug in _SYNTHETIC_SLUGS:
+        missing.append("is_synthetic_false")
+    if org.approval_status != APPROVAL_FOUNDER_APPROVED:
+        missing.append("status_FOUNDER_APPROVED")
+    if not (org.slug or "").strip():
+        missing.append("slug")
+    if not (org.display_name or "").strip():
+        missing.append("display_name")
+    if not (org.legal_name or "").strip():
+        missing.append("legal_name")
+    if not (org.sponsor_label or "").strip():
+        missing.append("sponsor_label")
+    if not (org.approved_by_label or "").strip():
+        missing.append("approved_by_label")
+    if len((org.founder_org_approval_ref or "").strip()) < 8:
+        missing.append("founder_org_approval_ref")
+    emails = _parse_emails(org.recipient_emails_json)
+    if len(emails) < 1:
+        missing.append("named_recipients")
+    if not _note_field(org.notes, "data_processing_basis_ref"):
+        missing.append("data_processing_basis_ref")
+    if not _note_field(org.notes, "success_criteria_ref"):
+        missing.append("success_criteria_ref")
+    complete = len(missing) == 0
+    return {
+        "complete": complete,
+        "missing_business_fields": missing,
+        "verdict": PACK_PREP_READY_UNSENT if complete else PACK_PREP_BLOCKED_INTAKE,
+        "organization": org_to_dict(org) if org else None,
+        "data_processing_basis_ref_present": bool(_note_field(org.notes, "data_processing_basis_ref")),
+        "success_criteria_ref_present": bool(_note_field(org.notes, "success_criteria_ref")),
+    }
+
+
+def evaluate_pack_preparation_gate(db: Session) -> dict[str, Any]:
+    """Find complete FOUNDER_APPROVED non-synthetic org or list missing intake fields.
+
+    Does not create packs or send mail.
+    """
+    orgs = (
+        db.query(PilotOrganization)
+        .filter(PilotOrganization.is_synthetic.is_(False))
+        .order_by(PilotOrganization.id.asc())
+        .all()
+    )
+    approved = [o for o in orgs if o.approval_status == APPROVAL_FOUNDER_APPROVED]
+    primary = approved[0] if approved else None
+    # Prefer first complete approval; else report gaps on first approved or none
+    if primary:
+        gate = approval_completeness(primary)
+    else:
+        # Candidate non-synthetic incomplete orgs — report gaps without treating as approved
+        candidates = [o for o in orgs if not o.is_synthetic]
+        gate = approval_completeness(candidates[0] if candidates else None)
+        if candidates and candidates[0].approval_status != APPROVAL_FOUNDER_APPROVED:
+            # ensure status missing is listed
+            if "status_FOUNDER_APPROVED" not in gate["missing_business_fields"]:
+                gate["missing_business_fields"] = [
+                    "status_FOUNDER_APPROVED",
+                    *gate["missing_business_fields"],
+                ]
+            gate["complete"] = False
+            gate["verdict"] = PACK_PREP_BLOCKED_INTAKE
+    packs_ready = 0
+    packs_sent = 0
+    if primary:
+        packs = (
+            db.query(PilotInvitationPack)
+            .filter(PilotInvitationPack.organization_id == primary.id)
+            .all()
+        )
+        packs_ready = sum(1 for p in packs if p.status == PACK_READY_UNSENT)
+        packs_sent = sum(1 for p in packs if p.status == PACK_SENT)
+    return {
+        "schema": "twin.pack_preparation_gate/v1",
+        "verdict": gate["verdict"],
+        "complete_approval": gate["complete"],
+        "missing_business_fields": gate["missing_business_fields"],
+        "organization": gate.get("organization"),
+        "packs_ready_unsent": packs_ready,
+        "packs_sent": packs_sent,
+        "invites_sent": packs_sent,
+        "can_prepare_pack": gate["complete"] and packs_sent == 0,
+        "send_forbidden_in_this_task": True,
+        "stance": {
+            "launch": "NO-GO",
+            "enrollment": "OFF",
+            "phase_3b": "BLOCKED",
+            "pilot": "READY_FOR_CONTROLLED_PILOT",
+        },
+        "rejected_sources": [
+            "synthetic",
+            "nova-hiring-pl",
+            "ops-intake-schema-probe",
+            "crm",
+            "loose_docs",
+            "comments",
+        ],
+    }
 
 
 def org_to_dict(org: PilotOrganization, *, mask: bool = True) -> dict[str, Any]:
@@ -225,6 +375,12 @@ def founder_approve_organization(
     legal = (legal_name or org.legal_name or org.display_name or "").strip()
     if len(legal) < 2:
         raise ValueError("legal_name_required")
+    if not _note_field(notes, "data_processing_basis_ref"):
+        raise ValueError("data_processing_basis_ref_required")
+    if not _note_field(notes, "success_criteria_ref"):
+        raise ValueError("success_criteria_ref_required")
+    if org.slug in _SYNTHETIC_SLUGS:
+        raise ValueError("synthetic_org_cannot_be_founder_approved_for_real_pilot")
     org.approval_status = APPROVAL_FOUNDER_APPROVED
     org.approved_at = _utcnow()
     org.approved_by_label = (approved_by_label or "Founder")[:120]
@@ -253,6 +409,13 @@ def prepare_invitation_pack(
         raise ValueError("org_not_founder_approved")
     if org.is_synthetic:
         raise ValueError("synthetic_org_blocked")
+    if org.slug in _SYNTHETIC_SLUGS:
+        raise ValueError("synthetic_org_blocked")
+    completeness = approval_completeness(org)
+    if not completeness["complete"]:
+        raise ValueError(
+            "pack_preparation_blocked:" + ",".join(completeness["missing_business_fields"])
+        )
     emails = _parse_emails(org.recipient_emails_json)
     if not emails:
         raise ValueError("recipients_required")
@@ -862,6 +1025,7 @@ def build_os_status(db: Session, settings: Settings | None = None) -> dict[str, 
         },
         "ai_real_validation": _ai_real_validation_block(db),
         "first_customer_success": _first_customer_success_block(db),
+        "pack_preparation": evaluate_pack_preparation_gate(db),
     }
 
 

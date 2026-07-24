@@ -157,6 +157,8 @@ def test_approve_prepare_pack_stays_unsent(monkeypatch) -> None:
                 "founder_org_approval_ref": "FOUNDER-ORG-APPROVAL-REF-001",
                 "sponsor_label": "Founder Sponsor",
                 "legal_name": "Acme Pilot Sp. z o.o.",
+                "data_processing_basis_ref": "DPA-PILOT-ACME-001",
+                "success_criteria_ref": "FCS-DEFAULT-V1",
             },
         )
         assert approved.status_code == 200, approved.text
@@ -202,6 +204,105 @@ def test_approve_prepare_pack_stays_unsent(monkeypatch) -> None:
         )
         assert gate_launch.status_code == 200
         assert gate_launch.json()["launch_decision"] == "NO-GO"
+    finally:
+        app.dependency_overrides.clear()
+        get_settings.cache_clear()
+        db.close()
+
+
+def test_pack_preparation_blocked_without_approved_org(monkeypatch) -> None:
+    client, db, app, get_settings = _client_with_db(monkeypatch)
+    try:
+        res = client.get(
+            "/api/v1/admin/pilot-os/pack-preparation",
+            headers={"Authorization": "Bearer ops-secret"},
+        )
+        assert res.status_code == 200, res.text
+        body = res.json()
+        assert body["verdict"] == pilot_os.PACK_PREP_BLOCKED_INTAKE
+        assert body["complete_approval"] is False
+        assert body["packs_ready_unsent"] == 0
+        assert body["invites_sent"] == 0
+        assert "founder_approved_real_organization" in body["missing_business_fields"]
+        assert body["send_forbidden_in_this_task"] is True
+
+        status = client.get(
+            "/api/v1/admin/pilot-os/status",
+            headers={"Authorization": "Bearer ops-secret"},
+        )
+        assert status.status_code == 200
+        assert "pack_preparation" in status.json()
+        assert status.json()["pack_preparation"]["verdict"] == pilot_os.PACK_PREP_BLOCKED_INTAKE
+    finally:
+        app.dependency_overrides.clear()
+        get_settings.cache_clear()
+        db.close()
+
+
+def test_approve_requires_basis_and_success_refs(monkeypatch) -> None:
+    client, db, app, get_settings = _client_with_db(monkeypatch)
+    try:
+        created = client.post(
+            "/api/v1/admin/pilot-os/organizations",
+            headers={"Authorization": "Bearer ops-secret"},
+            json={
+                "slug": "acme-basis-pl",
+                "display_name": "Acme Basis",
+                "legal_name": "Acme Basis Sp. z o.o.",
+                "sponsor_label": "Sponsor",
+                "recipient_emails": ["r1@acme.test"],
+            },
+        )
+        assert created.status_code == 200, created.text
+        org_id = created.json()["organization"]["id"]
+        denied = client.post(
+            f"/api/v1/admin/pilot-os/organizations/{org_id}/approve",
+            headers={"Authorization": "Bearer ops-secret"},
+            json={
+                "approved_by_label": "Founder",
+                "founder_org_approval_ref": "FOUNDER-ORG-APPROVAL-REF-002",
+                "sponsor_label": "Sponsor",
+                "legal_name": "Acme Basis Sp. z o.o.",
+            },
+        )
+        assert denied.status_code == 422
+    finally:
+        app.dependency_overrides.clear()
+        get_settings.cache_clear()
+        db.close()
+
+
+def test_ops_probe_slug_rejected_as_synthetic_on_approve(monkeypatch) -> None:
+    client, db, app, get_settings = _client_with_db(monkeypatch)
+    try:
+        created = client.post(
+            "/api/v1/admin/pilot-os/organizations",
+            headers={"Authorization": "Bearer ops-secret"},
+            json={
+                "slug": "ops-intake-schema-probe",
+                "display_name": "Probe",
+                "legal_name": "Probe Legal",
+                "sponsor_label": "Ops",
+                "recipient_emails": ["op@example.com"],
+                "is_synthetic": True,
+            },
+        )
+        assert created.status_code == 200, created.text
+        org_id = created.json()["organization"]["id"]
+        denied = client.post(
+            f"/api/v1/admin/pilot-os/organizations/{org_id}/approve",
+            headers={"Authorization": "Bearer ops-secret"},
+            json={
+                "approved_by_label": "Founder",
+                "founder_org_approval_ref": "FOUNDER-ORG-APPROVAL-REF-003",
+                "sponsor_label": "Ops",
+                "legal_name": "Probe Legal",
+                "data_processing_basis_ref": "DPA-PROBE",
+                "success_criteria_ref": "FCS-V1",
+            },
+        )
+        assert denied.status_code == 400
+        assert "synthetic" in denied.text.lower()
     finally:
         app.dependency_overrides.clear()
         get_settings.cache_clear()
