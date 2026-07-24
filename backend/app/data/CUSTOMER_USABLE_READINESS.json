@@ -1,0 +1,48 @@
+{
+  "schema": "twin.customer_usable_readiness/v2",
+  "updated_at": "2026-07-24T09:00:00Z",
+  "definition": "CUSTOMER_USABLE_PASS ≠ Hard LIVE technical PASS",
+  "hard_live_core_pass_technical": 143,
+  "hard_live_note": "143/0/0 is technical existence only — not customer-usable count",
+  "evidence_label": "production_smoked_synthetic≠real_customer_validated≠real_pilot_data",
+  "minimal_journey": {
+    "id": "recruiter_inbox_accept_decline",
+    "customer_usable": true,
+    "evidence_tier": "production_smoked_synthetic",
+    "label": "Recruiter inbox → accept/decline (subsumed by multi-role)",
+    "evidence_smoke": "scripts/customer-usable-minimal-journey-smoke.py"
+  },
+  "multi_role_journey": {
+    "id": "company_recruiter_candidate_pipeline",
+    "customer_usable": true,
+    "evidence_tier": "production_smoked_synthetic",
+    "real_customer_validated": false,
+    "real_pilot_data": false,
+    "label": "Company role → import → inbox → decision → company visibility → audit → feedback",
+    "evidence_smoke": "scripts/customer-usable-multirole-journey-smoke.py",
+    "smoke_result": "PASS 19/19",
+    "api_git_commit": "47c3bff02d4584ed2dee62d98e43f857c36eb64a",
+    "tenants": ["cu-pilot-alpha", "cu-pilot-beta"]
+  },
+  "counts": {
+    "customer_usable_pass": 11,
+    "note": "Synthetic multi-role CU modules after smoke; not real-customer-validated"
+  },
+  "scores": {
+    "technical_existence_score": 100,
+    "customer_usable_synthetic_score": 92,
+    "real_customer_validation_score": 0,
+    "launch_go_readiness_score_cap": 15
+  },
+  "verdict": "CUSTOMER-USABLE MULTI-ROLE PILOT JOURNEY COMPLETE — READY FOR FIRST APPROVED ORGANIZATION",
+  "pilot_stance": "READY_FOR_CONTROLLED_PILOT",
+  "frozen": {
+    "launch": "NO-GO",
+    "enrollment": "OFF",
+    "phase_3b": "BLOCKED",
+    "stripe_public": "OFF",
+    "ats_live_write": "OFF",
+    "ms_write": "OFF"
+  },
+  "registry_ts": "frontend/src/lib/customer-usable-readiness.ts"
+}

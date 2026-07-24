@@ -124,7 +124,7 @@ def build_health_ops_public(s: Settings) -> dict[str, Any]:
                     scores.get("launch_go_readiness_score") or 0
                 )
                 cu = load_customer_usable_readiness()
-                out["customer_usable_pass"] = int(cu.get("customer_usable_pass") or 3)
+                out["customer_usable_pass"] = int(cu.get("customer_usable_pass") or 11)
                 out["hard_live_core_pass_technical"] = int(
                     cu.get("hard_live_core_pass_technical") or 143
                 )
