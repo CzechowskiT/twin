@@ -109,7 +109,7 @@ def main() -> int:
         },
     )
     role = json.loads(raw) if raw.startswith(b"{") else {}
-    role_id = role.get("id")
+    role_id = (role.get("role") or role).get("id") if isinstance(role.get("role") or role, dict) else None
     ok("A_company_role_create", c in (200, 201) and bool(role_id), f"http={c} id={role_id}")
     if not role_id:
         return 1
@@ -165,7 +165,7 @@ def main() -> int:
         },
     )
     role_b = json.loads(raw) if raw.startswith(b"{") else {}
-    role_b_id = role_b.get("id")
+    role_b_id = (role_b.get("role") or role_b).get("id") if isinstance(role_b.get("role") or role_b, dict) else None
     ok("B2_tenant_b_role", c in (200, 201) and bool(role_b_id), f"http={c}")
     if role_b_id:
         c, raw = req(
@@ -173,7 +173,7 @@ def main() -> int:
             f"{API}/api/v1/recruiter/talent-pool/candidates?company_slug={TENANT_B}",
             headers=hb,
             data={
-                "display_name": f"Beta Cand {stamp}",
+                "display_name": f"Beta Candidate {stamp % 100}",
                 "job_title": "Analyst",
                 "location": "Remote",
                 "skills": ["SQL"],
@@ -182,10 +182,13 @@ def main() -> int:
             },
         )
         body = json.loads(raw) if raw.startswith(b"{") else {}
+        detail = ""
+        if c >= 400:
+            detail = (raw[:120].decode("utf-8", "ignore") if isinstance(raw, (bytes, bytearray)) else str(raw))[:120]
         ok(
             "B2_tenant_b_manual_assign",
             c in (200, 201) and bool((body.get("application") or {}).get("application_id")),
-            f"http={c}",
+            f"http={c} {detail}",
         )
 
     # C — inbox review contains app

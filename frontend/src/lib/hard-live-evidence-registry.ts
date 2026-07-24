@@ -1348,7 +1348,7 @@ export const HARD_LIVE_REGISTRY_META = {
   wave: "5",
   hard_live_denominator: HARD_LIVE_DENOMINATOR_RULE,
   stance: {
-    pilot: "TECHNICALLY_READY_BUT_CUSTOMER_JOURNEY_INCOMPLETE",
+    pilot: "READY_FOR_CONTROLLED_PILOT",
     gate_f: "PASS",
     launch: "NO-GO",
     pmf: "INSUFFICIENT_DATA",

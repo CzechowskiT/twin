@@ -48,7 +48,7 @@ const OPTIONAL_RECLASS = [
 ] as const;
 
 test("stance remains Founder-blocked; Gate F PASS; Launch NO-GO; Enrollment OFF", () => {
-  assert.equal(HARD_LIVE_REGISTRY_META.stance.pilot, "TECHNICALLY_READY_BUT_CUSTOMER_JOURNEY_INCOMPLETE");
+  assert.equal(HARD_LIVE_REGISTRY_META.stance.pilot, "READY_FOR_CONTROLLED_PILOT");
   assert.equal(HARD_LIVE_REGISTRY_META.stance.gate_f, "PASS");
   assert.equal(HARD_LIVE_REGISTRY_META.stance.launch, "NO-GO");
   assert.equal(HARD_LIVE_REGISTRY_META.stance.external_pilot_enrollment_enabled, false);
@@ -298,7 +298,7 @@ test("docs registry JSON mirrors TS module ids, product_inclusion, CORE readines
   for (const id of registryModuleIds()) {
     assert.ok(docIds.has(id), id);
   }
-  assert.equal(doc.stance.pilot, "TECHNICALLY_READY_BUT_CUSTOMER_JOURNEY_INCOMPLETE");
+  assert.equal(doc.stance.pilot, "READY_FOR_CONTROLLED_PILOT");
   assert.equal(doc.stance.gate_f, "PASS");
   assert.equal(doc.stance.external_pilot_enrollment_enabled, false);
   assert.equal(doc.wave, "5");

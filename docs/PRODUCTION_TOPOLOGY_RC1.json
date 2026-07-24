@@ -75,16 +75,19 @@
     "launch_go_gate": "docs/LAUNCH_GO_EVIDENCE_GATE.json",
     "status_api": "/api/v1/admin/pilot-os/status"
   },
-  "verified_tip": "3d1c1ed033693392da484f53efe637a37412ada7",
-  "verdict": "CUSTOMER-USABLE PILOT SCOPE COMPLETE — ONE REAL END-TO-END JOURNEY PRODUCTION-READY",
+  "verified_tip": "47c3bff02d4584ed2dee62d98e43f857c36eb64a",
+  "verdict": "CUSTOMER-USABLE MULTI-ROLE PILOT JOURNEY COMPLETE — READY FOR FIRST APPROVED ORGANIZATION",
   "customer_usable": {
     "definition": "docs/CUSTOMER_USABLE_DEFINITION.md",
     "readiness": "docs/CUSTOMER_USABLE_READINESS.json",
-    "journey_evidence": "docs/CUSTOMER_USABLE_JOURNEY_EVIDENCE.json",
+    "journey_evidence": "docs/CUSTOMER_USABLE_MULTIROLE_JOURNEY_EVIDENCE.json",
     "minimal_journey_id": "recruiter_inbox_accept_decline",
-    "customer_usable_pass": 3,
+    "multi_role_journey_id": "company_recruiter_candidate_pipeline",
+    "customer_usable_pass": 11,
     "hard_live_core_pass_technical": 143,
-    "hard_live_is_technical_only": true
+    "hard_live_is_technical_only": true,
+    "evidence_tier": "production_smoked_synthetic",
+    "real_customer_validated": false
   },
   "first_customer": {
     "checklists": "docs/FIRST_CUSTOMER_SUCCESS_CHECKLISTS.md",

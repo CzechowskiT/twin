@@ -13,7 +13,7 @@
     "total_core": 143
   },
   "stance": {
-    "pilot": "TECHNICALLY_READY_BUT_CUSTOMER_JOURNEY_INCOMPLETE",
+    "pilot": "READY_FOR_CONTROLLED_PILOT",
     "gate_f": "PASS",
     "launch": "NO-GO",
     "pmf": "INSUFFICIENT_DATA",

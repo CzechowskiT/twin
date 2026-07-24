@@ -80,12 +80,12 @@ def build_health_ops_public(s: Settings) -> dict[str, Any]:
         "rc1_founder_approved_real_orgs": 0,
         "rc1_pilot_health_score": 80,
         "rc1_launch_go_readiness_score": 0,
-        "customer_usable_pass": 3,
+        "customer_usable_pass": 11,
         "hard_live_core_pass_technical": 143,
         "hard_live_is_technical_only": True,
         "customer_usable_minimal_journey_id": "recruiter_inbox_accept_decline",
         "customer_usable_verdict": (
-            "CUSTOMER-USABLE PILOT SCOPE COMPLETE — ONE REAL END-TO-END JOURNEY PRODUCTION-READY"
+            "CUSTOMER-USABLE MULTI-ROLE PILOT JOURNEY COMPLETE — READY FOR FIRST APPROVED ORGANIZATION"
         ),
     }
     try:

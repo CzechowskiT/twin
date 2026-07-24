@@ -1,0 +1,31 @@
+{
+  "schema": "twin.customer_usable_multirole_journey_evidence/v1",
+  "journey_id": "company_recruiter_candidate_pipeline",
+  "smoked_at": "2026-07-24T08:58:00Z",
+  "api_git_commit": "47c3bff02d4584ed2dee62d98e43f857c36eb64a",
+  "api_base": "https://twin-production-bcd9.up.railway.app",
+  "tenants": ["cu-pilot-alpha", "cu-pilot-beta"],
+  "synthetic_only": true,
+  "real_customer_validated": false,
+  "real_pilot_data": false,
+  "script": "scripts/customer-usable-multirole-journey-smoke.py",
+  "result": "PASS",
+  "checks_passed": 19,
+  "checks_failed": 0,
+  "steps": [
+    "A_company_role_create",
+    "A_org_settings_write",
+    "B_csv_import_assign",
+    "B2_tenant_b_manual_assign",
+    "C_inbox_review",
+    "C_tenant_isolation_no_leak",
+    "tenant_mismatch_blocked",
+    "D_decision_accept",
+    "D_pipeline_transition",
+    "E_company_pipeline_visibility",
+    "F_audit_trail",
+    "F_feedback_persist"
+  ],
+  "customer_usable": true,
+  "label": "production_smoked_synthetic≠real_customer_validated≠real_pilot_data"
+}

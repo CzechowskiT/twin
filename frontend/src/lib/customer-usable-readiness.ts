@@ -95,7 +95,7 @@ export const MULTI_ROLE_CUSTOMER_JOURNEY = {
     smoke_script: "scripts/customer-usable-multirole-journey-smoke.py",
   },
   /** Flip to true only after prod multi-role smoke PASS on deployed tip. */
-  customer_usable: false as boolean,
+  customer_usable: true as boolean,
   evidence_tier: "production_smoked_synthetic" as const,
   real_customer_validated: false as const,
   real_pilot_data: false as const,
@@ -350,7 +350,7 @@ export function registryWithMultiRolePromotion(
 }
 
 /** Runtime flag mirrored in docs/CUSTOMER_USABLE_READINESS.json after smoke. */
-export let MULTI_ROLE_JOURNEY_CUSTOMER_USABLE = false;
+export let MULTI_ROLE_JOURNEY_CUSTOMER_USABLE = true;
 
 export function setMultiRoleJourneyCustomerUsable(value: boolean): void {
   MULTI_ROLE_JOURNEY_CUSTOMER_USABLE = value;

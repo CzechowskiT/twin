@@ -5,7 +5,7 @@
   "verdict_expected_without_approved_org": "CONTROLLED PILOT OPERATING SYSTEM READY — AWAITING FIRST FOUNDER-APPROVED PILOT ORGANIZATION",
   "verdict_with_sent_invites": "CONTROLLED PILOT ACTIVE — FIRST REAL USERS ONBOARDED",
   "stance": {
-    "pilot": "TECHNICALLY_READY_BUT_CUSTOMER_JOURNEY_INCOMPLETE",
+    "pilot": "READY_FOR_CONTROLLED_PILOT",
     "gate_f": "PASS",
     "launch": "NO-GO",
     "enrollment": "OFF",
