@@ -64,6 +64,13 @@ def build_recruiter_batch(
         }
         item.update(build_recruiter_match_summary(db, cand, job, locale=locale))
         item.update(scheduling_fields_for_inbox_item(app))
+        try:
+            from app.services.candidate_intelligence import attach_compact_intelligence
+
+            attach_compact_intelligence(db, item, cand.id)
+        except Exception:
+            item["candidate_id"] = cand.id
+            item["intelligence"] = None
         items.append(item)
         if len(items) >= limit:
             break

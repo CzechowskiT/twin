@@ -1021,6 +1021,83 @@ def override_match(
     return match_to_dict(row)
 
 
+def ingest_synthetic_cv_text(
+    db: Session,
+    *,
+    candidate_id: int,
+    cv_text: str,
+    mark_exclude_metrics: bool = True,
+) -> Candidate:
+    """Ops/smoke-only: attach synthetic CV text for intelligence processing.
+
+    Never commit real CVs. Caller must authorize as ops.
+    """
+    from app.database.models import User
+
+    candidate = db.query(Candidate).filter(Candidate.id == candidate_id).one_or_none()
+    if candidate is None:
+        raise ValueError("candidate_not_found")
+    text = (cv_text or "").strip()
+    if len(text) < 40:
+        raise ValueError("cv_text_too_short")
+    text, _ = scrub_protected_content(text[:20000])
+    candidate.cv_text = text
+    candidate.cv_filename = candidate.cv_filename or "synthetic-intel.txt"
+    candidate.cv_uploaded_at = _utcnow()
+    if mark_exclude_metrics:
+        user = db.query(User).filter(User.id == candidate.user_id).one_or_none()
+        if user is not None:
+            user.exclude_from_product_metrics = True
+    db.commit()
+    db.refresh(candidate)
+    return candidate
+
+
+def company_approved_subset(db: Session, *, candidate_id: int) -> dict[str, Any]:
+    """Company-safe intelligence subset — no recruiter notes / debug / full CV."""
+    profile = (
+        db.query(CandidateIntelligenceProfile)
+        .filter(CandidateIntelligenceProfile.candidate_id == candidate_id)
+        .one_or_none()
+    )
+    if profile is None:
+        return {
+            "ok": True,
+            "candidate_id": candidate_id,
+            "available": False,
+            "human_review_required": True,
+            "autonomous_employment_decision": False,
+        }
+    brief = (
+        db.query(CandidateRecruiterBrief)
+        .filter(CandidateRecruiterBrief.profile_id == profile.id)
+        .order_by(CandidateRecruiterBrief.id.desc())
+        .first()
+    )
+    match = (
+        db.query(CandidateRoleMatch)
+        .filter(CandidateRoleMatch.candidate_id == candidate_id)
+        .order_by(CandidateRoleMatch.id.desc())
+        .first()
+    )
+    strengths = (_loads(match.strengths_json, []) or [])[:5] if match else []
+    gaps = (_loads(match.gaps_json, []) or [])[:5] if match else []
+    return {
+        "ok": True,
+        "available": True,
+        "candidate_id": candidate_id,
+        "brief": (brief.brief if brief else None),
+        "fit_band": (match.recruiter_override or match.overall_fit_band) if match else None,
+        "strengths": [s.get("label") if isinstance(s, dict) else str(s) for s in strengths],
+        "gaps": [g.get("label") if isinstance(g, dict) else str(g) for g in gaps],
+        "pipeline_hint": None,
+        "human_decision_state": "pending_human_review",
+        "human_review_required": True,
+        "autonomous_employment_decision": False,
+        "disclaimer": "AI-assisted. Company view shows approved subset only. Humans decide.",
+    }
+
+
 def compact_list_card(db: Session, candidate_id: int) -> dict[str, Any] | None:
     profile = (
         db.query(CandidateIntelligenceProfile)
@@ -1049,6 +1126,14 @@ def compact_list_card(db: Session, candidate_id: int) -> dict[str, Any] | None:
         ),
         "human_review_required": True,
     }
+
+
+def attach_compact_intelligence(db: Session, item: dict[str, Any], candidate_id: int) -> dict[str, Any]:
+    """Mutate list/pipeline item with compact intelligence card fields."""
+    item["candidate_id"] = candidate_id
+    item["intelligence"] = compact_list_card(db, candidate_id)
+    return item
+
 
 
 def enqueue_intelligence_for_candidate(candidate_id: int, job_id: int | None = None) -> str | None:

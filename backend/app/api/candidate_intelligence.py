@@ -64,6 +64,15 @@ class ProcessBody(BaseModel):
     locale: str = "en"
 
 
+class SyntheticCvBody(BaseModel):
+    """Ops/smoke only — synthetic CV text, never log full body in reports."""
+
+    cv_text: str = Field(..., min_length=40, max_length=20000)
+    process: bool = True
+    job_id: int | None = None
+    locale: str = "en"
+
+
 @router.get("/candidates/{candidate_id}/intelligence")
 def get_intelligence(
     candidate_id: int,
@@ -216,3 +225,55 @@ def clarification_draft(
         "status": "DRAFT_UNSENT",
         "note": "Clarification drafts never auto-send.",
     }
+
+
+@router.post("/candidates/{candidate_id}/intelligence/seed-synthetic-cv")
+def seed_synthetic_cv(
+    candidate_id: int,
+    body: SyntheticCvBody,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+    token: str | None = Depends(_oauth_optional),
+) -> dict:
+    """Ops-only synthetic CV attach for intelligence smoke — excludes from real KPI."""
+    ops = settings.ops_admin_token.strip() or settings.beta_admin_token.strip()
+    raw = None
+    if authorization and authorization.lower().startswith("bearer "):
+        raw = authorization.split(" ", 1)[1].strip()
+    if not ops or raw != ops:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="ops_only_synthetic_cv_seed")
+    try:
+        intel.ingest_synthetic_cv_text(db, candidate_id=candidate_id, cv_text=body.cv_text)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    if body.process:
+        result = intel.run_extraction_pipeline(
+            db,
+            candidate_id=candidate_id,
+            job_id=body.job_id,
+            force=True,
+            locale=body.locale,
+        )
+        return {
+            "ok": True,
+            "seeded": True,
+            "synthetic": True,
+            "kpi_excluded": True,
+            "cv_chars": len(body.cv_text),
+            **{k: result.get(k) for k in ("profile", "timeline", "brief", "match", "stance", "missing_information", "signals")},
+        }
+    return {"ok": True, "seeded": True, "synthetic": True, "kpi_excluded": True}
+
+
+@router.get("/candidates/{candidate_id}/intelligence/company-subset")
+def company_intelligence_subset(
+    candidate_id: int,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+    token: str | None = Depends(_oauth_optional),
+) -> dict:
+    """Approved company subset: brief, strengths, gaps, decision state — no recruiter notes."""
+    _authorize(db, settings, authorization, token)
+    return intel.company_approved_subset(db, candidate_id=candidate_id)
