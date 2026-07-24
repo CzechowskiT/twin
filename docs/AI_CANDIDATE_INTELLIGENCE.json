@@ -2,14 +2,27 @@
   "schema": "twin.ai_candidate_intelligence/v1",
   "updated_at": "2026-07-24T12:20:00Z",
   "branch": "cursor/phase1-monorepo-scaffold",
-  "final_verdict": "AI CANDIDATE INTELLIGENCE INCOMPLETE — EXACT PRODUCTION BLOCKERS",
-  "fit_bands": ["MATCH", "NO_MATCH", "UNKNOWN"],
+  "final_verdict": "AI CANDIDATE INTELLIGENCE INCOMPLETE \u2014 EXACT PRODUCTION BLOCKERS",
+  "fit_bands": [
+    "MATCH",
+    "NO_MATCH",
+    "UNKNOWN"
+  ],
   "human_review_required": true,
   "autonomous_employment_decision": false,
   "alembic": "103_candidate_intelligence",
-  "unit_tests": {"path": "tests/test_candidate_intelligence.py", "result": "5/5 PASS"},
-  "prod_route_smoke": {"path": "scripts/candidate-intelligence-prod-smoke.py", "result": "PASS"},
-  "multi_role_smoke": {"result": "19/19 PASS", "regression": false},
+  "unit_tests": {
+    "path": "tests/test_candidate_intelligence.py",
+    "result": "5/5 PASS"
+  },
+  "prod_route_smoke": {
+    "path": "scripts/candidate-intelligence-prod-smoke.py",
+    "result": "PASS"
+  },
+  "multi_role_smoke": {
+    "result": "19/19 PASS",
+    "regression": false
+  },
   "customer_usable_promoted_count": 0,
   "modules_status": "TECHNICAL_PASS_ONLY",
   "exact_production_blockers": [
@@ -41,5 +54,6 @@
   "kpi": {
     "token": "NO_REAL_PILOT_DATA",
     "synthetic_excluded_from_real_kpi": true
-  }
+  },
+  "fe_build": "local_npm_run_build_PASS_after_evidence_tier_fix"
 }
