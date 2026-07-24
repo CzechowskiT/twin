@@ -1,6 +1,6 @@
 {
   "schema": "twin.customer_usable_readiness/v2",
-  "updated_at": "2026-07-24T09:00:00Z",
+  "updated_at": "2026-07-24T12:45:00Z",
   "definition": "CUSTOMER_USABLE_PASS ≠ Hard LIVE technical PASS",
   "hard_live_core_pass_technical": 143,
   "hard_live_note": "143/0/0 is technical existence only — not customer-usable count",
@@ -21,16 +21,25 @@
     "label": "Company role → import → inbox → decision → company visibility → audit → feedback",
     "evidence_smoke": "scripts/customer-usable-multirole-journey-smoke.py",
     "smoke_result": "PASS 19/19",
-    "api_git_commit": "47c3bff02d4584ed2dee62d98e43f857c36eb64a",
+    "api_git_commit": "687d43f8dc4acc7635b5ddcf30b18389fba17cbd",
     "tenants": ["cu-pilot-alpha", "cu-pilot-beta"]
   },
+  "ai_candidate_intelligence": {
+    "customer_usable": true,
+    "evidence_tier": "production_smoked_synthetic",
+    "ws20_smoke": "PASS 30/30",
+    "ws20_evidence_sha": "687d43f8dc4acc7635b5ddcf30b18389fba17cbd",
+    "eval_harness": "PASS",
+    "promoted_modules": 6,
+    "verdict": "AI CANDIDATE INTELLIGENCE CUSTOMER-USABLE — EXPLAINABLE CV SCREENING PRODUCTION-READY"
+  },
   "counts": {
-    "customer_usable_pass": 11,
-    "note": "Synthetic multi-role CU modules after smoke; not real-customer-validated"
+    "customer_usable_pass": 17,
+    "note": "Synthetic multi-role + intelligence CU modules after WS20; not real-customer-validated"
   },
   "scores": {
     "technical_existence_score": 100,
-    "customer_usable_synthetic_score": 92,
+    "customer_usable_synthetic_score": 94,
     "real_customer_validation_score": 0,
     "launch_go_readiness_score_cap": 15
   },

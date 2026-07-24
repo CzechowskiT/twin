@@ -1,8 +1,8 @@
 {
   "schema": "twin.ai_candidate_intelligence/v1",
-  "updated_at": "2026-07-24T12:20:00Z",
+  "updated_at": "2026-07-24T12:45:00Z",
   "branch": "cursor/phase1-monorepo-scaffold",
-  "final_verdict": "AI CANDIDATE INTELLIGENCE INCOMPLETE \u2014 EXACT PRODUCTION BLOCKERS",
+  "final_verdict": "AI CANDIDATE INTELLIGENCE CUSTOMER-USABLE — EXPLAINABLE CV SCREENING PRODUCTION-READY",
   "fit_bands": [
     "MATCH",
     "NO_MATCH",
@@ -15,23 +15,38 @@
     "path": "tests/test_candidate_intelligence.py",
     "result": "5/5 PASS"
   },
+  "offline_eval_harness": {
+    "path": "scripts/candidate-intelligence-eval-harness.py",
+    "result": "PASS",
+    "label": "synthetic_eval_harness≠real_customer_validated"
+  },
   "prod_route_smoke": {
     "path": "scripts/candidate-intelligence-prod-smoke.py",
     "result": "PASS"
   },
+  "workstream_20_prod_e2e": {
+    "path": "scripts/candidate-intelligence-ws20-smoke.py",
+    "result": "PASS 30/30",
+    "evidence_git_commit": "687d43f8dc4acc7635b5ddcf30b18389fba17cbd",
+    "label": "production_smoked_synthetic≠real_customer_validated≠real_pilot_data"
+  },
   "multi_role_smoke": {
     "result": "19/19 PASS",
-    "regression": false
+    "regression": false,
+    "ssl_certifi_context": true
   },
-  "customer_usable_promoted_count": 0,
-  "modules_status": "TECHNICAL_PASS_ONLY",
-  "exact_production_blockers": [
-    "full_workstream20_prod_synthetic_cv_e2e_not_completed",
-    "inbox_pipeline_company_compact_intelligence_cards_incomplete",
-    "company_approved_subset_view_not_shipped",
-    "evaluation_framework_synthetic_dataset_minimal",
-    "cu_module_promotion_blocked_until_full_prod_e2e"
+  "customer_usable_promoted_count": 6,
+  "customer_usable_pass_runtime": 17,
+  "modules_status": "CUSTOMER_USABLE_PASS",
+  "promoted_modules": [
+    "candidate_intelligence_profile",
+    "candidate_recruiter_brief",
+    "candidate_role_match",
+    "recruiter_clarification_draft",
+    "company_intelligence_subset",
+    "recruiter_intelligence_compact_cards"
   ],
+  "exact_production_blockers": [],
   "shipped": [
     "canonical_models_alembic_103",
     "async_celery_pipeline",
@@ -43,7 +58,13 @@
     "protected_attribute_scrub",
     "prompt_injection_scan",
     "recruiter_detail_ui_panel",
-    "pilot_os_ai_metrics_stub"
+    "compact_cards_inbox_pipeline_talent_pool",
+    "company_approved_subset_view",
+    "ops_synthetic_cv_seed",
+    "offline_eval_harness",
+    "ws20_full_prod_synthetic_e2e",
+    "pilot_os_ai_metrics_stub",
+    "cu_modules_promoted_after_ws20"
   ],
   "frozen": {
     "launch": "NO-GO",
@@ -54,6 +75,5 @@
   "kpi": {
     "token": "NO_REAL_PILOT_DATA",
     "synthetic_excluded_from_real_kpi": true
-  },
-  "fe_build": "local_npm_run_build_PASS_after_evidence_tier_fix"
+  }
 }

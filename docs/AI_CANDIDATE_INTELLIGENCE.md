@@ -48,9 +48,19 @@ CV upload (PDF/DOCX/TXT)
 | API | `backend/app/api/candidate_intelligence.py` |
 | Task | `backend/app/tasks/candidate_intelligence_tasks.py` |
 | Alembic | `103_candidate_intelligence` |
-| UI | `frontend/src/components/recruiter/candidate-intelligence-panel.tsx` |
-| Smoke | `scripts/candidate-intelligence-prod-smoke.py` |
+| UI detail | `frontend/src/components/recruiter/candidate-intelligence-panel.tsx` |
+| UI compact | `frontend/src/components/recruiter/intelligence-compact-card.tsx` (inbox / pipeline / talent-pool) |
+| Company subset | `frontend/src/components/company/company-intelligence-subset.tsx` |
+| Route smoke | `scripts/candidate-intelligence-prod-smoke.py` |
+| WS20 E2E | `scripts/candidate-intelligence-ws20-smoke.py` |
+| Eval harness | `scripts/candidate-intelligence-eval-harness.py` |
 | Machine doc | `docs/AI_CANDIDATE_INTELLIGENCE.json` |
+
+## Customer-usable
+
+Promoted after **Workstream 20** production synthetic E2E **PASS 30/30** @ evidence SHA `687d43f8`.  
+Label: `production_smoked_synthetic≠real_customer_validated≠real_pilot_data`.  
+Verdict: **AI CANDIDATE INTELLIGENCE CUSTOMER-USABLE — EXPLAINABLE CV SCREENING PRODUCTION-READY**
 
 ## Corrections
 

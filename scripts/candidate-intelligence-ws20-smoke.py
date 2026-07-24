@@ -11,15 +11,19 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import ssl
 import sys
 import urllib.error
 import urllib.request
 from pathlib import Path
 
+import certifi
+
 API = os.environ.get("TWIN_PROD_API_BASE_URL", "https://twin-production-bcd9.up.railway.app").rstrip("/")
 TENANT_A = os.environ.get("TWIN_CU_TENANT_A", "cu-pilot-alpha").strip() or "cu-pilot-alpha"
 TENANT_B = os.environ.get("TWIN_CU_TENANT_B", "cu-pilot-beta").strip() or "cu-pilot-beta"
 ROOT = Path(__file__).resolve().parents[1]
+SSL_CTX = ssl.create_default_context(cafile=certifi.where())
 
 SYNTH_CV = (
     "Synthetic Intel Candidate WS20\nSenior Backend Engineer\n"
@@ -30,8 +34,10 @@ SYNTH_CV = (
 
 
 def load_env() -> dict[str, str]:
+    """Prefer frontend/.env.local over .env.railway (Railway often has stale RECRUITER_*)."""
     env: dict[str, str] = {}
-    for p in (ROOT / "frontend" / ".env.local", ROOT / ".env.local", ROOT / ".env.railway"):
+    # Ops secrets: railway first as fallback
+    for p in (ROOT / ".env.railway", ROOT / ".env.local", ROOT / "frontend" / ".env.local"):
         if not p.exists():
             continue
         for line in p.read_text().splitlines():
@@ -51,7 +57,7 @@ def req(method: str, url: str, *, headers: dict | None = None, data: dict | None
         h.setdefault("Content-Type", "application/json")
     r = urllib.request.Request(url, data=body, headers=h, method=method)
     try:
-        with urllib.request.urlopen(r, timeout=90) as resp:
+        with urllib.request.urlopen(r, timeout=90, context=SSL_CTX) as resp:
             return resp.status, resp.read()
     except urllib.error.HTTPError as e:
         return e.code, e.read()

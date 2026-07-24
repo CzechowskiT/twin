@@ -71,26 +71,35 @@ def build_recruiter_talent_pool(
             warning_counts[str(w)] += 1
         skills = _parse_json(rec.skills_json, [])
         source_counts["imported_internal_pool"] += 1
-        items.append(
-            {
-                "id": rec.id,
-                "display_name": rec.display_name,
-                "job_title": rec.job_title,
-                "location": rec.location,
-                "seniority": rec.seniority,
-                "skills": skills if isinstance(skills, list) else [],
-                "data_quality": quality,
-                "external_ats_id": rec.external_ats_id,
-                "candidate_id": rec.candidate_id,
-                "application_id": rec.application_id,
-                "pipeline_status": rec.pipeline_status,
-                "source": rec.source_type or "imported_internal_pool",
-                "source_type": rec.source_type or "csv_import",
-                "consent_visibility": rec.consent_visibility or "unknown",
-                "archived": rec.archived_at is not None,
-                "created_at": rec.created_at.isoformat() if rec.created_at else None,
-            }
-        )
+        item: dict[str, Any] = {
+            "id": rec.id,
+            "display_name": rec.display_name,
+            "job_title": rec.job_title,
+            "location": rec.location,
+            "seniority": rec.seniority,
+            "skills": skills if isinstance(skills, list) else [],
+            "data_quality": quality,
+            "external_ats_id": rec.external_ats_id,
+            "candidate_id": rec.candidate_id,
+            "application_id": rec.application_id,
+            "pipeline_status": rec.pipeline_status,
+            "source": rec.source_type or "imported_internal_pool",
+            "source_type": rec.source_type or "csv_import",
+            "consent_visibility": rec.consent_visibility or "unknown",
+            "archived": rec.archived_at is not None,
+            "created_at": rec.created_at.isoformat() if rec.created_at else None,
+        }
+        cid = str(rec.candidate_id or "").strip()
+        if cid.isdigit():
+            try:
+                from app.services.candidate_intelligence import attach_compact_intelligence
+
+                attach_compact_intelligence(db, item, int(cid))
+            except Exception:
+                item["intelligence"] = None
+        else:
+            item["intelligence"] = None
+        items.append(item)
 
     import_sources = Counter(i.import_source for i in imports)
     last_import = imports[0] if imports else None

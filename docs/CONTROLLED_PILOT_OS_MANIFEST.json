@@ -1,6 +1,6 @@
 {
   "schema": "twin.controlled_pilot_os.manifest/v1",
-  "updated_at": "2026-07-24T09:30:00Z",
+  "updated_at": "2026-07-24T12:45:00Z",
   "branch": "cursor/phase1-monorepo-scaffold",
   "verdict_expected_without_approved_org": "FIRST REAL PILOT ORGANIZATION APPROVAL REQUIRED — ACTIVATION SYSTEM READY",
   "verdict_alias_os_without_approved_org": "CONTROLLED PILOT OPERATING SYSTEM READY — AWAITING FIRST FOUNDER-APPROVED PILOT ORGANIZATION",
@@ -88,6 +88,8 @@
     "exit_expansion",
     "launch_comms_plan",
     "docs_set",
-    "ci_policy_guards"
+    "ci_policy_guards",
+    "ai_candidate_intelligence_ws20",
+    "ai_candidate_intelligence_eval_harness"
   ]
 }

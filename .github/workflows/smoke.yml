@@ -46,7 +46,11 @@ jobs:
             tests/test_recruiter_inbox.py \
             tests/test_nightly_auto_apply_mail.py \
             tests/test_ops_demo_refresh.py \
+            tests/test_candidate_intelligence.py \
             -q
+      - name: Candidate intelligence offline eval harness
+        working-directory: ${{ github.workspace }}
+        run: python3 scripts/candidate-intelligence-eval-harness.py
 
   frontend-build:
     runs-on: ubuntu-latest

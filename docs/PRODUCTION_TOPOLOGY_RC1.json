@@ -88,7 +88,7 @@
     "docs_only_drift": true,
     "note": "API/worker at intelligence tip; FE catching Vercel queue; CU intel modules not promoted"
   },
-  "verdict": "AI CANDIDATE INTELLIGENCE INCOMPLETE \u2014 EXACT PRODUCTION BLOCKERS",
+  "verdict": "AI CANDIDATE INTELLIGENCE CUSTOMER-USABLE — EXPLAINABLE CV SCREENING PRODUCTION-READY",
   "activation": {
     "approved_real_orgs": 0,
     "invitations_sent": 0,
@@ -127,9 +127,14 @@
   "ai_candidate_intelligence": {
     "doc": "docs/AI_CANDIDATE_INTELLIGENCE.json",
     "alembic": "103_candidate_intelligence",
-    "customer_usable_promoted": false,
+    "customer_usable_promoted": true,
+    "customer_usable_promoted_count": 6,
     "unit_tests": "5/5",
     "route_smoke": "PASS",
-    "multi_role": "19/19"
+    "ws20_e2e": "PASS 30/30",
+    "ws20_evidence_sha": "687d43f8dc4acc7635b5ddcf30b18389fba17cbd",
+    "eval_harness": "PASS",
+    "multi_role": "19/19",
+    "verdict": "AI CANDIDATE INTELLIGENCE CUSTOMER-USABLE — EXPLAINABLE CV SCREENING PRODUCTION-READY"
   }
 }
