@@ -1,7 +1,8 @@
 {
   "schema": "twin.customer_usable_journey_evidence/v1",
   "journey_id": "recruiter_inbox_accept_decline",
-  "smoked_at": "2026-07-24T07:50:00Z",
+  "smoked_at": "2026-07-24T08:05:00Z",
+  "api_git_commit": "3d1c1ed033693392da484f53efe637a37412ada7",
   "api_base": "https://twin-production-bcd9.up.railway.app",
   "company_slug": "nova-hiring-pl",
   "synthetic_tenant": true,
