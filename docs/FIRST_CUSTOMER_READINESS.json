@@ -1,8 +1,11 @@
 {
   "schema": "twin.first_customer_readiness/v1",
-  "updated_at": "2026-07-23T21:00:00Z",
-  "expected_verdict_without_org": "FIRST CUSTOMER READY — WAITING FOR FIRST APPROVED PILOT ORGANIZATION",
-  "expected_verdict_with_onboarded": "FIRST CUSTOMER ONBOARDED — CONTROLLED PILOT ACTIVE",
+  "updated_at": "2026-07-24T18:15:00Z",
+  "expected_verdict_without_org": "FIRST REAL CUSTOMER SUCCESS SYSTEM READY — AWAITING FOUNDER-APPROVED PILOT ORGANIZATION",
+  "expected_verdict_with_onboarded": "FIRST REAL CUSTOMER ACTIVATED — PILOT JOURNEY IN PROGRESS",
+  "expected_verdict_validated": "FIRST REAL CUSTOMER SUCCESS VALIDATED — PILOT CONTINUATION DECISION READY",
+  "machine_doc": "docs/FIRST_CUSTOMER_SUCCESS.json",
+  "phase_2_handoff": "docs/PHASE2_PRODUCTION_HARDENING_HANDOFF.md",
   "stance": {
     "pilot": "READY_FOR_CONTROLLED_PILOT",
     "gate_f": "PASS",
@@ -18,9 +21,12 @@
     "pilot_health_with_sent_and_login": 95
   },
   "checklists_doc": "docs/FIRST_CUSTOMER_SUCCESS_CHECKLISTS.md",
+  "invitation_pack_doc": "docs/FIRST_CUSTOMER_INVITATION_PACK.md",
   "surfaces": {
     "admin_pilot_os": "/admin/pilot-os",
     "status_api": "/api/v1/admin/pilot-os/status",
+    "fcs_api": "/api/v1/admin/pilot-os/first-customer-success",
+    "evidence_api": "/api/v1/admin/pilot-os/first-customer-success/evidence",
     "feedback_admin": "/api/v1/admin/feedback",
     "cli": "scripts/controlled-pilot-os-status.py"
   },
@@ -29,6 +35,7 @@
     "no_public_enrollment",
     "no_live_stripe_public",
     "no_invented_customers",
-    "no_fake_kpi"
+    "no_fake_kpi",
+    "no_send_without_separate_send_auth"
   ]
 }

@@ -120,8 +120,15 @@
   "first_customer": {
     "checklists": "docs/FIRST_CUSTOMER_SUCCESS_CHECKLISTS.md",
     "readiness": "docs/FIRST_CUSTOMER_READINESS.json",
+    "machine": "docs/FIRST_CUSTOMER_SUCCESS.json",
+    "invitation_pack": "docs/FIRST_CUSTOMER_INVITATION_PACK.md",
+    "phase_2_handoff": "docs/PHASE2_PRODUCTION_HARDENING_HANDOFF.md",
     "admin_ui": "/admin/pilot-os",
-    "kpi": "NO_REAL_PILOT_DATA"
+    "api": "/api/v1/admin/pilot-os/first-customer-success",
+    "kpi": "NO_REAL_PILOT_DATA",
+    "verdict_without_org": "FIRST REAL CUSTOMER SUCCESS SYSTEM READY — AWAITING FOUNDER-APPROVED PILOT ORGANIZATION",
+    "approved_real_orgs": 0,
+    "invites_sent": 0
   },
   "verified_tip": "f64c0775c6ca0558f9702c275b9723d8fb3767a1",
   "ai_candidate_intelligence": {

@@ -257,11 +257,22 @@ def prepare_invitation_pack(
     if not emails:
         raise ValueError("recipients_required")
     from app.services import ai_intel_validation as aiv
+    from app.services import first_customer_success as fcs
 
     ai_section = aiv.ai_invitation_section()
+    pack_content = fcs.bilingual_invitation_pack()
     note_parts = [
         notes or "Prepared — awaiting Founder send approval (not sent)",
-        "AI_SECTION=" + json.dumps(ai_section, separators=(",", ":"))[:1500],
+        "AI_SECTION=" + json.dumps(ai_section, separators=(",", ":"))[:1200],
+        "FCS_PACK=" + json.dumps(
+            {
+                "en_subject": pack_content["en"]["subject"],
+                "pl_subject": pack_content["pl"]["subject"],
+                "canonical_url": pack_content["canonical_url"],
+                "forbidden_claims": pack_content["forbidden_claims"][:8],
+            },
+            separators=(",", ":"),
+        )[:800],
     ]
     pack = PilotInvitationPack(
         organization_id=org.id,
@@ -592,7 +603,6 @@ def evaluate_send_safety_gate(
     ``allowed`` is True only when pack/org gates pass AND an explicit
     ``founder_send_approval_ref`` (≥8) is supplied at evaluation time.
     """
-    _ = settings  # reserved for future enrollment / provider checks
     pack = db.query(PilotInvitationPack).filter(PilotInvitationPack.id == pack_id).one_or_none()
     if pack is None:
         return {
@@ -629,6 +639,11 @@ def evaluate_send_safety_gate(
     cu = load_customer_usable_readiness()
     if not cu.get("multi_role_journey_customer_usable", True):
         blockers.append("customer_usable_journey_regression")
+    s = settings or get_settings()
+    if bool(getattr(s, "external_pilot_enrollment_enabled", False)):
+        blockers.append("enrollment_must_stay_off")
+    if not bool(getattr(s, "pilot_registration_invite_only", True)):
+        blockers.append("invite_only_required")
     ref = (founder_send_approval_ref or "").strip()
     if len(ref) < 8:
         blockers.append("founder_send_approval_ref_required_at_send_time")
@@ -640,6 +655,17 @@ def evaluate_send_safety_gate(
         "blockers": blockers,
         "requires_founder_send_approval_ref": True,
         "min_ref_length": 8,
+        "checks": {
+            "non_synthetic_org": org is not None and not org.is_synthetic,
+            "founder_org_approved": org is not None and org.approval_status == APPROVAL_FOUNDER_APPROVED,
+            "pack_ready_unsent": pack.status == PACK_READY_UNSENT,
+            "recipients_present": org is not None and len(_parse_emails(org.recipient_emails_json)) >= 1,
+            "separate_send_ref": len(ref) >= 8,
+            "enrollment_off": not bool(getattr(s, "external_pilot_enrollment_enabled", False)),
+            "invite_only": bool(getattr(s, "pilot_registration_invite_only", True)),
+            "launch_nogo": True,
+            "canonical_url": "https://twin-sooty.vercel.app",
+        },
         "pack": pack_to_dict(pack),
         "organization": org_to_dict(org) if org else None,
         "frozen": {
@@ -835,7 +861,25 @@ def build_os_status(db: Session, settings: Settings | None = None) -> dict[str, 
             "note": "production_smoked_synthetic≠real_customer_validated≠real_pilot_data",
         },
         "ai_real_validation": _ai_real_validation_block(db),
+        "first_customer_success": _first_customer_success_block(db),
     }
+
+
+def _first_customer_success_block(db: Session) -> dict[str, Any]:
+    from app.services import first_customer_success as fcs
+
+    try:
+        return fcs.build_control_plane(db)
+    except Exception as exc:  # pragma: no cover
+        return {
+            "verdict": fcs.VERDICT_AWAITING,
+            "error": type(exc).__name__,
+            "kpi": {
+                "token": "NO_REAL_PILOT_DATA",
+                "real_pilot_data_started": False,
+                "synthetic_excluded": True,
+            },
+        }
 
 
 def _ai_real_validation_block(db: Session) -> dict[str, Any]:

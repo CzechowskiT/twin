@@ -101,6 +101,21 @@ type OsStatus = {
     verdict?: string;
   };
   ai_real_validation?: AiRealValidation;
+  first_customer_success?: {
+    verdict?: string;
+    organization?: {
+      current_blocker?: string | null;
+      exact_next_action?: string;
+      invitation_pack_status?: string;
+      number_of_approved_recipients?: number;
+      provisioning_status?: string;
+    };
+    funnel?: Record<string, number | string>;
+    success_criteria?: { passed_count?: number; total_count?: number; all_met?: boolean };
+    kpi?: { token?: string; real_customer_success_validated?: boolean };
+    daily_summary?: { message?: string; next_action?: string };
+    time_to_value?: { median_hours?: number | null; note?: string };
+  };
 };
 
 function authHeaders(token: string): HeadersInit {
@@ -125,6 +140,8 @@ export default function AdminPilotOsPage() {
   const [approveOrgId, setApproveOrgId] = useState("");
   const [approvedBy, setApprovedBy] = useState("");
   const [orgApprovalRef, setOrgApprovalRef] = useState("");
+  const [dataBasisRef, setDataBasisRef] = useState("");
+  const [successCriteriaRef, setSuccessCriteriaRef] = useState("");
   const [packOrgId, setPackOrgId] = useState("");
   const [sendPackId, setSendPackId] = useState("");
   const [sendRef, setSendRef] = useState("");
@@ -326,6 +343,62 @@ export default function AdminPilotOsPage() {
             </div>
           ) : null}
 
+          {status.first_customer_success ? (
+            <div
+              className="rounded border border-sky-200 bg-sky-50/40 p-4"
+              data-testid="pilot-os-first-customer-success"
+            >
+              <h2 className="font-medium">First Real Customer Success</h2>
+              <p className="mt-1 text-sm">{status.first_customer_success.verdict}</p>
+              <p className="mt-2 text-sm text-neutral-700">
+                Next: {status.first_customer_success.organization?.exact_next_action || "—"}
+              </p>
+              <p className="mt-1 text-xs text-neutral-600">
+                Blocker:{" "}
+                {status.first_customer_success.organization?.current_blocker || "none"} · Pack:{" "}
+                {status.first_customer_success.organization?.invitation_pack_status || "—"} ·
+                Recipients:{" "}
+                {status.first_customer_success.organization?.number_of_approved_recipients ?? 0} ·
+                Provision:{" "}
+                {status.first_customer_success.organization?.provisioning_status || "—"}
+              </p>
+              <dl className="mt-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
+                <div>
+                  <dt className="text-neutral-500">Success criteria</dt>
+                  <dd className="font-semibold">
+                    {status.first_customer_success.success_criteria?.passed_count ?? 0}/
+                    {status.first_customer_success.success_criteria?.total_count ?? 0}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-neutral-500">TTV median (h)</dt>
+                  <dd className="font-semibold">
+                    {status.first_customer_success.time_to_value?.median_hours ?? "—"}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-neutral-500">Funnel activated</dt>
+                  <dd className="font-semibold">
+                    {status.first_customer_success.funnel?.activated ?? 0}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-neutral-500">KPI</dt>
+                  <dd className="font-semibold">
+                    {status.first_customer_success.kpi?.token || "NO_REAL_PILOT_DATA"}
+                  </dd>
+                </div>
+              </dl>
+              <p className="mt-2 text-xs text-neutral-600">
+                {status.first_customer_success.daily_summary?.message}
+              </p>
+              <p className="mt-1 text-[11px] text-neutral-500">
+                Launch stays NO-GO. No send without Founder org approval + separate send auth. Synthetic
+                ≠ real.
+              </p>
+            </div>
+          ) : null}
+
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="rounded border border-neutral-200 p-4">
               <p className="text-neutral-500">Pilot health</p>
@@ -466,6 +539,18 @@ export default function AdminPilotOsPage() {
                 value={legalName}
                 onChange={(e) => setLegalName(e.target.value)}
               />
+              <input
+                className="rounded border px-2 py-1"
+                placeholder="data_processing_basis_ref (≥4)"
+                value={dataBasisRef}
+                onChange={(e) => setDataBasisRef(e.target.value)}
+              />
+              <input
+                className="rounded border px-2 py-1"
+                placeholder="success_criteria_ref (optional label)"
+                value={successCriteriaRef}
+                onChange={(e) => setSuccessCriteriaRef(e.target.value)}
+              />
               <button
                 type="button"
                 className="rounded bg-neutral-800 px-3 py-2 text-white disabled:opacity-50"
@@ -476,6 +561,8 @@ export default function AdminPilotOsPage() {
                     founder_org_approval_ref: orgApprovalRef,
                     sponsor_label: sponsor || null,
                     legal_name: legalName || null,
+                    data_processing_basis_ref: dataBasisRef || null,
+                    success_criteria_ref: successCriteriaRef || null,
                   })
                 }
               >

@@ -39,6 +39,8 @@ class OrgApproveBody(BaseModel):
     legal_name: str | None = Field(None, max_length=200)
     recipient_emails: list[str] | None = None
     notes: str | None = Field(None, max_length=2000)
+    data_processing_basis_ref: str | None = Field(None, min_length=4, max_length=128)
+    success_criteria_ref: str | None = Field(None, max_length=200)
 
 
 class PackPrepareBody(BaseModel):
@@ -122,12 +124,19 @@ def approve_pilot_org(
 ) -> dict:
     _require_ops_admin(settings, authorization)
     try:
+        note_parts: list[str] = []
+        if body.notes:
+            note_parts.append(body.notes.strip())
+        if body.data_processing_basis_ref:
+            note_parts.append(f"data_processing_basis_ref={body.data_processing_basis_ref.strip()}")
+        if body.success_criteria_ref:
+            note_parts.append(f"success_criteria_ref={body.success_criteria_ref.strip()}")
         org = pilot_os.founder_approve_organization(
             db,
             org_id=org_id,
             approved_by_label=body.approved_by_label,
             recipient_emails=body.recipient_emails,
-            notes=body.notes,
+            notes=" | ".join(note_parts)[:2000] if note_parts else None,
             founder_org_approval_ref=body.founder_org_approval_ref,
             legal_name=body.legal_name,
             sponsor_label=body.sponsor_label,
@@ -296,3 +305,42 @@ def pilot_os_ai_validation_safety(
         multi_role_green=True,
         ws20_green=True,
     )
+
+
+@router.get("/pilot-os/first-customer-success")
+def pilot_os_first_customer_success(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    """First Customer Success control plane (ops Bearer)."""
+    _require_ops_admin(settings, authorization)
+    from app.services import first_customer_success as fcs
+
+    return fcs.build_control_plane(db)
+
+
+@router.get("/pilot-os/first-customer-success/evidence")
+def pilot_os_first_customer_evidence(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    _require_ops_admin(settings, authorization)
+    from app.services import first_customer_success as fcs
+
+    plane = fcs.build_control_plane(db)
+    return plane.get("evidence_package") or {}
+
+
+@router.get("/pilot-os/first-customer-success/provisioning-dry-run")
+def pilot_os_provisioning_dry_run(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    """Synthetic-only provisioning verification — never creates a real tenant."""
+    _require_ops_admin(settings, authorization)
+    from app.services import first_customer_success as fcs
+
+    return fcs.synthetic_provisioning_dry_run()
