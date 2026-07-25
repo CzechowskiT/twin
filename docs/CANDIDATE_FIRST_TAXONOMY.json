@@ -27,6 +27,11 @@
     "B": "CANDIDATE-FIRST PILOT INCOMPLETE — EXACT CANDIDATE JOURNEY BLOCKERS",
     "C": "CANDIDATE-FIRST PILOT ACTIVE — FIRST REAL CANDIDATES ONBOARDED"
   },
+  "readiness_states": {
+    "READY_FOR_COHORT_INPUT": "Verdict A without named intake / without READY_UNSENT pack",
+    "PACK_READY_UNSENT": "Verdict A with prepared pack awaiting separate send auth",
+    "AWAITING_SEND_AUTHORIZATION": "Send-safety requires founder_send_approval_ref"
+  },
   "stance": {
     "pilot": "READY_FOR_CONTROLLED_PILOT",
     "gate_f": "PASS",

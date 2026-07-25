@@ -55,6 +55,9 @@ def test_control_plane_verdict_a_without_intake(monkeypatch) -> None:
     try:
         plane = cfp.build_control_plane(db)
         assert plane["verdict"] == cfp.VERDICT_A
+        assert plane["readiness_state"] == cfp.READY_FOR_COHORT_INPUT
+        assert plane["scorecard"]["ready_for_cohort_input"] is True
+        assert plane["scorecard"]["ready_unsent_present"] is False
         assert plane["org_first_path"] == cfp.ORG_FIRST_SECONDARY
         assert plane["alten_org_pack"] == "NOT_PREPARED"
         assert plane["invites_sent"] == 0
@@ -177,12 +180,19 @@ def test_prepare_pack_ready_unsent_send_safety_blocks_without_ref(monkeypatch) -
         assert gate["frozen"]["alten_org_pack"] == "NOT_PREPARED"
 
         status = client.get(
-            "/api/v1/admin/pilot-os/status",
+            "/api/v1/admin/pilot-os/candidate-first",
             headers={"Authorization": "Bearer ops-secret"},
         )
         assert status.status_code == 200
-        assert status.json()["primary_product_validation"] == "candidate_first_pilot"
-        assert "SECONDARY_B2B" in status.json()["org_first_path"]
+        assert status.json()["readiness_state"] == cfp.PACK_READY_UNSENT_STATE
+
+        os_status = client.get(
+            "/api/v1/admin/pilot-os/status",
+            headers={"Authorization": "Bearer ops-secret"},
+        )
+        assert os_status.status_code == 200
+        assert os_status.json()["primary_product_validation"] == "candidate_first_pilot"
+        assert "SECONDARY_B2B" in os_status.json()["org_first_path"]
     finally:
         app.dependency_overrides.clear()
         get_settings.cache_clear()

@@ -127,6 +127,7 @@ type OsStatus = {
   };
   candidate_first_pilot?: {
     verdict?: string;
+    readiness_state?: string;
     primary_product?: string;
     org_first_path?: string;
     alten_org_pack?: string;
@@ -458,6 +459,9 @@ export default function AdminPilotOsPage() {
             >
               <h2 className="font-medium">Candidate-first pilot (PRIMARY)</h2>
               <p className="mt-1 text-sm">{status.candidate_first_pilot.verdict}</p>
+              <p className="mt-1 text-xs text-neutral-600">
+                State: {status.candidate_first_pilot.readiness_state || "—"} · READY_UNSENT ≠ product-ready
+              </p>
               <p className="mt-2 text-sm text-neutral-700">
                 Next: {status.candidate_first_pilot.next_action}
               </p>

@@ -9,9 +9,17 @@ from __future__ import annotations
 
 import json
 import os
+import ssl
 import sys
 import urllib.error
 import urllib.request
+
+try:
+    import certifi
+
+    _CTX = ssl.create_default_context(cafile=certifi.where())
+except Exception:  # pragma: no cover
+    _CTX = ssl.create_default_context()
 
 API = os.environ.get("TWIN_API_BASE", "https://twin-production-bcd9.up.railway.app").rstrip("/")
 FE = os.environ.get("TWIN_FE_BASE", "https://twin-sooty.vercel.app").rstrip("/")
@@ -26,7 +34,7 @@ def get(url: str, auth: bool = False) -> tuple[int, dict | list | str]:
         headers["Authorization"] = f"Bearer {TOKEN}"
     req = urllib.request.Request(url, headers=headers)
     try:
-        with urllib.request.urlopen(req, timeout=45) as resp:
+        with urllib.request.urlopen(req, timeout=45, context=_CTX) as resp:
             raw = resp.read().decode("utf-8", errors="replace")
             try:
                 return resp.status, json.loads(raw)
@@ -77,6 +85,13 @@ def main() -> int:
     ok("candidate_first_api", c == 200 and isinstance(plane, dict), f"http={c}")
     if isinstance(plane, dict):
         ok("verdict_a_or_awaiting", "CANDIDATE-FIRST" in str(plane.get("verdict")), str(plane.get("verdict"))[:80])
+        ok(
+            "ready_for_cohort_input",
+            plane.get("readiness_state") == "READY_FOR_COHORT_INPUT"
+            or plane.get("scorecard", {}).get("ready_for_cohort_input") is True
+            or plane.get("packs_ready_unsent") == 0,
+            str(plane.get("readiness_state")),
+        )
         ok("org_first_secondary", "SECONDARY_B2B" in str(plane.get("org_first_path")), "")
         ok("alten_not_prepared", plane.get("alten_org_pack") == "NOT_PREPARED", "")
         ok("invites_zero", int(plane.get("invites_sent") or 0) == 0, "")
@@ -91,6 +106,7 @@ def main() -> int:
     else:
         for n in (
             "verdict_a_or_awaiting",
+            "ready_for_cohort_input",
             "org_first_secondary",
             "alten_not_prepared",
             "invites_zero",

@@ -29,6 +29,10 @@ VERDICT_AWAITING_INTAKE = (
     "CANDIDATE-FIRST PILOT READY — AWAITING FOUNDER CANDIDATE COHORT INTAKE"
 )
 
+# Sub-states under Verdict A (product ready) — never confuse with pack lifecycle
+READY_FOR_COHORT_INPUT = "READY_FOR_COHORT_INPUT"
+PACK_READY_UNSENT_STATE = "PACK_READY_UNSENT"
+AWAITING_SEND_AUTH = "AWAITING_SEND_AUTHORIZATION"
 ORG_FIRST_SECONDARY = "SECONDARY_B2B_PILOT_PATH — NOT PRIMARY PRODUCT VALIDATION"
 
 STATUS_DRAFT = "DRAFT"
@@ -620,26 +624,52 @@ def build_control_plane(db: Session, settings: Settings | None = None) -> dict[s
         )
     if not journey_ok:
         verdict = VERDICT_B
+        readiness_state = "BLOCKED_JOURNEY"
     elif packs_sent > 0:
         verdict = VERDICT_C
+        readiness_state = "ACTIVE_SENT"
+    elif packs_ready > 0 and intake_count > 0 and primary:
+        verdict = VERDICT_A
+        readiness_state = PACK_READY_UNSENT_STATE
     else:
         verdict = VERDICT_A
+        readiness_state = READY_FOR_COHORT_INPUT
 
     next_action = (
         "Founder: create non-synthetic cohort + approve + add named recipients + prepare READY_UNSENT; "
         "send only with separate founder_send_approval_ref"
-        if intake_count == 0 or packs_ready == 0
+        if readiness_state == READY_FOR_COHORT_INPUT
         else "Founder: run send-safety then authorize send with founder_send_approval_ref (not auto)"
+        if readiness_state == PACK_READY_UNSENT_STATE
+        else "Monitor first real candidate activation"
     )
     return {
         "schema": "twin.candidate_first_pilot.control_plane/v1",
         "verdict": verdict,
+        "readiness_state": readiness_state,
+        "readiness_note": (
+            "Verdict A with READY_FOR_COHORT_INPUT means product+template+send-safety ready; "
+            "no READY_UNSENT pack until Founder named intake. "
+            "PACK_READY_UNSENT means pack prepared but not sent."
+        ),
         "primary_product": "candidate",
         "org_first_path": ORG_FIRST_SECONDARY,
         "alten_org_pack": "NOT_PREPARED",
         "journey": journey,
         "invitation_pack_template": bilingual_candidate_pack(),
         "success_criteria": success_criteria(),
+        "docs_index": {
+            "pilot": "docs/CANDIDATE_FIRST_PILOT.md",
+            "taxonomy": "docs/CANDIDATE_FIRST_TAXONOMY.json",
+            "readiness": "docs/CANDIDATE_FIRST_READINESS.json",
+            "checklists": "docs/CANDIDATE_FIRST_CHECKLISTS.md",
+            "invitation_pack": "docs/CANDIDATE_FIRST_INVITATION_PACK.md",
+            "send_safety": "docs/CANDIDATE_FIRST_SEND_SAFETY.md",
+            "success_criteria": "docs/CANDIDATE_FIRST_SUCCESS_CRITERIA.md",
+            "analytics": "docs/CANDIDATE_FIRST_ANALYTICS.md",
+            "support_ops": "docs/CANDIDATE_FIRST_SUPPORT_OPS.md",
+            "troubleshooting": "docs/CANDIDATE_FIRST_TROUBLESHOOTING.md",
+        },
         "cohorts": [cohort_to_dict(c) for c in real],
         "approved_cohorts": len(approved),
         "intake_recipients": intake_count,
@@ -680,6 +710,7 @@ def build_control_plane(db: Session, settings: Settings | None = None) -> dict[s
             "template_ready": True,
             "real_intake_present": intake_count > 0,
             "ready_unsent_present": packs_ready > 0,
+            "ready_for_cohort_input": readiness_state == READY_FOR_COHORT_INPUT,
             "sent": packs_sent > 0,
         },
         "generated_at": _utcnow().isoformat() + "Z",

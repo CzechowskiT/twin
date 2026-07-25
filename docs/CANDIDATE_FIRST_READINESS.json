@@ -1,0 +1,31 @@
+{
+  "schema": "twin.candidate_first_readiness/v1",
+  "updated_at": "2026-07-25T08:15:00Z",
+  "verdict_without_cohort_intake": "CANDIDATE-FIRST PILOT READY — REAL CANDIDATE COHORT CAN BE INVITED",
+  "readiness_state_without_intake": "READY_FOR_COHORT_INPUT",
+  "readiness_state_with_pack": "PACK_READY_UNSENT",
+  "primary_product": "candidate",
+  "org_first_path": "SECONDARY_B2B_PILOT_PATH — NOT PRIMARY PRODUCT VALIDATION",
+  "alten_org_pack": "NOT_PREPARED",
+  "stance": {
+    "pilot": "READY_FOR_CONTROLLED_PILOT",
+    "gate_f": "PASS",
+    "launch": "NO-GO",
+    "enrollment": "OFF",
+    "phase_3b": "BLOCKED",
+    "kpi_default": "NO_REAL_PILOT_DATA",
+    "invite_only": true
+  },
+  "surfaces": {
+    "api": "/api/v1/admin/pilot-os/candidate-first",
+    "ui": "/admin/pilot-os",
+    "taxonomy": "docs/CANDIDATE_FIRST_TAXONOMY.json",
+    "pilot_doc": "docs/CANDIDATE_FIRST_PILOT.md"
+  },
+  "alembic": "105_candidate_first_pilot",
+  "distinction": {
+    "READY_FOR_COHORT_INPUT": "Product+template+send-safety ready; no named recipients yet; no READY_UNSENT pack",
+    "PACK_READY_UNSENT": "Named intake present; bilingual pack prepared; send not executed",
+    "AWAITING_SEND_AUTHORIZATION": "Send-safety may PASS only with separate founder_send_approval_ref"
+  }
+}

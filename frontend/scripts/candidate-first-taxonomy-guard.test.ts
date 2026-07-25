@@ -1,7 +1,7 @@
 /**
- * Guard: candidate-first taxonomy marks org-first as secondary.
+ * Guard: candidate-first taxonomy marks org-first as secondary + docs present.
  */
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const root = join(__dirname, "../..");
@@ -18,5 +18,23 @@ if (tax.alten_org_pack !== "NOT_PREPARED") {
 }
 if (!tax.verdicts?.A?.includes("CANDIDATE-FIRST PILOT READY")) {
   throw new Error("missing verdict A");
+}
+
+const requiredDocs = [
+  "docs/CANDIDATE_FIRST_PILOT.md",
+  "docs/CANDIDATE_FIRST_TAXONOMY.json",
+  "docs/CANDIDATE_FIRST_READINESS.json",
+  "docs/CANDIDATE_FIRST_CHECKLISTS.md",
+  "docs/CANDIDATE_FIRST_INVITATION_PACK.md",
+  "docs/CANDIDATE_FIRST_SEND_SAFETY.md",
+  "docs/CANDIDATE_FIRST_SUCCESS_CRITERIA.md",
+  "docs/CANDIDATE_FIRST_ANALYTICS.md",
+  "docs/CANDIDATE_FIRST_SUPPORT_OPS.md",
+  "docs/CANDIDATE_FIRST_TROUBLESHOOTING.md",
+];
+for (const rel of requiredDocs) {
+  if (!existsSync(join(root, rel))) {
+    throw new Error(`missing required doc: ${rel}`);
+  }
 }
 console.log("candidate-first-taxonomy-guard: ok");
