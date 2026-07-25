@@ -352,6 +352,166 @@ def pilot_os_pack_preparation(
     settings: Settings = Depends(get_settings),
     authorization: str | None = Header(default=None),
 ) -> dict:
-    """Pack preparation gate — lists missing intake fields; never sends."""
+    """Org-first pack preparation gate — SECONDARY B2B path; never sends."""
     _require_ops_admin(settings, authorization)
-    return pilot_os.evaluate_pack_preparation_gate(db)
+    gate = pilot_os.evaluate_pack_preparation_gate(db)
+    gate["path"] = "SECONDARY_B2B_PILOT_PATH — NOT PRIMARY PRODUCT VALIDATION"
+    gate["primary_product_validation"] = "candidate_first_pilot"
+    gate["alten_org_pack"] = "NOT_PREPARED"
+    return gate
+
+
+class CandidateCohortCreateBody(BaseModel):
+    slug: str = Field(..., min_length=3, max_length=80)
+    display_name: str = Field(..., min_length=2, max_length=200)
+    notes: str | None = Field(None, max_length=2000)
+    is_synthetic: bool = False
+
+
+class CandidateCohortApproveBody(BaseModel):
+    approved_by_label: str = Field(..., min_length=2, max_length=120)
+    founder_cohort_approval_ref: str = Field(..., min_length=8, max_length=128)
+    data_processing_basis_ref: str = Field(..., min_length=4, max_length=128)
+    success_criteria_ref: str = Field(..., min_length=4, max_length=200)
+
+
+class CandidateIntakeBody(BaseModel):
+    emails: list[str] = Field(..., min_length=1)
+    locale: str = Field(default="pl", max_length=8)
+    consent_basis_ref: str | None = Field(None, max_length=128)
+
+
+class CandidatePackPrepareBody(BaseModel):
+    notes: str | None = Field(None, max_length=2000)
+
+
+@router.get("/pilot-os/candidate-first")
+def candidate_first_status(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    """Candidate-first primary validation control plane."""
+    _require_ops_admin(settings, authorization)
+    from app.services import candidate_first_pilot as cfp
+
+    return cfp.build_control_plane(db, settings)
+
+
+@router.get("/pilot-os/candidate-first/synthetic-e2e")
+def candidate_first_synthetic_e2e(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    _require_ops_admin(settings, authorization)
+    from app.services import candidate_first_pilot as cfp
+
+    _ = db
+    return cfp.synthetic_candidate_e2e_checklist()
+
+
+@router.post("/pilot-os/candidate-first/cohorts")
+def candidate_first_create_cohort(
+    body: CandidateCohortCreateBody,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    _require_ops_admin(settings, authorization)
+    from app.services import candidate_first_pilot as cfp
+
+    try:
+        cohort = cfp.create_cohort_draft(
+            db,
+            slug=body.slug,
+            display_name=body.display_name,
+            notes=body.notes,
+            is_synthetic=body.is_synthetic,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    return {"cohort": cfp.cohort_to_dict(cohort)}
+
+
+@router.post("/pilot-os/candidate-first/cohorts/{cohort_id}/approve")
+def candidate_first_approve_cohort(
+    cohort_id: int,
+    body: CandidateCohortApproveBody,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    _require_ops_admin(settings, authorization)
+    from app.services import candidate_first_pilot as cfp
+
+    try:
+        cohort = cfp.founder_approve_cohort(
+            db,
+            cohort_id=cohort_id,
+            approved_by_label=body.approved_by_label,
+            founder_cohort_approval_ref=body.founder_cohort_approval_ref,
+            data_processing_basis_ref=body.data_processing_basis_ref,
+            success_criteria_ref=body.success_criteria_ref,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    return {"cohort": cfp.cohort_to_dict(cohort)}
+
+
+@router.post("/pilot-os/candidate-first/cohorts/{cohort_id}/intake")
+def candidate_first_intake(
+    cohort_id: int,
+    body: CandidateIntakeBody,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    """Add named candidate emails (stored hashed/masked). Does not send."""
+    _require_ops_admin(settings, authorization)
+    from app.services import candidate_first_pilot as cfp
+
+    try:
+        result = cfp.add_intake_recipients(
+            db,
+            cohort_id=cohort_id,
+            emails=body.emails,
+            locale=body.locale,
+            consent_basis_ref=body.consent_basis_ref,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    return result
+
+
+@router.post("/pilot-os/candidate-first/cohorts/{cohort_id}/invitation-packs")
+def candidate_first_prepare_pack(
+    cohort_id: int,
+    body: CandidatePackPrepareBody,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    """Prepare bilingual pack → READY_UNSENT. Never sends."""
+    _require_ops_admin(settings, authorization)
+    from app.services import candidate_first_pilot as cfp
+
+    try:
+        pack = cfp.prepare_candidate_pack(db, cohort_id=cohort_id, notes=body.notes)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    return {"invitation_pack": cfp.pack_to_dict(pack), "send_executed": False}
+
+
+@router.get("/pilot-os/candidate-first/invitation-packs/{pack_id}/send-safety")
+def candidate_first_send_safety(
+    pack_id: int,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    """Candidate send-safety — does not send mail."""
+    _require_ops_admin(settings, authorization)
+    from app.services import candidate_first_pilot as cfp
+
+    return cfp.evaluate_candidate_send_safety(db, settings, pack_id=pack_id)

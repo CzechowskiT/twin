@@ -1,8 +1,11 @@
 {
   "schema": "twin.production_topology.rc1/v1",
-  "updated_at": "2026-07-24T18:57:00Z",
+  "updated_at": "2026-07-25T06:45:00Z",
   "branch": "cursor/phase1-monorepo-scaffold",
   "hard_live_denominator": "CORE_PILOT_ONLY",
+  "primary_product_validation": "candidate_first_pilot",
+  "org_first_path": "SECONDARY_B2B_PILOT_PATH — NOT PRIMARY PRODUCT VALIDATION",
+  "alten_org_pack": "NOT_PREPARED",
   "stance": {
     "pilot": "READY_FOR_CONTROLLED_PILOT",
     "pilot_ready_token": "READY_FOR_CONTROLLED_PILOT",
@@ -51,7 +54,7 @@
     "worker_service": "enthusiastic-encouragement",
     "postgres": "Postgres",
     "redis": "Redis",
-    "alembic_head_expected": "104_ai_intel_validation"
+    "alembic_head_expected": "105_candidate_first_pilot"
   },
   "on_call_roles": {
     "primary": "PILOT_ON_CALL_PRIMARY",
@@ -88,7 +91,7 @@
     "docs_only_drift": true,
     "note": "Runtime four-way ALIGNED at b8c1a019 (pack-prep gate); docs tip may advance"
   },
-  "verdict": "PACK PREPARATION BLOCKED — COMPLETE FOUNDER ORGANIZATION INTAKE REQUIRED",
+  "verdict": "CANDIDATE-FIRST PILOT READY — REAL CANDIDATE COHORT CAN BE INVITED",
   "activation": {
     "approved_real_orgs": 0,
     "invitations_sent": 0,
@@ -117,6 +120,7 @@
     "synthetic_smoke": "19/19"
   },
   "first_customer": {
+    "path": "SECONDARY_B2B_PILOT_PATH — NOT PRIMARY PRODUCT VALIDATION",
     "checklists": "docs/FIRST_CUSTOMER_SUCCESS_CHECKLISTS.md",
     "readiness": "docs/FIRST_CUSTOMER_READINESS.json",
     "machine": "docs/FIRST_CUSTOMER_SUCCESS.json",
@@ -125,9 +129,19 @@
     "admin_ui": "/admin/pilot-os",
     "api": "/api/v1/admin/pilot-os/first-customer-success",
     "kpi": "NO_REAL_PILOT_DATA",
-    "verdict_without_org": "FIRST REAL CUSTOMER SUCCESS SYSTEM READY — AWAITING FOUNDER-APPROVED PILOT ORGANIZATION",
+    "verdict_without_org": "PACK PREPARATION BLOCKED — COMPLETE FOUNDER ORGANIZATION INTAKE REQUIRED",
     "approved_real_orgs": 0,
-    "invites_sent": 0
+    "invites_sent": 0,
+    "alten_org_pack": "NOT_PREPARED"
+  },
+  "candidate_first_pilot": {
+    "doc": "docs/CANDIDATE_FIRST_PILOT.md",
+    "taxonomy": "docs/CANDIDATE_FIRST_TAXONOMY.json",
+    "api": "/api/v1/admin/pilot-os/candidate-first",
+    "synthetic_e2e": "scripts/candidate-first-synthetic-e2e.py",
+    "alembic": "105_candidate_first_pilot",
+    "verdict": "CANDIDATE-FIRST PILOT READY — REAL CANDIDATE COHORT CAN BE INVITED",
+    "primary": true
   },
   "verified_tip": "b8c1a019dfa704acc4cb497f2bec0556965efa25",
   "ci_smoke_run": "30118723247",

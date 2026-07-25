@@ -1,7 +1,10 @@
 {
   "schema": "twin.controlled_pilot_os.manifest/v1",
-  "updated_at": "2026-07-24T18:15:00Z",
+  "updated_at": "2026-07-25T06:45:00Z",
   "branch": "cursor/phase1-monorepo-scaffold",
+  "primary_product_validation": "candidate_first_pilot",
+  "org_first_path": "SECONDARY_B2B_PILOT_PATH — NOT PRIMARY PRODUCT VALIDATION",
+  "verdict_candidate_first_without_intake": "CANDIDATE-FIRST PILOT READY — REAL CANDIDATE COHORT CAN BE INVITED",
   "verdict_expected_without_approved_org": "FIRST REAL PILOT ORGANIZATION APPROVAL REQUIRED — ACTIVATION SYSTEM READY",
   "verdict_alias_os_without_approved_org": "CONTROLLED PILOT OPERATING SYSTEM READY — AWAITING FIRST FOUNDER-APPROVED PILOT ORGANIZATION",
   "verdict_first_customer_success_without_org": "FIRST REAL CUSTOMER SUCCESS SYSTEM READY — AWAITING FOUNDER-APPROVED PILOT ORGANIZATION",
@@ -32,10 +35,12 @@
     "orgs_api": "/api/v1/admin/pilot-os/organizations",
     "pilot_os_ui": "/admin/pilot-os",
     "cli": "scripts/controlled-pilot-os-status.py",
-    "alembic": "104_ai_intel_validation",
+    "alembic": "105_candidate_first_pilot",
     "activation_doc": "docs/FIRST_REAL_PILOT_ACTIVATION.json",
     "first_customer_success": "docs/FIRST_CUSTOMER_SUCCESS.json",
     "first_customer_success_api": "GET /api/v1/admin/pilot-os/first-customer-success",
+    "candidate_first_pilot": "docs/CANDIDATE_FIRST_PILOT.md",
+    "candidate_first_api": "GET /api/v1/admin/pilot-os/candidate-first",
     "phase_2_handoff": "docs/PHASE2_PRODUCTION_HARDENING_HANDOFF.md"
   },
   "hard_bans": [
@@ -99,6 +104,9 @@
     "first_customer_success_control_plane",
     "first_customer_invitation_pack_bilingual",
     "first_customer_send_safety_enrollment_checks",
-    "phase_2_production_hardening_handoff_only"
+    "phase_2_production_hardening_handoff_only",
+    "candidate_first_pilot_control_plane",
+    "candidate_first_taxonomy_primary",
+    "org_first_reclassified_secondary_b2b"
   ]
 }

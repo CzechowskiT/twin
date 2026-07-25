@@ -123,7 +123,24 @@ type OsStatus = {
     packs_ready_unsent?: number;
     invites_sent?: number;
     can_prepare_pack?: boolean;
+    path?: string;
   };
+  candidate_first_pilot?: {
+    verdict?: string;
+    primary_product?: string;
+    org_first_path?: string;
+    alten_org_pack?: string;
+    approved_cohorts?: number;
+    intake_recipients?: number;
+    packs_ready_unsent?: number;
+    invites_sent?: number;
+    next_action?: string;
+    scorecard?: Record<string, boolean>;
+    kpi?: { token?: string };
+  };
+  primary_product_validation?: string;
+  org_first_path?: string;
+  alten_org_pack?: string;
 };
 
 function authHeaders(token: string): HeadersInit {
@@ -240,7 +257,8 @@ export default function AdminPilotOsPage() {
       </p>
       <h1 className="mt-2 text-2xl font-semibold tracking-tight">Pilot OS — first real org</h1>
       <p className="mt-1 text-sm text-neutral-600">
-        Founder intake only. Launch stays NO-GO. Do not invent customers. Send never auto-runs.
+        Founder intake. Primary validation = candidate-first. Org/B2B path is secondary. Launch stays
+        NO-GO. Do not invent customers. Send never auto-runs. ALTEN org pack not prepared.
       </p>
 
       <label className="mt-6 block text-sm font-medium">Ops Bearer token</label>
@@ -427,7 +445,53 @@ export default function AdminPilotOsPage() {
                 </ul>
               ) : null}
               <p className="mt-1 text-[11px] text-neutral-500">
-                This gate never sends. Separate founder_send_approval_ref required later.
+                This gate never sends. Separate founder_send_approval_ref required later. Path:{" "}
+                {status.pack_preparation.path || status.org_first_path || "secondary B2B"}
+              </p>
+            </div>
+          ) : null}
+
+          {status.candidate_first_pilot ? (
+            <div
+              className="rounded border border-teal-200 bg-teal-50/40 p-4"
+              data-testid="pilot-os-candidate-first"
+            >
+              <h2 className="font-medium">Candidate-first pilot (PRIMARY)</h2>
+              <p className="mt-1 text-sm">{status.candidate_first_pilot.verdict}</p>
+              <p className="mt-2 text-sm text-neutral-700">
+                Next: {status.candidate_first_pilot.next_action}
+              </p>
+              <dl className="mt-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
+                <div>
+                  <dt className="text-neutral-500">Approved cohorts</dt>
+                  <dd className="font-semibold">
+                    {status.candidate_first_pilot.approved_cohorts ?? 0}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-neutral-500">Intake (masked)</dt>
+                  <dd className="font-semibold">
+                    {status.candidate_first_pilot.intake_recipients ?? 0}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-neutral-500">READY_UNSENT</dt>
+                  <dd className="font-semibold">
+                    {status.candidate_first_pilot.packs_ready_unsent ?? 0}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-neutral-500">Invites sent</dt>
+                  <dd className="font-semibold">{status.candidate_first_pilot.invites_sent ?? 0}</dd>
+                </div>
+              </dl>
+              <p className="mt-2 text-xs text-neutral-600">
+                KPI {status.candidate_first_pilot.kpi?.token} · ALTEN pack:{" "}
+                {status.candidate_first_pilot.alten_org_pack || status.alten_org_pack || "NOT_PREPARED"}
+              </p>
+              <p className="mt-1 text-[11px] text-neutral-500">
+                {status.candidate_first_pilot.org_first_path || status.org_first_path}. No send without
+                separate Founder send auth. Synthetic ≠ real.
               </p>
             </div>
           ) : null}

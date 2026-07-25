@@ -1,0 +1,62 @@
+{
+  "schema": "twin.candidate_first_taxonomy/v1",
+  "updated_at": "2026-07-25T06:40:00Z",
+  "branch": "cursor/phase1-monorepo-scaffold",
+  "primary_product": "candidate",
+  "primary_validation": "candidate_first_pilot",
+  "org_first_path": "SECONDARY_B2B_PILOT_PATH — NOT PRIMARY PRODUCT VALIDATION",
+  "alten_org_pack": "NOT_PREPARED",
+  "primary_journey": [
+    "understand",
+    "direction",
+    "opportunities",
+    "fit_gaps",
+    "prepare",
+    "decide_act",
+    "recruitment_support",
+    "learn"
+  ],
+  "secondary_surfaces": [
+    "company",
+    "recruiter",
+    "employer_tenant",
+    "org_invitation_pack"
+  ],
+  "verdicts": {
+    "A": "CANDIDATE-FIRST PILOT READY — REAL CANDIDATE COHORT CAN BE INVITED",
+    "B": "CANDIDATE-FIRST PILOT INCOMPLETE — EXACT CANDIDATE JOURNEY BLOCKERS",
+    "C": "CANDIDATE-FIRST PILOT ACTIVE — FIRST REAL CANDIDATES ONBOARDED"
+  },
+  "stance": {
+    "pilot": "READY_FOR_CONTROLLED_PILOT",
+    "gate_f": "PASS",
+    "launch": "NO-GO",
+    "enrollment": "OFF",
+    "phase_3b": "BLOCKED",
+    "kpi_default": "NO_REAL_PILOT_DATA",
+    "invite_only": true,
+    "auto_apply": "OFF_FOR_PILOT_DEFAULT"
+  },
+  "surfaces": {
+    "control_plane": "GET /api/v1/admin/pilot-os/candidate-first",
+    "synthetic_e2e": "GET /api/v1/admin/pilot-os/candidate-first/synthetic-e2e",
+    "pilot_os_ui": "/admin/pilot-os",
+    "candidate_home": "/dashboard",
+    "onboarding": "/onboarding",
+    "career": "/dashboard/career",
+    "jobs": "/dashboard/jobs",
+    "applications": "/dashboard/applications",
+    "trust": "/dashboard/trust/controls"
+  },
+  "alembic": "105_candidate_first_pilot",
+  "hard_bans": [
+    "no_launch_go",
+    "no_public_enrollment",
+    "no_mass_outreach",
+    "no_invented_candidates",
+    "no_send_without_separate_send_auth",
+    "no_autonomous_employment",
+    "no_false_bias_free_claims",
+    "no_alten_org_pack_in_this_program"
+  ]
+}

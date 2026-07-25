@@ -259,6 +259,9 @@ def evaluate_pack_preparation_gate(db: Session) -> dict[str, Any]:
             "loose_docs",
             "comments",
         ],
+        "path": "SECONDARY_B2B_PILOT_PATH — NOT PRIMARY PRODUCT VALIDATION",
+        "primary_product_validation": "candidate_first_pilot",
+        "alten_org_pack": "NOT_PREPARED",
     }
 
 
@@ -1026,7 +1029,25 @@ def build_os_status(db: Session, settings: Settings | None = None) -> dict[str, 
         "ai_real_validation": _ai_real_validation_block(db),
         "first_customer_success": _first_customer_success_block(db),
         "pack_preparation": evaluate_pack_preparation_gate(db),
+        "candidate_first_pilot": _candidate_first_pilot_block(db, settings),
+        "primary_product_validation": "candidate_first_pilot",
+        "org_first_path": "SECONDARY_B2B_PILOT_PATH — NOT PRIMARY PRODUCT VALIDATION",
+        "alten_org_pack": "NOT_PREPARED",
     }
+
+
+def _candidate_first_pilot_block(db: Session, settings: Settings | None = None) -> dict[str, Any]:
+    from app.services import candidate_first_pilot as cfp
+
+    try:
+        return cfp.build_control_plane(db, settings)
+    except Exception as exc:  # pragma: no cover
+        return {
+            "verdict": cfp.VERDICT_B,
+            "error": type(exc).__name__,
+            "kpi": {"token": "NO_REAL_PILOT_DATA", "synthetic_excluded": True},
+            "org_first_path": cfp.ORG_FIRST_SECONDARY,
+        }
 
 
 def _first_customer_success_block(db: Session) -> dict[str, Any]:

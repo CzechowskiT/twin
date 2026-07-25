@@ -3150,3 +3150,70 @@ class CandidateRecruiterBrief(Base):
     model_version: Mapped[str | None] = mapped_column(String(64), nullable=True)
     generated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidatePilotCohort(Base):
+    """Candidate-first controlled pilot cohort — no employer/tenant required."""
+
+    __tablename__ = "candidate_pilot_cohorts"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    slug: Mapped[str] = mapped_column(String(80), unique=True, index=True)
+    display_name: Mapped[str] = mapped_column(String(200))
+    status: Mapped[str] = mapped_column(String(32), default="DRAFT", index=True)
+    # DRAFT|FOUNDER_APPROVED|ACTIVE|PAUSED|CLOSED
+    is_synthetic: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+    founder_cohort_approval_ref: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    approved_by_label: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    approved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    success_criteria_ref: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    data_processing_basis_ref: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidatePilotInvitationPack(Base):
+    """Candidate invite pack — READY_UNSENT until separate Founder send auth."""
+
+    __tablename__ = "candidate_pilot_invitation_packs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    cohort_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_pilot_cohorts.id", ondelete="CASCADE"), index=True
+    )
+    status: Mapped[str] = mapped_column(String(32), default="DRAFT", index=True)
+    recipients_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    template_key: Mapped[str] = mapped_column(String(128), default="candidate_first_invite_v1")
+    pack_content_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    prepared_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    sent_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    founder_send_approval_ref: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidatePilotIntakeRow(Base):
+    """Named candidate recipient intake — email hashed/masked; never invent."""
+
+    __tablename__ = "candidate_pilot_intake_rows"
+    __table_args__ = (
+        UniqueConstraint("cohort_id", "email_hash", name="uq_candidate_pilot_intake_email"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    cohort_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_pilot_cohorts.id", ondelete="CASCADE"), index=True
+    )
+    email_masked: Mapped[str] = mapped_column(String(200))
+    email_hash: Mapped[str] = mapped_column(String(64))
+    locale: Mapped[str] = mapped_column(String(8), default="pl")
+    consent_basis_ref: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="INTAKE", index=True)
+    is_synthetic: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

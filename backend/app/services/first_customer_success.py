@@ -478,6 +478,8 @@ def build_control_plane(db: Session) -> dict[str, Any]:
         },
         "phase_2_handoff_doc": "docs/PHASE2_PRODUCTION_HARDENING_HANDOFF.md",
         "phase_3_untouched": True,
+        "org_first_path": "SECONDARY_B2B_PILOT_PATH — NOT PRIMARY PRODUCT VALIDATION",
+        "primary_product_validation": "candidate_first_pilot",
         "checklists_doc": "docs/FIRST_CUSTOMER_SUCCESS_CHECKLISTS.md",
         "generated_at": _utcnow().isoformat() + "Z",
     }
