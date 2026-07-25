@@ -1,6 +1,6 @@
 {
   "schema": "twin.production_topology.rc1/v1",
-  "updated_at": "2026-07-25T06:50:00Z",
+  "updated_at": "2026-07-25T06:13:36Z",
   "branch": "cursor/phase1-monorepo-scaffold",
   "hard_live_denominator": "CORE_PILOT_ONLY",
   "primary_product_validation": "candidate_first_pilot",
@@ -81,15 +81,15 @@
     "status_api": "/api/v1/admin/pilot-os/status",
     "send_safety_api": "/api/v1/admin/pilot-os/invitation-packs/{id}/send-safety"
   },
-  "verified_runtime_commit": "6531ee61acbadf0be343738f78d3efbab87d3417",
+  "verified_runtime_commit": "0f8b5a17535db6c86963f05945f1c5014f8462b0",
   "alignment": {
-    "repo_head": "6531ee61acba",
-    "prod_api_commit": "6531ee61acbadf0be343738f78d3efbab87d3417",
-    "prod_frontend_commit": "6531ee61acbadf0be343738f78d3efbab87d3417",
-    "prod_worker_commit": "fb40e6ba047a8d8022f7eb365ce1c3a26c65d380",
+    "repo_head": "0f8b5a17535db6c86963f05945f1c5014f8462b0",
+    "prod_api_commit": "0f8b5a17535db6c86963f05945f1c5014f8462b0",
+    "prod_frontend_commit": "0f8b5a17535db6c86963f05945f1c5014f8462b0",
+    "prod_worker_commit": "0f8b5a17535db6c86963f05945f1c5014f8462b0",
     "alignment_status": "ALIGNED",
-    "docs_only_drift": true,
-    "note": "Candidate-first primary @ 6531ee61 API; FE may lag package.json-only tip; Alembic 105"
+    "docs_only_drift": false,
+    "note": "Candidate-first Verdict A + READY_FOR_COHORT_INPUT; Alembic 105; no READY_UNSENT without intake"
   },
   "verdict": "CANDIDATE-FIRST PILOT READY \u2014 REAL CANDIDATE COHORT CAN BE INVITED",
   "activation": {
@@ -138,13 +138,17 @@
   "candidate_first_pilot": {
     "doc": "docs/CANDIDATE_FIRST_PILOT.md",
     "taxonomy": "docs/CANDIDATE_FIRST_TAXONOMY.json",
+    "readiness": "docs/CANDIDATE_FIRST_READINESS.json",
     "api": "/api/v1/admin/pilot-os/candidate-first",
     "synthetic_e2e": "scripts/candidate-first-synthetic-e2e.py",
     "alembic": "105_candidate_first_pilot",
     "verdict": "CANDIDATE-FIRST PILOT READY \u2014 REAL CANDIDATE COHORT CAN BE INVITED",
-    "primary": true
+    "readiness_state": "READY_FOR_COHORT_INPUT",
+    "primary": true,
+    "invites_sent": 0,
+    "packs_ready_unsent": 0
   },
-  "verified_tip": "6531ee61acbadf0be343738f78d3efbab87d3417",
+  "verified_tip": "0f8b5a17535db6c86963f05945f1c5014f8462b0",
   "ci_smoke_run": "30118723247",
   "ai_candidate_intelligence": {
     "doc": "docs/AI_CANDIDATE_INTELLIGENCE.json",
