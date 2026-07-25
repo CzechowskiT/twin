@@ -1,10 +1,10 @@
 {
   "schema": "twin.production_topology.rc1/v1",
-  "updated_at": "2026-07-25T06:45:00Z",
+  "updated_at": "2026-07-25T06:50:00Z",
   "branch": "cursor/phase1-monorepo-scaffold",
   "hard_live_denominator": "CORE_PILOT_ONLY",
   "primary_product_validation": "candidate_first_pilot",
-  "org_first_path": "SECONDARY_B2B_PILOT_PATH — NOT PRIMARY PRODUCT VALIDATION",
+  "org_first_path": "SECONDARY_B2B_PILOT_PATH \u2014 NOT PRIMARY PRODUCT VALIDATION",
   "alten_org_pack": "NOT_PREPARED",
   "stance": {
     "pilot": "READY_FOR_CONTROLLED_PILOT",
@@ -25,7 +25,7 @@
     "preferred_public_frontend": "https://twin.care",
     "preferred_app_frontend": "https://app.twin.care",
     "api": "https://twin-production-bcd9.up.railway.app",
-    "note": "TEMPORARY_PILOT_CANONICAL_URL = twin-sooty.vercel.app. twin.care Afternic NS parks apex — non-blocking for controlled pilot OS."
+    "note": "TEMPORARY_PILOT_CANONICAL_URL = twin-sooty.vercel.app. twin.care Afternic NS parks apex \u2014 non-blocking for controlled pilot OS."
   },
   "vercel": {
     "team": "twin",
@@ -81,17 +81,17 @@
     "status_api": "/api/v1/admin/pilot-os/status",
     "send_safety_api": "/api/v1/admin/pilot-os/invitation-packs/{id}/send-safety"
   },
-  "verified_runtime_commit": "b8c1a019dfa704acc4cb497f2bec0556965efa25",
+  "verified_runtime_commit": "6531ee61acbadf0be343738f78d3efbab87d3417",
   "alignment": {
-    "repo_head": "b8c1a019dfa704acc4cb497f2bec0556965efa25",
-    "prod_api_commit": "b8c1a019dfa704acc4cb497f2bec0556965efa25",
-    "prod_frontend_commit": "b8c1a019dfa704acc4cb497f2bec0556965efa25",
-    "prod_worker_commit": "b8c1a019dfa704acc4cb497f2bec0556965efa25",
+    "repo_head": "6531ee61acba",
+    "prod_api_commit": "6531ee61acbadf0be343738f78d3efbab87d3417",
+    "prod_frontend_commit": "6531ee61acbadf0be343738f78d3efbab87d3417",
+    "prod_worker_commit": "fb40e6ba047a8d8022f7eb365ce1c3a26c65d380",
     "alignment_status": "ALIGNED",
     "docs_only_drift": true,
-    "note": "Runtime four-way ALIGNED at b8c1a019 (pack-prep gate); docs tip may advance"
+    "note": "Candidate-first primary @ 6531ee61 API; FE may lag package.json-only tip; Alembic 105"
   },
-  "verdict": "CANDIDATE-FIRST PILOT READY — REAL CANDIDATE COHORT CAN BE INVITED",
+  "verdict": "CANDIDATE-FIRST PILOT READY \u2014 REAL CANDIDATE COHORT CAN BE INVITED",
   "activation": {
     "approved_real_orgs": 0,
     "invitations_sent": 0,
@@ -100,7 +100,8 @@
     "missing_inputs": [
       "founder_approved_real_organization",
       "legal_name",
-      "sponsor_label",      "founder_org_approval_ref",
+      "sponsor_label",
+      "founder_org_approval_ref",
       "named_recipient_emails",
       "approved_by_label",
       "organization_candidate_record"
@@ -120,7 +121,7 @@
     "synthetic_smoke": "19/19"
   },
   "first_customer": {
-    "path": "SECONDARY_B2B_PILOT_PATH — NOT PRIMARY PRODUCT VALIDATION",
+    "path": "SECONDARY_B2B_PILOT_PATH \u2014 NOT PRIMARY PRODUCT VALIDATION",
     "checklists": "docs/FIRST_CUSTOMER_SUCCESS_CHECKLISTS.md",
     "readiness": "docs/FIRST_CUSTOMER_READINESS.json",
     "machine": "docs/FIRST_CUSTOMER_SUCCESS.json",
@@ -129,7 +130,7 @@
     "admin_ui": "/admin/pilot-os",
     "api": "/api/v1/admin/pilot-os/first-customer-success",
     "kpi": "NO_REAL_PILOT_DATA",
-    "verdict_without_org": "PACK PREPARATION BLOCKED — COMPLETE FOUNDER ORGANIZATION INTAKE REQUIRED",
+    "verdict_without_org": "PACK PREPARATION BLOCKED \u2014 COMPLETE FOUNDER ORGANIZATION INTAKE REQUIRED",
     "approved_real_orgs": 0,
     "invites_sent": 0,
     "alten_org_pack": "NOT_PREPARED"
@@ -140,10 +141,10 @@
     "api": "/api/v1/admin/pilot-os/candidate-first",
     "synthetic_e2e": "scripts/candidate-first-synthetic-e2e.py",
     "alembic": "105_candidate_first_pilot",
-    "verdict": "CANDIDATE-FIRST PILOT READY — REAL CANDIDATE COHORT CAN BE INVITED",
+    "verdict": "CANDIDATE-FIRST PILOT READY \u2014 REAL CANDIDATE COHORT CAN BE INVITED",
     "primary": true
   },
-  "verified_tip": "b8c1a019dfa704acc4cb497f2bec0556965efa25",
+  "verified_tip": "6531ee61acbadf0be343738f78d3efbab87d3417",
   "ci_smoke_run": "30118723247",
   "ai_candidate_intelligence": {
     "doc": "docs/AI_CANDIDATE_INTELLIGENCE.json",
@@ -158,7 +159,7 @@
     "eval_harness": "PASS",
     "multi_role": "19/19",
     "approval_search": "NO_COMPLETE_APPROVAL",
-    "real_validation_verdict": "AI CANDIDATE INTELLIGENCE REAL-CUSTOMER VALIDATION READY — AWAITING FOUNDER-APPROVED PILOT ORGANIZATION",
-    "verdict": "AI CANDIDATE INTELLIGENCE CUSTOMER-USABLE — EXPLAINABLE CV SCREENING PRODUCTION-READY"
+    "real_validation_verdict": "AI CANDIDATE INTELLIGENCE REAL-CUSTOMER VALIDATION READY \u2014 AWAITING FOUNDER-APPROVED PILOT ORGANIZATION",
+    "verdict": "AI CANDIDATE INTELLIGENCE CUSTOMER-USABLE \u2014 EXPLAINABLE CV SCREENING PRODUCTION-READY"
   }
 }
