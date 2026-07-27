@@ -22,6 +22,7 @@ export function OnboardingGate({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [ready, setReady] = useState(false);
+  const [blocked, setBlocked] = useState(false);
 
   useEffect(() => {
     const token = getToken();
@@ -32,24 +33,36 @@ export function OnboardingGate({ children }: { children: ReactNode }) {
 
     let cancelled = false;
     (async () => {
-      try {
-        const me = await apiFetch<Me>("/api/v1/auth/me", {}, token);
-        if (!cancelled && !me.onboarding_completed_at) {
-          if (isDemoUserEmail(me.email)) {
-            try {
-              await apiFetch("/api/v1/auth/onboarding/complete", { method: "POST" }, token);
-            } catch {
-              /* still allow dashboard for demo account */
+      let attempts = 0;
+      while (attempts < 3 && !cancelled) {
+        attempts += 1;
+        try {
+          const me = await apiFetch<Me>("/api/v1/auth/me", {}, token);
+          if (!cancelled && !me.onboarding_completed_at) {
+            if (isDemoUserEmail(me.email)) {
+              try {
+                await apiFetch("/api/v1/auth/onboarding/complete", { method: "POST" }, token);
+              } catch {
+                /* still allow dashboard for demo account */
+              }
+            } else {
+              router.replace("/onboarding");
+              return;
             }
-          } else {
-            router.replace("/onboarding");
+          }
+          if (!cancelled) setReady(true);
+          return;
+        } catch {
+          if (attempts >= 3) {
+            if (!cancelled) {
+              setBlocked(true);
+              setReady(true);
+            }
             return;
           }
+          await new Promise((r) => setTimeout(r, 400 * attempts));
         }
-      } catch {
-        /* allow dashboard if /me fails transiently */
       }
-      if (!cancelled) setReady(true);
     })();
 
     return () => {
@@ -59,6 +72,18 @@ export function OnboardingGate({ children }: { children: ReactNode }) {
 
   if (!ready) {
     return <p className="twin-muted px-4 py-8 text-sm">{t("common.loadingEllipsis")}</p>;
+  }
+
+  if (blocked) {
+    return (
+      <div className="mx-auto max-w-md px-4 py-12 text-center" data-testid="onboarding-gate-blocked">
+        <p className="text-sm text-[var(--foreground)]">{t("common.sessionCheckFailed")}</p>
+        <p className="twin-muted mt-2 text-sm">{t("common.tryAgainOrLogin")}</p>
+        <a className="mt-4 inline-block text-sm underline" href="/login">
+          {t("nav.login")}
+        </a>
+      </div>
+    );
   }
 
   return <>{children}</>;

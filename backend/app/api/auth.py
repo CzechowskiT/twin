@@ -29,6 +29,7 @@ from app.schemas.auth import (
     ForgotPasswordRequest,
     GdprConsentIn,
     NotificationPreferencesIn,
+    OnboardingProgressIn,
     ResetPasswordRequest,
     VerifyEmailRequest,
     Token,
@@ -205,17 +206,31 @@ def register(request: Request, body: UserRegister, db: Session = Depends(get_db)
             detail="All required consents must be accepted (privacy, terms, job data, AI matching)",
         )
     settings = get_settings()
+    invite_token_to_consume: str | None = None
     if not settings.external_pilot_enrollment_enabled and settings.pilot_registration_invite_only:
         allow = {
             e.strip().lower()
             for e in (settings.pilot_email_allowlist or "").split(",")
             if e.strip()
         }
-        if str(body.email).strip().lower() not in allow:
+        email_l = str(body.email).strip().lower()
+        bridge_ok = False
+        if email_l not in allow:
+            try:
+                from app.services import candidate_invite_tokens as invite_tokens
+
+                bridge_ok = invite_tokens.email_allowed_for_register(
+                    db, email=email_l, invite_token=body.invite_token
+                )
+            except Exception:  # noqa: BLE001
+                bridge_ok = False
+        if email_l not in allow and not bridge_ok:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="registration_invite_only",
             )
+        if body.invite_token and bridge_ok and email_l not in allow:
+            invite_token_to_consume = body.invite_token.strip()
     if db.query(User).filter(User.email == body.email).first():
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")
     stored_ref_note = normalize_stored_referred_by_note(body.referred_by_note)
@@ -286,6 +301,18 @@ def register(request: Request, body: UserRegister, db: Session = Depends(get_db)
         )
     db.commit()
     db.refresh(user)
+    if invite_token_to_consume:
+        try:
+            from app.services import candidate_invite_tokens as invite_tokens
+
+            invite_tokens.validate_invite_token(
+                db,
+                email=str(body.email).strip().lower(),
+                raw_token=invite_token_to_consume,
+                consume=True,
+            )
+        except Exception:  # noqa: BLE001
+            pass
     try:
         from app.services.product_funnel import emit_funnel_event
 
@@ -574,6 +601,7 @@ def complete_onboarding(
     first_completion = user.onboarding_completed_at is None
     if first_completion:
         user.onboarding_completed_at = datetime.now(timezone.utc)
+        user.onboarding_step = "complete"
         db.add(user)
         db.commit()
         db.refresh(user)
@@ -597,6 +625,52 @@ def complete_onboarding(
             # Activation must never break onboarding completion
             pass
     return UserOut.from_user(user)
+
+
+@router.put("/onboarding/progress", response_model=UserOut)
+@limiter.limit("60/minute")
+def save_onboarding_progress(
+    request: Request,
+    body: OnboardingProgressIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> UserOut:
+    """Persist onboarding step server-side so progress survives device/browser loss."""
+    import json
+
+    user.onboarding_step = body.step.strip()[:64]
+    if body.progress is not None:
+        user.onboarding_progress_json = json.dumps(body.progress)[:4000]
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return UserOut.from_user(user)
+
+
+@router.get("/onboarding/progress")
+@limiter.limit("60/minute")
+def get_onboarding_progress(
+    request: Request,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    import json
+
+    _ = db
+    progress = None
+    raw = getattr(user, "onboarding_progress_json", None)
+    if raw:
+        try:
+            progress = json.loads(raw)
+        except json.JSONDecodeError:
+            progress = None
+    return {
+        "step": getattr(user, "onboarding_step", None),
+        "progress": progress,
+        "onboarding_completed_at": (
+            user.onboarding_completed_at.isoformat() if user.onboarding_completed_at else None
+        ),
+    }
 
 
 @router.get("/linkedin/login")

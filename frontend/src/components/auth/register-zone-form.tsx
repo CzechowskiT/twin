@@ -181,6 +181,9 @@ export function RegisterZoneForm({ zone }: { zone: LoginZone }) {
           marketing_emails_opt_in: form.get("marketing_emails_opt_in") === "on",
           ...attributionFromUrl,
           ...(referredRaw ? { referred_by_note: referredRaw.slice(0, 500) } : {}),
+          ...(searchParams.get("invite")
+            ? { invite_token: String(searchParams.get("invite")).slice(0, 128) }
+            : {}),
         }),
         },
         null,
@@ -190,7 +193,18 @@ export function RegisterZoneForm({ zone }: { zone: LoginZone }) {
       setPersona(zone);
       router.push(safeNext);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("register.failed"));
+      const raw = err instanceof Error ? err.message : "";
+      if (raw.includes("registration_invite_only")) {
+        setError(t("register.inviteOnly"));
+      } else if (
+        raw.includes("invite_token_invalid") ||
+        raw.includes("invite_token_expired") ||
+        raw.includes("invite_token_revoked")
+      ) {
+        setError(t("register.inviteTokenInvalid"));
+      } else {
+        setError(raw || t("register.failed"));
+      }
     } finally {
       setLoading(false);
     }

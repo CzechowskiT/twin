@@ -128,6 +128,9 @@ type OsStatus = {
   candidate_first_pilot?: {
     verdict?: string;
     readiness_state?: string;
+    phase2_status?: string;
+    hardening_verdict?: string;
+    company_approval_is_top_blocker?: boolean;
     primary_product?: string;
     org_first_path?: string;
     alten_org_pack?: string;
@@ -138,6 +141,11 @@ type OsStatus = {
     next_action?: string;
     scorecard?: Record<string, boolean>;
     kpi?: { token?: string };
+    hardening?: {
+      verdict_target?: string;
+      open_critical_high?: number;
+      company_approval_is_top_blocker?: boolean;
+    };
   };
   primary_product_validation?: string;
   org_first_path?: string;
@@ -497,6 +505,35 @@ export default function AdminPilotOsPage() {
                 {status.candidate_first_pilot.org_first_path || status.org_first_path}. No send without
                 separate Founder send auth. Synthetic ≠ real.
               </p>
+              {status.candidate_first_pilot.phase2_status || status.candidate_first_pilot.hardening ? (
+                <div
+                  className="mt-3 rounded border border-teal-300/60 bg-white/50 p-3"
+                  data-testid="pilot-os-phase2-hardening"
+                >
+                  <p className="text-xs font-medium text-teal-900">
+                    Phase 2: {status.candidate_first_pilot.phase2_status || "PRODUCTION_HARDENED"}
+                  </p>
+                  <p className="mt-1 text-[11px] text-neutral-600">
+                    {status.candidate_first_pilot.hardening_verdict ||
+                      status.candidate_first_pilot.hardening?.verdict_target ||
+                      "—"}
+                  </p>
+                  <p className="mt-1 text-[11px] text-neutral-600">
+                    Open Critical/High:{" "}
+                    {status.candidate_first_pilot.hardening?.open_critical_high ?? 0} · Company approval
+                    top blocker:{" "}
+                    {String(
+                      status.candidate_first_pilot.company_approval_is_top_blocker ??
+                        status.candidate_first_pilot.hardening?.company_approval_is_top_blocker ??
+                        false,
+                    )}
+                  </p>
+                  <p className="mt-1 text-[11px] text-neutral-500">
+                    External gate: founder named cohort intake only. Activation not re-run. Phase 3 not
+                    started.
+                  </p>
+                </div>
+              ) : null}
             </div>
           ) : null}
 

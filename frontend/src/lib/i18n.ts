@@ -1672,6 +1672,9 @@ const en = {
     emailPasswordRequired: "Enter email and password.",
     coreConsentsRequired: "Please accept privacy, terms, job data use, and AI matching to register.",
     failed: "Registration failed",
+    inviteOnly:
+      "This pilot is invite-only. Use the email from your invitation, or open the invite link you received.",
+    inviteTokenInvalid: "This invitation link is invalid or expired. Request a new invite.",
     orContinue: "or continue with",
     errorLinkedinNotConfigured:
       "LinkedIn sign-up is not set up on the server yet. Use the form below or ask an admin.",
@@ -8932,6 +8935,8 @@ eyebrow: "Product roadmap",
     errorTitle: "Something went wrong",
     errorBody: "Please try again. If the problem persists, refresh the page.",
     tryAgain: "Try again",
+    sessionCheckFailed: "We could not verify your session.",
+    tryAgainOrLogin: "Check your connection, then try again or sign in.",
   },
 } as const;
 
@@ -10345,6 +10350,9 @@ const pl: MessageTree = {
     emailPasswordRequired: "Podaj adres e-mail i hasło.",
     coreConsentsRequired: "Zaakceptuj prywatność, regulamin, wykorzystanie danych ofert oraz dopasowanie AI, aby się zarejestrować.",
     failed: "Rejestracja nie powiodła się",
+    inviteOnly:
+      "Ten pilotaż jest tylko na zaproszenie. Użyj adresu z zaproszenia albo otwórz link, który otrzymałeś/aś.",
+    inviteTokenInvalid: "Ten link zaproszenia jest nieprawidłowy lub wygasł. Poproś o nowe zaproszenie.",
     orContinue: "lub kontynuuj przez",
     errorLinkedinNotConfigured:
       "Rejestracja przez LinkedIn nie jest jeszcze skonfigurowana na serwerze. Użyj formularza poniżej lub poproś administratora.",
@@ -17644,6 +17652,8 @@ const pl: MessageTree = {
     errorTitle: "Coś poszło nie tak",
     errorBody: "Spróbuj ponownie. Jeśli problem wraca, odśwież stronę.",
     tryAgain: "Spróbuj ponownie",
+    sessionCheckFailed: "Nie udało się zweryfikować sesji.",
+    tryAgainOrLogin: "Sprawdź połączenie, spróbuj ponownie albo zaloguj się.",
   },
 };
 

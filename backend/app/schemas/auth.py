@@ -34,6 +34,11 @@ class UserRegister(BaseModel):
         max_length=128,
         description="Optional share token (same as referrer's referral_public_token); also sendable as ?ref= on /register.",
     )
+    invite_token: str | None = Field(
+        default=None,
+        max_length=128,
+        description="Candidate-first pilot invite token (Founder-authorized send).",
+    )
 
 
 class UserLogin(BaseModel):
@@ -126,6 +131,7 @@ class UserOut(BaseModel):
     google_calendar_oauth_configured: bool = False
     microsoft_calendar_oauth_configured: bool = False
     onboarding_completed_at: datetime | None = None
+    onboarding_step: str | None = None
     email_verified_at: datetime | None = None
     email_verified: bool = False
     has_password_login: bool = False
@@ -160,10 +166,16 @@ class UserOut(BaseModel):
                 user, "profile_documents_processing_consent_at", None
             ),
             onboarding_completed_at=getattr(user, "onboarding_completed_at", None),
+            onboarding_step=getattr(user, "onboarding_step", None),
             email_verified_at=getattr(user, "email_verified_at", None),
             email_verified=getattr(user, "email_verified_at", None) is not None,
             has_password_login=bool(getattr(user, "hashed_password", None)),
         )
+
+
+class OnboardingProgressIn(BaseModel):
+    step: str = Field(..., min_length=1, max_length=64)
+    progress: dict | None = None
 
 
 class UserRegisteredOut(UserOut):

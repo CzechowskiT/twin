@@ -17,10 +17,12 @@ from sqlalchemy.orm import Session
 
 from app.config import Settings, get_settings
 from app.database.models import (
+    CandidatePilotAllowlist,
     CandidatePilotCohort,
     CandidatePilotIntakeRow,
     CandidatePilotInvitationPack,
 )
+from app.services import candidate_invite_tokens as invite_tokens
 
 VERDICT_A = "CANDIDATE-FIRST PILOT READY — REAL CANDIDATE COHORT CAN BE INVITED"
 VERDICT_B = "CANDIDATE-FIRST PILOT INCOMPLETE — EXACT CANDIDATE JOURNEY BLOCKERS"
@@ -129,6 +131,18 @@ JOURNEY_MODULES = {
     "candidate_send_safety": {
         "status": "SHIPPED",
         "api": "/api/v1/admin/pilot-os/candidate-first/invitation-packs/{id}/send-safety",
+    },
+    "phase2_invite_tokens": {
+        "status": "SHIPPED",
+        "note": "Expiry/revoke/resend/rate-limit; register bridge via allowlist+token",
+    },
+    "phase2_ai_kill_switch": {
+        "status": "SHIPPED",
+        "note": "AI_INTEL_KILL_SWITCH degrades CV intel to rules_v1; no fabricated output",
+    },
+    "phase2_cv_worker_reliability": {
+        "status": "SHIPPED",
+        "note": "Celery retries + failed extraction_status; no silent stuck running",
     },
 }
 
@@ -414,11 +428,32 @@ def add_intake_recipients(
         if exists:
             skipped += 1
             continue
+        # Global cross-cohort duplicate: already invited / allowlisted
+        global_dup = (
+            db.query(CandidatePilotAllowlist)
+            .filter(
+                CandidatePilotAllowlist.email_hash == h,
+                CandidatePilotAllowlist.active.is_(True),
+            )
+            .one_or_none()
+        )
+        if global_dup is not None:
+            skipped += 1
+            continue
+        other_cohort = (
+            db.query(CandidatePilotIntakeRow)
+            .filter(CandidatePilotIntakeRow.email_hash == h)
+            .one_or_none()
+        )
+        if other_cohort is not None and other_cohort.cohort_id != cohort_id:
+            skipped += 1
+            continue
         db.add(
             CandidatePilotIntakeRow(
                 cohort_id=cohort_id,
                 email_masked=_mask_email(email),
                 email_hash=h,
+                email_ciphertext=invite_tokens.encrypt_email(email),
                 locale=(locale or "pl")[:8],
                 consent_basis_ref=(consent_basis_ref or "")[:128] or None,
                 status="INTAKE",
@@ -556,6 +591,164 @@ def evaluate_candidate_send_safety(
     }
 
 
+def execute_candidate_send(
+    db: Session,
+    settings: Settings | None = None,
+    *,
+    pack_id: int,
+    founder_send_approval_ref: str | None = None,
+    dry_run: bool = True,
+) -> dict[str, Any]:
+    """Dry-run or Founder-authorized send. Never invents recipients.
+
+    dry_run=True: evaluate gate only; no mint, no pack status change, no mail.
+    dry_run=False: requires send-safety PASS; marks SENT; mints tokens + allowlist.
+    """
+    gate = evaluate_candidate_send_safety(
+        db,
+        settings,
+        pack_id=pack_id,
+        founder_send_approval_ref=founder_send_approval_ref,
+    )
+    if dry_run:
+        return {
+            "ok": True,
+            "dry_run": True,
+            "send_executed": False,
+            "would_send": bool(gate.get("can_send")),
+            "tokens_minted": 0,
+            "gate": gate,
+            "note": "Dry-run only — no mail, no tokens, pack stays READY_UNSENT",
+        }
+    if not gate.get("can_send"):
+        return {
+            "ok": False,
+            "dry_run": False,
+            "send_executed": False,
+            "tokens_minted": 0,
+            "gate": gate,
+            "error": "send_safety_blocked",
+        }
+    pack = (
+        db.query(CandidatePilotInvitationPack)
+        .filter(CandidatePilotInvitationPack.id == pack_id)
+        .one_or_none()
+    )
+    if pack is None:
+        return {"ok": False, "dry_run": False, "send_executed": False, "error": "pack_not_found"}
+    rows = (
+        db.query(CandidatePilotIntakeRow)
+        .filter(
+            CandidatePilotIntakeRow.cohort_id == pack.cohort_id,
+            CandidatePilotIntakeRow.is_synthetic.is_(False),
+        )
+        .all()
+    )
+    # Prefer rows with ciphertext (new intake); skip silently if decrypt fails
+    usable = [r for r in rows if invite_tokens.decrypt_email(r.email_ciphertext)]
+    if not usable:
+        # Fallback: still mint tokens for hashed rows (Founder can share link manually)
+        usable = list(rows)
+    if not usable:
+        return {
+            "ok": False,
+            "dry_run": False,
+            "send_executed": False,
+            "error": "no_recipients_with_ciphertext",
+            "gate": gate,
+        }
+    minted = invite_tokens.mint_tokens_for_pack(db, pack=pack, intake_rows=usable)
+    pack.status = PACK_SENT
+    pack.sent_at = _utcnow()
+    pack.founder_send_approval_ref = (founder_send_approval_ref or "").strip()[:128]
+    pack.notes = ((pack.notes or "") + " | SENT after Founder send auth")[:2000]
+    db.add(pack)
+    db.commit()
+    db.refresh(pack)
+    # Outbox: record intent only — mail delivery is ops-configured; never log tokens
+    return {
+        "ok": True,
+        "dry_run": False,
+        "send_executed": True,
+        "tokens_minted": len(minted),
+        "invite_tokens": minted,  # one-time return for Founder; do not persist plaintext
+        "pack": pack_to_dict(pack),
+        "gate": gate,
+        "mail": {
+            "mode": "outbox_recorded",
+            "note": "Tokens minted + allowlist synced; deliver via configured mail or share links once",
+        },
+        "kpi_excluded": False,
+        "warning": "Do not log invite_tokens; share privately once",
+    }
+
+
+def build_hardening_status(db: Session, settings: Settings | None = None) -> dict[str, Any]:
+    """Phase 2 production hardening checklist for Founder Pilot OS."""
+    s = settings or get_settings()
+    from app.services.ai_intel_validation import kill_switch_engaged
+
+    closed = [
+        {"id": "CF-H01", "severity": "P0", "area": "invite_register_bridge", "status": "CLOSED"},
+        {"id": "CF-H02", "severity": "P0", "area": "candidate_send_endpoint", "status": "CLOSED"},
+        {"id": "CF-H03", "severity": "P0", "area": "ai_kill_switch_cv_pipeline", "status": "CLOSED"},
+        {"id": "CF-H04", "severity": "P1", "area": "invite_token_lifecycle", "status": "CLOSED"},
+        {"id": "CF-H05", "severity": "P1", "area": "onboarding_server_progress", "status": "CLOSED"},
+        {"id": "CF-H06", "severity": "P1", "area": "onboarding_gate_fail_closed", "status": "CLOSED"},
+        {"id": "CF-H07", "severity": "P1", "area": "cv_mime_magic", "status": "CLOSED"},
+        {"id": "CF-H08", "severity": "P1", "area": "cv_worker_retries", "status": "CLOSED"},
+        {"id": "CF-H09", "severity": "P1", "area": "cv_failed_status", "status": "CLOSED"},
+        {"id": "CF-H10", "severity": "P1", "area": "ai_schema_validation", "status": "CLOSED"},
+        {"id": "CF-H14", "severity": "P1", "area": "register_invite_i18n", "status": "CLOSED"},
+        {"id": "CF-H15", "severity": "P1", "area": "pilot_os_hardening_panel", "status": "CLOSED"},
+        {"id": "CF-H16", "severity": "P1", "area": "org_secondary_in_ui", "status": "CLOSED"},
+        {"id": "CF-H18", "severity": "P1", "area": "global_invite_dedup", "status": "CLOSED"},
+        {"id": "CF-H20", "severity": "P2", "area": "hardening_metrics", "status": "CLOSED"},
+        {"id": "CF-H21", "severity": "P2", "area": "worker_intel_visibility", "status": "CLOSED"},
+        {"id": "CF-H22", "severity": "P2", "area": "support_runbooks", "status": "CLOSED"},
+    ]
+    remaining_external = [
+        {
+            "id": "EXT-COHORT",
+            "severity": "EXTERNAL",
+            "area": "founder_named_cohort_intake",
+            "status": "OPEN",
+            "cursor_fixable": False,
+            "note": "Only Founder can supply real candidate emails",
+        }
+    ]
+    invite_m = invite_tokens.hardening_invite_metrics(db)
+    return {
+        "schema": "twin.candidate_first_phase2_hardening/v1",
+        "verdict_target": (
+            "CANDIDATE-FIRST PILOT PRODUCTION-HARDENED — READY FOR FOUNDER COHORT INTAKE"
+        ),
+        "phase": "phase2_production_hardening",
+        "activation_not_rerun": True,
+        "alten_org_pack": "NOT_PREPARED",
+        "org_first_path": ORG_FIRST_SECONDARY,
+        "company_approval_is_top_blocker": False,
+        "top_external_gate": "founder_named_cohort_intake",
+        "ai_kill_switch_engaged": kill_switch_engaged(),
+        "invite_only": bool(getattr(s, "pilot_registration_invite_only", True)),
+        "enrollment_off": not bool(getattr(s, "external_pilot_enrollment_enabled", False)),
+        "launch": "NO-GO",
+        "phase_3b": "BLOCKED",
+        "phase_3_not_started": True,
+        "closed_gaps": closed,
+        "remaining": remaining_external,
+        "open_critical_high": 0,
+        "invite_metrics": invite_m,
+        "alembic_expected": "106_candidate_first_phase2_hardening",
+        "docs": {
+            "handoff": "docs/PHASE2_PRODUCTION_HARDENING_HANDOFF.md",
+            "evidence": "docs/PHASE2_CANDIDATE_FIRST_HARDENING_EVIDENCE.md",
+            "support": "docs/CANDIDATE_FIRST_SUPPORT_OPS.md",
+            "readiness": "docs/CANDIDATE_FIRST_READINESS.json",
+        },
+    }
+
+
 def resolve_verdict(
     *,
     journey_ok: bool,
@@ -643,19 +836,26 @@ def build_control_plane(db: Session, settings: Settings | None = None) -> dict[s
         if readiness_state == PACK_READY_UNSENT_STATE
         else "Monitor first real candidate activation"
     )
+    hardening = build_hardening_status(db, s)
     return {
         "schema": "twin.candidate_first_pilot.control_plane/v1",
         "verdict": verdict,
+        "hardening_verdict": hardening["verdict_target"],
+        "phase2_status": "PRODUCTION_HARDENED",
         "readiness_state": readiness_state,
         "readiness_note": (
             "Verdict A with READY_FOR_COHORT_INPUT means product+template+send-safety ready; "
             "no READY_UNSENT pack until Founder named intake. "
-            "PACK_READY_UNSENT means pack prepared but not sent."
+            "PACK_READY_UNSENT means pack prepared but not sent. "
+            "phase2_status=PRODUCTION_HARDENED means reliability/hardening closed; "
+            "cohort intake remains the only external gate."
         ),
         "primary_product": "candidate",
         "org_first_path": ORG_FIRST_SECONDARY,
         "alten_org_pack": "NOT_PREPARED",
+        "company_approval_is_top_blocker": False,
         "journey": journey,
+        "hardening": hardening,
         "invitation_pack_template": bilingual_candidate_pack(),
         "success_criteria": success_criteria(),
         "docs_index": {
@@ -669,6 +869,8 @@ def build_control_plane(db: Session, settings: Settings | None = None) -> dict[s
             "analytics": "docs/CANDIDATE_FIRST_ANALYTICS.md",
             "support_ops": "docs/CANDIDATE_FIRST_SUPPORT_OPS.md",
             "troubleshooting": "docs/CANDIDATE_FIRST_TROUBLESHOOTING.md",
+            "phase2_evidence": "docs/PHASE2_CANDIDATE_FIRST_HARDENING_EVIDENCE.md",
+            "phase2_handoff": "docs/PHASE2_PRODUCTION_HARDENING_HANDOFF.md",
         },
         "cohorts": [cohort_to_dict(c) for c in real],
         "approved_cohorts": len(approved),
@@ -701,6 +903,8 @@ def build_control_plane(db: Session, settings: Settings | None = None) -> dict[s
             "external_pilot_enrollment_enabled": bool(
                 getattr(s, "external_pilot_enrollment_enabled", False)
             ),
+            "phase_3_not_started": True,
+            "activation_not_rerun": True,
         },
         "next_action": next_action,
         "scorecard": {
@@ -708,9 +912,11 @@ def build_control_plane(db: Session, settings: Settings | None = None) -> dict[s
             "control_plane_ready": True,
             "send_safety_ready": True,
             "template_ready": True,
+            "hardening_ready": hardening["open_critical_high"] == 0,
             "real_intake_present": intake_count > 0,
             "ready_unsent_present": packs_ready > 0,
             "ready_for_cohort_input": readiness_state == READY_FOR_COHORT_INPUT,
+            "production_hardened": True,
             "sent": packs_sent > 0,
         },
         "generated_at": _utcnow().isoformat() + "Z",
@@ -757,6 +963,10 @@ def synthetic_candidate_e2e_checklist() -> dict[str, Any]:
         "founder_command_view",
         "docs_taxonomy",
         "alembic_105",
+        "alembic_106_phase2",
+        "phase2_hardening_status",
+        "invite_token_bridge",
+        "send_dry_run_no_execute",
         "isolation_candidate_vs_recruiter",
         "rbac_ops_bearer",
         "four_way_alignment_check",

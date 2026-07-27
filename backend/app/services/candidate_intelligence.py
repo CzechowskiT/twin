@@ -257,6 +257,11 @@ CV:
 
 
 def _claude_extract(cv_text: str) -> dict[str, Any] | None:
+    from app.services.ai_intel_validation import kill_switch_engaged
+
+    if kill_switch_engaged():
+        logger.info("candidate_intelligence_ai_kill_switch_engaged")
+        return None
     if not is_anthropic_configured():
         return None
     inj = ai_compliance.scan_prompt_injection(cv_text or "")
@@ -280,14 +285,49 @@ def _claude_extract(cv_text: str) -> dict[str, Any] | None:
         data = json.loads(raw)
         if not isinstance(data, dict):
             return None
-        data["_injection_scan"] = inj
-        data["_model"] = get_settings().anthropic_model
+        # Schema guard — keep only known keys; drop protected / hallucinated attrs
+        allowed = {
+            "current_role",
+            "current_employer",
+            "seniority",
+            "total_experience_months",
+            "relevant_experience_months",
+            "primary_domains",
+            "normalized_skills",
+            "education_summary",
+            "language_summary",
+            "location_summary",
+            "timeline",
+            "missing_fields",
+            "warnings",
+        }
+        forbidden = {
+            "age",
+            "gender",
+            "ethnicity",
+            "race",
+            "religion",
+            "disability",
+            "sexual_orientation",
+            "marital_status",
+            "pregnancy",
+            "nationality",
+            "photo",
+        }
+        cleaned: dict[str, Any] = {}
+        for k, v in data.items():
+            if k in forbidden or str(k).lower() in forbidden:
+                continue
+            if k in allowed or k.startswith("_"):
+                cleaned[k] = v
+        cleaned["_injection_scan"] = inj
+        cleaned["_model"] = get_settings().anthropic_model
         usage = getattr(msg, "usage", None)
         if usage:
-            data["_tokens"] = int(getattr(usage, "input_tokens", 0) or 0) + int(
+            cleaned["_tokens"] = int(getattr(usage, "input_tokens", 0) or 0) + int(
                 getattr(usage, "output_tokens", 0) or 0
             )
-        return data
+        return cleaned
     except Exception as exc:  # noqa: BLE001
         logger.warning("candidate_intelligence_claude_extract_failed: %s", type(exc).__name__)
         return None
@@ -499,6 +539,8 @@ def run_extraction_pipeline(
     if candidate is None:
         return {"ok": False, "error": "candidate_not_found"}
 
+    from app.services.ai_intel_validation import kill_switch_engaged
+
     cv_text = candidate.cv_text or ""
     inj = ai_compliance.scan_prompt_injection(cv_text)
     profile = get_or_create_profile(db, candidate)
@@ -519,9 +561,45 @@ def run_extraction_pipeline(
     profile.updated_at = _utcnow()
     db.commit()
 
+    try:
+        return _run_extraction_pipeline_body(
+            db,
+            candidate=candidate,
+            profile=profile,
+            cv_text=cv_text,
+            inj=inj,
+            job_id=job_id,
+            locale=locale,
+            kill_switch=kill_switch_engaged(),
+        )
+    except Exception as exc:  # noqa: BLE001
+        logger.exception("candidate_intelligence_pipeline_failed")
+        profile.extraction_status = STATUS_FAILED
+        profile.warnings_json = _dumps(
+            [*( _loads(profile.warnings_json, []) or []), f"pipeline_error:{type(exc).__name__}"]
+        )
+        profile.updated_at = _utcnow()
+        db.add(profile)
+        db.commit()
+        return {"ok": False, "error": type(exc).__name__, "profile_id": profile.id, "status": STATUS_FAILED}
+
+
+def _run_extraction_pipeline_body(
+    db: Session,
+    *,
+    candidate: Candidate,
+    profile: CandidateIntelligenceProfile,
+    cv_text: str,
+    inj: dict[str, Any],
+    job_id: int | None,
+    locale: str,
+    kill_switch: bool,
+) -> dict[str, Any]:
     warnings: list[str] = []
     if inj.get("blocked") or inj.get("neutralized"):
         warnings.append("cv_prompt_injection_signals_detected_treated_as_untrusted")
+    if kill_switch:
+        warnings.append("ai_kill_switch_engaged_using_rules_fallback")
 
     # Base rule enrichment (reuse existing)
     existing = {
@@ -533,7 +611,7 @@ def run_extraction_pipeline(
         else [],
     }
     enriched = enrich_from_cv_text(cv_text, existing)
-    ai = _claude_extract(cv_text) if cv_text else None
+    ai = None if kill_switch else (_claude_extract(cv_text) if cv_text else None)
 
     extracted: dict[str, Any] = {
         "current_role": None,

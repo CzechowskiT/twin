@@ -131,6 +131,9 @@ class User(Base):
         DateTime, nullable=True
     )
     onboarding_completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    # Server-side onboarding resume (Phase 2 hardening) — step id + JSON progress blob.
+    onboarding_step: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    onboarding_progress_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     # Ops/smoke accounts — excluded from North Star and business funnel aggregates by default.
     exclude_from_product_metrics: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
     email_verified_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
@@ -3212,8 +3215,64 @@ class CandidatePilotIntakeRow(Base):
     )
     email_masked: Mapped[str] = mapped_column(String(200))
     email_hash: Mapped[str] = mapped_column(String(64))
+    # Fernet ciphertext for Founder-authorized send only — never log plaintext.
+    email_ciphertext: Mapped[str | None] = mapped_column(Text, nullable=True)
     locale: Mapped[str] = mapped_column(String(8), default="pl")
     consent_basis_ref: Mapped[str | None] = mapped_column(String(128), nullable=True)
     status: Mapped[str] = mapped_column(String(32), default="INTAKE", index=True)
     is_synthetic: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateInviteToken(Base):
+    """Cryptographic invite token — expiry, revoke, single-use, rate-limited validate."""
+
+    __tablename__ = "candidate_invite_tokens"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    cohort_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_pilot_cohorts.id", ondelete="CASCADE"), index=True
+    )
+    pack_id: Mapped[int | None] = mapped_column(
+        ForeignKey("candidate_pilot_invitation_packs.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+    intake_row_id: Mapped[int | None] = mapped_column(
+        ForeignKey("candidate_pilot_intake_rows.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    email_hash: Mapped[str] = mapped_column(String(64), index=True)
+    email_masked: Mapped[str] = mapped_column(String(200))
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True)
+    status: Mapped[str] = mapped_column(String(32), default="ACTIVE", index=True)
+    # ACTIVE|USED|REVOKED|EXPIRED
+    expires_at: Mapped[datetime] = mapped_column(DateTime, index=True)
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    used_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    last_validate_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    validate_fail_count: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidatePilotAllowlist(Base):
+    """Hash-only registration allowlist synced on Founder-authorized send."""
+
+    __tablename__ = "candidate_pilot_allowlist"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    email_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    email_masked: Mapped[str] = mapped_column(String(200))
+    cohort_id: Mapped[int | None] = mapped_column(
+        ForeignKey("candidate_pilot_cohorts.id", ondelete="CASCADE"),
+        nullable=True,
+        index=True,
+    )
+    pack_id: Mapped[int | None] = mapped_column(
+        ForeignKey("candidate_pilot_invitation_packs.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    source: Mapped[str] = mapped_column(String(64), default="founder_send")
+    active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)

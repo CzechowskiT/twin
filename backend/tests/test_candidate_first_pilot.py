@@ -5,6 +5,8 @@ from __future__ import annotations
 from fastapi.testclient import TestClient
 
 from app.database.models import (
+    CandidateInviteToken,
+    CandidatePilotAllowlist,
     CandidatePilotCohort,
     CandidatePilotIntakeRow,
     CandidatePilotInvitationPack,
@@ -29,6 +31,8 @@ def _client(monkeypatch):
         CandidatePilotCohort.__table__,
         CandidatePilotInvitationPack.__table__,
         CandidatePilotIntakeRow.__table__,
+        CandidateInviteToken.__table__,
+        CandidatePilotAllowlist.__table__,
     ):
         table.create(bind=bind, checkfirst=True)
 
@@ -77,8 +81,11 @@ def test_control_plane_verdict_a_without_intake(monkeypatch) -> None:
             headers={"Authorization": "Bearer ops-secret"},
         )
         assert e2e.status_code == 200
-        assert e2e.json()["total"] == 40
+        assert e2e.json()["total"] >= 40
         assert e2e.json()["sends_mail"] is False
+        names = {s["name"] for s in e2e.json()["steps"]}
+        assert "alembic_106_phase2" in names
+        assert "phase2_hardening_status" in names
     finally:
         app.dependency_overrides.clear()
         get_settings.cache_clear()

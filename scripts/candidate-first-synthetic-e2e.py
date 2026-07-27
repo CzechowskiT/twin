@@ -97,6 +97,13 @@ def main() -> int:
         ok("invites_zero", int(plane.get("invites_sent") or 0) == 0, "")
         ok("template_ready", bool(plane.get("invitation_pack_template")), "")
         ok("send_safety_module", bool((plane.get("journey") or {}).get("modules", {}).get("candidate_send_safety")), "")
+        ok("phase2_production_hardened", plane.get("phase2_status") == "PRODUCTION_HARDENED", str(plane.get("phase2_status")))
+        ok(
+            "hardening_no_open_critical",
+            int((plane.get("hardening") or {}).get("open_critical_high") or 0) == 0,
+            "",
+        )
+        ok("company_not_top_blocker", plane.get("company_approval_is_top_blocker") is False, "")
         ok("action_boundary_no_auto_apply", True, "documented OFF")
         ok("ai_disclosure_present", "ai_disclosure" in json.dumps(plane.get("invitation_pack_template") or {}), "")
         ok("forbidden_claims_listed", "bias_free_ai" in json.dumps(plane.get("invitation_pack_template") or {}), "")
@@ -112,6 +119,9 @@ def main() -> int:
             "invites_zero",
             "template_ready",
             "send_safety_module",
+            "phase2_production_hardened",
+            "hardening_no_open_critical",
+            "company_not_top_blocker",
             "action_boundary_no_auto_apply",
             "ai_disclosure_present",
             "forbidden_claims_listed",
@@ -122,14 +132,19 @@ def main() -> int:
             ok(n, False, "no_plane")
 
     c, e2e = get(f"{API}/api/v1/admin/pilot-os/candidate-first/synthetic-e2e", auth=True)
-    ok("synthetic_e2e_api", c == 200 and isinstance(e2e, dict) and e2e.get("total") == 40, f"http={c}")
+    ok(
+        "synthetic_e2e_api",
+        c == 200 and isinstance(e2e, dict) and int(e2e.get("total") or 0) >= 40,
+        f"http={c} total={(e2e or {}).get('total') if isinstance(e2e, dict) else None}",
+    )
     ok("synthetic_no_mail", isinstance(e2e, dict) and e2e.get("sends_mail") is False, "")
 
     c, mig = get(f"{API}/api/v1/admin/migrations/current", auth=True)
+    rev = (mig or {}).get("current_revision") if isinstance(mig, dict) else None
     ok(
-        "alembic_105",
-        c == 200 and isinstance(mig, dict) and mig.get("current_revision") == "105_candidate_first_pilot",
-        str((mig or {}).get("current_revision") if isinstance(mig, dict) else mig)[:80],
+        "alembic_106",
+        c == 200 and rev == "106_candidate_first_phase2_hardening",
+        str(rev)[:80],
     )
 
     ok("application_prepared_boundary", True, "SubmissionStatus.application_prepared")

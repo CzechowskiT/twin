@@ -31,10 +31,19 @@ const requiredDocs = [
   "docs/CANDIDATE_FIRST_ANALYTICS.md",
   "docs/CANDIDATE_FIRST_SUPPORT_OPS.md",
   "docs/CANDIDATE_FIRST_TROUBLESHOOTING.md",
+  "docs/PHASE2_CANDIDATE_FIRST_HARDENING_EVIDENCE.md",
+  "docs/PHASE2_PRODUCTION_HARDENING_HANDOFF.md",
 ];
 for (const rel of requiredDocs) {
   if (!existsSync(join(root, rel))) {
     throw new Error(`missing required doc: ${rel}`);
   }
+}
+const readiness = JSON.parse(readFileSync(join(root, "docs/CANDIDATE_FIRST_READINESS.json"), "utf8"));
+if (readiness.phase2_status !== "PRODUCTION_HARDENED") {
+  throw new Error("readiness phase2_status must be PRODUCTION_HARDENED");
+}
+if (!String(readiness.hardening_verdict || "").includes("PRODUCTION-HARDENED")) {
+  throw new Error("missing hardening_verdict");
 }
 console.log("candidate-first-taxonomy-guard: ok");

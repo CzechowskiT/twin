@@ -385,6 +385,11 @@ class CandidatePackPrepareBody(BaseModel):
     notes: str | None = Field(None, max_length=2000)
 
 
+class CandidateSendBody(BaseModel):
+    founder_send_approval_ref: str | None = Field(None, max_length=128)
+    dry_run: bool = True
+
+
 @router.get("/pilot-os/candidate-first")
 def candidate_first_status(
     db: Session = Depends(get_db),
@@ -515,3 +520,61 @@ def candidate_first_send_safety(
     from app.services import candidate_first_pilot as cfp
 
     return cfp.evaluate_candidate_send_safety(db, settings, pack_id=pack_id)
+
+
+@router.post("/pilot-os/candidate-first/invitation-packs/{pack_id}/send")
+def candidate_first_send(
+    pack_id: int,
+    body: CandidateSendBody,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    """Dry-run (default) or Founder-authorized send. Default dry_run=true never mints/sends."""
+    _require_ops_admin(settings, authorization)
+    from app.services import candidate_first_pilot as cfp
+
+    result = cfp.execute_candidate_send(
+        db,
+        settings,
+        pack_id=pack_id,
+        founder_send_approval_ref=body.founder_send_approval_ref,
+        dry_run=body.dry_run,
+    )
+    if not result.get("ok") and not result.get("dry_run"):
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN,
+            detail={
+                "message": "Candidate send blocked",
+                "result": result,
+            },
+        )
+    return result
+
+
+@router.get("/pilot-os/candidate-first/hardening")
+def candidate_first_hardening(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    _require_ops_admin(settings, authorization)
+    from app.services import candidate_first_pilot as cfp
+
+    return cfp.build_hardening_status(db, settings)
+
+
+@router.post("/pilot-os/candidate-first/invite-tokens/{token_id}/revoke")
+def candidate_first_revoke_token(
+    token_id: int,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    _require_ops_admin(settings, authorization)
+    from app.services import candidate_invite_tokens as invite_tokens
+
+    row = invite_tokens.revoke_invite_token(db, token_id=token_id)
+    if row is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="token_not_found")
+    return {"token": invite_tokens.token_to_dict(row), "revoked": True}

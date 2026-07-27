@@ -1,12 +1,18 @@
 {
   "schema": "twin.candidate_first_readiness/v1",
-  "updated_at": "2026-07-25T08:15:00Z",
+  "updated_at": "2026-07-27T12:00:00Z",
   "verdict_without_cohort_intake": "CANDIDATE-FIRST PILOT READY — REAL CANDIDATE COHORT CAN BE INVITED",
+  "hardening_verdict": "CANDIDATE-FIRST PILOT PRODUCTION-HARDENED — READY FOR FOUNDER COHORT INTAKE",
+  "phase2_status": "PRODUCTION_HARDENED",
   "readiness_state_without_intake": "READY_FOR_COHORT_INPUT",
   "readiness_state_with_pack": "PACK_READY_UNSENT",
   "primary_product": "candidate",
   "org_first_path": "SECONDARY_B2B_PILOT_PATH — NOT PRIMARY PRODUCT VALIDATION",
   "alten_org_pack": "NOT_PREPARED",
+  "activation_not_rerun": true,
+  "phase_3_not_started": true,
+  "company_approval_is_top_blocker": false,
+  "top_external_gate": "founder_named_cohort_intake",
   "stance": {
     "pilot": "READY_FOR_CONTROLLED_PILOT",
     "gate_f": "PASS",
@@ -18,14 +24,17 @@
   },
   "surfaces": {
     "api": "/api/v1/admin/pilot-os/candidate-first",
+    "hardening_api": "/api/v1/admin/pilot-os/candidate-first/hardening",
     "ui": "/admin/pilot-os",
     "taxonomy": "docs/CANDIDATE_FIRST_TAXONOMY.json",
-    "pilot_doc": "docs/CANDIDATE_FIRST_PILOT.md"
+    "pilot_doc": "docs/CANDIDATE_FIRST_PILOT.md",
+    "phase2_evidence": "docs/PHASE2_CANDIDATE_FIRST_HARDENING_EVIDENCE.md"
   },
-  "alembic": "105_candidate_first_pilot",
+  "alembic": "106_candidate_first_phase2_hardening",
   "distinction": {
     "READY_FOR_COHORT_INPUT": "Product+template+send-safety ready; no named recipients yet; no READY_UNSENT pack",
     "PACK_READY_UNSENT": "Named intake present; bilingual pack prepared; send not executed",
-    "AWAITING_SEND_AUTHORIZATION": "Send-safety may PASS only with separate founder_send_approval_ref"
+    "AWAITING_SEND_AUTHORIZATION": "Send-safety may PASS only with separate founder_send_approval_ref",
+    "PRODUCTION_HARDENED": "Phase 2 reliability closed; Founder cohort intake remains external prerequisite"
   }
 }
