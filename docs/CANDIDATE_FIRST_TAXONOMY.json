@@ -4,7 +4,7 @@
   "branch": "cursor/phase1-monorepo-scaffold",
   "primary_product": "candidate",
   "primary_validation": "candidate_first_pilot",
-  "org_first_path": "SECONDARY_B2B_PILOT_PATH — NOT PRIMARY PRODUCT VALIDATION",
+  "org_first_path": "SECONDARY_B2B_PILOT_PATH \u2014 NOT PRIMARY PRODUCT VALIDATION",
   "alten_org_pack": "NOT_PREPARED",
   "primary_journey": [
     "understand",
@@ -23,9 +23,9 @@
     "org_invitation_pack"
   ],
   "verdicts": {
-    "A": "CANDIDATE-FIRST PILOT READY — REAL CANDIDATE COHORT CAN BE INVITED",
-    "B": "CANDIDATE-FIRST PILOT INCOMPLETE — EXACT CANDIDATE JOURNEY BLOCKERS",
-    "C": "CANDIDATE-FIRST PILOT ACTIVE — FIRST REAL CANDIDATES ONBOARDED"
+    "A": "CANDIDATE-FIRST PILOT READY \u2014 REAL CANDIDATE COHORT CAN BE INVITED",
+    "B": "CANDIDATE-FIRST PILOT INCOMPLETE \u2014 EXACT CANDIDATE JOURNEY BLOCKERS",
+    "C": "CANDIDATE-FIRST PILOT ACTIVE \u2014 FIRST REAL CANDIDATES ONBOARDED"
   },
   "readiness_states": {
     "READY_FOR_COHORT_INPUT": "Verdict A without named intake / without READY_UNSENT pack",
@@ -53,7 +53,7 @@
     "applications": "/dashboard/applications",
     "trust": "/dashboard/trust/controls"
   },
-  "alembic": "105_candidate_first_pilot",
+  "alembic": "106_candidate_first_phase2_hardening",
   "hard_bans": [
     "no_launch_go",
     "no_public_enrollment",
@@ -63,5 +63,6 @@
     "no_autonomous_employment",
     "no_false_bias_free_claims",
     "no_alten_org_pack_in_this_program"
-  ]
+  ],
+  "phase2_status": "PRODUCTION_HARDENED"
 }

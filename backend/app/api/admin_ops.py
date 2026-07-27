@@ -30,8 +30,8 @@ def _require_ops_admin(settings: Settings, authorization: str | None) -> None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid admin token")
 
 
-# Keep in sync with alembic head (105_candidate_first_pilot).
-EXPECTED_ALEMBIC_HEAD = "105_candidate_first_pilot"
+# Keep in sync with alembic head (106_candidate_first_phase2_hardening).
+EXPECTED_ALEMBIC_HEAD = "106_candidate_first_phase2_hardening"
 
 
 def _read_alembic_current(db: Session) -> str | None:

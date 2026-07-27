@@ -1,6 +1,6 @@
 {
   "schema": "twin.production_topology.rc1/v1",
-  "updated_at": "2026-07-25T06:13:36Z",
+  "updated_at": "2026-07-27T10:42:51Z",
   "branch": "cursor/phase1-monorepo-scaffold",
   "hard_live_denominator": "CORE_PILOT_ONLY",
   "primary_product_validation": "candidate_first_pilot",
@@ -54,7 +54,7 @@
     "worker_service": "enthusiastic-encouragement",
     "postgres": "Postgres",
     "redis": "Redis",
-    "alembic_head_expected": "105_candidate_first_pilot"
+    "alembic_head_expected": "106_candidate_first_phase2_hardening"
   },
   "on_call_roles": {
     "primary": "PILOT_ON_CALL_PRIMARY",
@@ -81,17 +81,17 @@
     "status_api": "/api/v1/admin/pilot-os/status",
     "send_safety_api": "/api/v1/admin/pilot-os/invitation-packs/{id}/send-safety"
   },
-  "verified_runtime_commit": "0f8b5a17535db6c86963f05945f1c5014f8462b0",
+  "verified_runtime_commit": "082ff306d41c09cddadffbe7f8c8802f3d10e7d5",
   "alignment": {
-    "repo_head": "0f8b5a17535db6c86963f05945f1c5014f8462b0",
-    "prod_api_commit": "0f8b5a17535db6c86963f05945f1c5014f8462b0",
-    "prod_frontend_commit": "0f8b5a17535db6c86963f05945f1c5014f8462b0",
-    "prod_worker_commit": "0f8b5a17535db6c86963f05945f1c5014f8462b0",
+    "repo_head": "082ff306d41c09cddadffbe7f8c8802f3d10e7d5",
+    "prod_api_commit": "082ff306d41c09cddadffbe7f8c8802f3d10e7d5",
+    "prod_frontend_commit": "082ff306d41c09cddadffbe7f8c8802f3d10e7d5",
+    "prod_worker_commit": "082ff306d41c09cddadffbe7f8c8802f3d10e7d5",
     "alignment_status": "ALIGNED",
     "docs_only_drift": false,
-    "note": "Candidate-first Verdict A + READY_FOR_COHORT_INPUT; Alembic 105; no READY_UNSENT without intake"
+    "note": "Phase 2 PRODUCTION_HARDENED; Alembic 106; invites 0; READY_FOR_COHORT_INPUT"
   },
-  "verdict": "CANDIDATE-FIRST PILOT READY \u2014 REAL CANDIDATE COHORT CAN BE INVITED",
+  "verdict": "CANDIDATE-FIRST PILOT PRODUCTION-HARDENED \u2014 READY FOR FOUNDER COHORT INTAKE",
   "activation": {
     "approved_real_orgs": 0,
     "invitations_sent": 0,
@@ -141,14 +141,17 @@
     "readiness": "docs/CANDIDATE_FIRST_READINESS.json",
     "api": "/api/v1/admin/pilot-os/candidate-first",
     "synthetic_e2e": "scripts/candidate-first-synthetic-e2e.py",
-    "alembic": "105_candidate_first_pilot",
+    "alembic": "106_candidate_first_phase2_hardening",
     "verdict": "CANDIDATE-FIRST PILOT READY \u2014 REAL CANDIDATE COHORT CAN BE INVITED",
     "readiness_state": "READY_FOR_COHORT_INPUT",
     "primary": true,
     "invites_sent": 0,
-    "packs_ready_unsent": 0
+    "packs_ready_unsent": 0,
+    "phase2_status": "PRODUCTION_HARDENED",
+    "hardening_verdict": "CANDIDATE-FIRST PILOT PRODUCTION-HARDENED \u2014 READY FOR FOUNDER COHORT INTAKE",
+    "phase2_evidence": "docs/PHASE2_CANDIDATE_FIRST_HARDENING_EVIDENCE.md"
   },
-  "verified_tip": "0f8b5a17535db6c86963f05945f1c5014f8462b0",
+  "verified_tip": "082ff306d41c09cddadffbe7f8c8802f3d10e7d5",
   "ci_smoke_run": "30118723247",
   "ai_candidate_intelligence": {
     "doc": "docs/AI_CANDIDATE_INTELLIGENCE.json",

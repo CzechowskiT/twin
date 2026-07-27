@@ -3,13 +3,13 @@
   "updated_at": "2026-07-25T06:45:00Z",
   "branch": "cursor/phase1-monorepo-scaffold",
   "primary_product_validation": "candidate_first_pilot",
-  "org_first_path": "SECONDARY_B2B_PILOT_PATH — NOT PRIMARY PRODUCT VALIDATION",
-  "verdict_candidate_first_without_intake": "CANDIDATE-FIRST PILOT READY — REAL CANDIDATE COHORT CAN BE INVITED",
-  "verdict_expected_without_approved_org": "FIRST REAL PILOT ORGANIZATION APPROVAL REQUIRED — ACTIVATION SYSTEM READY",
-  "verdict_alias_os_without_approved_org": "CONTROLLED PILOT OPERATING SYSTEM READY — AWAITING FIRST FOUNDER-APPROVED PILOT ORGANIZATION",
-  "verdict_first_customer_success_without_org": "FIRST REAL CUSTOMER SUCCESS SYSTEM READY — AWAITING FOUNDER-APPROVED PILOT ORGANIZATION",
-  "verdict_with_sent_invites_awaiting_activation": "FIRST REAL PILOT ORGANIZATION INVITATIONS SENT — AWAITING USER ACTIVATION",
-  "verdict_with_sent_invites_legacy_alias": "CONTROLLED PILOT ACTIVE — FIRST REAL USERS ONBOARDED",
+  "org_first_path": "SECONDARY_B2B_PILOT_PATH \u2014 NOT PRIMARY PRODUCT VALIDATION",
+  "verdict_candidate_first_without_intake": "CANDIDATE-FIRST PILOT READY \u2014 REAL CANDIDATE COHORT CAN BE INVITED",
+  "verdict_expected_without_approved_org": "FIRST REAL PILOT ORGANIZATION APPROVAL REQUIRED \u2014 ACTIVATION SYSTEM READY",
+  "verdict_alias_os_without_approved_org": "CONTROLLED PILOT OPERATING SYSTEM READY \u2014 AWAITING FIRST FOUNDER-APPROVED PILOT ORGANIZATION",
+  "verdict_first_customer_success_without_org": "FIRST REAL CUSTOMER SUCCESS SYSTEM READY \u2014 AWAITING FOUNDER-APPROVED PILOT ORGANIZATION",
+  "verdict_with_sent_invites_awaiting_activation": "FIRST REAL PILOT ORGANIZATION INVITATIONS SENT \u2014 AWAITING USER ACTIVATION",
+  "verdict_with_sent_invites_legacy_alias": "CONTROLLED PILOT ACTIVE \u2014 FIRST REAL USERS ONBOARDED",
   "stance": {
     "pilot": "READY_FOR_CONTROLLED_PILOT",
     "gate_f": "PASS",
@@ -21,7 +21,10 @@
     "public_registration": "INVITE_ONLY"
   },
   "kpi_default": "NO_REAL_PILOT_DATA",
-  "synthetic_not_real": ["nova-hiring-pl", "demo@twin.career"],
+  "synthetic_not_real": [
+    "nova-hiring-pl",
+    "demo@twin.career"
+  ],
   "canonical_url": "https://twin-sooty.vercel.app",
   "dns": {
     "preferred": "twin.care",

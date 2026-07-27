@@ -22,7 +22,7 @@ understand → direction → opportunities → fit/gaps → prepare → decide/a
 - Synthetic E2E (40 steps, no mail): `GET /api/v1/admin/pilot-os/candidate-first/synthetic-e2e`
 - UI: `/admin/pilot-os` panel **Candidate-first pilot (PRIMARY)**
 - Machine: `docs/CANDIDATE_FIRST_TAXONOMY.json`
-- Alembic: `105_candidate_first_pilot`
+- Alembic: `106_candidate_first_phase2_hardening` (Phase 2 hardening; Activation tables from `105`)
 
 ## Founder flow (no invent)
 
