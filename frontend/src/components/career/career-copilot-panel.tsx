@@ -209,7 +209,12 @@ export function CareerCopilotPanel() {
           <h2 className="text-lg font-semibold text-[var(--foreground)]">{t("careerCopilot.title")}</h2>
           <p className="twin-muted mt-1 max-w-prose text-sm">{t("careerCopilot.lead")}</p>
         </div>
-        <Button type="button" variant="secondary" disabled={busy} onClick={() => void refresh()}>
+        <Button
+          type="button"
+          className="border border-[var(--twin-border)] bg-transparent"
+          disabled={busy}
+          onClick={() => void refresh()}
+        >
           {t("careerCopilot.refresh")}
         </Button>
       </div>
@@ -306,7 +311,7 @@ export function CareerCopilotPanel() {
                   {d.status !== "accepted" ? (
                     <Button
                       type="button"
-                      variant="secondary"
+                      className="border border-[var(--twin-border)] bg-transparent"
                       disabled={busy}
                       onClick={() => void overrideDirection(d.path_key, "accept")}
                     >
@@ -316,7 +321,7 @@ export function CareerCopilotPanel() {
                   {d.status !== "rejected" ? (
                     <Button
                       type="button"
-                      variant="secondary"
+                      className="border border-[var(--twin-border)] bg-transparent"
                       disabled={busy}
                       onClick={() => void overrideDirection(d.path_key, "reject")}
                     >
@@ -325,7 +330,7 @@ export function CareerCopilotPanel() {
                   ) : (
                     <Button
                       type="button"
-                      variant="secondary"
+                      className="border border-[var(--twin-border)] bg-transparent"
                       disabled={busy}
                       onClick={() => void overrideDirection(d.path_key, "restart")}
                     >
@@ -357,7 +362,7 @@ export function CareerCopilotPanel() {
               {a.status !== "completed" ? (
                 <Button
                   type="button"
-                  variant="secondary"
+                  className="border border-[var(--twin-border)] bg-transparent"
                   disabled={busy}
                   onClick={() => void completeAction(a.id)}
                 >
