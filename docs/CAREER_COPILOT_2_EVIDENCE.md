@@ -27,7 +27,7 @@
 | WS17 Observability | SHIPPED | degraded flag + aggregate safety block |
 | WS18 Tests | SHIPPED | `test_career_copilot_2.py` |
 | WS19 Docs | SHIPPED | this file + architecture |
-| WS20 Deploy | pending push/align | Alembic 107 |
+| WS20 Deploy | SHIPPED | four-way ALIGNED add6a475; smoke 30390271505; Alembic 107 via start-api.sh |
 
 ## Confirmations
 

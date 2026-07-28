@@ -1,6 +1,6 @@
 {
   "schema": "twin.production_topology.rc1/v1",
-  "updated_at": "2026-07-28T18:55:13Z",
+  "updated_at": "2026-07-28T19:07:43Z",
   "branch": "cursor/phase1-monorepo-scaffold",
   "hard_live_denominator": "CORE_PILOT_ONLY",
   "primary_product_validation": "candidate_first_pilot",
@@ -81,17 +81,17 @@
     "status_api": "/api/v1/admin/pilot-os/status",
     "send_safety_api": "/api/v1/admin/pilot-os/invitation-packs/{id}/send-safety"
   },
-  "verified_runtime_commit": "65d4e415ca627fc9a1c086fa0604bd9c759ae884",
+  "verified_runtime_commit": "add6a4751aeac500c70c09d7481c747d3bd9e367",
   "alignment": {
-    "repo_head": "65d4e415ca627fc9a1c086fa0604bd9c759ae884",
-    "prod_api_commit": "65d4e415ca627fc9a1c086fa0604bd9c759ae884",
-    "prod_frontend_commit": "65d4e415ca627fc9a1c086fa0604bd9c759ae884",
-    "prod_worker_commit": "65d4e415ca627fc9a1c086fa0604bd9c759ae884",
+    "repo_head": "add6a4751aeac500c70c09d7481c747d3bd9e367",
+    "prod_api_commit": "add6a4751aeac500c70c09d7481c747d3bd9e367",
+    "prod_frontend_commit": "add6a4751aeac500c70c09d7481c747d3bd9e367",
+    "prod_worker_commit": "add6a4751aeac500c70c09d7481c747d3bd9e367",
     "alignment_status": "ALIGNED",
     "docs_only_drift": false,
-    "note": "Phase 2 PRODUCTION_HARDENED; Alembic 106 is_at_head; invites 0; READY_FOR_COHORT_INPUT"
+    "note": "Career Copilot 2.0; Alembic 107 via start-api.sh; invites 0; Launch NO-GO"
   },
-  "verdict": "CANDIDATE-FIRST PILOT PRODUCTION-HARDENED \u2014 READY FOR FOUNDER COHORT INTAKE",
+  "verdict": "CAREER COPILOT 2.0 CUSTOMER-USABLE \u2014 PERSISTENT AI CAREER ADVISOR PRODUCTION-READY",
   "activation": {
     "approved_real_orgs": 0,
     "invitations_sent": 0,
@@ -151,7 +151,7 @@
     "hardening_verdict": "CANDIDATE-FIRST PILOT PRODUCTION-HARDENED \u2014 READY FOR FOUNDER COHORT INTAKE",
     "phase2_evidence": "docs/PHASE2_CANDIDATE_FIRST_HARDENING_EVIDENCE.md"
   },
-  "verified_tip": "65d4e415ca627fc9a1c086fa0604bd9c759ae884",
+  "verified_tip": "add6a4751aeac500c70c09d7481c747d3bd9e367",
   "ci_smoke_run": "30118723247",
   "ai_candidate_intelligence": {
     "doc": "docs/AI_CANDIDATE_INTELLIGENCE.json",
@@ -176,6 +176,9 @@
     "ui": "/dashboard/career",
     "alembic": "107_career_copilot_2",
     "verdict_target": "CAREER COPILOT 2.0 CUSTOMER-USABLE \u2014 PERSISTENT AI CAREER ADVISOR PRODUCTION-READY",
-    "phase_3_career_agent": "NOT_STARTED"
+    "phase_3_career_agent": "NOT_STARTED",
+    "runtime_sha": "add6a4751aeac500c70c09d7481c747d3bd9e367",
+    "smoke": "https://github.com/CzechowskiT/twin/actions/runs/30390271505",
+    "status": "CUSTOMER_USABLE"
   }
 }
