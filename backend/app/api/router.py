@@ -31,6 +31,7 @@ from app.api import (
     candidate_wave1,
     company,
     career_assistant,
+    career_copilot,
     curated_careers,
     gamification,
     geo,
@@ -133,6 +134,9 @@ api_router.include_router(beta_waitlist.router, prefix="/beta", tags=["Beta wait
 api_router.include_router(billing.router, prefix="/billing", tags=["Billing"])
 api_router.include_router(kyc.router, prefix="/kyc", tags=["KYC"])
 api_router.include_router(candidates.router, prefix="/candidates", tags=["Candidates"])
+api_router.include_router(
+    career_copilot.router, prefix="/candidates", tags=["Career Copilot"]
+)
 api_router.include_router(
     candidate_intelligence.router, prefix="", tags=["Candidate Intelligence"]
 )

@@ -1,6 +1,6 @@
 {
   "schema": "twin.production_topology.rc1/v1",
-  "updated_at": "2026-07-27T10:46:26Z",
+  "updated_at": "2026-07-28T18:55:13Z",
   "branch": "cursor/phase1-monorepo-scaffold",
   "hard_live_denominator": "CORE_PILOT_ONLY",
   "primary_product_validation": "candidate_first_pilot",
@@ -54,7 +54,7 @@
     "worker_service": "enthusiastic-encouragement",
     "postgres": "Postgres",
     "redis": "Redis",
-    "alembic_head_expected": "106_candidate_first_phase2_hardening"
+    "alembic_head_expected": "107_career_copilot_2"
   },
   "on_call_roles": {
     "primary": "PILOT_ON_CALL_PRIMARY",
@@ -168,5 +168,14 @@
     "approval_search": "NO_COMPLETE_APPROVAL",
     "real_validation_verdict": "AI CANDIDATE INTELLIGENCE REAL-CUSTOMER VALIDATION READY \u2014 AWAITING FOUNDER-APPROVED PILOT ORGANIZATION",
     "verdict": "AI CANDIDATE INTELLIGENCE CUSTOMER-USABLE \u2014 EXPLAINABLE CV SCREENING PRODUCTION-READY"
+  },
+  "career_copilot_2": {
+    "doc": "docs/CAREER_COPILOT_2.md",
+    "evidence": "docs/CAREER_COPILOT_2_EVIDENCE.md",
+    "api": "/api/v1/candidates/me/career-copilot",
+    "ui": "/dashboard/career",
+    "alembic": "107_career_copilot_2",
+    "verdict_target": "CAREER COPILOT 2.0 CUSTOMER-USABLE \u2014 PERSISTENT AI CAREER ADVISOR PRODUCTION-READY",
+    "phase_3_career_agent": "NOT_STARTED"
   }
 }

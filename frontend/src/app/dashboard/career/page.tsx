@@ -21,6 +21,7 @@ import {
   formsEqual,
   validateForm,
 } from "@/lib/candidate-career-compass";
+import { CareerCopilotPanel } from "@/components/career/career-copilot-panel";
 import { CAREER_COMPASS_SHIP_STATUS } from "@/lib/seven-day-d2-candidate";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -214,6 +215,8 @@ export default function CareerCompassPage() {
           </div>
         </div>
       </Card>
+
+      <CareerCopilotPanel />
 
       {error ? (
         <Card variant="soft" className="mb-4 border-red-200 bg-red-50/50">

@@ -936,6 +936,181 @@ class CandidateCareerCompass(Base):
     candidate: Mapped["Candidate"] = relationship(back_populates="career_compass")
 
 
+class CandidateCareerGraph(Base):
+    """Career Copilot 2.0 — persistent canonical career graph (one per candidate)."""
+
+    __tablename__ = "candidate_career_graphs"
+    __table_args__ = (UniqueConstraint("candidate_id", name="uq_candidate_career_graphs_candidate_id"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True, unique=True
+    )
+    graph_json: Mapped[str] = mapped_column(Text, default="{}")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    source: Mapped[str] = mapped_column(String(64), default="rules_v1")
+    confidence: Mapped[str] = mapped_column(String(16), default="low")
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateCareerDirection(Base):
+    """Career direction path suggestion — specialist / EM / product / etc."""
+
+    __tablename__ = "candidate_career_directions"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "path_key", name="uq_career_direction_path_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    path_key: Mapped[str] = mapped_column(String(64))
+    title: Mapped[str] = mapped_column(String(200))
+    status: Mapped[str] = mapped_column(String(32), default="suggested")
+    probability: Mapped[float | None] = mapped_column(Float, nullable=True)
+    effort: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    risk: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    timeline_months: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    market_demand: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    salary_trend: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    confidence: Mapped[str] = mapped_column(String(16), default="low")
+    evidence_json: Mapped[str] = mapped_column(Text, default="[]")
+    claims_json: Mapped[str] = mapped_column(Text, default="[]")
+    payload_json: Mapped[str] = mapped_column(Text, default="{}")
+    is_selected: Mapped[bool] = mapped_column(Boolean, default=False)
+    rejected_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidateCareerGoal(Base):
+    """Persistent career goals with progress history."""
+
+    __tablename__ = "candidate_career_goals"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    title: Mapped[str] = mapped_column(String(300))
+    goal_type: Mapped[str] = mapped_column(String(64), default="career")
+    status: Mapped[str] = mapped_column(String(32), default="active", index=True)
+    target_role: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    target_date: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    progress_percent: Mapped[int] = mapped_column(Integer, default=0)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    history_json: Mapped[str] = mapped_column(Text, default="[]")
+    paused_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    archived_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidateCareerAction(Base):
+    """Action planner roadmap items (week/month/quarter horizons)."""
+
+    __tablename__ = "candidate_career_actions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    goal_id: Mapped[int | None] = mapped_column(
+        ForeignKey("candidate_career_goals.id", ondelete="SET NULL"), nullable=True
+    )
+    horizon: Mapped[str] = mapped_column(String(32), default="month1", index=True)
+    title: Mapped[str] = mapped_column(String(300))
+    status: Mapped[str] = mapped_column(String(32), default="planned")
+    effort: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    priority: Mapped[int] = mapped_column(Integer, default=50)
+    dependency: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    impact: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    confidence: Mapped[str] = mapped_column(String(16), default="medium")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="SUGGESTION")
+    source: Mapped[str] = mapped_column(String(64), default="copilot")
+    payload_json: Mapped[str] = mapped_column(Text, default="{}")
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidateCopilotRecommendation(Base):
+    """Recommendation memory — never silently overwrite history."""
+
+    __tablename__ = "candidate_copilot_recommendations"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "rec_key", name="uq_copilot_rec_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    rec_key: Mapped[str] = mapped_column(String(128))
+    kind: Mapped[str] = mapped_column(String(64), default="direction")
+    title: Mapped[str] = mapped_column(String(300))
+    status: Mapped[str] = mapped_column(String(32), default="suggested")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="SUGGESTION")
+    confidence: Mapped[str] = mapped_column(String(16), default="low")
+    evidence_json: Mapped[str] = mapped_column(Text, default="[]")
+    payload_json: Mapped[str] = mapped_column(Text, default="{}")
+    accepted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    rejected_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    ignored_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidateCareerDecision(Base):
+    """Decision simulator comparison snapshots."""
+
+    __tablename__ = "candidate_career_decisions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    scenario_key: Mapped[str] = mapped_column(String(64))
+    title: Mapped[str] = mapped_column(String(200))
+    comparison_json: Mapped[str] = mapped_column(Text, default="{}")
+    confidence: Mapped[str] = mapped_column(String(16), default="low")
+    claims_json: Mapped[str] = mapped_column(Text, default="[]")
+    user_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidateCareerReflection(Base):
+    """Reflection engine entries after milestones."""
+
+    __tablename__ = "candidate_career_reflections"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    milestone_ref: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    body_json: Mapped[str] = mapped_column(Text, default="{}")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
 class CandidateReferralProgram(Base):
     """One referral program per candidate — unique share code (Wave B slice 3)."""
 
