@@ -1262,6 +1262,11 @@ def completeness_and_tasks(db: Session, *, candidate_id: int, user_id: int) -> d
             )
         except Exception:
             logger.debug("acceptance calendar evidence task skip", exc_info=True)
+    try:
+        db.commit()
+    except Exception:
+        logger.debug("acceptance calendar evidence task commit skip", exc_info=True)
+        db.rollback()
     return {
         "strong": len([e for e in evidence if e.quality == "STRONG"]),
         "weak": len(weak),

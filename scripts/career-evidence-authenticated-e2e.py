@@ -645,9 +645,22 @@ def main() -> int:
         ]
         check(
             "evidence_task_in_acal",
-            bool(evidence_tasks or evidence_tasks2 or code2 == 200),
+            bool(evidence_tasks2) or bool(evidence_tasks),
             f"n={len(evidence_tasks2)}",
         )
+        if not (evidence_tasks2 or evidence_tasks):
+            # Fallback: unscheduled view
+            c3, uns = _req("GET", "/api/v1/candidates/me/acceptance-calendar/views/unscheduled", token=token)
+            uns_items = (uns.get("items") or []) if isinstance(uns, dict) else []
+            uns_ev = [
+                i
+                for i in uns_items
+                if "evidence" in str(i.get("title", "")).lower()
+                or str(i.get("item_key", "")).startswith("evidence:task:")
+            ]
+            check("evidence_task_unscheduled_view", bool(uns_ev), f"n={len(uns_ev)}")
+        else:
+            check("evidence_task_unscheduled_view", True, "covered_by_agenda")
 
     # Daily OS brief (if available)
     code, brief = _req("GET", "/api/v1/candidates/me/daily-os/brief", token=token)
