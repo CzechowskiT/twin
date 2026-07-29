@@ -1111,6 +1111,155 @@ class CandidateCareerReflection(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
+class CandidateCopilotMemory(Base):
+    """Long-term adaptive memory — versioned, never silently overwritten."""
+
+    __tablename__ = "candidate_copilot_memories"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "memory_key", "version", name="uq_copilot_memory_ver"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    memory_key: Mapped[str] = mapped_column(String(128))
+    kind: Mapped[str] = mapped_column(String(64), default="event", index=True)
+    title: Mapped[str] = mapped_column(String(300))
+    body_json: Mapped[str] = mapped_column(Text, default="{}")
+    source: Mapped[str] = mapped_column(String(64), default="copilot")
+    confidence: Mapped[str] = mapped_column(String(16), default="medium")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    superseded_by_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    edited_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    archived_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidateCopilotPreference(Base):
+    """Inferred/explicit preferences — never protected attributes."""
+
+    __tablename__ = "candidate_copilot_preferences"
+    __table_args__ = (UniqueConstraint("candidate_id", "pref_key", name="uq_copilot_pref_key"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    pref_key: Mapped[str] = mapped_column(String(64))
+    value_json: Mapped[str] = mapped_column(Text, default="{}")
+    confidence: Mapped[str] = mapped_column(String(16), default="low")
+    evidence_json: Mapped[str] = mapped_column(Text, default="[]")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="INFERENCE")
+    editable: Mapped[bool] = mapped_column(Boolean, default=True)
+    user_override: Mapped[bool] = mapped_column(Boolean, default=False)
+    archived_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidateCareerTimelineEvent(Base):
+    """Persistent career timeline across goals/apps/decisions/learning."""
+
+    __tablename__ = "candidate_career_timeline_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    event_type: Mapped[str] = mapped_column(String(64))
+    title: Mapped[str] = mapped_column(String(300))
+    payload_json: Mapped[str] = mapped_column(Text, default="{}")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
+    occurred_at: Mapped[datetime] = mapped_column(DateTime, index=True)
+    archived_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateSkillEvolution(Base):
+    """Skill gaining/stagnation/decay signals — never fabricate evidence."""
+
+    __tablename__ = "candidate_skill_evolution"
+    __table_args__ = (UniqueConstraint("candidate_id", "skill", name="uq_skill_evolution_skill"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    skill: Mapped[str] = mapped_column(String(120))
+    status: Mapped[str] = mapped_column(String(32), default="unknown")
+    evidence_json: Mapped[str] = mapped_column(Text, default="[]")
+    next_exercise: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    confidence: Mapped[str] = mapped_column(String(16), default="low")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="INFERENCE")
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateCareerHealthSnapshot(Base):
+    """Explainable multi-dimension career health score."""
+
+    __tablename__ = "candidate_career_health_snapshots"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    overall_score: Mapped[int] = mapped_column(Integer, default=0)
+    dimensions_json: Mapped[str] = mapped_column(Text, default="{}")
+    explanations_json: Mapped[str] = mapped_column(Text, default="{}")
+    confidence: Mapped[str] = mapped_column(String(16), default="low")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateLearningLoopEntry(Base):
+    """Post-milestone learning loop — useful? correct? surprise? improve?"""
+
+    __tablename__ = "candidate_learning_loop_entries"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    milestone_ref: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    useful: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    prediction_correct: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    surprise: Mapped[str | None] = mapped_column(Text, nullable=True)
+    improve_reasoning: Mapped[str | None] = mapped_column(Text, nullable=True)
+    payload_json: Mapped[str] = mapped_column(Text, default="{}")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateCareerScenario(Base):
+    """Unlimited scenario comparisons (Job A/B, Stay, Abroad, Freelance…)."""
+
+    __tablename__ = "candidate_career_scenarios"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    scenario_key: Mapped[str] = mapped_column(String(64))
+    title: Mapped[str] = mapped_column(String(200))
+    comparison_json: Mapped[str] = mapped_column(Text, default="{}")
+    confidence: Mapped[str] = mapped_column(String(16), default="low")
+    claims_json: Mapped[str] = mapped_column(Text, default="[]")
+    ranking_explain_json: Mapped[str] = mapped_column(Text, default="{}")
+    archived_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
 class CandidateReferralProgram(Base):
     """One referral program per candidate — unique share code (Wave B slice 3)."""
 

@@ -1,6 +1,8 @@
-"""Career Copilot 2.0 API — candidate-owned persistent advisor."""
+"""Career Copilot 2.0 + Adaptive Career Intelligence API."""
 
 from __future__ import annotations
+
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
@@ -9,6 +11,7 @@ from sqlalchemy.orm import Session
 from app.core.deps import get_current_user, get_db
 from app.database.models import Candidate, User
 from app.services import career_copilot as cc
+from app.services import career_copilot_adaptive as adaptive
 
 router = APIRouter()
 
@@ -55,13 +58,41 @@ class SimulateIn(BaseModel):
     options: list[str] | None = Field(default=None, max_length=8)
 
 
+class MemoryEditIn(BaseModel):
+    title: str | None = Field(default=None, max_length=300)
+    body: dict[str, Any] | None = None
+
+
+class PrefOverrideIn(BaseModel):
+    pref_key: str = Field(..., max_length=64)
+    value: dict[str, Any] = Field(default_factory=dict)
+
+
+class OpportunityIn(BaseModel):
+    opportunity_title: str = Field(..., min_length=2, max_length=200)
+    required_skills: list[str] | None = Field(default=None, max_length=20)
+
+
+class ScenarioIn(BaseModel):
+    options: list[str] = Field(default_factory=list, max_length=12)
+    title: str | None = Field(default=None, max_length=200)
+
+
+class LearningLoopIn(BaseModel):
+    useful: bool | None = None
+    prediction_correct: bool | None = None
+    surprise: str | None = Field(default=None, max_length=2000)
+    improve_reasoning: str | None = Field(default=None, max_length=2000)
+    milestone_ref: str | None = Field(default=None, max_length=128)
+
+
 @router.get("/me/career-copilot")
 def get_career_copilot(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> dict:
     cand = _candidate(db, user)
-    return cc.build_aggregate(db, candidate_id=cand.id)
+    return adaptive.build_adaptive_aggregate(db, candidate_id=cand.id)
 
 
 @router.post("/me/career-copilot/refresh")
@@ -74,10 +105,7 @@ def refresh_career_copilot(
     cc.refresh_directions(db, candidate_id=cand.id)
     cc.ensure_action_plan(db, candidate_id=cand.id, force=False)
     cc.sync_direction_recommendations(db, candidate_id=cand.id)
-    return cc.build_aggregate(db, candidate_id=cand.id)
-
-
-@router.get("/me/career-copilot/overview")
+    return adaptive.build_adaptive_aggregate(db, candidate_id=cand.id, force_health=True)
 def get_copilot_overview(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -254,3 +282,201 @@ def post_reflection(
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
     return {"reflection": {"id": row.id, "body": cc._loads(row.body_json, {})}}
+
+
+@router.get("/me/career-copilot/adaptive")
+def get_adaptive(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    cand = _candidate(db, user)
+    return adaptive.build_adaptive_aggregate(db, candidate_id=cand.id)
+
+
+@router.get("/me/career-copilot/memories")
+def get_memories(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    cand = _candidate(db, user)
+    return {"memories": adaptive.list_memories(db, candidate_id=cand.id)}
+
+
+@router.patch("/me/career-copilot/memories/{memory_id}")
+def patch_memory(
+    memory_id: int,
+    body: MemoryEditIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    cand = _candidate(db, user)
+    try:
+        row = adaptive.edit_memory(
+            db,
+            candidate_id=cand.id,
+            memory_id=memory_id,
+            title=body.title,
+            body=body.body,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    return {
+        "memory": {
+            "id": row.id,
+            "memory_key": row.memory_key,
+            "title": row.title,
+            "version": row.version,
+            "editable": True,
+        }
+    }
+
+
+@router.get("/me/career-copilot/preferences")
+def get_preferences(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    cand = _candidate(db, user)
+    rows = adaptive.infer_preferences(db, candidate_id=cand.id)
+    return {
+        "preferences": [
+            {
+                "id": p.id,
+                "pref_key": p.pref_key,
+                "value": cc._loads(p.value_json, {}),
+                "confidence": p.confidence,
+                "evidence": cc._loads(p.evidence_json, []),
+                "claim_kind": p.claim_kind,
+                "user_override": p.user_override,
+                "editable": p.editable,
+            }
+            for p in rows
+        ]
+    }
+
+
+@router.post("/me/career-copilot/preferences/override")
+def post_pref_override(
+    body: PrefOverrideIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    cand = _candidate(db, user)
+    try:
+        row = adaptive.set_preference_override(
+            db, candidate_id=cand.id, pref_key=body.pref_key, value=body.value
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    return {
+        "preference": {
+            "id": row.id,
+            "pref_key": row.pref_key,
+            "value": cc._loads(row.value_json, {}),
+            "user_override": row.user_override,
+        }
+    }
+
+
+@router.get("/me/career-copilot/ranking")
+def get_ranking(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    cand = _candidate(db, user)
+    return {"ranked": adaptive.rank_recommendations(db, candidate_id=cand.id)}
+
+
+@router.post("/me/career-copilot/opportunity-intelligence")
+def post_opportunity_intel(
+    body: OpportunityIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    cand = _candidate(db, user)
+    return adaptive.opportunity_intelligence(
+        db,
+        candidate_id=cand.id,
+        opportunity_title=cc.scrub_prompt_injection(body.opportunity_title),
+        required_skills=body.required_skills,
+    )
+
+
+@router.get("/me/career-copilot/timeline")
+def get_timeline(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    cand = _candidate(db, user)
+    return {"timeline": adaptive.list_timeline(db, candidate_id=cand.id)}
+
+
+@router.get("/me/career-copilot/skill-evolution")
+def get_skill_evolution(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    cand = _candidate(db, user)
+    return {"skills": adaptive.refresh_skill_evolution(db, candidate_id=cand.id)}
+
+
+@router.get("/me/career-copilot/health")
+def get_health(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    cand = _candidate(db, user)
+    return adaptive.compute_health_score(db, candidate_id=cand.id, force=True)
+
+
+@router.post("/me/career-copilot/scenarios", status_code=status.HTTP_201_CREATED)
+def post_scenario(
+    body: ScenarioIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    cand = _candidate(db, user)
+    row = adaptive.create_scenario(
+        db,
+        candidate_id=cand.id,
+        options=body.options or [],
+        title=body.title,
+    )
+    return {
+        "scenario": {
+            "id": row.id,
+            "scenario_key": row.scenario_key,
+            "title": row.title,
+            "comparison": cc._loads(row.comparison_json, {}),
+            "ranking_explain": cc._loads(row.ranking_explain_json, {}),
+            "confidence": row.confidence,
+            "claims": cc._loads(row.claims_json, []),
+        }
+    }
+
+
+@router.post("/me/career-copilot/learning-loop", status_code=status.HTTP_201_CREATED)
+def post_learning_loop(
+    body: LearningLoopIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    cand = _candidate(db, user)
+    row = adaptive.submit_learning_loop(
+        db,
+        candidate_id=cand.id,
+        useful=body.useful,
+        prediction_correct=body.prediction_correct,
+        surprise=body.surprise,
+        improve_reasoning=body.improve_reasoning,
+        milestone_ref=body.milestone_ref,
+    )
+    return {
+        "entry": {
+            "id": row.id,
+            "useful": row.useful,
+            "prediction_correct": row.prediction_correct,
+            "surprise": row.surprise,
+            "improve_reasoning": row.improve_reasoning,
+        }
+    }

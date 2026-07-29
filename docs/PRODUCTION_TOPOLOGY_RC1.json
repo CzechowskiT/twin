@@ -54,7 +54,7 @@
     "worker_service": "enthusiastic-encouragement",
     "postgres": "Postgres",
     "redis": "Redis",
-    "alembic_head_expected": "107_career_copilot_2"
+    "alembic_head_expected": "108_adaptive_career_intelligence"
   },
   "on_call_roles": {
     "primary": "PILOT_ON_CALL_PRIMARY",
@@ -180,5 +180,16 @@
     "runtime_sha": "add6a4751aeac500c70c09d7481c747d3bd9e367",
     "smoke": "https://github.com/CzechowskiT/twin/actions/runs/30390271505",
     "status": "CUSTOMER_USABLE"
+  },
+  "adaptive_career_intelligence": {
+    "doc": "docs/CAREER_COPILOT_ADAPTIVE.md",
+    "evidence": "docs/CAREER_COPILOT_ADAPTIVE_EVIDENCE.md",
+    "api": "/api/v1/candidates/me/career-copilot",
+    "ui": "/dashboard/career",
+    "alembic": "108_adaptive_career_intelligence",
+    "verdict_target": "ADAPTIVE CAREER COPILOT CUSTOMER-USABLE \u2014 LONG-TERM CAREER INTELLIGENCE PRODUCTION-READY",
+    "phase_3_career_agent": "NOT_STARTED",
+    "extends": "career_copilot_2",
+    "status": "SHIPPED_PENDING_PROD_EVIDENCE"
   }
 }

@@ -58,7 +58,7 @@ def test_migrations_current_ok(migrations_admin_client) -> None:
     assert res.status_code == 200
     body = res.json()
     assert body["current_revision"] == "068_placement_events_foundation"
-    assert body["head_revision"] == "107_career_copilot_2"
+    assert body["head_revision"] == "108_adaptive_career_intelligence"
     assert body["is_at_head"] is False
     assert body["read_only"] is True
     blob = res.text.lower()
