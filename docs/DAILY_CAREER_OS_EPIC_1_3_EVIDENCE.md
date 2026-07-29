@@ -2,14 +2,15 @@
 
 **Epic:** 1.3 Daily Career OS Completion, Authenticated Product Proof and Notification Delivery  
 **Branch:** `cursor/phase1-monorepo-scaffold`  
-**Alembic:** `109_daily_career_os` (no new migration — delivery state in reminder payload_json)
+**Runtime tip:** `162ed8f75c2339bcc4c36b3616062701455b51ee`  
+**Alembic:** `109_daily_career_os` (`is_at_head: true`)
 
 ## Gaps closed vs Epic 1.2
 
 | Gap | Resolution |
 |-----|------------|
-| Worker lag / SHA drift | Backend+FE code change redeploys API/worker/FE to same tip |
-| Unauthenticated-only proof | Ops mint + authenticated candidate JWT E2E script |
+| Worker lag / SHA drift | FE/API/worker ALIGNED @ `162ed8f7` after backend+FE push |
+| Unauthenticated-only proof | Ops mint + authenticated candidate JWT E2E **40/40 PASS** |
 | Notification delivery path | Celery `career_reminders_sweep` + `deliver_career_reminder` |
 | Quiet hours / consent | `in_quiet_hours` + email opt-in gate + dry-run API |
 | Silent failure | Failed status + attempts in payload + Celery retries |
@@ -28,27 +29,36 @@
 OPS_ADMIN_TOKEN=… python3 scripts/daily-career-os-authenticated-e2e.py
 ```
 
-Mint: `POST /api/v1/admin/pilot-os/daily-os/mint-synthetic-session` → synthetic `daily-os-synth+kpi@twin.internal` (kpi_excluded, not a real person).
+Result (prod 2026-07-29): **SUMMARY 40/40 pass** · `LABEL synthetic_authenticated_daily_os≠real_customer`
 
-## Tests
+Mint: `POST /api/v1/admin/pilot-os/daily-os/mint-synthetic-session` → `daily-os-synth+kpi@twin.internal` (kpi_excluded).
+
+## Tests / CI
 
 ```bash
-cd backend && python3 -m pytest tests/test_career_daily_os.py -q
+cd backend && python3 -m pytest tests/test_career_daily_os.py tests/test_career_copilot_adaptive.py tests/test_career_copilot_2.py -q
+# 15 + 10 + 7 = 32 passed locally
 ```
 
-## Production evidence (fill after deploy)
+Smoke CI: https://github.com/CzechowskiT/twin/actions/runs/30450381735 **success**
+
+## Production evidence
 
 | Field | Value |
 |-------|-------|
-| `repo_head` | _(post-push)_ |
-| `prod_frontend_commit` | _(public-health)_ |
-| `prod_api_commit` | _(health)_ |
-| `prod_worker_commit` | _(public-health worker_commit)_ |
-| `alignment_status` | _(ALIGNED / residual)_ |
-| `alembic_current` | `109_daily_career_os` |
-| `authenticated_e2e` | _(script summary)_ |
-| `smoke_ci` | _(GitHub Actions)_ |
+| `repo_head` | `162ed8f75c2339bcc4c36b3616062701455b51ee` |
+| `prod_frontend_commit` | `162ed8f75c2339bcc4c36b3616062701455b51ee` |
+| `prod_api_commit` | `162ed8f75c2339bcc4c36b3616062701455b51ee` |
+| `prod_worker_commit` | `162ed8f75c2339bcc4c36b3616062701455b51ee` |
+| `alignment_status` | **ALIGNED** (four-way) |
+| `alembic_current` | `109_daily_career_os` (`is_at_head: true`) |
+| `authenticated_e2e` | 40/40 PASS |
+| `smoke_ci` | https://github.com/CzechowskiT/twin/actions/runs/30450381735 |
 
 ## Stance (frozen)
 
 Launch NO-GO · Enrollment OFF · Phase 3B BLOCKED · Phase 3 Agent NOT_STARTED · invite-only · invites 0 · synthetic ≠ real · no ALTEN · candidate-first PRIMARY
+
+## Verdict
+
+**A:** `DAILY CAREER OS COMPLETE — AUTHENTICATED PRODUCT PROOF AND NOTIFICATION DELIVERY PRODUCTION-READY`
