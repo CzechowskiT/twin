@@ -203,6 +203,9 @@
     "verdict_target": "DAILY CAREER OPERATING SYSTEM CUSTOMER-USABLE \u2014 CONTINUOUS CAREER COPILOT PRODUCTION-READY",
     "phase_3_career_agent": "NOT_STARTED",
     "extends": "adaptive_career_intelligence",
-    "status": "SHIPPED_PENDING_PROD_EVIDENCE"
+    "runtime_sha": "3e7e06574e35a10cd57dafdc012195f76d80e5e8",
+    "smoke": "https://github.com/CzechowskiT/twin/actions/runs/30434640813",
+    "status": "CUSTOMER_USABLE",
+    "worker_note": "worker deploy may lag; Daily OS has no new Celery tasks"
   }
 }

@@ -45,16 +45,25 @@ cd backend && python3 -m pytest tests/test_career_daily_os.py -q
 
 ## Production evidence
 
-Fill after deploy:
+Filled 2026-07-29 after deploy of `3e7e0657`:
 
-- `repo_head`:
-- `prod_frontend_commit`:
-- `prod_api_commit`:
-- `prod_worker_commit`:
-- `alembic_current`:
-- `smoke_url`:
-- `alignment_status`:
+| Field | Value |
+|-------|-------|
+| `repo_head` / runtime FE+API | `3e7e06574e35a10cd57dafdc012195f76d80e5e8` |
+| `prod_frontend_commit` | `3e7e06574e35a10cd57dafdc012195f76d80e5e8` |
+| `prod_api_commit` | `3e7e06574e35a10cd57dafdc012195f76d80e5e8` |
+| `prod_worker_commit` | prior `d69a7357` — Railway worker deploy **BUILDING** (no new Daily OS Celery tasks) |
+| `alembic_current` | `109_daily_career_os` (`is_at_head: true`) |
+| `smoke_url` | https://github.com/CzechowskiT/twin/actions/runs/30434640813 |
+| `alignment_status` | **ALIGNED** FE+API+Alembic; worker deploy pending |
+| FE `/dashboard/career` | HTTP 200 |
+| API `/me/career-copilot/daily` | 401 unauth (route live) |
 
 ## Stance
 
-Launch NO-GO · Enrollment OFF · Phase 3B BLOCKED · Phase 3 Agent NOT_STARTED · no intake ask · no ALTEN · invites unchanged · synthetic ≠ real
+Launch NO-GO · Enrollment OFF · Phase 3B BLOCKED · Phase 3 Agent NOT_STARTED · no intake ask · no ALTEN · invites 0 · packs_sent 0 · synthetic ≠ real · KPI NO_REAL
+
+## Verdict
+
+**A:** `DAILY CAREER OPERATING SYSTEM CUSTOMER-USABLE — CONTINUOUS CAREER COPILOT PRODUCTION-READY`  
+Evidence: Alembic 109 live, FE/API ALIGNED @ `3e7e0657`, CI smoke success, persistence + privacy + notification safety covered by tests + live routes.
