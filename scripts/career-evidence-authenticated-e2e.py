@@ -559,13 +559,38 @@ def main() -> int:
         for n in ("application_pack", "no_auto_submit_pack", "fit_kind_present", "claimed_vs_evidence_fit"):
             check(n, False, "")
 
-    # Conflicts
+    # Conflicts — create overlapping titles then scan/resolve
+    code, _ = _req(
+        "POST",
+        "/api/v1/candidates/me/career-evidence/items",
+        token=token,
+        body={
+            "evidence_type": "responsibility",
+            "title": "Owned payments ledger",
+            "claim_kind": "CANDIDATE_CONFIRMED",
+            "source_ids": [source_id] if source_id else [],
+        },
+    )
+    check("conflict_seed_a", code in {200, 201}, str(code))
+    code, _ = _req(
+        "POST",
+        "/api/v1/candidates/me/career-evidence/items",
+        token=token,
+        body={
+            "evidence_type": "responsibility",
+            "title": "Owned payments ledger",
+            "claim_kind": "INFERENCE",
+            "source_ids": [source_id] if source_id else [],
+        },
+    )
+    check("conflict_seed_b", code in {200, 201}, str(code))
+
     code, scan = _req("POST", "/api/v1/candidates/me/career-evidence/conflicts/scan", token=token)
     check("conflict_scan", code == 200, str(code))
     if isinstance(scan, dict):
         conflicts = scan.get("conflicts") or scan.get("claims") or []
-        if conflicts:
-            cid = conflicts[0].get("id")
+        cid = next((c.get("id") for c in conflicts if c.get("id")), None)
+        if cid:
             code, res = _req(
                 "POST",
                 f"/api/v1/candidates/me/career-evidence/conflicts/{cid}/resolve",
@@ -574,7 +599,7 @@ def main() -> int:
             )
             check("conflict_explicit_resolve", code == 200, str(code))
         else:
-            check("conflict_explicit_resolve", True, "no_open_conflicts")
+            check("conflict_explicit_resolve", False, "no_conflict_id")
     else:
         check("conflict_explicit_resolve", False, "")
 

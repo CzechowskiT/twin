@@ -708,16 +708,29 @@ def detect_conflicts(db: Session, *, candidate_id: int) -> list[dict]:
             existing.consistency = consistency
             existing.conflict_with_json = claim.conflict_with_json
             existing.version = int(existing.version or 1) + 1
+            existing.status = "open"
+            db.flush()
+            out.append(
+                {
+                    "id": existing.id,
+                    "consistency": consistency,
+                    "title": group[0].title,
+                    "evidence_ids": [g.id for g in group],
+                    "auto_resolved": False,
+                }
+            )
         else:
             db.add(claim)
-        out.append(
-            {
-                "consistency": consistency,
-                "title": group[0].title,
-                "evidence_ids": [g.id for g in group],
-                "auto_resolved": False,
-            }
-        )
+            db.flush()
+            out.append(
+                {
+                    "id": claim.id,
+                    "consistency": consistency,
+                    "title": group[0].title,
+                    "evidence_ids": [g.id for g in group],
+                    "auto_resolved": False,
+                }
+            )
     db.commit()
     return out
 
