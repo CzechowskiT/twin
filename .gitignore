@@ -50,4 +50,8 @@ reports/merge-plan/
 
 # Alembic (keep versions tracked)
 # migrations are committed
-.cursor/
+# Cursor local state; keep shared project rules tracked
+.cursor/*
+!.cursor/rules/
+!.cursor/rules/**/*.mdc
+
