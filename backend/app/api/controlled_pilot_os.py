@@ -578,3 +578,40 @@ def candidate_first_revoke_token(
     if row is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="token_not_found")
     return {"token": invite_tokens.token_to_dict(row), "revoked": True}
+
+
+@router.post("/pilot-os/daily-os/mint-synthetic-session")
+def daily_os_mint_synthetic_session(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    """Mint short-lived JWT for synthetic Daily OS authenticated product proof (KPI-excluded)."""
+    _require_ops_admin(settings, authorization)
+    from app.services.daily_os_synthetic_proof import mint_synthetic_daily_os_session
+
+    return mint_synthetic_daily_os_session(db, expires_minutes=45)
+
+
+class DailyOsReminderSweepBody(BaseModel):
+    dry_run: bool = True
+    limit: int = Field(default=50, ge=1, le=200)
+
+
+@router.post("/pilot-os/daily-os/reminder-sweep")
+def daily_os_reminder_sweep(
+    body: DailyOsReminderSweepBody,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    """Ops-triggered career reminder sweep. Default dry_run=True — never mass-emails."""
+    _require_ops_admin(settings, authorization)
+    from app.services import career_daily_os as daily_os
+
+    if body.dry_run:
+        return daily_os.sweep_due_career_reminders(db, dry_run=True, limit=body.limit)
+    # Non-dry-run enqueues worker tasks (same path as Celery beat).
+    from app.tasks.reminder_tasks import career_reminders_sweep
+
+    return career_reminders_sweep(dry_run=False, limit=body.limit)

@@ -32,6 +32,7 @@ from app.database.models import (
     CandidateOpportunityWatch,
     CandidateProgressReview,
     CandidateRecommendationWeights,
+    CandidateCareerReminder,
     CandidateSkillEvolution,
     User,
 )
@@ -78,6 +79,7 @@ def _setup(monkeypatch):
         CandidateMomentumSnapshot.__table__,
         CandidateOpportunityWatch.__table__,
         CandidateProgressReview.__table__,
+        CandidateCareerReminder.__table__,
     ]
     # optional Application
     try:
@@ -331,3 +333,100 @@ def test_risks_no_mental_health(monkeypatch):
         app.dependency_overrides.clear()
         get_settings.cache_clear()
         db.close()
+
+
+def test_reminder_in_product_delivery_and_idempotency(monkeypatch):
+    db, cand, client, app, get_settings = _setup(monkeypatch)
+    try:
+        row = daily.schedule_reminder(
+            db,
+            candidate_id=cand.id,
+            title="Due now",
+            due_at=datetime.utcnow() - timedelta(minutes=1),
+            channel="in_product",
+        )
+        first = daily.deliver_career_reminder(db, reminder_id=row.id)
+        assert first["result"] == "delivered"
+        assert first["sent"] is False
+        db.refresh(row)
+        assert row.status == "delivered"
+        second = daily.deliver_career_reminder(db, reminder_id=row.id)
+        assert second["result"] == "already_done"
+        assert second.get("idempotent") is True
+    finally:
+        app.dependency_overrides.clear()
+        get_settings.cache_clear()
+        db.close()
+
+
+def test_reminder_quiet_hours_and_dry_run_no_send(monkeypatch):
+    db, cand, client, app, get_settings = _setup(monkeypatch)
+    try:
+        daily.update_cadence(
+            db,
+            candidate_id=cand.id,
+            timezone_name="UTC",
+            quiet_mode=True,
+        )
+        row = daily.schedule_reminder(
+            db,
+            candidate_id=cand.id,
+            title="Quiet blocked",
+            due_at=datetime.utcnow() - timedelta(minutes=1),
+            channel="in_product",
+        )
+        out = daily.deliver_career_reminder(db, reminder_id=row.id)
+        assert out["result"] == "skipped_quiet_hours"
+        db.refresh(row)
+        assert row.status == "scheduled"
+
+        dry = daily.deliver_career_reminder(db, reminder_id=row.id, dry_run=True, force=True)
+        assert dry.get("sent") is not True
+        assert "dry_run" in str(dry.get("result"))
+        db.refresh(row)
+        assert row.status == "scheduled"
+
+        res = client.post(
+            "/api/v1/candidates/me/career-copilot/daily/reminders/dry-run",
+            json={"reminder_id": row.id},
+        )
+        assert res.status_code == 200
+        assert res.json().get("sent") is not True
+    finally:
+        app.dependency_overrides.clear()
+        get_settings.cache_clear()
+        db.close()
+
+
+def test_reminder_email_blocked_without_consent_on_deliver(monkeypatch):
+    db, cand, _c, app, get_settings = _setup(monkeypatch)
+    try:
+        daily.update_privacy(db, candidate_id=cand.id, email_reminders_opt_in=True)
+        row = daily.schedule_reminder(
+            db,
+            candidate_id=cand.id,
+            title="Email later",
+            due_at=datetime.utcnow() - timedelta(minutes=1),
+            channel="email",
+        )
+        daily.update_privacy(db, candidate_id=cand.id, email_reminders_opt_in=False)
+        out = daily.deliver_career_reminder(db, reminder_id=row.id, force=True)
+        assert out["result"] == "blocked_no_email_consent"
+        assert out.get("would_send") is False
+        assert out.get("unauthorized_send") is False
+    finally:
+        app.dependency_overrides.clear()
+        get_settings.cache_clear()
+        db.close()
+
+
+def test_career_reminder_beat_registered(monkeypatch):
+    monkeypatch.setenv("SECRET_KEY", "daily-os-test-secret")
+    monkeypatch.setenv("CAREER_REMINDER_BEAT_ENABLED", "true")
+    from app.config import get_settings
+    from app.tasks import celery_app as ca
+
+    get_settings.cache_clear()
+    ca._configure_beat_schedule()
+    assert "career-reminders-hourly" in ca.celery_app.conf.beat_schedule
+    get_settings.cache_clear()

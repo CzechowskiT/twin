@@ -526,6 +526,10 @@ class ReminderIn(BaseModel):
     channel: str = Field(default="in_product", pattern="^(in_product|email)$")
 
 
+class ReminderDryRunIn(BaseModel):
+    reminder_id: int | None = None
+
+
 class ReviewApproveIn(BaseModel):
     approved: bool
 
@@ -707,6 +711,24 @@ def post_reminder(
             "status": row.status,
         }
     }
+
+
+@router.post("/me/career-copilot/daily/reminders/dry-run")
+def dry_run_reminders(
+    body: ReminderDryRunIn | None = None,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    """Consent-safe dry-run — never sends email; proves quiet hours / opt-in gates."""
+    cand = _candidate(db, user)
+    try:
+        return daily_os.dry_run_reminder_delivery(
+            db,
+            candidate_id=cand.id,
+            reminder_id=(body.reminder_id if body else None),
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
 
 
 @router.post("/me/career-copilot/daily/reviews", status_code=status.HTTP_201_CREATED)

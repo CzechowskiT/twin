@@ -104,6 +104,13 @@ def _configure_beat_schedule() -> None:
             "task": "app.tasks.reminder_tasks.interview_reminders_sweep",
             "schedule": crontab(minute=20),
         }
+    if s.career_reminder_beat_enabled:
+        cm = min(59, max(0, int(s.career_reminder_beat_minute)))
+        schedule["career-reminders-hourly"] = {
+            "task": "app.tasks.reminder_tasks.career_reminders_sweep",
+            "schedule": crontab(minute=cm),
+            "options": {"expires": 3300},
+        }
     if s.weekly_digest_beat_enabled:
         wd = min(6, max(0, int(s.weekly_digest_beat_weekday)))
         wh = min(23, max(0, int(s.weekly_digest_beat_hour_utc)))
@@ -144,5 +151,4 @@ def _configure_beat_schedule() -> None:
 
 _configure_beat_schedule()
 
-# planner-fix deploy nudge 202607191904
-# activation-align nudge 20260723T1200Z
+# epic-1.3 career reminder delivery + four-way align nudge 20260729T1400Z

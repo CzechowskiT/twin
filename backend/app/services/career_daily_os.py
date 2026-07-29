@@ -7,10 +7,14 @@ Never fabricate market/salary/employer/outcomes. UNKNOWN when no evidence.
 
 from __future__ import annotations
 
+import logging
 from datetime import datetime, timedelta, timezone
 from typing import Any
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from sqlalchemy.orm import Session
+
+logger = logging.getLogger(__name__)
 
 from app.database.models import (
     Application,
@@ -1270,6 +1274,320 @@ def schedule_reminder(
     db.commit()
     db.refresh(row)
     return row
+
+
+def _local_hour_now(tz_name: str) -> int:
+    try:
+        tz = ZoneInfo(tz_name or "UTC")
+    except ZoneInfoNotFoundError:
+        tz = ZoneInfo("UTC")
+    return datetime.now(tz).hour
+
+
+def in_quiet_hours(cadence: CandidateDailyCadence, *, now_utc: datetime | None = None) -> bool:
+    """True when quiet_mode or local hour falls in [start, end) (supports overnight wrap)."""
+    if cadence.quiet_mode:
+        return True
+    start = cadence.quiet_hours_start
+    end = cadence.quiet_hours_end
+    if start is None or end is None:
+        return False
+    hour = _local_hour_now(cadence.timezone or "UTC")
+    if start == end:
+        return False
+    if start < end:
+        return start <= hour < end
+    return hour >= start or hour < end
+
+
+def _reminder_payload(row: CandidateCareerReminder) -> dict:
+    return cc._loads(row.payload_json, {}) or {}
+
+
+def _record_reminder_attempt(
+    row: CandidateCareerReminder,
+    *,
+    outcome: str,
+    detail: str | None = None,
+    dry_run: bool = False,
+) -> None:
+    payload = _reminder_payload(row)
+    attempts = list(payload.get("attempts") or [])
+    attempts.append(
+        {
+            "at": _utcnow().isoformat() + "Z",
+            "outcome": outcome,
+            "detail": detail,
+            "dry_run": dry_run,
+        }
+    )
+    payload["attempts"] = attempts[-20:]
+    payload["last_outcome"] = outcome
+    if detail:
+        payload["last_error"] = detail if outcome.startswith("fail") else payload.get("last_error")
+    if dry_run:
+        payload["last_dry_run_at"] = _utcnow().isoformat() + "Z"
+        payload["last_dry_run_outcome"] = outcome
+    row.payload_json = cc._dumps(payload)
+
+
+def deliver_career_reminder(
+    db: Session,
+    *,
+    reminder_id: int,
+    dry_run: bool = False,
+    force: bool = False,
+) -> dict[str, Any]:
+    """Deliver one due career reminder — consent-safe, idempotent, quiet-hours aware.
+
+    Email sends only with privacy.email_reminders_opt_in + reminders_enabled + mail configured.
+    Real send never happens when dry_run=True. No SMS / recruiter outreach.
+    """
+    row = db.query(CandidateCareerReminder).filter(CandidateCareerReminder.id == reminder_id).one_or_none()
+    if not row:
+        return {"ok": False, "result": "not_found", "reminder_id": reminder_id}
+    if row.status in {"delivered", "sent", "cancelled"} and not force:
+        return {
+            "ok": True,
+            "result": "already_done",
+            "reminder_id": row.id,
+            "status": row.status,
+            "idempotent": True,
+        }
+
+    privacy = get_or_create_privacy(db, candidate_id=row.candidate_id)
+    cadence = get_or_create_cadence(db, candidate_id=row.candidate_id)
+    now = _utcnow()
+
+    if not privacy.reminders_enabled:
+        out = {"ok": True, "result": "reminders_disabled", "reminder_id": row.id, "would_send": False}
+        _record_reminder_attempt(row, outcome="skipped_reminders_disabled", dry_run=dry_run)
+        if not dry_run:
+            row.status = "cancelled"
+            db.commit()
+        else:
+            db.commit()
+        return out
+
+    if not force and in_quiet_hours(cadence, now_utc=now):
+        _record_reminder_attempt(row, outcome="skipped_quiet_hours", dry_run=dry_run)
+        db.commit()
+        return {
+            "ok": True,
+            "result": "skipped_quiet_hours",
+            "reminder_id": row.id,
+            "would_send": False,
+            "quiet_hours": True,
+            "timezone": cadence.timezone,
+        }
+
+    if row.due_at and row.due_at > now and not force:
+        return {
+            "ok": True,
+            "result": "not_due",
+            "reminder_id": row.id,
+            "would_send": False,
+            "due_at": row.due_at.isoformat() + "Z",
+        }
+
+    channel = (row.channel or "in_product").strip()
+    if channel == "email":
+        if not privacy.email_reminders_opt_in:
+            _record_reminder_attempt(row, outcome="blocked_no_email_consent", dry_run=dry_run)
+            db.commit()
+            return {
+                "ok": True,
+                "result": "blocked_no_email_consent",
+                "reminder_id": row.id,
+                "would_send": False,
+                "unauthorized_send": False,
+            }
+        from app.config import get_settings
+        from app.services.mail import is_mail_configured
+
+        settings = get_settings()
+        if not is_mail_configured(settings):
+            _record_reminder_attempt(
+                row, outcome="skipped_no_mail", detail="mail_not_configured", dry_run=dry_run
+            )
+            db.commit()
+            return {
+                "ok": True,
+                "result": "skipped_no_mail",
+                "reminder_id": row.id,
+                "would_send": False,
+            }
+        if dry_run:
+            _record_reminder_attempt(row, outcome="dry_run_would_email", dry_run=True)
+            db.commit()
+            return {
+                "ok": True,
+                "result": "dry_run_would_email",
+                "reminder_id": row.id,
+                "would_send": True,
+                "channel": "email",
+                "sent": False,
+            }
+        # Real email path — transactional, consent-gated; no mass mail.
+        try:
+            from app.database.models import Candidate, User
+            from app.services.mail import send_generic_email
+
+            cand = db.query(Candidate).filter(Candidate.id == row.candidate_id).one_or_none()
+            user = db.query(User).filter(User.id == cand.user_id).one_or_none() if cand else None
+            if not user or not (user.email or "").strip():
+                raise RuntimeError("missing_user_email")
+            base = (settings.frontend_url or "http://localhost:3000").rstrip("/")
+            send_generic_email(
+                settings,
+                to_email=user.email.strip(),
+                subject="TWIN career reminder",
+                text_body=(
+                    f"{row.title}\n\nOpen your Daily Career OS: {base}/dashboard/career\n"
+                ),
+                html_body=(
+                    f"<p>{row.title}</p>"
+                    f'<p><a href="{base}/dashboard/career">Open Daily Career OS</a></p>'
+                ),
+            )
+            row.status = "sent"
+            row.sent_at = now
+            _record_reminder_attempt(row, outcome="sent_email")
+            db.commit()
+            return {
+                "ok": True,
+                "result": "sent",
+                "reminder_id": row.id,
+                "channel": "email",
+                "sent": True,
+            }
+        except Exception as exc:
+            logger.exception("career reminder email failed id=%s", row.id)
+            _record_reminder_attempt(row, outcome="failed_email", detail=type(exc).__name__)
+            row.status = "failed"
+            db.commit()
+            return {
+                "ok": False,
+                "result": "failed_email",
+                "reminder_id": row.id,
+                "error": type(exc).__name__,
+                "visible_failure": True,
+            }
+
+    # Default: in-product delivery — surface via inbox item, no external send.
+    if dry_run:
+        _record_reminder_attempt(row, outcome="dry_run_would_deliver_in_product", dry_run=True)
+        db.commit()
+        return {
+            "ok": True,
+            "result": "dry_run_would_deliver_in_product",
+            "reminder_id": row.id,
+            "would_send": True,
+            "channel": "in_product",
+            "sent": False,
+        }
+
+    try:
+        upsert_inbox_item(
+            db,
+            candidate_id=row.candidate_id,
+            item_key=f"reminder:delivered:{row.id}",
+            kind="reminder",
+            title=row.title[:300],
+            body={
+                "reminder_id": row.id,
+                "channel": "in_product",
+                "external_auto_action": False,
+                "kpi_excluded": True,
+            },
+            priority_score=60,
+            priority_explain={
+                "factors": [{"factor": "due_reminder", "why": "Scheduled reminder became due"}],
+                "external_auto_action": False,
+            },
+            deep_link="/dashboard/career",
+            effort="S",
+            completion_criterion="Acknowledge or snooze the reminder",
+            claim_kind=cc.CLAIM_UNKNOWN,
+            confidence="medium",
+        )
+        row.status = "delivered"
+        row.sent_at = now
+        _record_reminder_attempt(row, outcome="delivered_in_product")
+        db.commit()
+        return {
+            "ok": True,
+            "result": "delivered",
+            "reminder_id": row.id,
+            "channel": "in_product",
+            "sent": False,
+        }
+    except Exception as exc:
+        logger.exception("career reminder in-product deliver failed id=%s", row.id)
+        _record_reminder_attempt(row, outcome="failed_in_product", detail=type(exc).__name__)
+        row.status = "failed"
+        db.commit()
+        return {
+            "ok": False,
+            "result": "failed_in_product",
+            "reminder_id": row.id,
+            "error": type(exc).__name__,
+            "visible_failure": True,
+        }
+
+
+def sweep_due_career_reminders(
+    db: Session,
+    *,
+    dry_run: bool = False,
+    limit: int = 100,
+    candidate_id: int | None = None,
+) -> dict[str, Any]:
+    """Process due scheduled career reminders (worker / ops). Failures are explicit."""
+    now = _utcnow()
+    q = db.query(CandidateCareerReminder).filter(
+        CandidateCareerReminder.status == "scheduled",
+        CandidateCareerReminder.due_at <= now,
+    )
+    if candidate_id is not None:
+        q = q.filter(CandidateCareerReminder.candidate_id == candidate_id)
+    ids = [r.id for r in q.order_by(CandidateCareerReminder.due_at.asc()).limit(max(1, min(500, limit))).all()]
+    results: list[dict] = []
+    counts: dict[str, int] = {}
+    for rid in ids:
+        out = deliver_career_reminder(db, reminder_id=rid, dry_run=dry_run)
+        results.append(out)
+        key = str(out.get("result") or "unknown")
+        counts[key] = counts.get(key, 0) + 1
+    return {
+        "ok": True,
+        "dry_run": dry_run,
+        "scanned": len(ids),
+        "counts": counts,
+        "results": results[:50],
+        "kpi_excluded": True,
+        "mass_email": False,
+        "unauthorized_send": False,
+    }
+
+
+def dry_run_reminder_delivery(
+    db: Session, *, candidate_id: int, reminder_id: int | None = None
+) -> dict[str, Any]:
+    """Candidate-scoped dry-run — never sends email."""
+    if reminder_id is not None:
+        row = (
+            db.query(CandidateCareerReminder)
+            .filter(
+                CandidateCareerReminder.id == reminder_id,
+                CandidateCareerReminder.candidate_id == candidate_id,
+            )
+            .one_or_none()
+        )
+        if not row:
+            raise ValueError("reminder_not_found")
+        return deliver_career_reminder(db, reminder_id=row.id, dry_run=True, force=True)
+    return sweep_due_career_reminders(db, dry_run=True, candidate_id=candidate_id, limit=50)
 
 
 def create_progress_review(

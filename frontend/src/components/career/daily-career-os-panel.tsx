@@ -292,6 +292,7 @@ export function DailyCareerOsPanel({ compact = false }: Props) {
       </div>
 
       <p className="twin-muted mt-3 text-[11px]">{t("dailyOs.disclaimer")}</p>
+      <p className="twin-muted mt-1 text-[11px]">{t("dailyOs.reminderDelivery")}</p>
     </section>
   );
 }

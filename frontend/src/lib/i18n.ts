@@ -3022,6 +3022,8 @@ eyebrow: "Product roadmap",
     degraded: "Assist is in rules-only mode — priorities stay available without invented output.",
     disclaimer:
       "Recommendations only. TWIN never submits applications, emails recruiters, or invents market/salary data. You stay in control.",
+    reminderDelivery:
+      "Reminders stay in-product by default. Email only with opt-in, quiet hours, and no duplicate sends.",
   },
   jobBrief: {
     demoBanner:
@@ -11791,6 +11793,8 @@ const pl: MessageTree = {
     degraded: "Asysta w trybie reguł — priorytety bez wymyślonych treści.",
     disclaimer:
       "Tylko rekomendacje. TWIN nie wysyła aplikacji, nie mailuje rekruterów i nie wymyśla rynku/pensji. Ty decydujesz.",
+    reminderDelivery:
+      "Przypomnienia domyślnie w produkcie. E-mail tylko po zgodzie, z godzinami ciszy i bez duplikatów.",
   },
   jobBrief: {
     demoBanner:
