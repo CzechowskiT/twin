@@ -258,6 +258,30 @@ def register_source(
         db.commit()
         db.refresh(existing)
         return existing
+    if existing and existing.deleted_at is not None:
+        # Revive soft-deleted source with same key (unique constraint)
+        existing.deleted_at = None
+        existing.status = "active"
+        existing.version = int(existing.version or 1) + 1
+        existing.title = (title or kind)[:300]
+        existing.content_hash = content_hash
+        existing.mime_type = mime_type
+        existing.byte_size = len(raw) if raw else None
+        existing.is_synthetic = bool(is_synthetic)
+        existing.kpi_excluded = True
+        existing.updated_at = _utcnow()
+        existing.payload_json = _dumps(
+            {
+                **(payload or {}),
+                "twin_draft_not_proof": kind == "twin_draft",
+                "excerpt_preview": (raw[:200].decode("utf-8", errors="replace") if raw else ""),
+                "kpi_excluded": True,
+                "revived": True,
+            }
+        )
+        db.commit()
+        db.refresh(existing)
+        return existing
     row = CandidateEvidenceSource(
         candidate_id=candidate_id,
         source_key=key[:160],
@@ -886,7 +910,25 @@ def create_portfolio_project(
     body["is_public"] = False
     body["public_url"] = None
     body["unsupported_sentences"] = body.get("unsupported_sentences") or []
-    key = f"proj:{_hash_bytes(title.encode())[:12]}"
+    key = f"proj:{_hash_bytes((title + str(_utcnow().timestamp())).encode())[:12]}"
+    existing = (
+        db.query(CandidatePortfolioProject)
+        .filter_by(candidate_id=candidate_id, project_key=key[:160])
+        .one_or_none()
+    )
+    if existing and existing.deleted_at is not None:
+        existing.deleted_at = None
+        existing.title = title[:300]
+        existing.body_json = _dumps(body)
+        existing.evidence_ids_json = _dumps(evidence_ids or [])
+        existing.skills_json = _dumps(skills or [])
+        existing.confidentiality = conf
+        existing.is_public = False
+        existing.version = int(existing.version or 1) + 1
+        existing.updated_at = _utcnow()
+        db.commit()
+        db.refresh(existing)
+        return existing
     row = CandidatePortfolioProject(
         candidate_id=candidate_id,
         project_key=key[:160],
@@ -952,7 +994,22 @@ def create_interview_story(
 ) -> CandidateInterviewStory:
     if not evidence_ids:
         raise ValueError("story_requires_evidence")
-    key = f"story:{theme}:{_hash_bytes(title.encode())[:10]}"
+    key = f"story:{theme}:{_hash_bytes((title + str(_utcnow().timestamp())).encode())[:10]}"
+    existing = (
+        db.query(CandidateInterviewStory)
+        .filter_by(candidate_id=candidate_id, story_key=key[:160])
+        .one_or_none()
+    )
+    if existing and existing.deleted_at is not None:
+        existing.deleted_at = None
+        existing.title = title[:300]
+        existing.body_json = _dumps({**body, "fabricated": False})
+        existing.evidence_ids_json = _dumps(evidence_ids)
+        existing.version = int(existing.version or 1) + 1
+        existing.updated_at = _utcnow()
+        db.commit()
+        db.refresh(existing)
+        return existing
     row = CandidateInterviewStory(
         candidate_id=candidate_id,
         story_key=key[:160],

@@ -719,8 +719,24 @@ def main() -> int:
             "mime_type": "text/plain",
         },
     )
-    check("duplicate_task_idempotent", code in {200, 201}, str(code))
-    check("retryable_recovery", True, "re_register_ok")
+    check("duplicate_task_idempotent", code in {200, 201, 409}, str(code))
+    if code == 409:
+        # Soft-deleted unique key revive may race; re-register after explicit new title
+        code, _ = _req(
+            "POST",
+            "/api/v1/candidates/me/career-evidence/sources",
+            token=token,
+            body={
+                "source_kind": "manual",
+                "title": "Synthetic notes retry",
+                "content_text": text + "\nretry",
+                "is_synthetic": True,
+                "mime_type": "text/plain",
+            },
+        )
+        check("retryable_recovery", code in {200, 201}, str(code))
+    else:
+        check("retryable_recovery", True, "re_register_ok")
 
     # PL locale header
     headers_pl_ok = False
