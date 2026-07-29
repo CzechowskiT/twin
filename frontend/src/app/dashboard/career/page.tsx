@@ -22,6 +22,7 @@ import {
   validateForm,
 } from "@/lib/candidate-career-compass";
 import { CareerCopilotPanel } from "@/components/career/career-copilot-panel";
+import { DailyCareerOsPanel } from "@/components/career/daily-career-os-panel";
 import { CAREER_COMPASS_SHIP_STATUS } from "@/lib/seven-day-d2-candidate";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -216,6 +217,7 @@ export default function CareerCompassPage() {
         </div>
       </Card>
 
+      <DailyCareerOsPanel />
       <CareerCopilotPanel />
 
       {error ? (

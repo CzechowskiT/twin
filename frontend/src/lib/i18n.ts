@@ -174,6 +174,7 @@ export type TranslationKey =
   | `investorDataRoom.${keyof typeof en.investorDataRoom}`
   | `careerAssistant.${keyof typeof en.careerAssistant}`
   | `careerCopilot.${keyof typeof en.careerCopilot}`
+  | `dailyOs.${keyof typeof en.dailyOs}`
   | `strategic.${keyof typeof en.strategic}`
   | `jobBrief.${keyof typeof en.jobBrief}`
   | `marketingHowItWorks.${keyof typeof en.marketingHowItWorks}`
@@ -2995,6 +2996,32 @@ eyebrow: "Product roadmap",
     adaptiveReuse: "This generation reuses your memory, preferences, timeline, and health — never from zero.",
     disclaimer:
       "FACT / INFERENCE / SUGGESTION / UNKNOWN labels are required. No therapy, medical, legal, or financial advice. No automated employment decisions. Market and salary stay UNKNOWN without real sources. History is editable and never silently overwritten.",
+  },
+  dailyOs: {
+    eyebrow: "Today",
+    lead: "What changed, what matters, and your next action — evidence-based, dismissible.",
+    fallbackHeadline: "Your daily career brief",
+    continuity: "Builds on your Copilot memory and history — never from zero.",
+    loadFailed: "Could not load daily brief",
+    actionFailed: "Action failed — try again",
+    nextAction: "Next action",
+    whatChanged: "What changed",
+    noChanges: "No evidence-backed changes today",
+    momentum: "Momentum",
+    risks: "Process risks",
+    noRisks: "No process risks flagged",
+    inbox: "Career inbox",
+    inboxEmpty: "Inbox is clear",
+    snooze: "Snooze",
+    dismiss: "Dismiss",
+    reopen: "Show brief again",
+    complete: "Done",
+    open: "Open",
+    briefSnoozed: "Daily brief snoozed.",
+    briefDismissed: "Daily brief dismissed for today.",
+    degraded: "Assist is in rules-only mode — priorities stay available without invented output.",
+    disclaimer:
+      "Recommendations only. TWIN never submits applications, emails recruiters, or invents market/salary data. You stay in control.",
   },
   jobBrief: {
     demoBanner:
@@ -11738,6 +11765,32 @@ const pl: MessageTree = {
     adaptiveReuse: "Ta generacja korzysta z pamięci, preferencji, osi czasu i zdrowia — nigdy od zera.",
     disclaimer:
       "Etykiety FACT / INFERENCE / SUGGESTION / UNKNOWN są wymagane. Bez porad terapeutycznych, medycznych, prawnych ani finansowych. Bez automatycznych decyzji o zatrudnieniu. Rynek i wynagrodzenie pozostają UNKNOWN bez realnych źródeł. Historia jest edytowalna i nigdy nie jest cicho nadpisywana.",
+  },
+  dailyOs: {
+    eyebrow: "Dziś",
+    lead: "Co się zmieniło, co ma znaczenie i następna akcja — na dowodach, do odrzucenia.",
+    fallbackHeadline: "Twój dzienny brief kariery",
+    continuity: "Korzysta z pamięci Copilota — nigdy od zera.",
+    loadFailed: "Nie udało się wczytać dziennego briefu",
+    actionFailed: "Akcja nie powiodła się — spróbuj ponownie",
+    nextAction: "Następna akcja",
+    whatChanged: "Co się zmieniło",
+    noChanges: "Brak zmian opartych na dowodach",
+    momentum: "Momentum",
+    risks: "Ryzyka procesu",
+    noRisks: "Brak oznaczonych ryzyk procesu",
+    inbox: "Skrzynka kariery",
+    inboxEmpty: "Skrzynka pusta",
+    snooze: "Odłóż",
+    dismiss: "Odrzuć",
+    reopen: "Pokaż brief ponownie",
+    complete: "Zrobione",
+    open: "Otwórz",
+    briefSnoozed: "Dzienny brief odłożony.",
+    briefDismissed: "Dzienny brief odrzucony na dziś.",
+    degraded: "Asysta w trybie reguł — priorytety bez wymyślonych treści.",
+    disclaimer:
+      "Tylko rekomendacje. TWIN nie wysyła aplikacji, nie mailuje rekruterów i nie wymyśla rynku/pensji. Ty decydujesz.",
   },
   jobBrief: {
     demoBanner:

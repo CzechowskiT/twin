@@ -1260,6 +1260,237 @@ class CandidateCareerScenario(Base):
     )
 
 
+class CandidateDailyBrief(Base):
+    """Persistent personalized daily career brief — dismissible/snoozable."""
+
+    __tablename__ = "candidate_daily_briefs"
+    __table_args__ = (UniqueConstraint("candidate_id", "brief_date", name="uq_daily_brief_date"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    brief_date: Mapped[str] = mapped_column(String(10))
+    status: Mapped[str] = mapped_column(String(32), default="active")
+    headline: Mapped[str] = mapped_column(String(300), default="")
+    body_json: Mapped[str] = mapped_column(Text, default="{}")
+    context_version: Mapped[int] = mapped_column(Integer, default=1)
+    snoozed_until: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    dismissed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidateCareerChangeEvent(Base):
+    """Evidence-only change detection (NEW/IMPROVED/DECLINED/STALE/…)."""
+
+    __tablename__ = "candidate_career_change_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    change_kind: Mapped[str] = mapped_column(String(32))
+    entity_type: Mapped[str] = mapped_column(String(64))
+    entity_key: Mapped[str] = mapped_column(String(128))
+    title: Mapped[str] = mapped_column(String(300))
+    before_json: Mapped[str] = mapped_column(Text, default="{}")
+    after_json: Mapped[str] = mapped_column(Text, default="{}")
+    evidence_json: Mapped[str] = mapped_column(Text, default="[]")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
+    confidence: Mapped[str] = mapped_column(String(16), default="medium")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateCareerInboxItem(Base):
+    """Career inbox — NEW/SEEN/PINNED/SNOOZED/COMPLETED/DISMISSED/ARCHIVED."""
+
+    __tablename__ = "candidate_career_inbox_items"
+    __table_args__ = (UniqueConstraint("candidate_id", "item_key", name="uq_career_inbox_item_key"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    item_key: Mapped[str] = mapped_column(String(128))
+    kind: Mapped[str] = mapped_column(String(64))
+    title: Mapped[str] = mapped_column(String(300))
+    body_json: Mapped[str] = mapped_column(Text, default="{}")
+    status: Mapped[str] = mapped_column(String(32), default="NEW", index=True)
+    priority_score: Mapped[int] = mapped_column(Integer, default=50)
+    priority_explain_json: Mapped[str] = mapped_column(Text, default="{}")
+    deep_link: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    effort: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    completion_criterion: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="SUGGESTION")
+    confidence: Mapped[str] = mapped_column(String(16), default="medium")
+    snoozed_until: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    last_surfaced_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    pinned: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidateCareerInboxAudit(Base):
+    """Append-only audit for inbox mutations."""
+
+    __tablename__ = "candidate_career_inbox_audits"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    inbox_item_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    action: Mapped[str] = mapped_column(String(64))
+    payload_json: Mapped[str] = mapped_column(Text, default="{}")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateCareerReminder(Base):
+    """In-product reminders; email only with explicit opt-in + existing consent path."""
+
+    __tablename__ = "candidate_career_reminders"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "idempotency_key", name="uq_career_reminder_idem"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    reminder_key: Mapped[str] = mapped_column(String(128))
+    title: Mapped[str] = mapped_column(String(300))
+    due_at: Mapped[datetime] = mapped_column(DateTime)
+    channel: Mapped[str] = mapped_column(String(32), default="in_product")
+    status: Mapped[str] = mapped_column(String(32), default="scheduled")
+    idempotency_key: Mapped[str] = mapped_column(String(128))
+    payload_json: Mapped[str] = mapped_column(Text, default="{}")
+    sent_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateOpportunityWatch(Base):
+    """Watchlist for roles/companies/industries/locations/skills/directions."""
+
+    __tablename__ = "candidate_opportunity_watchlist"
+    __table_args__ = (UniqueConstraint("candidate_id", "watch_key", name="uq_watchlist_key"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    watch_key: Mapped[str] = mapped_column(String(128))
+    watch_type: Mapped[str] = mapped_column(String(64))
+    label: Mapped[str] = mapped_column(String(200))
+    criteria_json: Mapped[str] = mapped_column(Text, default="{}")
+    last_snapshot_json: Mapped[str] = mapped_column(Text, default="{}")
+    freshness: Mapped[str] = mapped_column(String(32), default="UNKNOWN")
+    archived_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidateDailyCadence(Base):
+    """Personal operating cadence — timezone, quiet hours, intensity, caps."""
+
+    __tablename__ = "candidate_daily_cadence"
+    __table_args__ = (UniqueConstraint("candidate_id", name="uq_daily_cadence_candidate"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), unique=True
+    )
+    timezone: Mapped[str] = mapped_column(String(64), default="UTC")
+    quiet_hours_start: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    quiet_hours_end: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    intensity: Mapped[str] = mapped_column(String(32), default="normal")
+    quiet_mode: Mapped[bool] = mapped_column(Boolean, default=False)
+    paused_modules_json: Mapped[str] = mapped_column(Text, default="[]")
+    daily_cap: Mapped[int] = mapped_column(Integer, default=7)
+    cooldown_hours: Mapped[int] = mapped_column(Integer, default=24)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateDailyPrivacySettings(Base):
+    """Daily OS privacy — disable learning/briefs/reminders; audited via inbox audits."""
+
+    __tablename__ = "candidate_daily_privacy_settings"
+    __table_args__ = (UniqueConstraint("candidate_id", name="uq_daily_privacy_candidate"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), unique=True
+    )
+    learning_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    briefs_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    reminders_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    email_reminders_opt_in: Mapped[bool] = mapped_column(Boolean, default=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateRecommendationWeights(Base):
+    """Versioned recommendation calibration weights — no unvalidated AI-improve claims."""
+
+    __tablename__ = "candidate_recommendation_weights"
+    __table_args__ = (UniqueConstraint("candidate_id", "version", name="uq_rec_weights_ver"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    weights_json: Mapped[str] = mapped_column(Text, default="{}")
+    source: Mapped[str] = mapped_column(String(64), default="baseline")
+    evidence_json: Mapped[str] = mapped_column(Text, default="[]")
+    archived_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateMomentumSnapshot(Base):
+    """Evidence-backed career momentum — UNKNOWN ok; no fake gamification."""
+
+    __tablename__ = "candidate_momentum_snapshots"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    score: Mapped[int] = mapped_column(Integer, default=0)
+    dimensions_json: Mapped[str] = mapped_column(Text, default="{}")
+    explain_json: Mapped[str] = mapped_column(Text, default="{}")
+    confidence: Mapped[str] = mapped_column(String(16), default="low")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateProgressReview(Base):
+    """Weekly/monthly progress review — user must approve goal/strategy changes."""
+
+    __tablename__ = "candidate_progress_reviews"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    period: Mapped[str] = mapped_column(String(16))
+    summary_json: Mapped[str] = mapped_column(Text, default="{}")
+    proposed_changes_json: Mapped[str] = mapped_column(Text, default="[]")
+    user_approved: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    approved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
 class CandidateReferralProgram(Base):
     """One referral program per candidate — unique share code (Wave B slice 3)."""
 

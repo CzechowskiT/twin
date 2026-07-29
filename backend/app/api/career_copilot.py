@@ -12,6 +12,7 @@ from app.core.deps import get_current_user, get_db
 from app.database.models import Candidate, User
 from app.services import career_copilot as cc
 from app.services import career_copilot_adaptive as adaptive
+from app.services import career_daily_os as daily_os
 
 router = APIRouter()
 
@@ -92,7 +93,7 @@ def get_career_copilot(
     user: User = Depends(get_current_user),
 ) -> dict:
     cand = _candidate(db, user)
-    return adaptive.build_adaptive_aggregate(db, candidate_id=cand.id)
+    return daily_os.build_daily_os_aggregate(db, candidate_id=cand.id)
 
 
 @router.post("/me/career-copilot/refresh")
@@ -105,7 +106,10 @@ def refresh_career_copilot(
     cc.refresh_directions(db, candidate_id=cand.id)
     cc.ensure_action_plan(db, candidate_id=cand.id, force=False)
     cc.sync_direction_recommendations(db, candidate_id=cand.id)
-    return adaptive.build_adaptive_aggregate(db, candidate_id=cand.id, force_health=True)
+    return daily_os.build_daily_os_aggregate(db, candidate_id=cand.id)
+
+
+@router.get("/me/career-copilot/overview")
 def get_copilot_overview(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
@@ -480,3 +484,280 @@ def post_learning_loop(
             "improve_reasoning": row.improve_reasoning,
         }
     }
+
+
+class BriefActionIn(BaseModel):
+    action: str = Field(..., pattern="^(dismiss|snooze|reopen)$")
+    snooze_hours: int | None = Field(default=None, ge=1, le=48)
+
+
+class InboxActionIn(BaseModel):
+    action: str = Field(..., pattern="^(pin|demote|dismiss|snooze|complete|reopen|seen|archive)$")
+    snooze_hours: int | None = Field(default=None, ge=1, le=168)
+
+
+class CadenceIn(BaseModel):
+    timezone: str | None = Field(default=None, max_length=64)
+    quiet_hours_start: int | None = Field(default=None, ge=0, le=23)
+    quiet_hours_end: int | None = Field(default=None, ge=0, le=23)
+    intensity: str | None = Field(default=None, pattern="^(low|normal|high)$")
+    quiet_mode: bool | None = None
+    paused_modules: list[str] | None = None
+    daily_cap: int | None = Field(default=None, ge=1, le=20)
+    cooldown_hours: int | None = Field(default=None, ge=1, le=168)
+
+
+class PrivacyIn(BaseModel):
+    learning_enabled: bool | None = None
+    briefs_enabled: bool | None = None
+    reminders_enabled: bool | None = None
+    email_reminders_opt_in: bool | None = None
+
+
+class WatchIn(BaseModel):
+    watch_type: str = Field(..., pattern="^(role|company|industry|location|skill|direction)$")
+    label: str = Field(..., min_length=1, max_length=200)
+    criteria: dict | None = None
+
+
+class ReminderIn(BaseModel):
+    title: str = Field(..., min_length=2, max_length=300)
+    due_at: str = Field(..., max_length=64)
+    channel: str = Field(default="in_product", pattern="^(in_product|email)$")
+
+
+class ReviewApproveIn(BaseModel):
+    approved: bool
+
+
+@router.get("/me/career-copilot/daily")
+def get_daily_os(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    cand = _candidate(db, user)
+    return daily_os.build_daily_os_aggregate(db, candidate_id=cand.id)
+
+
+@router.post("/me/career-copilot/daily/brief/refresh")
+def refresh_daily_brief(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    cand = _candidate(db, user)
+    return daily_os.ensure_daily_brief(db, candidate_id=cand.id, force=True)
+
+
+@router.post("/me/career-copilot/daily/brief/action")
+def daily_brief_action(
+    body: BriefActionIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    cand = _candidate(db, user)
+    try:
+        return daily_os.mutate_brief(
+            db, candidate_id=cand.id, action=body.action, snooze_hours=body.snooze_hours
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.get("/me/career-copilot/daily/inbox")
+def get_daily_inbox(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    cand = _candidate(db, user)
+    return {"inbox": daily_os.list_inbox(db, candidate_id=cand.id), "kpi_excluded": True}
+
+
+@router.post("/me/career-copilot/daily/inbox/{item_id}/action")
+def daily_inbox_action(
+    item_id: int,
+    body: InboxActionIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    cand = _candidate(db, user)
+    try:
+        row = daily_os.mutate_inbox(
+            db,
+            candidate_id=cand.id,
+            item_id=item_id,
+            action=body.action,
+            snooze_hours=body.snooze_hours,
+        )
+    except ValueError as exc:
+        code = status.HTTP_404_NOT_FOUND if "not_found" in str(exc) else status.HTTP_400_BAD_REQUEST
+        raise HTTPException(code, detail=str(exc)) from exc
+    return {"item": daily_os._ser_inbox(row)}
+
+
+@router.patch("/me/career-copilot/daily/cadence")
+def patch_cadence(
+    body: CadenceIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    cand = _candidate(db, user)
+    row = daily_os.update_cadence(
+        db,
+        candidate_id=cand.id,
+        timezone_name=body.timezone,
+        quiet_hours_start=body.quiet_hours_start,
+        quiet_hours_end=body.quiet_hours_end,
+        intensity=body.intensity,
+        quiet_mode=body.quiet_mode,
+        paused_modules=body.paused_modules,
+        daily_cap=body.daily_cap,
+        cooldown_hours=body.cooldown_hours,
+    )
+    return {
+        "cadence": {
+            "timezone": row.timezone,
+            "quiet_mode": row.quiet_mode,
+            "intensity": row.intensity,
+            "daily_cap": row.daily_cap,
+            "cooldown_hours": row.cooldown_hours,
+        }
+    }
+
+
+@router.patch("/me/career-copilot/daily/privacy")
+def patch_daily_privacy(
+    body: PrivacyIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    cand = _candidate(db, user)
+    row = daily_os.update_privacy(
+        db,
+        candidate_id=cand.id,
+        learning_enabled=body.learning_enabled,
+        briefs_enabled=body.briefs_enabled,
+        reminders_enabled=body.reminders_enabled,
+        email_reminders_opt_in=body.email_reminders_opt_in,
+    )
+    return {
+        "privacy": {
+            "learning_enabled": row.learning_enabled,
+            "briefs_enabled": row.briefs_enabled,
+            "reminders_enabled": row.reminders_enabled,
+            "email_reminders_opt_in": row.email_reminders_opt_in,
+        }
+    }
+
+
+@router.post("/me/career-copilot/daily/watchlist", status_code=status.HTTP_201_CREATED)
+def post_watch(
+    body: WatchIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    cand = _candidate(db, user)
+    try:
+        row = daily_os.add_watch(
+            db,
+            candidate_id=cand.id,
+            watch_type=body.watch_type,
+            label=cc.scrub_prompt_injection(body.label),
+            criteria=body.criteria,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    return {
+        "watch": {
+            "id": row.id,
+            "watch_type": row.watch_type,
+            "label": row.label,
+            "freshness": row.freshness,
+        }
+    }
+
+
+@router.post("/me/career-copilot/daily/reminders", status_code=status.HTTP_201_CREATED)
+def post_reminder(
+    body: ReminderIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    from datetime import datetime
+
+    cand = _candidate(db, user)
+    try:
+        due = datetime.fromisoformat(body.due_at.replace("Z", "+00:00")).replace(tzinfo=None)
+        row = daily_os.schedule_reminder(
+            db,
+            candidate_id=cand.id,
+            title=cc.scrub_prompt_injection(body.title),
+            due_at=due,
+            channel=body.channel,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="invalid_due_at") from exc
+    return {
+        "reminder": {
+            "id": row.id,
+            "title": row.title,
+            "due_at": row.due_at.isoformat() + "Z",
+            "channel": row.channel,
+            "status": row.status,
+        }
+    }
+
+
+@router.post("/me/career-copilot/daily/reviews", status_code=status.HTTP_201_CREATED)
+def post_review(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+    period: str = "weekly",
+) -> dict:
+    cand = _candidate(db, user)
+    row = daily_os.create_progress_review(db, candidate_id=cand.id, period=period)
+    return {
+        "review": {
+            "id": row.id,
+            "period": row.period,
+            "summary": cc._loads(row.summary_json, {}),
+            "proposed_changes": cc._loads(row.proposed_changes_json, []),
+            "user_approved": row.user_approved,
+        }
+    }
+
+
+@router.post("/me/career-copilot/daily/reviews/{review_id}/approve")
+def approve_review(
+    review_id: int,
+    body: ReviewApproveIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    cand = _candidate(db, user)
+    try:
+        row = daily_os.approve_progress_review(
+            db, candidate_id=cand.id, review_id=review_id, approved=body.approved
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    return {"review": {"id": row.id, "user_approved": row.user_approved}}
+
+
+@router.get("/me/career-copilot/daily/export")
+def export_daily(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    cand = _candidate(db, user)
+    return daily_os.export_daily_history(db, candidate_id=cand.id)
+
+
+@router.post("/me/career-copilot/daily/history/delete")
+def delete_daily(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    cand = _candidate(db, user)
+    return daily_os.delete_daily_history(db, candidate_id=cand.id)

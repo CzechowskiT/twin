@@ -54,7 +54,7 @@
     "worker_service": "enthusiastic-encouragement",
     "postgres": "Postgres",
     "redis": "Redis",
-    "alembic_head_expected": "108_adaptive_career_intelligence"
+    "alembic_head_expected": "109_daily_career_os"
   },
   "on_call_roles": {
     "primary": "PILOT_ON_CALL_PRIMARY",
@@ -193,5 +193,16 @@
     "runtime_sha": "d69a735714511f06cc32f43b1430ceaad3774df0",
     "smoke": "https://github.com/CzechowskiT/twin/actions/runs/30427653832",
     "status": "CUSTOMER_USABLE"
+  },
+  "daily_career_os": {
+    "doc": "docs/DAILY_CAREER_OS.md",
+    "evidence": "docs/DAILY_CAREER_OS_EVIDENCE.md",
+    "api": "/api/v1/candidates/me/career-copilot/daily",
+    "ui": ["/dashboard", "/dashboard/career"],
+    "alembic": "109_daily_career_os",
+    "verdict_target": "DAILY CAREER OPERATING SYSTEM CUSTOMER-USABLE \u2014 CONTINUOUS CAREER COPILOT PRODUCTION-READY",
+    "phase_3_career_agent": "NOT_STARTED",
+    "extends": "adaptive_career_intelligence",
+    "status": "SHIPPED_PENDING_PROD_EVIDENCE"
   }
 }
