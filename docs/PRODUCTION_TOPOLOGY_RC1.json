@@ -190,6 +190,8 @@
     "verdict_target": "ADAPTIVE CAREER COPILOT CUSTOMER-USABLE \u2014 LONG-TERM CAREER INTELLIGENCE PRODUCTION-READY",
     "phase_3_career_agent": "NOT_STARTED",
     "extends": "career_copilot_2",
-    "status": "SHIPPED_PENDING_PROD_EVIDENCE"
+    "runtime_sha": "d69a735714511f06cc32f43b1430ceaad3774df0",
+    "smoke": "https://github.com/CzechowskiT/twin/actions/runs/30427653832",
+    "status": "CUSTOMER_USABLE"
   }
 }

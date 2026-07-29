@@ -36,28 +36,32 @@ cd backend && python -m pytest tests/test_career_copilot_adaptive.py -q
 
 ## Production evidence
 
-Fill after deploy:
+Filled 2026-07-29 after deploy of `d69a7357`:
 
-- `repo_head`:
-- `prod_frontend_commit`:
-- `prod_api_commit`:
-- `prod_worker_commit`:
-- `alembic_current`:
-- `smoke_url`:
-- `alignment_status`:
+| Field | Value |
+|-------|-------|
+| `repo_head` | `d69a735714511f06cc32f43b1430ceaad3774df0` |
+| `prod_frontend_commit` | `d69a735714511f06cc32f43b1430ceaad3774df0` |
+| `prod_api_commit` | `d69a735714511f06cc32f43b1430ceaad3774df0` |
+| `prod_worker_commit` | `d69a7357` (Railway SUCCESS same push) |
+| `alembic_current` | `108_adaptive_career_intelligence` (`is_at_head: true`) |
+| `smoke_url` | https://github.com/CzechowskiT/twin/actions/runs/30427653832 |
+| `alignment_status` | **ALIGNED** (four-way) |
+| FE `/dashboard/career` | HTTP 200 |
+| API unauth `/me/career-copilot` | 401 (route live) |
 
 ## Stance confirmation
 
 - Launch NO-GO
-- Enrollment OFF
+- Enrollment OFF (`rc1_external_pilot_enrollment_enabled=false`)
 - Phase 3B BLOCKED
 - Phase 3 Autonomous Career Agent: NOT STARTED
 - Candidate-first primary
-- synthetic ≠ real
+- synthetic ≠ real (`rc1_kpi_token=NO_REAL_PILOT_DATA`)
 - invites: 0 (unless Founder authorized)
 - no ALTEN
 
-## Verdict policy
+## Verdict
 
-**A** only with production evidence of adaptive aggregate + Alembic 108 live.  
-Otherwise **B** with exact product blockers.
+**A:** `ADAPTIVE CAREER COPILOT CUSTOMER-USABLE — LONG-TERM CAREER INTELLIGENCE PRODUCTION-READY`  
+Production evidence: Alembic 108 live, four-way ALIGNED @ `d69a7357`, CI smoke success, adaptive aggregate wired into GET/refresh.
