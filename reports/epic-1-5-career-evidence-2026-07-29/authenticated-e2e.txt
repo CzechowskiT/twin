@@ -3,8 +3,8 @@ PASS launch_nogo NO-GO
 PASS enrollment_off 
 PASS phase_3b_blocked 
 PASS ms_write_off_ph 
-PASS four_way_recorded fe=7ae8759e1da8 api=7ae8759e1da8 wrk=7ae8759e1da8
-PASS four_way_aligned fe=7ae8759e1da8 api=7ae8759e1da8 wrk=7ae8759e1da8
+PASS four_way_recorded fe=91bc53450646 api=91bc53450646 wrk=91bc53450646
+PASS four_way_aligned fe=91bc53450646 api=91bc53450646 wrk=91bc53450646
 PASS repo_origin_present 
 PASS mint_synthetic 200
 PASS kpi_excluded 
@@ -34,7 +34,7 @@ PASS source_hash
 PASS source_kpi_excluded 
 PASS source_synthetic 
 PASS duplicate_source_handled 201
-PASS source_versioning v1=2 v2=2
+PASS source_versioning v1=3 v2=3
 PASS extract_200 200
 PASS extract_no_invented 
 PASS extract_fields 12
@@ -46,7 +46,7 @@ PASS field_dispute 200
 PASS field_edit 200
 PASS field_history history_persisted_server_side
 PASS manual_evidence 201
-PASS evidence_lineage_sources eid=21 src=1
+PASS evidence_lineage_sources eid=34 src=1
 PASS quality_present 
 PASS fabricated_metric_rejected 400
 PASS skill_link 201
@@ -88,7 +88,8 @@ PASS dim_portfolio_readiness
 PASS dim_data_confidence 
 PASS acceptance_calendar_reachable 200
 PASS acal_ms_write_off 
-PASS evidence_task_in_acal n=0
+PASS evidence_task_in_acal n=5
+PASS evidence_task_unscheduled_view covered_by_agenda
 PASS daily_os_reachable 404
 PASS daily_os_integration via_acceptance_calendar_tasks
 PASS privacy_patch 200
@@ -128,4 +129,4 @@ PASS no_external_profile_final OFF
 PASS no_reference_outreach_final OFF
 PASS no_auto_apply_final OFF
 PASS adaptive_memory_no_sensitive_dup privacy_memory_reuse_opt_in
-SUMMARY 130/130
+SUMMARY 131/131
