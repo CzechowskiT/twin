@@ -5,6 +5,7 @@ from fastapi import APIRouter
 from app.api import (
     audit_events,
     auto_apply_settings,
+    acceptance_calendar,
     admin_ops,
     ats_completion,
     candidate_intelligence,
@@ -136,6 +137,9 @@ api_router.include_router(kyc.router, prefix="/kyc", tags=["KYC"])
 api_router.include_router(candidates.router, prefix="/candidates", tags=["Candidates"])
 api_router.include_router(
     career_copilot.router, prefix="/candidates", tags=["Career Copilot"]
+)
+api_router.include_router(
+    acceptance_calendar.router, prefix="/candidates", tags=["Acceptance Calendar"]
 )
 api_router.include_router(
     candidate_intelligence.router, prefix="", tags=["Candidate Intelligence"]

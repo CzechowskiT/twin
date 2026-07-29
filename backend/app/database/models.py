@@ -1491,6 +1491,210 @@ class CandidateProgressReview(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
+class CandidateAcceptanceOutcome(Base):
+    """Candidate-defined acceptance outcome — never a hiring certainty claim."""
+
+    __tablename__ = "candidate_acceptance_outcomes"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    title: Mapped[str] = mapped_column(String(300))
+    description: Mapped[str] = mapped_column(Text, default="")
+    target_date: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="active")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="SUGGESTION")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    evidence_json: Mapped[str] = mapped_column(Text, default="[]")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidateTimeBudget(Base):
+    """Explicit time budget only — never infer private obligations."""
+
+    __tablename__ = "candidate_time_budgets"
+    __table_args__ = (UniqueConstraint("candidate_id", name="uq_time_budget_candidate"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), unique=True
+    )
+    timezone: Mapped[str] = mapped_column(String(64), default="UTC")
+    hours_per_week: Mapped[int] = mapped_column(Integer, default=10)
+    hours_per_day_cap: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    protected_blocks_json: Mapped[str] = mapped_column(Text, default="[]")
+    note: Mapped[str] = mapped_column(Text, default="")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    source: Mapped[str] = mapped_column(String(32), default="explicit_user")
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateCalendarConsent(Base):
+    """Per-capability calendar consent — no bundled hidden opt-in."""
+
+    __tablename__ = "candidate_calendar_consents"
+    __table_args__ = (UniqueConstraint("candidate_id", name="uq_calendar_consent_candidate"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), unique=True
+    )
+    internal_calendar_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    ms_busy_read_opt_in: Mapped[bool] = mapped_column(Boolean, default=False)
+    google_busy_read_opt_in: Mapped[bool] = mapped_column(Boolean, default=False)
+    ics_export_opt_in: Mapped[bool] = mapped_column(Boolean, default=True)
+    store_availability_blocks: Mapped[bool] = mapped_column(Boolean, default=False)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateCalendarPreference(Base):
+    """Versioned calendar preference weights from explicit feedback."""
+
+    __tablename__ = "candidate_calendar_preferences"
+    __table_args__ = (UniqueConstraint("candidate_id", "version", name="uq_cal_prefs_ver"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    version: Mapped[int] = mapped_column(Integer)
+    prefs_json: Mapped[str] = mapped_column(Text, default="{}")
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
+    source: Mapped[str] = mapped_column(String(64), default="user_feedback")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateAcceptanceItem(Base):
+    """Unified Acceptance Calendar item — internal planning only; no external auto-write."""
+
+    __tablename__ = "candidate_acceptance_items"
+    __table_args__ = (UniqueConstraint("candidate_id", "item_key", name="uq_acceptance_item_key"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    item_key: Mapped[str] = mapped_column(String(160))
+    category: Mapped[str] = mapped_column(String(48))
+    state: Mapped[str] = mapped_column(String(48), default="proposed")
+    title: Mapped[str] = mapped_column(String(300))
+    summary: Mapped[str] = mapped_column(Text, default="")
+    importance: Mapped[int] = mapped_column(Integer, default=50)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="UNKNOWN")
+    confidence: Mapped[str] = mapped_column(String(16), default="medium")
+    starts_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    ends_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    due_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, index=True)
+    timezone: Mapped[str] = mapped_column(String(64), default="UTC")
+    duration_minutes: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    source_type: Mapped[str] = mapped_column(String(64), default="internal")
+    source_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    outcome_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    deep_link: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    evidence_json: Mapped[str] = mapped_column(Text, default="[]")
+    payload_json: Mapped[str] = mapped_column(Text, default="{}")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    at_risk: Mapped[bool] = mapped_column(Boolean, default=False)
+    protected: Mapped[bool] = mapped_column(Boolean, default=False)
+    archived_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidateProposedHold(Base):
+    """Proposed time hold — DRAFT→…; never auto-creates external calendar events."""
+
+    __tablename__ = "candidate_proposed_holds"
+    __table_args__ = (UniqueConstraint("candidate_id", "hold_key", name="uq_proposed_hold_key"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    hold_key: Mapped[str] = mapped_column(String(160))
+    title: Mapped[str] = mapped_column(String(300))
+    status: Mapped[str] = mapped_column(String(32), default="DRAFT")
+    starts_at: Mapped[datetime] = mapped_column(DateTime)
+    ends_at: Mapped[datetime] = mapped_column(DateTime)
+    timezone: Mapped[str] = mapped_column(String(64), default="UTC")
+    why_json: Mapped[str] = mapped_column(Text, default="{}")
+    alternatives_json: Mapped[str] = mapped_column(Text, default="[]")
+    item_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="SUGGESTION")
+    external_created: Mapped[bool] = mapped_column(Boolean, default=False)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidateAvailabilityBlock(Base):
+    """Normalized busy blocks only — no event titles/attendees stored."""
+
+    __tablename__ = "candidate_availability_blocks"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    provider: Mapped[str] = mapped_column(String(32))
+    starts_at: Mapped[datetime] = mapped_column(DateTime)
+    ends_at: Mapped[datetime] = mapped_column(DateTime)
+    busy: Mapped[bool] = mapped_column(Boolean, default=True)
+    source: Mapped[str] = mapped_column(String(32), default="synthetic")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateWeeklyPlan(Base):
+    """Weekly planning strategy — strategy changes require explicit approval."""
+
+    __tablename__ = "candidate_weekly_plans"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "week_start", "version", name="uq_weekly_plan_ver"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    week_start: Mapped[str] = mapped_column(String(10))
+    strategy_json: Mapped[str] = mapped_column(Text, default="{}")
+    user_approved: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    approved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateAcceptanceItemAudit(Base):
+    """Append-only audit for Acceptance Calendar edits (reversible history)."""
+
+    __tablename__ = "candidate_acceptance_item_audits"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    item_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    action: Mapped[str] = mapped_column(String(64))
+    before_json: Mapped[str] = mapped_column(Text, default="{}")
+    after_json: Mapped[str] = mapped_column(Text, default="{}")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
 class CandidateReferralProgram(Base):
     """One referral program per candidate — unique share code (Wave B slice 3)."""
 
