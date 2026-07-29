@@ -139,6 +139,7 @@ export type TranslationKey =
   | `candidateEvidence.${keyof typeof en.candidateEvidence}`
   | `acceptanceQueue.${keyof typeof en.acceptanceQueue}`
   | `acceptanceCalendar.${keyof typeof en.acceptanceCalendar}`
+  | `careerEvidence.${keyof typeof en.careerEvidence}`
   | `recruiterInbox.${keyof typeof en.recruiterInbox}`
   | `recruiterAudit.${keyof typeof en.recruiterAudit}`
   | `recruiterScorecard.${keyof typeof en.recruiterScorecard}`
@@ -4597,6 +4598,34 @@ eyebrow: "Product roadmap",
     disclaimer:
       "Internal planning only. TWIN never writes Microsoft Calendar, invites attendees, contacts recruiters, or submits applications without you.",
     proposedLabel: "Proposed hold — not externally booked. Export ICS to add manually.",
+  },
+  careerEvidence: {
+    eyebrow: "Career evidence",
+    portfolioTitle: "Private portfolio",
+    lead: "Source-backed proof of competence — confirm claims, never invent metrics. Private by default; no public URL.",
+    loadFailed: "Could not load career evidence",
+    actionFailed: "Action failed — try again",
+    privacyBanner: "Portfolio is private. No indexing, no public profile, no external publishing.",
+    privateOnly: "Private only",
+    evidenceReadiness: "Evidence readiness",
+    portfolioReadiness: "Portfolio readiness",
+    weakEvidence: "Weak / needs context",
+    uploadExtract: "Register source & extract",
+    sourceLabel: "Source text",
+    runExtract: "Extract evidence",
+    addAchievement: "Add STAR draft (no invented metrics)",
+    refresh: "Refresh",
+    evidenceList: "Evidence",
+    emptyEvidence: "No evidence yet — extract from a source or add manually.",
+    confirmFields: "Confirm extracted fields",
+    confirm: "Confirm",
+    projects: "Projects",
+    emptyProjects: "No private projects yet",
+    stories: "Interview stories",
+    emptyStories: "No stories yet",
+    disclaimer:
+      "TWIN never invents achievements or metrics. Claims stay FACT / CANDIDATE_CONFIRMED / SOURCE_SUPPORTED / INFERENCE / SUGGESTION / UNKNOWN. Public portfolio OFF.",
+    openVault: "Open evidence vault",
   },
   productPolish: {
     pilotPreviewBanner: "Pilot preview — not part of public launch.",
@@ -13409,6 +13438,34 @@ const pl: MessageTree = {
     disclaimer:
       "Tylko planowanie wewnętrzne. TWIN nie zapisuje do Microsoft Calendar, nie zaprasza uczestników, nie kontaktuje rekruterów i nie wysyła aplikacji bez Ciebie.",
     proposedLabel: "Proponowany blok — nie zarezerwowany zewnętrznie. Eksport ICS do ręcznego dodania.",
+  },
+  careerEvidence: {
+    eyebrow: "Dowody kariery",
+    portfolioTitle: "Prywatne portfolio",
+    lead: "Dowody kompetencji oparte na źródłach — potwierdzaj twierdzenia, nigdy nie wymyślaj metryk. Domyślnie prywatne; bez publicznego URL.",
+    loadFailed: "Nie udało się wczytać dowodów kariery",
+    actionFailed: "Akcja nie powiodła się — spróbuj ponownie",
+    privacyBanner: "Portfolio jest prywatne. Bez indeksowania, bez publicznego profilu, bez zewnętrznej publikacji.",
+    privateOnly: "Tylko prywatne",
+    evidenceReadiness: "Gotowość dowodów",
+    portfolioReadiness: "Gotowość portfolio",
+    weakEvidence: "Słabe / wymagają kontekstu",
+    uploadExtract: "Zarejestruj źródło i wyodrębnij",
+    sourceLabel: "Tekst źródła",
+    runExtract: "Wyodrębnij dowody",
+    addAchievement: "Dodaj szkic STAR (bez wymyślonych metryk)",
+    refresh: "Odśwież",
+    evidenceList: "Dowody",
+    emptyEvidence: "Brak dowodów — wyodrębnij ze źródła lub dodaj ręcznie.",
+    confirmFields: "Potwierdź wyodrębnione pola",
+    confirm: "Potwierdź",
+    projects: "Projekty",
+    emptyProjects: "Brak prywatnych projektów",
+    stories: "Historie rozmów",
+    emptyStories: "Brak historii",
+    disclaimer:
+      "TWIN nigdy nie wymyśla osiągnięć ani metryk. Twierdzenia pozostają FACT / CANDIDATE_CONFIRMED / SOURCE_SUPPORTED / INFERENCE / SUGGESTION / UNKNOWN. Publiczne portfolio WYŁĄCZONE.",
+    openVault: "Otwórz sejf dowodów",
   },
   productPolish: {
     pilotPreviewBanner: "Podgląd pilota — poza publicznym launch.",

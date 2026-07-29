@@ -1695,6 +1695,303 @@ class CandidateAcceptanceItemAudit(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
+class CandidateEvidenceSource(Base):
+    """Registry of CVs, uploads, notes, drafts — TWIN drafts are not proof alone."""
+
+    __tablename__ = "candidate_evidence_sources"
+    __table_args__ = (UniqueConstraint("candidate_id", "source_key", name="uq_evidence_source_key"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    source_key: Mapped[str] = mapped_column(String(160))
+    source_kind: Mapped[str] = mapped_column(String(64))
+    title: Mapped[str] = mapped_column(String(300), default="")
+    location_ref: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    content_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    mime_type: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    byte_size: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    supersedes_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="active")
+    is_synthetic: Mapped[bool] = mapped_column(Boolean, default=False)
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    payload_json: Mapped[str] = mapped_column(Text, default="{}")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateCareerEvidence(Base):
+    """Canonical career evidence item — source-backed, never invents achievements."""
+
+    __tablename__ = "candidate_career_evidence"
+    __table_args__ = (UniqueConstraint("candidate_id", "evidence_key", name="uq_career_evidence_key"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    evidence_key: Mapped[str] = mapped_column(String(160))
+    evidence_type: Mapped[str] = mapped_column(String(64))
+    title: Mapped[str] = mapped_column(String(300))
+    summary: Mapped[str] = mapped_column(Text, default="")
+    context_json: Mapped[str] = mapped_column(Text, default="{}")
+    action_json: Mapped[str] = mapped_column(Text, default="{}")
+    result_json: Mapped[str] = mapped_column(Text, default="{}")
+    metrics_json: Mapped[str] = mapped_column(Text, default="[]")
+    technologies_json: Mapped[str] = mapped_column(Text, default="[]")
+    skills_json: Mapped[str] = mapped_column(Text, default="[]")
+    target_roles_json: Mapped[str] = mapped_column(Text, default="[]")
+    source_ids_json: Mapped[str] = mapped_column(Text, default="[]")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="UNKNOWN")
+    quality: Mapped[str] = mapped_column(String(32), default="UNKNOWN")
+    quality_explain_json: Mapped[str] = mapped_column(Text, default="{}")
+    confidence: Mapped[str] = mapped_column(String(16), default="low")
+    confidentiality: Mapped[str] = mapped_column(String(40), default="PRIVATE")
+    external_usability: Mapped[str] = mapped_column(String(40), default="PRIVATE")
+    verification_state: Mapped[str] = mapped_column(String(40), default="UNCONFIRMED")
+    status: Mapped[str] = mapped_column(String(32), default="draft")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    is_synthetic: Mapped[bool] = mapped_column(Boolean, default=False)
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    occurred_from: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    occurred_to: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    redacted_of_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    supersedes_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    payload_json: Mapped[str] = mapped_column(Text, default="{}")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    archived_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateEvidenceField(Base):
+    """Field-level confirmation history for career evidence."""
+
+    __tablename__ = "candidate_evidence_fields"
+    __table_args__ = (UniqueConstraint("evidence_id", "field_name", name="uq_evidence_field_name"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    evidence_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_career_evidence.id", ondelete="CASCADE")
+    )
+    field_name: Mapped[str] = mapped_column(String(80))
+    field_value_json: Mapped[str] = mapped_column(Text, default="null")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="UNKNOWN")
+    confirmation: Mapped[str] = mapped_column(String(32), default="pending")
+    source_location: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    confidence: Mapped[str] = mapped_column(String(16), default="low")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    history_json: Mapped[str] = mapped_column(Text, default="[]")
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateEvidenceClaim(Base):
+    """Claims with consistency classification — never auto-resolve material conflicts."""
+
+    __tablename__ = "candidate_evidence_claims"
+    __table_args__ = (UniqueConstraint("candidate_id", "claim_key", name="uq_evidence_claim_key"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    evidence_id: Mapped[int | None] = mapped_column(
+        ForeignKey("candidate_career_evidence.id", ondelete="CASCADE"), nullable=True
+    )
+    claim_key: Mapped[str] = mapped_column(String(160))
+    statement: Mapped[str] = mapped_column(Text)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="INFERENCE")
+    consistency: Mapped[str] = mapped_column(String(32), default="UNKNOWN")
+    conflict_with_json: Mapped[str] = mapped_column(Text, default="[]")
+    source_ids_json: Mapped[str] = mapped_column(Text, default="[]")
+    status: Mapped[str] = mapped_column(String(32), default="open")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidateEvidenceSkillLink(Base):
+    """Skill↔evidence link — never claims mastery from one mention."""
+
+    __tablename__ = "candidate_evidence_skill_links"
+    __table_args__ = (UniqueConstraint("evidence_id", "skill", name="uq_evidence_skill_link"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    evidence_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_career_evidence.id", ondelete="CASCADE")
+    )
+    skill: Mapped[str] = mapped_column(String(120))
+    link_state: Mapped[str] = mapped_column(String(40), default="CLAIM_ONLY")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="INFERENCE")
+    mastery_claim: Mapped[bool] = mapped_column(Boolean, default=False)
+    evidence_explain_json: Mapped[str] = mapped_column(Text, default="{}")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidatePortfolioProject(Base):
+    """Private portfolio project — never public by default."""
+
+    __tablename__ = "candidate_portfolio_projects"
+    __table_args__ = (UniqueConstraint("candidate_id", "project_key", name="uq_portfolio_project_key"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    project_key: Mapped[str] = mapped_column(String(160))
+    title: Mapped[str] = mapped_column(String(300))
+    external_safe_title: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    body_json: Mapped[str] = mapped_column(Text, default="{}")
+    evidence_ids_json: Mapped[str] = mapped_column(Text, default="[]")
+    skills_json: Mapped[str] = mapped_column(Text, default="[]")
+    confidentiality: Mapped[str] = mapped_column(String(40), default="PRIVATE")
+    status: Mapped[str] = mapped_column(String(32), default="draft")
+    is_public: Mapped[bool] = mapped_column(Boolean, default=False)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateInterviewStory(Base):
+    """Evidence-backed STAR/CAR interview story — never fabricated."""
+
+    __tablename__ = "candidate_interview_stories"
+    __table_args__ = (UniqueConstraint("candidate_id", "story_key", name="uq_interview_story_key"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    story_key: Mapped[str] = mapped_column(String(160))
+    theme: Mapped[str] = mapped_column(String(64))
+    framework: Mapped[str] = mapped_column(String(16), default="STAR")
+    title: Mapped[str] = mapped_column(String(300))
+    body_json: Mapped[str] = mapped_column(Text, default="{}")
+    evidence_ids_json: Mapped[str] = mapped_column(Text, default="[]")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="SUGGESTION")
+    status: Mapped[str] = mapped_column(String(32), default="draft")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateCvBulletDraft(Base):
+    """Evidence-backed CV bullet draft — never silently rewrites canonical CV."""
+
+    __tablename__ = "candidate_cv_bullet_drafts"
+    __table_args__ = (UniqueConstraint("candidate_id", "bullet_key", name="uq_cv_bullet_key"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    bullet_key: Mapped[str] = mapped_column(String(160))
+    source_bullet: Mapped[str | None] = mapped_column(Text, nullable=True)
+    draft_text: Mapped[str] = mapped_column(Text)
+    audit_status: Mapped[str] = mapped_column(String(40), default="needs_rewrite")
+    evidence_ids_json: Mapped[str] = mapped_column(Text, default="[]")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="SUGGESTION")
+    approved: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    target_role: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidateApplicationEvidencePack(Base):
+    """Private application evidence pack — no auto-submit / external send."""
+
+    __tablename__ = "candidate_application_evidence_packs"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "pack_key", name="uq_app_evidence_pack_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    application_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    pack_key: Mapped[str] = mapped_column(String(160))
+    title: Mapped[str] = mapped_column(String(300))
+    body_json: Mapped[str] = mapped_column(Text, default="{}")
+    fit_kind: Mapped[str] = mapped_column(String(40), default="UNKNOWN")
+    evidence_ids_json: Mapped[str] = mapped_column(Text, default="[]")
+    gaps_json: Mapped[str] = mapped_column(Text, default="[]")
+    auto_submit: Mapped[bool] = mapped_column(Boolean, default=False)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidateEvidencePrivacy(Base):
+    """Evidence processing privacy — no hidden cross-application reuse."""
+
+    __tablename__ = "candidate_evidence_privacy"
+    __table_args__ = (UniqueConstraint("candidate_id", name="uq_evidence_privacy_candidate"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), unique=True
+    )
+    ai_extraction_opt_in: Mapped[bool] = mapped_column(Boolean, default=False)
+    drafting_opt_in: Mapped[bool] = mapped_column(Boolean, default=True)
+    memory_reuse_opt_in: Mapped[bool] = mapped_column(Boolean, default=True)
+    portfolio_inclusion_default: Mapped[str] = mapped_column(String(40), default="PRIVATE")
+    export_include_confidential: Mapped[bool] = mapped_column(Boolean, default=False)
+    paused: Mapped[bool] = mapped_column(Boolean, default=False)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateEvidenceAudit(Base):
+    """Append-only audit for evidence/portfolio mutations."""
+
+    __tablename__ = "candidate_evidence_audits"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    entity_type: Mapped[str] = mapped_column(String(64))
+    entity_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    action: Mapped[str] = mapped_column(String(64))
+    before_json: Mapped[str] = mapped_column(Text, default="{}")
+    after_json: Mapped[str] = mapped_column(Text, default="{}")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
 class CandidateReferralProgram(Base):
     """One referral program per candidate — unique share code (Wave B slice 3)."""
 

@@ -9,6 +9,7 @@ from app.api import (
     admin_ops,
     ats_completion,
     candidate_intelligence,
+    career_evidence,
     chatgpt_twin,
     company,
     company_feedback_persistence,
@@ -140,6 +141,9 @@ api_router.include_router(
 )
 api_router.include_router(
     acceptance_calendar.router, prefix="/candidates", tags=["Acceptance Calendar"]
+)
+api_router.include_router(
+    career_evidence.router, prefix="/candidates", tags=["Career Evidence"]
 )
 api_router.include_router(
     candidate_intelligence.router, prefix="", tags=["Candidate Intelligence"]
