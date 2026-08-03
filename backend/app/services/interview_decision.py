@@ -895,7 +895,7 @@ def create_decision_memo(
         candidate_id=candidate_id,
         process_id=process_id,
         offer_id=offer_id,
-        memo_key=f"memo:{candidate_id}:{int(_utcnow().timestamp())}"[:160],
+        memo_key=f"memo:{candidate_id}:{int(_utcnow().timestamp() * 1000)}"[:160],
         criteria_json=_dumps(crit),
         memo_json=_dumps(
             {
