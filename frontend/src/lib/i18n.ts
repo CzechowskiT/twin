@@ -141,6 +141,7 @@ export type TranslationKey =
   | `acceptanceCalendar.${keyof typeof en.acceptanceCalendar}`
   | `careerEvidence.${keyof typeof en.careerEvidence}`
   | `applicationStudio.${keyof typeof en.applicationStudio}`
+  | `interviewDecision.${keyof typeof en.interviewDecision}`
   | `recruiterInbox.${keyof typeof en.recruiterInbox}`
   | `recruiterAudit.${keyof typeof en.recruiterAudit}`
   | `recruiterScorecard.${keyof typeof en.recruiterScorecard}`
@@ -4652,6 +4653,28 @@ eyebrow: "Product roadmap",
     selectWorkspace: "Select or create a workspace",
     disclaimer:
       "Drafts require confirmed Career Evidence lineage. Sensitive screening questions are never auto-completed. SUBMITTED only after you declare with provenance.",
+  },
+  interviewDecision: {
+    eyebrow: "Interview & Decision",
+    title: "Interview and Decision Copilot",
+    lead: "Handoff → stage prep → evidence-backed answers → mock practice → feedback → offer analysis → your declared decision. No covert live help. No external accept/reject.",
+    loadFailed: "Could not load Interview & Decision Copilot",
+    actionFailed: "Action failed — try again",
+    safetyBanner: "Practice and decide privately — no covert assistance, no emotion scoring, no external negotiation send.",
+    noCovert: "Covert assistance OFF",
+    runChain: "Prepare practice chain",
+    refresh: "Refresh",
+    chainDone: "Practice chain saved — decision declared as hold (no external action).",
+    processes: "Interview processes",
+    empty: "No interview processes yet",
+    active: "Active process",
+    gate: "Prep gate",
+    company: "Company / role",
+    offers: "Offers (candidate-declared)",
+    selectProcess: "Select or create a process",
+    noGuaranteed: "No guaranteed interview success or hiring probability.",
+    disclaimer:
+      "Answers need evidence lineage. Snapshots from Application Studio stay immutable. Feedback raw ≠ interpretation. Offers never auto-created from positive feedback. Phase 3 Agent NOT_STARTED.",
   },
   productPolish: {
     pilotPreviewBanner: "Pilot preview — not part of public launch.",
@@ -13517,6 +13540,28 @@ const pl: MessageTree = {
     selectWorkspace: "Wybierz lub utwórz workspace",
     disclaimer:
       "Szkice wymagają potwierdzonej linii Career Evidence. Wrażliwe pytania screeningowe nigdy nie są uzupełniane automatycznie. SUBMITTED tylko po Twojej deklaracji z provenance.",
+  },
+  interviewDecision: {
+    eyebrow: "Interview & Decision",
+    title: "Interview and Decision Copilot",
+    lead: "Handoff → prep etapu → odpowiedzi na dowodach → mock → feedback → analiza oferty → Twoja deklaracja decyzji. Bez ukrytej pomocy na żywo. Bez zewnętrznego accept/reject.",
+    loadFailed: "Nie udało się wczytać Interview & Decision Copilot",
+    actionFailed: "Akcja nie powiodła się — spróbuj ponownie",
+    safetyBanner: "Ćwicz i decyduj prywatnie — bez covert assistance, bez scoringu emocji, bez wysyłki negocjacji.",
+    noCovert: "Covert assistance WYŁĄCZONY",
+    runChain: "Uruchom łańcuch przygotowania",
+    refresh: "Odśwież",
+    chainDone: "Łańcuch zapisany — decyzja zadeklarowana jako hold (bez akcji zewnętrznej).",
+    processes: "Procesy rekrutacyjne",
+    empty: "Brak procesów",
+    active: "Aktywny proces",
+    gate: "Brama przygotowania",
+    company: "Firma / rola",
+    offers: "Oferty (zadeklarowane przez kandydata)",
+    selectProcess: "Wybierz lub utwórz proces",
+    noGuaranteed: "Brak gwarancji sukcesu rozmowy ani prawdopodobieństwa hiring.",
+    disclaimer:
+      "Odpowiedzi wymagają linii dowodów. Snapshoty z Application Studio są niemutowalne. Feedback raw ≠ interpretacja. Oferty nigdy nie powstają automatycznie z pozytywnego feedbacku. Phase 3 Agent NOT_STARTED.",
   },
   productPolish: {
     pilotPreviewBanner: "Podgląd pilota — poza publicznym launch.",

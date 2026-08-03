@@ -2216,6 +2216,308 @@ class CandidateAppStudioAudit(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
+class CandidateInterviewProcess(Base):
+    """Interview process — prepare/practice/decide; never covert assist or external acts."""
+
+    __tablename__ = "candidate_interview_processes"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "process_key", name="uq_interview_process_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    process_key: Mapped[str] = mapped_column(String(160))
+    title: Mapped[str] = mapped_column(String(300))
+    status: Mapped[str] = mapped_column(String(48), default="active")
+    workspace_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    application_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    company: Mapped[str] = mapped_column(String(300), default="UNKNOWN")
+    role_title: Mapped[str] = mapped_column(String(300), default="UNKNOWN")
+    submitted_snapshot_json: Mapped[str] = mapped_column(Text, default="{}")
+    snapshot_immutable: Mapped[bool] = mapped_column(Boolean, default=True)
+    snapshot_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    expectations_json: Mapped[str] = mapped_column(Text, default="{}")
+    hypotheses_json: Mapped[str] = mapped_column(Text, default="[]")
+    coverage_json: Mapped[str] = mapped_column(Text, default="{}")
+    candidate_questions_json: Mapped[str] = mapped_column(Text, default="[]")
+    company_brief_json: Mapped[str] = mapped_column(Text, default="{}")
+    prep_gate_json: Mapped[str] = mapped_column(Text, default="{}")
+    outcome_json: Mapped[str] = mapped_column(Text, default="{}")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="SUGGESTION")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    is_synthetic: Mapped[bool] = mapped_column(Boolean, default=False)
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    payload_json: Mapped[str] = mapped_column(Text, default="{}")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateInterviewStage(Base):
+    """Interview stage within a process."""
+
+    __tablename__ = "candidate_interview_stages"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "stage_key", name="uq_interview_stage_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    process_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_interview_processes.id", ondelete="CASCADE"), index=True
+    )
+    stage_key: Mapped[str] = mapped_column(String(160))
+    name: Mapped[str] = mapped_column(String(200))
+    stage_kind: Mapped[str] = mapped_column(String(64), default="screen")
+    status: Mapped[str] = mapped_column(String(48), default="planned")
+    expectations_json: Mapped[str] = mapped_column(Text, default="{}")
+    hypotheses_json: Mapped[str] = mapped_column(Text, default="[]")
+    prep_gate_json: Mapped[str] = mapped_column(Text, default="{}")
+    adaptation_json: Mapped[str] = mapped_column(Text, default="{}")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="SUGGESTION")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateInterviewAnswer(Base):
+    """Evidence-backed interview answer draft — never fabricated stories/metrics."""
+
+    __tablename__ = "candidate_interview_answers"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "answer_key", name="uq_interview_answer_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    process_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_interview_processes.id", ondelete="CASCADE"), index=True
+    )
+    stage_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    answer_key: Mapped[str] = mapped_column(String(160))
+    question: Mapped[str] = mapped_column(Text)
+    likelihood: Mapped[str] = mapped_column(String(32), default="POSSIBLE")
+    outline_json: Mapped[str] = mapped_column(Text, default="{}")
+    answer_text: Mapped[str] = mapped_column(Text, default="")
+    evidence_ids_json: Mapped[str] = mapped_column(Text, default="[]")
+    story_ids_json: Mapped[str] = mapped_column(Text, default="[]")
+    audit_json: Mapped[str] = mapped_column(Text, default="{}")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="SUGGESTION")
+    approved: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    fabricated: Mapped[bool] = mapped_column(Boolean, default=False)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateInterviewMock(Base):
+    """Mock interview practice — never covert live employer assistance."""
+
+    __tablename__ = "candidate_interview_mocks"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "mock_key", name="uq_interview_mock_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    process_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_interview_processes.id", ondelete="CASCADE")
+    )
+    stage_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    mock_key: Mapped[str] = mapped_column(String(160))
+    mode: Mapped[str] = mapped_column(String(48), default="practice")
+    questions_json: Mapped[str] = mapped_column(Text, default="[]")
+    assessment_json: Mapped[str] = mapped_column(Text, default="{}")
+    feedback_json: Mapped[str] = mapped_column(Text, default="{}")
+    covert_assistance: Mapped[bool] = mapped_column(Boolean, default=False)
+    emotion_scoring: Mapped[bool] = mapped_column(Boolean, default=False)
+    personality_scoring: Mapped[bool] = mapped_column(Boolean, default=False)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="SUGGESTION")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateInterviewEvent(Base):
+    """Candidate-declared interview event / recollection — not employer truth."""
+
+    __tablename__ = "candidate_interview_events"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "event_key", name="uq_interview_event_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    process_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_interview_processes.id", ondelete="CASCADE")
+    )
+    stage_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    event_key: Mapped[str] = mapped_column(String(160))
+    recollection_json: Mapped[str] = mapped_column(Text, default="{}")
+    provenance: Mapped[str] = mapped_column(String(64), default="candidate_recollection")
+    notes_confidential: Mapped[bool] = mapped_column(Boolean, default=True)
+    transcript_json: Mapped[str] = mapped_column(Text, default="{}")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="CANDIDATE_CONFIRMED")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateInterviewFeedback(Base):
+    """Feedback with separated employer-raw vs candidate interpretation."""
+
+    __tablename__ = "candidate_interview_feedback"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "feedback_key", name="uq_interview_feedback_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    process_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_interview_processes.id", ondelete="CASCADE")
+    )
+    feedback_key: Mapped[str] = mapped_column(String(160))
+    employer_raw_json: Mapped[str] = mapped_column(Text, default="{}")
+    candidate_interpretation_json: Mapped[str] = mapped_column(Text, default="{}")
+    analysis_json: Mapped[str] = mapped_column(Text, default="{}")
+    provenance: Mapped[str] = mapped_column(String(64), default="candidate_entered")
+    auto_creates_offer: Mapped[bool] = mapped_column(Boolean, default=False)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="UNKNOWN")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateOfferRecord(Base):
+    """Candidate-declared offer registry — never auto-created from feedback; no external accept."""
+
+    __tablename__ = "candidate_offer_records"
+    __table_args__ = (UniqueConstraint("candidate_id", "offer_key", name="uq_offer_record_key"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    process_id: Mapped[int | None] = mapped_column(
+        ForeignKey("candidate_interview_processes.id", ondelete="CASCADE"), nullable=True
+    )
+    offer_key: Mapped[str] = mapped_column(String(160))
+    title: Mapped[str] = mapped_column(String(300))
+    company: Mapped[str] = mapped_column(String(300), default="UNKNOWN")
+    provenance: Mapped[str] = mapped_column(String(64), default="candidate_declared")
+    terms_json: Mapped[str] = mapped_column(Text, default="{}")
+    ambiguity_json: Mapped[str] = mapped_column(Text, default="{}")
+    comparison_json: Mapped[str] = mapped_column(Text, default="{}")
+    scenarios_json: Mapped[str] = mapped_column(Text, default="[]")
+    negotiation_prep_json: Mapped[str] = mapped_column(Text, default="{}")
+    external_negotiation: Mapped[bool] = mapped_column(Boolean, default=False)
+    external_accept: Mapped[bool] = mapped_column(Boolean, default=False)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="CANDIDATE_CONFIRMED")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateDecisionMemo(Base):
+    """Decision memo + candidate-declared decision — no external accept/reject/resign."""
+
+    __tablename__ = "candidate_decision_memos"
+    __table_args__ = (UniqueConstraint("candidate_id", "memo_key", name="uq_decision_memo_key"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    process_id: Mapped[int | None] = mapped_column(
+        ForeignKey("candidate_interview_processes.id", ondelete="CASCADE"), nullable=True
+    )
+    offer_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    memo_key: Mapped[str] = mapped_column(String(160))
+    criteria_json: Mapped[str] = mapped_column(Text, default="[]")
+    memo_json: Mapped[str] = mapped_column(Text, default="{}")
+    declared_decision: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    provenance: Mapped[str] = mapped_column(String(64), default="none")
+    external_action: Mapped[bool] = mapped_column(Boolean, default=False)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="SUGGESTION")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateInterviewPrivacy(Base):
+    """Interview/Decision Copilot privacy — transcripts private by default."""
+
+    __tablename__ = "candidate_interview_privacy"
+    __table_args__ = (UniqueConstraint("candidate_id", name="uq_interview_privacy_candidate"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), unique=True
+    )
+    ai_prep_opt_in: Mapped[bool] = mapped_column(Boolean, default=True)
+    transcript_retention_opt_in: Mapped[bool] = mapped_column(Boolean, default=False)
+    export_include_transcripts: Mapped[bool] = mapped_column(Boolean, default=False)
+    paused: Mapped[bool] = mapped_column(Boolean, default=False)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidateInterviewAudit(Base):
+    """Append-only Interview & Decision Copilot audit."""
+
+    __tablename__ = "candidate_interview_audits"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    process_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    entity_type: Mapped[str] = mapped_column(String(64))
+    entity_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    action: Mapped[str] = mapped_column(String(64))
+    before_json: Mapped[str] = mapped_column(Text, default="{}")
+    after_json: Mapped[str] = mapped_column(Text, default="{}")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
 class CandidateReferralProgram(Base):
     """One referral program per candidate — unique share code (Wave B slice 3)."""
 

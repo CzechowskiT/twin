@@ -1451,6 +1451,12 @@ def delete_all_evidence(db: Session, *, candidate_id: int) -> dict:
         app_studio.purge_all_evidence_refs(db, candidate_id=candidate_id)
     except Exception:
         logger.debug("app_studio purge skip", exc_info=True)
+    try:
+        from app.services import interview_decision as idc
+
+        idc.purge_all_evidence_refs(db, candidate_id=candidate_id)
+    except Exception:
+        logger.debug("interview_decision purge skip", exc_info=True)
     _audit(
         db,
         candidate_id=candidate_id,
