@@ -208,13 +208,17 @@ def main() -> int:
     mid = ((memo.get("memo") if isinstance(memo, dict) else None) or {}).get("id")
     check("memo_id", bool(mid), str(mid))
 
-    # Hold must not open transition
+    # Hold must not open transition (separate memo; avoid same-second key collision)
+    import time as _time
+
+    _time.sleep(1.1)
     code, hold_m = _req(
         "POST",
         "/api/v1/candidates/me/interview-decision/memos",
         token=token,
         body={"offer_id": oid, "criteria": []},
     )
+    check("hold_memo_create", code in {200, 201}, str(code) + " " + str(hold_m)[:80])
     hold_id = ((hold_m.get("memo") if isinstance(hold_m, dict) else None) or {}).get("id")
     if hold_id:
         _req(
