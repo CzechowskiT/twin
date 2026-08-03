@@ -4626,6 +4626,10 @@ eyebrow: "Product roadmap",
     disclaimer:
       "TWIN never invents achievements or metrics. Claims stay FACT / CANDIDATE_CONFIRMED / SOURCE_SUPPORTED / INFERENCE / SUGGESTION / UNKNOWN. Public portfolio OFF.",
     openVault: "Open evidence vault",
+    export: "Export (safe)",
+    deleteHistory: "Delete evidence history",
+    sourceViewer: "Source registry",
+    emptySources: "No sources registered yet",
   },
   productPolish: {
     pilotPreviewBanner: "Pilot preview — not part of public launch.",
@@ -13466,6 +13470,10 @@ const pl: MessageTree = {
     disclaimer:
       "TWIN nigdy nie wymyśla osiągnięć ani metryk. Twierdzenia pozostają FACT / CANDIDATE_CONFIRMED / SOURCE_SUPPORTED / INFERENCE / SUGGESTION / UNKNOWN. Publiczne portfolio WYŁĄCZONE.",
     openVault: "Otwórz sejf dowodów",
+    export: "Eksport (bezpieczny)",
+    deleteHistory: "Usuń historię dowodów",
+    sourceViewer: "Rejestr źródeł",
+    emptySources: "Brak zarejestrowanych źródeł",
   },
   productPolish: {
     pilotPreviewBanner: "Podgląd pilota — poza publicznym launch.",

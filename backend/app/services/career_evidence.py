@@ -629,12 +629,18 @@ def confirm_field(
         "dispute": ("disputed", "DISPUTED"),
         "redact": ("redacted", "REDACTED"),
         "edit": ("confirmed", "CANDIDATE_CONFIRMED"),
+        "confidential": ("confidential", None),  # keep claim_kind
+        "archive": ("archived", None),
+        "delete": ("deleted", "UNKNOWN"),
+        "split": ("pending", None),  # candidate-requested; never auto-split content
+        "merge": ("pending", None),  # never auto-merge material differences
     }
     if action not in mapping:
         raise ValueError("invalid_field_action")
     conf, ck = mapping[action]
     row.confirmation = conf
-    row.claim_kind = ck
+    if ck is not None:
+        row.claim_kind = ck
     if action == "edit" and edited_value is not None:
         row.field_value_json = _dumps(edited_value)
     hist = _loads(row.history_json, [])
@@ -656,7 +662,29 @@ def confirm_field(
         )
         ev.quality_explain_json = _dumps(qexp)
         ev.version = int(ev.version or 1) + 1
+    if ev and action == "confidential":
+        ev.confidentiality = "CONFIDENTIAL"
+        ev.external_usability = "PRIVATE"
+        ev.version = int(ev.version or 1) + 1
+    if ev and action == "archive":
+        ev.archived_at = _utcnow()
+        ev.status = "archived"
+        ev.version = int(ev.version or 1) + 1
     _audit(db, candidate_id=candidate_id, entity_type="field", entity_id=row.id, action=action, before=before, after={"confirmation": conf})
+    # Adaptive memory: explicit candidate decisions only (no personality inference)
+    _audit(
+        db,
+        candidate_id=candidate_id,
+        entity_type="adaptive_memory",
+        entity_id=row.id,
+        action=f"field_{action}",
+        before={},
+        after={"field_name": row.field_name, "confirmation": conf, "sensitive_source_duplicated": False},
+    )
+    if action == "delete":
+        db.delete(row)
+        db.commit()
+        return row
     db.commit()
     db.refresh(row)
     return row
@@ -1262,6 +1290,30 @@ def completeness_and_tasks(db: Session, *, candidate_id: int, user_id: int) -> d
             )
         except Exception:
             logger.debug("acceptance calendar evidence task skip", exc_info=True)
+        # Daily OS inbox — non-autonomous evidence-building suggestion under fatigue rules
+        try:
+            from app.services import career_daily_os as daily_os
+
+            daily_os.upsert_inbox_item(
+                db,
+                candidate_id=candidate_id,
+                item_key=f"evidence:task:{e.id}",
+                kind="evidence_task",
+                title=f"Strengthen evidence: {e.title[:80]}",
+                body={
+                    "evidence_id": e.id,
+                    "autonomous": False,
+                    "kpi_excluded": True,
+                    "from_evidence_system": True,
+                },
+                priority_score=55,
+                deep_link="/dashboard/portfolio",
+                effort="S",
+                completion_criterion="Confirm or enrich evidence fields",
+                claim_kind=cc.CLAIM_SUGGESTION,
+            )
+        except Exception:
+            logger.debug("daily os evidence inbox skip", exc_info=True)
     try:
         db.commit()
     except Exception:

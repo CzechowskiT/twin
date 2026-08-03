@@ -50,8 +50,12 @@ class EvidenceIn(BaseModel):
 
 
 class FieldActionIn(BaseModel):
-    action: str = Field(..., pattern="^(confirm|partial|reject|dispute|redact|edit)$")
+    action: str = Field(
+        ...,
+        pattern="^(confirm|partial|reject|dispute|redact|edit|confidential|archive|delete|split|merge)$",
+    )
     edited_value: str | None = None
+    note: str | None = Field(default=None, max_length=500)
 
 
 class SkillLinkIn(BaseModel):
@@ -257,6 +261,8 @@ def field_action(
     except ValueError as exc:
         code = status.HTTP_404_NOT_FOUND if "not_found" in str(exc) else status.HTTP_400_BAD_REQUEST
         raise HTTPException(code, detail=str(exc)) from exc
+    if body.action == "delete":
+        return {"field": {"id": field_id, "confirmation": "deleted", "claim_kind": "UNKNOWN", "version": None}}
     return {
         "field": {
             "id": row.id,

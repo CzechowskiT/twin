@@ -116,6 +116,38 @@ export default function PortfolioPage() {
     }
   }
 
+  async function exportEvidence() {
+    const token = getToken();
+    if (!token) return;
+    setBusy(true);
+    try {
+      await apiFetch("/api/v1/candidates/me/career-evidence/export", {}, token);
+      await load();
+    } catch {
+      setErr(t("careerEvidence.actionFailed"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function deleteHistory() {
+    const token = getToken();
+    if (!token) return;
+    setBusy(true);
+    try {
+      await apiFetch(
+        "/api/v1/candidates/me/career-evidence/history/delete",
+        { method: "POST", body: JSON.stringify({}) },
+        token,
+      );
+      await load();
+    } catch {
+      setErr(t("careerEvidence.actionFailed"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function addAchievement() {
     const token = getToken();
     if (!token) return;
@@ -212,7 +244,40 @@ export default function PortfolioPage() {
           >
             {t("careerEvidence.refresh")}
           </Button>
+          <Button
+            type="button"
+            className="border border-[var(--twin-border)] bg-transparent"
+            disabled={busy}
+            onClick={() => void exportEvidence()}
+          >
+            {t("careerEvidence.export")}
+          </Button>
+          <Button
+            type="button"
+            className="border border-[var(--twin-border)] bg-transparent"
+            disabled={busy}
+            onClick={() => void deleteHistory()}
+          >
+            {t("careerEvidence.deleteHistory")}
+          </Button>
         </div>
+      </Card>
+
+      <Card className="mb-4">
+        <h2 className="text-base font-semibold">{t("careerEvidence.sourceViewer")}</h2>
+        <ul className="mt-2 space-y-2">
+          {(evidence?.sources || []).slice(0, 6).map((s) => (
+            <li key={s.id} className="rounded border border-[var(--twin-border)] px-3 py-2 text-sm">
+              <p className="font-medium">{s.title}</p>
+              <p className="twin-muted text-xs">
+                {s.source_kind} · hash={(s.content_hash || "—").slice(0, 12)}
+              </p>
+            </li>
+          ))}
+          {(evidence?.sources || []).length === 0 ? (
+            <li className="twin-muted text-sm">{t("careerEvidence.emptySources")}</li>
+          ) : null}
+        </ul>
       </Card>
 
       <div className="grid gap-4 lg:grid-cols-2">

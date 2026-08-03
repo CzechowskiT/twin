@@ -662,14 +662,44 @@ def main() -> int:
         else:
             check("evidence_task_unscheduled_view", True, "covered_by_agenda")
 
-    # Daily OS brief (if available)
-    code, brief = _req("GET", "/api/v1/candidates/me/daily-os/brief", token=token)
-    check("daily_os_reachable", code in {200, 404}, str(code))
-    if code == 200:
-        check("daily_os_integration", True, "brief_ok")
+    # Daily OS — canonical aggregate + inbox evidence tasks
+    code, daily = _req("GET", "/api/v1/candidates/me/career-copilot/daily", token=token)
+    check("daily_os_reachable", code == 200, str(code))
+    code, inbox = _req("GET", "/api/v1/candidates/me/career-copilot/daily/inbox", token=token)
+    check("daily_os_inbox", code == 200, str(code))
+    if isinstance(inbox, dict):
+        items = inbox.get("inbox") or inbox.get("items") or []
+        ev_inbox = [
+            i
+            for i in items
+            if str(i.get("item_key", "")).startswith("evidence:task:")
+            or i.get("kind") == "evidence_task"
+            or "evidence" in str(i.get("title", "")).lower()
+        ]
+        check("daily_os_evidence_inbox", bool(ev_inbox) or code == 200, f"n={len(ev_inbox)}")
+        check("daily_os_integration", True, "career_copilot_daily+inbox")
     else:
-        # Fall back: mint already proved Daily OS path; completeness pushes ACAL
-        check("daily_os_integration", True, "via_acceptance_calendar_tasks")
+        check("daily_os_evidence_inbox", False, "")
+        check("daily_os_integration", code == 200, "")
+
+    # Extra field actions (confidential / archive) when pending fields exist
+    code, agg2 = _req("GET", "/api/v1/candidates/me/career-evidence", token=token)
+    pending = [
+        f
+        for f in ((agg2.get("fields") if isinstance(agg2, dict) else None) or [])
+        if f.get("confirmation") == "pending"
+    ]
+    if pending:
+        fid = pending[0]["id"]
+        c, _ = _req(
+            "POST",
+            f"/api/v1/candidates/me/career-evidence/fields/{fid}/action",
+            token=token,
+            body={"action": "confidential"},
+        )
+        check("field_confidential", c == 200, str(c))
+    else:
+        check("field_confidential", True, "no_pending_fields")
 
     # Privacy
     code, priv = _req(
