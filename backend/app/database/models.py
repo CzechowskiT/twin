@@ -2518,6 +2518,221 @@ class CandidateInterviewAudit(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
+class CandidateCareerOutcome(Base):
+    """Candidate-declared career outcome registry — never inferred employer confirmation."""
+
+    __tablename__ = "candidate_career_outcomes"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "outcome_key", name="uq_career_outcome_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    outcome_key: Mapped[str] = mapped_column(String(160))
+    outcome_type: Mapped[str] = mapped_column(String(64))
+    application_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    process_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    offer_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    decision_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    transition_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    source_type: Mapped[str] = mapped_column(String(64), default="candidate_declared")
+    source_date: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    candidate_confirmed: Mapped[bool] = mapped_column(Boolean, default=True)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="CANDIDATE_CONFIRMED")
+    confidence: Mapped[str] = mapped_column(String(16), default="medium")
+    outcome_date: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    privacy: Mapped[str] = mapped_column(String(40), default="PRIVATE")
+    payload_json: Mapped[str] = mapped_column(Text, default="{}")
+    prediction_json: Mapped[str] = mapped_column(Text, default="{}")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    is_synthetic: Mapped[bool] = mapped_column(Boolean, default=False)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateTransitionWorkspace(Base):
+    """First-90-days transition workspace — plans AI_DRAFT until candidate approves."""
+
+    __tablename__ = "candidate_transition_workspaces"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "workspace_key", name="uq_transition_workspace_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    workspace_key: Mapped[str] = mapped_column(String(160))
+    title: Mapped[str] = mapped_column(String(300))
+    status: Mapped[str] = mapped_column(String(48), default="active")
+    decision_id: Mapped[int] = mapped_column(Integer)
+    offer_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    process_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    decision_snapshot_json: Mapped[str] = mapped_column(Text, default="{}")
+    offer_snapshot_json: Mapped[str] = mapped_column(Text, default="{}")
+    decision_snapshot_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    offer_snapshot_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    snapshots_immutable: Mapped[bool] = mapped_column(Boolean, default=True)
+    readiness_json: Mapped[str] = mapped_column(Text, default="{}")
+    pre_start_json: Mapped[str] = mapped_column(Text, default="[]")
+    resignation_json: Mapped[str] = mapped_column(Text, default="{}")
+    handover_json: Mapped[str] = mapped_column(Text, default="{}")
+    clarification_json: Mapped[str] = mapped_column(Text, default="[]")
+    first_day_json: Mapped[str] = mapped_column(Text, default="{}")
+    first_week_json: Mapped[str] = mapped_column(Text, default="{}")
+    plan_90_json: Mapped[str] = mapped_column(Text, default="{}")
+    plan_90_status: Mapped[str] = mapped_column(String(32), default="AI_DRAFT")
+    expectations_json: Mapped[str] = mapped_column(Text, default="{}")
+    stakeholders_json: Mapped[str] = mapped_column(Text, default="[]")
+    cockpit_json: Mapped[str] = mapped_column(Text, default="{}")
+    learning_plan_json: Mapped[str] = mapped_column(Text, default="{}")
+    risks_json: Mapped[str] = mapped_column(Text, default="[]")
+    retrospective_json: Mapped[str] = mapped_column(Text, default="{}")
+    graph_update_json: Mapped[str] = mapped_column(Text, default="{}")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="SUGGESTION")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    is_synthetic: Mapped[bool] = mapped_column(Boolean, default=False)
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    payload_json: Mapped[str] = mapped_column(Text, default="{}")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateTransitionCheckin(Base):
+    """Candidate check-in with separated facts vs interpretation provenance."""
+
+    __tablename__ = "candidate_transition_checkins"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "checkin_key", name="uq_transition_checkin_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    transition_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_transition_workspaces.id", ondelete="CASCADE"), index=True
+    )
+    checkin_key: Mapped[str] = mapped_column(String(160))
+    period: Mapped[str] = mapped_column(String(32), default="week_1")
+    facts_json: Mapped[str] = mapped_column(Text, default="{}")
+    interpretation_json: Mapped[str] = mapped_column(Text, default="{}")
+    provenance_facts: Mapped[str] = mapped_column(String(64), default="candidate_reported")
+    provenance_interpretation: Mapped[str] = mapped_column(
+        String(64), default="candidate_interpretation"
+    )
+    claim_kind: Mapped[str] = mapped_column(String(32), default="CANDIDATE_REPORTED")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateTransitionMilestone(Base):
+    """Transition milestone — no mastery inference without evidence."""
+
+    __tablename__ = "candidate_transition_milestones"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "milestone_key", name="uq_transition_milestone_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    transition_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_transition_workspaces.id", ondelete="CASCADE")
+    )
+    milestone_key: Mapped[str] = mapped_column(String(160))
+    title: Mapped[str] = mapped_column(String(300))
+    status: Mapped[str] = mapped_column(String(32), default="planned")
+    evidence_ids_json: Mapped[str] = mapped_column(Text, default="[]")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="SUGGESTION")
+    due_label: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateTransitionCalibration(Base):
+    """Versioned recommendation calibration — never silent overwrite; revert supported."""
+
+    __tablename__ = "candidate_transition_calibrations"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "calibration_key", name="uq_transition_calibration_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    calibration_key: Mapped[str] = mapped_column(String(160))
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    weights_json: Mapped[str] = mapped_column(Text, default="{}")
+    explain_json: Mapped[str] = mapped_column(Text, default="{}")
+    outcome_ids_json: Mapped[str] = mapped_column(Text, default="[]")
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
+    supersedes_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    reverted_from_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="INFERENCE")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    archived_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateTransitionPrivacy(Base):
+    """Transition privacy — no workplace monitoring; employer notes excluded by default."""
+
+    __tablename__ = "candidate_transition_privacy"
+    __table_args__ = (UniqueConstraint("candidate_id", name="uq_transition_privacy_candidate"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), unique=True
+    )
+    learning_opt_in: Mapped[bool] = mapped_column(Boolean, default=True)
+    reminders_opt_in: Mapped[bool] = mapped_column(Boolean, default=True)
+    export_include_employer_notes: Mapped[bool] = mapped_column(Boolean, default=False)
+    paused: Mapped[bool] = mapped_column(Boolean, default=False)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidateTransitionAudit(Base):
+    """Append-only Career Transition audit."""
+
+    __tablename__ = "candidate_transition_audits"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    transition_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    entity_type: Mapped[str] = mapped_column(String(64))
+    entity_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    action: Mapped[str] = mapped_column(String(64))
+    before_json: Mapped[str] = mapped_column(Text, default="{}")
+    after_json: Mapped[str] = mapped_column(Text, default="{}")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
 class CandidateReferralProgram(Base):
     """One referral program per candidate — unique share code (Wave B slice 3)."""
 

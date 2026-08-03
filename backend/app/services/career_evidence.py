@@ -1457,6 +1457,12 @@ def delete_all_evidence(db: Session, *, candidate_id: int) -> dict:
         idc.purge_all_evidence_refs(db, candidate_id=candidate_id)
     except Exception:
         logger.debug("interview_decision purge skip", exc_info=True)
+    try:
+        from app.services import career_transition as ctrans
+
+        ctrans.purge_all_evidence_refs(db, candidate_id=candidate_id)
+    except Exception:
+        logger.debug("career_transition purge skip", exc_info=True)
     _audit(
         db,
         candidate_id=candidate_id,

@@ -49,6 +49,9 @@ export function CandidateWorkspaceSubnav({
       <Link href="/dashboard/interview-decision" className={itemClass}>
         {t("interviewDecision.eyebrow")}
       </Link>
+      <Link href="/dashboard/career-transition" className={itemClass}>
+        {t("careerTransition.eyebrow")}
+      </Link>
       <Link href="/dashboard/identity" className={itemClass}>
         {t("dashboard.identityLink")}
       </Link>

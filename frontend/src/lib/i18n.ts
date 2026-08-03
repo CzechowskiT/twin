@@ -142,6 +142,7 @@ export type TranslationKey =
   | `careerEvidence.${keyof typeof en.careerEvidence}`
   | `applicationStudio.${keyof typeof en.applicationStudio}`
   | `interviewDecision.${keyof typeof en.interviewDecision}`
+  | `careerTransition.${keyof typeof en.careerTransition}`
   | `recruiterInbox.${keyof typeof en.recruiterInbox}`
   | `recruiterAudit.${keyof typeof en.recruiterAudit}`
   | `recruiterScorecard.${keyof typeof en.recruiterScorecard}`
@@ -4675,6 +4676,28 @@ eyebrow: "Product roadmap",
     noGuaranteed: "No guaranteed interview success or hiring probability.",
     disclaimer:
       "Answers need evidence lineage. Snapshots from Application Studio stay immutable. Feedback raw ≠ interpretation. Offers never auto-created from positive feedback. Phase 3 Agent NOT_STARTED.",
+  },
+  careerTransition: {
+    eyebrow: "Career Transition",
+    title: "First 90 days & outcome learning",
+    lead: "Declared decision → transition workspace → pre-start → plans → check-ins → outcomes → calibration. TWIN never monitors your workplace or sends resignation for you.",
+    loadFailed: "Could not load Career Transition",
+    actionFailed: "Action failed — try again",
+    safetyBanner:
+      "Candidate-owned only — no workplace monitoring, no employer email/Slack/Teams, resignation draft-only, interpretation ≠ employer-confirmed.",
+    runChain: "Start decision-to-impact chain",
+    refresh: "Refresh",
+    chainDone: "Transition saved — 30/60/90 approved, check-in recorded, Career Graph update approved by you.",
+    workspaces: "Transition workspaces",
+    empty: "No transitions yet — declare accept intent first",
+    active: "Active workspace",
+    planStatus: "30/60/90 status",
+    snapshots: "Decision/offer snapshots",
+    monitoring: "Workplace monitoring",
+    resignation: "Resignation",
+    outcomes: "Career outcomes (declared)",
+    disclaimer:
+      "Generated 30/60/90 stays AI_DRAFT until you approve. Missing fields stay UNKNOWN. Calibration is versioned with revert. Phase 3 Agent NOT_STARTED.",
   },
   productPolish: {
     pilotPreviewBanner: "Pilot preview — not part of public launch.",
@@ -13562,6 +13585,28 @@ const pl: MessageTree = {
     noGuaranteed: "Brak gwarancji sukcesu rozmowy ani prawdopodobieństwa hiring.",
     disclaimer:
       "Odpowiedzi wymagają linii dowodów. Snapshoty z Application Studio są niemutowalne. Feedback raw ≠ interpretacja. Oferty nigdy nie powstają automatycznie z pozytywnego feedbacku. Phase 3 Agent NOT_STARTED.",
+  },
+  careerTransition: {
+    eyebrow: "Career Transition",
+    title: "Pierwsze 90 dni i uczenie się z wyników",
+    lead: "Zadeklarowana decyzja → workspace przejścia → pre-start → plany → check-iny → outcomes → kalibracja. TWIN nie monitoruje miejsca pracy i nie wysyła rezygnacji.",
+    loadFailed: "Nie udało się wczytać Career Transition",
+    actionFailed: "Akcja nie powiodła się — spróbuj ponownie",
+    safetyBanner:
+      "Tylko Ty — bez monitoringu pracy, bez employer email/Slack/Teams, rezygnacja tylko jako draft, interpretacja ≠ potwierdzenie pracodawcy.",
+    runChain: "Uruchom łańcuch decyzja→wpływ",
+    refresh: "Odśwież",
+    chainDone: "Przejście zapisane — 30/60/90 zatwierdzone, check-in, aktualizacja Career Graph zatwierdzona przez Ciebie.",
+    workspaces: "Workspaces przejścia",
+    empty: "Brak przejść — najpierw zadeklaruj accept intent",
+    active: "Aktywny workspace",
+    planStatus: "Status 30/60/90",
+    snapshots: "Snapshoty decyzji/oferty",
+    monitoring: "Monitoring miejsca pracy",
+    resignation: "Rezygnacja",
+    outcomes: "Wyniki kariery (zadeklarowane)",
+    disclaimer:
+      "Wygenerowany 30/60/90 zostaje AI_DRAFT do Twojej zgody. Braki = UNKNOWN. Kalibracja wersjonowana z revert. Phase 3 Agent NOT_STARTED.",
   },
   productPolish: {
     pilotPreviewBanner: "Podgląd pilota — poza publicznym launch.",

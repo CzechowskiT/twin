@@ -12,6 +12,7 @@ from app.api import (
     career_evidence,
     application_studio,
     interview_decision,
+    career_transition,
     chatgpt_twin,
     company,
     company_feedback_persistence,
@@ -152,6 +153,9 @@ api_router.include_router(
 )
 api_router.include_router(
     interview_decision.router, prefix="/candidates", tags=["Interview Decision"]
+)
+api_router.include_router(
+    career_transition.router, prefix="/candidates", tags=["Career Transition"]
 )
 api_router.include_router(
     candidate_intelligence.router, prefix="", tags=["Candidate Intelligence"]
