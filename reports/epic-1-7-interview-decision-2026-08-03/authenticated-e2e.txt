@@ -3,8 +3,8 @@ PASS launch_nogo NO-GO
 PASS enrollment_off 
 PASS phase_3b_blocked 
 PASS ms_write_off_ph 
-PASS four_way_recorded fe=cc8a324f5d87 api=cc8a324f5d87 wrk=cc8a324f5d87
-PASS four_way_aligned fe=cc8a324f5d87 api=cc8a324f5d87 wrk=cc8a324f5d87
+PASS four_way_recorded fe=1783e94d3e40 api=1783e94d3e40 wrk=1783e94d3e40
+PASS four_way_aligned fe=1783e94d3e40 api=1783e94d3e40 wrk=1783e94d3e40
 PASS mint_synthetic 200
 PASS kpi_excluded 
 PASS synthetic_ne_real 
@@ -40,10 +40,10 @@ PASS fe_application_studio 200
 PASS daily_os_brief_200 200
 PASS daily_os_not_404 200
 PASS evidence_seed 201
-PASS evidence_id 69
+PASS evidence_id 70
 PASS studio_handoff_workspace 201
 PASS process_create 201
-PASS process_id 1
+PASS process_id 2
 PASS snapshot_immutable_flag 
 PASS hypotheses_present 
 PASS hypothesis_likelihood_labels 
@@ -59,7 +59,7 @@ PASS snapshot_not_mutable
 PASS snapshot_hash_matches 
 PASS process_get 200
 PASS stage_create 201
-PASS stage_id 2
+PASS stage_id 4
 PASS answer_create 201
 PASS answer_lineage 
 PASS answer_not_fabricated 
@@ -96,7 +96,7 @@ PASS offer_rejects_auto_provenance 400
 PASS offer_compare 200
 PASS compare_no_invented 
 PASS memo_create 201
-PASS memo_id 1
+PASS memo_id 2
 PASS declare_200 200
 PASS declare_hold 
 PASS declare_provenance 
