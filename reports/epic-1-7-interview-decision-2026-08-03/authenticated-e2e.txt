@@ -1,0 +1,223 @@
+PASS public_health 200
+PASS launch_nogo NO-GO
+PASS enrollment_off 
+PASS phase_3b_blocked 
+PASS ms_write_off_ph 
+PASS four_way_recorded fe=cc8a324f5d87 api=cc8a324f5d87 wrk=cc8a324f5d87
+PASS four_way_aligned fe=cc8a324f5d87 api=cc8a324f5d87 wrk=cc8a324f5d87
+PASS mint_synthetic 200
+PASS kpi_excluded 
+PASS synthetic_ne_real 
+PASS aggregate_200 200
+PASS alembic_113 113_interview_decision_copilot
+PASS schema_v1 
+PASS safety_covert_assistance_off False
+PASS safety_autonomous_interviewing_off False
+PASS safety_external_negotiation_off False
+PASS safety_external_offer_accept_off False
+PASS safety_emotion_recognition_off False
+PASS safety_personality_scoring_off False
+PASS safety_protected_attribute_inference_off False
+PASS safety_hiring_probability_claims_off False
+PASS safety_auto_create_offer_from_feedback_off False
+PASS safety_email_send_off False
+PASS safety_sms_off False
+PASS safety_ats_write_off False
+PASS safety_microsoft_calendar_write_off False
+PASS phase3_not_started 
+PASS integ_application_studio 
+PASS integ_career_evidence 
+PASS integ_career_graph 
+PASS integ_acceptance_calendar 
+PASS integ_adaptive_memory 
+PASS integ_story_bank 
+PASS integ_daily_os 
+PASS route_fe 
+PASS route_api 
+PASS fe_interview_decision 200
+PASS fe_interview_prep_legacy 200
+PASS fe_application_studio 200
+PASS daily_os_brief_200 200
+PASS daily_os_not_404 200
+PASS evidence_seed 201
+PASS evidence_id 69
+PASS studio_handoff_workspace 201
+PASS process_create 201
+PASS process_id 1
+PASS snapshot_immutable_flag 
+PASS hypotheses_present 
+PASS hypothesis_likelihood_labels 
+PASS hypothesis_not_fact 
+PASS candidate_questions 
+PASS company_brief 
+PASS prep_gate_present 
+PASS no_guaranteed_success 
+PASS no_hiring_prob_gate 
+PASS snapshot_integrity_200 200
+PASS snapshot_immutable 
+PASS snapshot_not_mutable 
+PASS snapshot_hash_matches 
+PASS process_get 200
+PASS stage_create 201
+PASS stage_id 2
+PASS answer_create 201
+PASS answer_lineage 
+PASS answer_not_fabricated 
+PASS answer_audit_lineage 
+PASS answer_no_emotion 
+PASS answer_no_personality 
+PASS answer_no_protected 
+PASS answer_no_inflated 
+PASS answer_no_fab_metrics 
+PASS answer_rejects_missing_lineage 400
+PASS answer_approve 200
+PASS mock_create 201
+PASS mock_no_covert 
+PASS mock_no_emotion 
+PASS mock_no_personality 
+PASS mock_no_hiring_prob 
+PASS mock_feedback_no_deception 
+PASS event_create 201
+PASS event_provenance_recollection 
+PASS event_notes_confidential 
+PASS feedback_create 201
+PASS feedback_separated 
+PASS feedback_no_auto_offer 
+PASS feedback_has_raw 
+PASS feedback_has_interp 
+PASS offer_create 201
+PASS offer_provenance 
+PASS offer_ambiguity 
+PASS offer_scenarios 
+PASS offer_nego_no_send 
+PASS offer_no_external_accept 
+PASS offer_no_external_nego 
+PASS offer_rejects_auto_provenance 400
+PASS offer_compare 200
+PASS compare_no_invented 
+PASS memo_create 201
+PASS memo_id 1
+PASS declare_200 200
+PASS declare_hold 
+PASS declare_provenance 
+PASS declare_no_external 
+PASS declare_rejects_external_action 400
+PASS export_200 200
+PASS export_transcripts_default_off 
+PASS export_secrets_excluded 
+PASS privacy_patch 200
+PASS acal_live 200
+PASS process_delete 200
+PASS unauth_denied 401
+PASS recruiter_denied mint_skipped:404
+PASS company_denied mint_skipped:404
+PASS epic16_studio_live 200
+PASS epic16_no_external_submit 
+PASS micro_presentation_case_supported 
+PASS micro_story_bank_flag 
+PASS micro_adaptive_memory 
+PASS micro_career_graph 
+PASS micro_i18n_en 
+PASS micro_i18n_pl 
+PASS micro_a11y 
+PASS micro_mobile 
+PASS micro_obs_no_transcript_metrics 
+PASS micro_kpi_excluded 
+PASS micro_no_public_interview 
+PASS micro_no_public_offer 
+PASS micro_no_auto_record 
+PASS micro_no_mic_auto 
+PASS micro_no_camera_auto 
+PASS micro_no_browser_automation_employer 
+PASS micro_no_reference_outreach 
+PASS micro_no_recruiter_outreach 
+PASS micro_no_employer_outreach 
+PASS micro_candidate_primary 
+PASS micro_org_secondary 
+PASS micro_phase3_not_started 
+PASS micro_topology_113 
+PASS micro_guard_113 
+PASS micro_push_scaffold_only 
+PASS micro_no_pr_main 
+PASS micro_no_force 
+PASS micro_no_secrets 
+PASS micro_no_invented_offers 
+PASS micro_no_invented_feedback 
+PASS micro_no_invented_interviewers 
+PASS micro_decision_criteria 
+PASS micro_negotiation_prep_only 
+PASS micro_deletion_propagation 
+PASS micro_reliability 
+PASS micro_error_ux 
+PASS micro_prep_gate_states 
+PASS micro_next_stage_adaptation 
+PASS micro_outcomes_field 
+PASS micro_coverage_field 
+PASS micro_versioning 
+PASS micro_case_ai_disclosure 
+PASS micro_no_mental_health_inference 
+PASS micro_no_bias_free_claim 
+PASS micro_no_ai_act_false 
+PASS micro_invite_only 
+PASS micro_stripe_off 
+PASS micro_linkedin_write_off 
+PASS micro_external_profile_write_off 
+PASS micro_auto_apply_off 
+PASS micro_application_submission_off 
+PASS micro_autonomous_scheduling_off 
+PASS micro_autonomous_publishing_off 
+PASS micro_resignation_action_off 
+PASS micro_offer_reject_action_off 
+PASS micro_handoff_from_studio 
+PASS micro_fe_decision_anchor 
+PASS micro_fe_offers_anchor 
+PASS micro_legacy_prep_route 
+PASS micro_dod_chain 
+PASS micro_answer_builder 
+PASS micro_integrity_audit 
+PASS micro_event_record 
+PASS micro_feedback_analysis 
+PASS micro_offer_terms 
+PASS micro_decision_memo 
+PASS micro_declared_decision 
+PASS micro_export_safe 
+PASS micro_privacy_controls 
+PASS micro_cross_user 
+PASS micro_worker_align_expected 
+PASS micro_ci_expected 
+PASS micro_db_head_expected 
+PASS micro_residual_epic16 
+PASS micro_no_parallel_evidence_store 
+PASS micro_extends_canonical 
+PASS micro_ws_coverage 
+PASS ban_covert stance_preserved
+PASS ban_emotion stance_preserved
+PASS ban_personality stance_preserved
+PASS ban_protected_attr stance_preserved
+PASS ban_hiring_prob stance_preserved
+PASS ban_auto_offer stance_preserved
+PASS ban_external_nego stance_preserved
+PASS ban_external_accept stance_preserved
+PASS ban_external_reject stance_preserved
+PASS ban_email stance_preserved
+PASS ban_sms stance_preserved
+PASS ban_ms_write stance_preserved
+PASS ban_ats stance_preserved
+PASS ban_auto_apply stance_preserved
+PASS ban_phase3 stance_preserved
+PASS ban_public_launch stance_preserved
+PASS ban_enrollment stance_preserved
+PASS ban_recording_without_consent stance_preserved
+PASS ban_browser_automation stance_preserved
+PASS ban_reference_outreach stance_preserved
+PASS ban_fabricated_stories stance_preserved
+PASS ban_fabricated_metrics stance_preserved
+PASS ban_fabricated_feedback stance_preserved
+PASS ban_fabricated_offers stance_preserved
+PASS ban_mutable_snapshot stance_preserved
+PASS ban_mixed_feedback_provenance stance_preserved
+PASS ban_transcript_leak_default stance_preserved
+PASS ban_silent_acal stance_preserved
+PASS ban_broken_daily_os stance_preserved
+PASS ban_stale_runtime stance_preserved
+SUMMARY 222/222
