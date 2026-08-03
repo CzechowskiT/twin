@@ -1444,6 +1444,13 @@ def delete_all_evidence(db: Session, *, candidate_id: int) -> dict:
     db.query(CandidateApplicationEvidencePack).filter(
         CandidateApplicationEvidencePack.candidate_id == candidate_id
     ).delete(synchronize_session=False)
+    # Propagate into Application Studio — no stale evidence in drafts/assets
+    try:
+        from app.services import application_studio as app_studio
+
+        app_studio.purge_all_evidence_refs(db, candidate_id=candidate_id)
+    except Exception:
+        logger.debug("app_studio purge skip", exc_info=True)
     _audit(
         db,
         candidate_id=candidate_id,

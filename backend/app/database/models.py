@@ -1992,6 +1992,230 @@ class CandidateEvidenceAudit(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
+class CandidateAppStudioWorkspace(Base):
+    """Application Studio workspace — prepare only; never external submit."""
+
+    __tablename__ = "candidate_app_studio_workspaces"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "workspace_key", name="uq_app_studio_workspace_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    workspace_key: Mapped[str] = mapped_column(String(160))
+    title: Mapped[str] = mapped_column(String(300))
+    status: Mapped[str] = mapped_column(String(48), default="draft")
+    application_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    opportunity_json: Mapped[str] = mapped_column(Text, default="{}")
+    requirements_json: Mapped[str] = mapped_column(Text, default="[]")
+    fit_json: Mapped[str] = mapped_column(Text, default="{}")
+    viability_json: Mapped[str] = mapped_column(Text, default="{}")
+    strategy_json: Mapped[str] = mapped_column(Text, default="{}")
+    checklist_json: Mapped[str] = mapped_column(Text, default="[]")
+    readiness_json: Mapped[str] = mapped_column(Text, default="{}")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="SUGGESTION")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    is_synthetic: Mapped[bool] = mapped_column(Boolean, default=False)
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    payload_json: Mapped[str] = mapped_column(Text, default="{}")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateAppStudioCvDraft(Base):
+    """Evidence-backed tailored CV draft — never silently rewrites canonical CV."""
+
+    __tablename__ = "candidate_app_studio_cv_drafts"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "draft_key", name="uq_app_studio_cv_draft_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    workspace_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_app_studio_workspaces.id", ondelete="CASCADE"), index=True
+    )
+    draft_key: Mapped[str] = mapped_column(String(160))
+    title: Mapped[str] = mapped_column(String(300))
+    body_json: Mapped[str] = mapped_column(Text, default="{}")
+    evidence_ids_json: Mapped[str] = mapped_column(Text, default="[]")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="SUGGESTION")
+    audit_json: Mapped[str] = mapped_column(Text, default="{}")
+    approved: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateAppStudioCoverLetter(Base):
+    """Evidence-backed cover letter draft — no external send."""
+
+    __tablename__ = "candidate_app_studio_cover_letters"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "letter_key", name="uq_app_studio_cover_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    workspace_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_app_studio_workspaces.id", ondelete="CASCADE")
+    )
+    letter_key: Mapped[str] = mapped_column(String(160))
+    body_text: Mapped[str] = mapped_column(Text, default="")
+    evidence_ids_json: Mapped[str] = mapped_column(Text, default="[]")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="SUGGESTION")
+    approved: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateAppStudioScreeningAnswer(Base):
+    """Screening Q&A — sensitive questions never auto-completed."""
+
+    __tablename__ = "candidate_app_studio_screening_answers"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "answer_key", name="uq_app_studio_answer_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    workspace_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_app_studio_workspaces.id", ondelete="CASCADE")
+    )
+    answer_key: Mapped[str] = mapped_column(String(160))
+    question: Mapped[str] = mapped_column(Text)
+    answer_text: Mapped[str] = mapped_column(Text, default="")
+    sensitive: Mapped[bool] = mapped_column(Boolean, default=False)
+    auto_completed: Mapped[bool] = mapped_column(Boolean, default=False)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="UNKNOWN")
+    evidence_ids_json: Mapped[str] = mapped_column(Text, default="[]")
+    audit_json: Mapped[str] = mapped_column(Text, default="{}")
+    approved: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateAppStudioAsset(Base):
+    """Private application asset registry — never public by default."""
+
+    __tablename__ = "candidate_app_studio_assets"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "asset_key", name="uq_app_studio_asset_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    workspace_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_app_studio_workspaces.id", ondelete="CASCADE")
+    )
+    asset_key: Mapped[str] = mapped_column(String(160))
+    asset_kind: Mapped[str] = mapped_column(String(64))
+    title: Mapped[str] = mapped_column(String(300))
+    evidence_ids_json: Mapped[str] = mapped_column(Text, default="[]")
+    is_public: Mapped[bool] = mapped_column(Boolean, default=False)
+    confidentiality: Mapped[str] = mapped_column(String(40), default="PRIVATE")
+    payload_json: Mapped[str] = mapped_column(Text, default="{}")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateAppStudioSubmission(Base):
+    """Candidate-declared submission record — never auto external submit."""
+
+    __tablename__ = "candidate_app_studio_submissions"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "submission_key", name="uq_app_studio_submission_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    workspace_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_app_studio_workspaces.id", ondelete="CASCADE")
+    )
+    submission_key: Mapped[str] = mapped_column(String(160))
+    status: Mapped[str] = mapped_column(String(48), default="not_submitted")
+    provenance: Mapped[str] = mapped_column(String(64), default="none")
+    declared_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    declared_channel: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    external_submit: Mapped[bool] = mapped_column(Boolean, default=False)
+    notes: Mapped[str] = mapped_column(Text, default="")
+    payload_json: Mapped[str] = mapped_column(Text, default="{}")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidateAppStudioPrivacy(Base):
+    """Application Studio privacy — no hidden cross-application reuse."""
+
+    __tablename__ = "candidate_app_studio_privacy"
+    __table_args__ = (UniqueConstraint("candidate_id", name="uq_app_studio_privacy_candidate"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), unique=True
+    )
+    ai_drafting_opt_in: Mapped[bool] = mapped_column(Boolean, default=True)
+    memory_reuse_opt_in: Mapped[bool] = mapped_column(Boolean, default=True)
+    export_include_confidential: Mapped[bool] = mapped_column(Boolean, default=False)
+    paused: Mapped[bool] = mapped_column(Boolean, default=False)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidateAppStudioAudit(Base):
+    """Append-only Application Studio audit."""
+
+    __tablename__ = "candidate_app_studio_audits"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    workspace_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    entity_type: Mapped[str] = mapped_column(String(64))
+    entity_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    action: Mapped[str] = mapped_column(String(64))
+    before_json: Mapped[str] = mapped_column(Text, default="{}")
+    after_json: Mapped[str] = mapped_column(Text, default="{}")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
 class CandidateReferralProgram(Base):
     """One referral program per candidate — unique share code (Wave B slice 3)."""
 

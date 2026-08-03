@@ -54,7 +54,7 @@
     "worker_service": "enthusiastic-encouragement",
     "postgres": "Postgres",
     "redis": "Redis",
-    "alembic_head_expected": "111_career_evidence_portfolio"
+    "alembic_head_expected": "112_application_studio"
   },
   "on_call_roles": {
     "primary": "PILOT_ON_CALL_PRIMARY",
@@ -199,7 +199,7 @@
     "evidence": "docs/DAILY_CAREER_OS_EVIDENCE.md",
     "api": "/api/v1/candidates/me/career-copilot/daily",
     "ui": ["/dashboard", "/dashboard/career"],
-    "alembic": "111_career_evidence_portfolio",
+    "alembic": "112_application_studio",
     "verdict_target": "DAILY CAREER OPERATING SYSTEM CUSTOMER-USABLE \u2014 CONTINUOUS CAREER COPILOT PRODUCTION-READY",
     "phase_3_career_agent": "NOT_STARTED",
     "extends": "adaptive_career_intelligence",
