@@ -3,8 +3,8 @@ PASS launch_nogo NO-GO
 PASS enrollment_off 
 PASS phase_3b_blocked 
 PASS ms_write_off_ph 
-PASS four_way_recorded fe=0c85f6d5b4a4 api=0c85f6d5b4a4 wrk=0c85f6d5b4a4
-PASS four_way_aligned fe=0c85f6d5b4a4 api=0c85f6d5b4a4 wrk=0c85f6d5b4a4
+PASS four_way_recorded fe=bded090f5e04 api=bded090f5e04 wrk=bded090f5e04
+PASS four_way_aligned fe=bded090f5e04 api=bded090f5e04 wrk=bded090f5e04
 PASS repo_origin_present 
 PASS mint_synthetic 200
 PASS kpi_excluded 
@@ -42,10 +42,10 @@ PASS daily_os_canonical_hint
 PASS daily_os_phase3_not 
 PASS daily_os_canonical_live 200
 PASS evidence_seed 201
-PASS evidence_id 65
+PASS evidence_id 67
 PASS confidential_evidence_seed 201
 PASS workspace_create 201
-PASS workspace_id 3
+PASS workspace_id 5
 PASS opp_normalized 
 PASS opp_title 
 PASS opp_company 
@@ -68,7 +68,7 @@ PASS readiness_no_external
 PASS refresh_fit 200
 PASS workspace_get 200
 PASS cv_draft_201 201
-PASS cv_lineage [65]
+PASS cv_lineage [67]
 PASS cv_canonical_preserved 
 PASS cv_audit_lineage 
 PASS cv_no_fabricated 
@@ -111,7 +111,7 @@ PASS privacy_patch 200
 PASS privacy_export_conf_default_off 
 PASS acal_live 200
 PASS acal_payload 
-PASS cv_version_attempt 409
+PASS cv_version_attempt 201
 PASS workspace_delete 200
 PASS stale_reappear_guard 
 PASS deleted_not_visible 404
