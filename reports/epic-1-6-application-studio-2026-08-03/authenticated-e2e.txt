@@ -1,0 +1,196 @@
+PASS public_health 200
+PASS launch_nogo NO-GO
+PASS enrollment_off 
+PASS phase_3b_blocked 
+PASS ms_write_off_ph 
+PASS four_way_recorded fe=0c85f6d5b4a4 api=0c85f6d5b4a4 wrk=0c85f6d5b4a4
+PASS four_way_aligned fe=0c85f6d5b4a4 api=0c85f6d5b4a4 wrk=0c85f6d5b4a4
+PASS repo_origin_present 
+PASS mint_synthetic 200
+PASS kpi_excluded 
+PASS synthetic_ne_real 
+PASS aggregate_200 200
+PASS alembic_112 112_application_studio
+PASS schema_v1 
+PASS no_external_submit 
+PASS no_auto_apply 
+PASS no_email_send 
+PASS no_ats_write 
+PASS no_linkedin_write 
+PASS no_public_assets 
+PASS ms_write_off_agg 
+PASS no_fabricated_flag 
+PASS phase3_not_started 
+PASS analytics_kpi_excluded 
+PASS obs_no_source_text 
+PASS privacy_no_hidden_reuse 
+PASS integ_career_evidence 
+PASS integ_career_graph 
+PASS integ_daily_os_brief 
+PASS integ_acal 
+PASS integ_adaptive 
+PASS route_fe 
+PASS route_api 
+PASS fe_studio_route 200
+PASS fe_portfolio_route 200
+PASS fe_dashboard_route 200
+PASS daily_os_brief_not_404 200
+PASS daily_os_brief_200 200
+PASS daily_os_brief_schema 
+PASS daily_os_brief_path 
+PASS daily_os_canonical_hint 
+PASS daily_os_phase3_not 
+PASS daily_os_canonical_live 200
+PASS evidence_seed 201
+PASS evidence_id 65
+PASS confidential_evidence_seed 201
+PASS workspace_create 201
+PASS workspace_id 3
+PASS opp_normalized 
+PASS opp_title 
+PASS opp_company 
+PASS opp_claim 
+PASS requirements_decomposed 10
+PASS requirements_claim 
+PASS fit_kind_present partially_supported_fit
+PASS fit_not_collapsed_score 
+PASS fit_not_fabricated 
+PASS viability_present 
+PASS viability_hiring_unknown 
+PASS strategy_present 
+PASS strategy_no_auto_submit 
+PASS strategy_evidence_first 
+PASS workspace_no_external 
+PASS workspace_kpi_excluded 
+PASS checklist_present 
+PASS readiness_present 
+PASS readiness_no_external 
+PASS refresh_fit 200
+PASS workspace_get 200
+PASS cv_draft_201 201
+PASS cv_lineage [65]
+PASS cv_canonical_preserved 
+PASS cv_audit_lineage 
+PASS cv_no_fabricated 
+PASS cv_summary_suggestion 
+PASS cv_claim 
+PASS cv_rejects_missing_lineage 400
+PASS cover_201 201
+PASS cover_not_sent 
+PASS cover_lineage 
+PASS sensitive_q_created 201
+PASS sensitive_flag 
+PASS sensitive_not_auto 
+PASS sensitive_requires_input 
+PASS sensitive_empty_answer 
+PASS screening_ok 201
+PASS screening_not_auto 
+PASS asset_create 201
+PASS asset_private 
+PASS asset_no_public_url 
+PASS approve_cv 200
+PASS approve_cover 200
+PASS approve_screening 200
+PASS readiness_after_approve 
+PASS checklist_progress {'ready_to_declare_submission': True, 'checklist_done': 8, 'checklist_total': 8, 'blocked_reasons': [], 'external_submit_allowed': False, 'c
+PASS declare_200 200
+PASS declare_status candidate_declared
+PASS declare_provenance 
+PASS declare_no_external 
+PASS declare_not_forbidden_label 
+PASS declare_rejects_auto_channel 422
+PASS handoff_200 200
+PASS handoff_no_external 
+PASS handoff_deep_link 
+PASS export_200 200
+PASS export_secrets_excluded 
+PASS export_prompts_excluded 
+PASS export_kpi_excluded 
+PASS export_no_hidden_reasoning 
+PASS privacy_patch 200
+PASS privacy_export_conf_default_off 
+PASS acal_live 200
+PASS acal_payload 
+PASS cv_version_attempt 409
+PASS workspace_delete 200
+PASS stale_reappear_guard 
+PASS deleted_not_visible 404
+PASS workspace_recreate 201
+PASS unauth_denied 401
+PASS unauth_create_denied 401
+PASS recruiter_denied_or_no_candidate mint_skipped:404
+PASS company_denied_or_no_candidate mint_skipped:404
+PASS evidence_history_delete 200
+PASS agg_after_evidence_delete 200
+PASS ban_public_apps stance_preserved
+PASS ban_ats stance_preserved
+PASS ban_auto_apply stance_preserved
+PASS ban_ms_write stance_preserved
+PASS ban_outreach stance_preserved
+PASS ban_email stance_preserved
+PASS ban_sms stance_preserved
+PASS ban_phase3 stance_preserved
+PASS micro_opp_ingestion 
+PASS micro_source_url 
+PASS micro_location 
+PASS micro_fit_kpi 
+PASS micro_viability_claim 
+PASS micro_checklist_submit_gate 
+PASS micro_readiness_blocked_list 
+PASS micro_fe_studio_nav 
+PASS micro_i18n_en 
+PASS micro_i18n_pl 
+PASS micro_ws_version 
+PASS micro_claim_labels 
+PASS micro_no_submitted_without_provenance 
+PASS micro_adaptive_memory_audit 
+PASS micro_reliability_route 
+PASS micro_obs_schema 
+PASS micro_mobile_layout 
+PASS micro_a11y_nav 
+PASS micro_error_ux 
+PASS micro_epic15_residual_documented 
+PASS micro_topology_112 
+PASS micro_admin_expected_112 
+PASS micro_guard_112 
+PASS micro_no_public_portfolio 
+PASS micro_no_reg 
+PASS micro_invite_only 
+PASS micro_stripe_off 
+PASS micro_captcha_bypass_off 
+PASS micro_protected_attr_off 
+PASS micro_mental_health_off 
+PASS micro_bias_free_claim_off 
+PASS micro_ai_act_false_off 
+PASS micro_no_alten 
+PASS micro_no_invented_candidates 
+PASS micro_no_invented_employers 
+PASS micro_no_invented_metrics 
+PASS micro_no_invented_submission 
+PASS micro_no_secrets_in_logs 
+PASS micro_candidate_primary 
+PASS micro_org_secondary 
+PASS micro_push_scaffold_only 
+PASS micro_no_pr_main 
+PASS micro_no_force_push 
+PASS micro_dod_chain 
+PASS micro_handoff_acal 
+PASS micro_studio_push_daily 
+PASS micro_export_assets_filtered 
+PASS micro_delete_propagation 
+PASS micro_cross_user 
+PASS micro_screening_audit 
+PASS micro_cv_professional_summary 
+PASS micro_cover_studio 
+PASS micro_screening_studio 
+PASS micro_asset_registry 
+PASS micro_approval_explicit 
+PASS micro_frozen_snapshot_path 
+PASS micro_interview_handoff 
+PASS micro_daily_os_debt_closed 
+PASS micro_career_evidence_integ 
+PASS micro_career_graph_integ 
+SUMMARY 192/192
+teg 
+PASS micro_career_graph_integ 
+SUMMARY 192/192

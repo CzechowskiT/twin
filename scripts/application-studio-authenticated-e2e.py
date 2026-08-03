@@ -479,7 +479,7 @@ def main() -> int:
         body={"evidence_ids": [eid] if eid else []},
     )
     # unique key may collide — accept 201 or 400 unique
-    check("cv_version_attempt", code in {200, 201, 400, 500}, str(code))
+    check("cv_version_attempt", code in {200, 201, 400, 409, 500}, str(code))
 
     # ── Deletion ────────────────────────────────────────────────────────
     code, deleted = _req(

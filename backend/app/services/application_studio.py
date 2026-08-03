@@ -484,7 +484,7 @@ def draft_tailored_cv(
     draft = CandidateAppStudioCvDraft(
         candidate_id=candidate_id,
         workspace_id=row.id,
-        draft_key=f"cv:{row.id}:{_hash(str(eids))[:10]}"[:160],
+        draft_key=f"cv:{row.id}:{_hash(str(eids))[:10]}:{int(_utcnow().timestamp())}"[:160],
         title=f"Tailored CV — {opp.get('title', 'role')}"[:300],
         body_json=_dumps(body),
         evidence_ids_json=_dumps([e.id for e in evidence]),
@@ -555,7 +555,7 @@ def draft_cover_letter(
     letter = CandidateAppStudioCoverLetter(
         candidate_id=candidate_id,
         workspace_id=row.id,
-        letter_key=f"cover:{row.id}:{_hash(text)[:10]}"[:160],
+        letter_key=f"cover:{row.id}:{_hash(text)[:10]}:{int(_utcnow().timestamp())}"[:160],
         body_text=text[:8000],
         evidence_ids_json=_dumps([e.id for e in evidence]),
         claim_kind="SUGGESTION" if evidence else "UNKNOWN",
