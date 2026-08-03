@@ -140,6 +140,7 @@ export type TranslationKey =
   | `acceptanceQueue.${keyof typeof en.acceptanceQueue}`
   | `acceptanceCalendar.${keyof typeof en.acceptanceCalendar}`
   | `careerEvidence.${keyof typeof en.careerEvidence}`
+  | `applicationStudio.${keyof typeof en.applicationStudio}`
   | `recruiterInbox.${keyof typeof en.recruiterInbox}`
   | `recruiterAudit.${keyof typeof en.recruiterAudit}`
   | `recruiterScorecard.${keyof typeof en.recruiterScorecard}`
