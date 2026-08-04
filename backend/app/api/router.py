@@ -16,6 +16,7 @@ from app.api import (
     career_lifecycle,
     career_strategy,
     opportunity_intelligence,
+    search_strategy_lab,
     chatgpt_twin,
     company,
     company_feedback_persistence,
@@ -168,6 +169,9 @@ api_router.include_router(
 )
 api_router.include_router(
     opportunity_intelligence.router, prefix="/candidates", tags=["Opportunity Intelligence"]
+)
+api_router.include_router(
+    search_strategy_lab.router, prefix="/candidates", tags=["Search Strategy Lab"]
 )
 api_router.include_router(
     candidate_intelligence.router, prefix="", tags=["Candidate Intelligence"]

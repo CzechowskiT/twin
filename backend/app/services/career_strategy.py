@@ -256,6 +256,13 @@ def _collect_candidates(db: Session, *, candidate_id: int, weights: dict) -> lis
         out.extend(oi.ranking_refs(db, candidate_id=candidate_id, weights=weights))
     except Exception:
         pass
+    # Epic 2.2 — active search strategies (candidate-approved only)
+    try:
+        from app.services import search_strategy_lab as sslab
+
+        out.extend(sslab.ranking_refs(db, candidate_id=candidate_id, weights=weights))
+    except Exception:
+        pass
     # Soft-deleted transitions must not appear
     out.sort(key=lambda x: (-float(x["score"]), x["id"]))
     for i, c in enumerate(out):

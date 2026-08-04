@@ -32,11 +32,20 @@ type StrategyProposal = {
   explain?: { silent?: boolean; requires_approval?: boolean };
 };
 
+type SearchStrategyPending = {
+  id: number;
+  title?: string;
+  status: string;
+  silent_activation?: boolean;
+  lifecycle_approval_id?: number | null;
+};
+
 export default function LifecycleApprovalsPage() {
   const { t } = useTranslation();
   const router = useRouter();
   const [items, setItems] = useState<Approval[]>([]);
   const [proposals, setProposals] = useState<StrategyProposal[]>([]);
+  const [searchPending, setSearchPending] = useState<SearchStrategyPending[]>([]);
   const [err, setErr] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -46,16 +55,24 @@ export default function LifecycleApprovalsPage() {
       return;
     }
     try {
-      const [life, strat] = await Promise.all([
+      const [life, strat, ss] = await Promise.all([
         apiFetch<{ approvals?: Approval[] }>("/api/v1/candidates/me/career-lifecycle", {}, token),
         apiFetch<{ calibration_proposals?: StrategyProposal[] }>(
           "/api/v1/candidates/me/career-strategy",
           {},
           token,
         ),
+        apiFetch<{ strategies?: SearchStrategyPending[] }>(
+          "/api/v1/candidates/me/search-strategy",
+          {},
+          token,
+        ),
       ]);
       setItems(life.approvals || []);
       setProposals(strat.calibration_proposals || []);
+      setSearchPending(
+        (ss.strategies || []).filter((s) => s.status === "pending_approval"),
+      );
       setErr(null);
     } catch (ex) {
       setErr(ex instanceof Error ? ex.message : t("careerLifecycle.loadFailed"));
@@ -98,6 +115,21 @@ export default function LifecycleApprovalsPage() {
     }
   }
 
+  async function resolveSearchStrategy(id: number, approved: boolean) {
+    const token = getToken();
+    if (!token) return;
+    try {
+      await apiFetch(
+        `/api/v1/candidates/me/search-strategy/${id}/resolve-activate`,
+        { method: "POST", body: JSON.stringify({ approved }) },
+        token,
+      );
+      await load();
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : t("searchStrategy.actionFailed"));
+    }
+  }
+
   return (
     <Shell>
       <CandidateWorkspaceSubnav ariaLabel={t("careerLifecycle.approvals")} />
@@ -109,6 +141,36 @@ export default function LifecycleApprovalsPage() {
             {err}
           </p>
         ) : null}
+
+        <Card>
+          <h2 className="mb-3 text-lg font-semibold">{t("searchStrategy.eyebrow")}</h2>
+          <ul className="flex flex-col gap-3 text-sm">
+            {searchPending.map((s) => (
+              <li
+                key={`ss-${s.id}`}
+                className="flex flex-col gap-2 border-b border-[var(--twin-border)] py-2"
+              >
+                <span>
+                  search strategy #{s.id} {s.title} · {s.status} · silent_activation=
+                  {String(!!s.silent_activation)}
+                </span>
+                <span className="flex gap-2">
+                  <Button type="button" onClick={() => void resolveSearchStrategy(s.id, true)}>
+                    {t("searchStrategy.approveActivate")}
+                  </Button>
+                  <Button type="button" onClick={() => void resolveSearchStrategy(s.id, false)}>
+                    {t("careerLifecycle.reject")}
+                  </Button>
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 text-sm">
+            <Link className="twin-link" href="/dashboard/search-strategy">
+              {t("searchStrategy.eyebrow")}
+            </Link>
+          </p>
+        </Card>
 
         <Card>
           <h2 className="mb-3 text-lg font-semibold">{t("careerStrategy.calibrationTitle")}</h2>

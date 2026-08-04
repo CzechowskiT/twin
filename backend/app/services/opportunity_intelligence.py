@@ -897,6 +897,12 @@ def run_refresh(
 
 def invalidate_on_evidence_delete(db: Session, *, candidate_id: int) -> dict:
     """When evidence deleted, recompute fit — never leave strong fabricated fit."""
+    try:
+        from app.services import search_strategy_lab as sslab
+
+        sslab.invalidate_theses_on_evidence_delete(db, candidate_id=candidate_id)
+    except Exception:
+        pass
     n = 0
     for row in (
         db.query(CandidateNormalizedOpportunity)
@@ -928,6 +934,12 @@ def invalidate_on_evidence_delete(db: Session, *, candidate_id: int) -> dict:
 
 def delete_discovery_history(db: Session, *, candidate_id: int) -> dict:
     now = _utcnow()
+    try:
+        from app.services import search_strategy_lab as sslab
+
+        sslab.invalidate_theses_on_evidence_delete(db, candidate_id=candidate_id)
+    except Exception:
+        pass
     for row in (
         db.query(CandidateNormalizedOpportunity)
         .filter(

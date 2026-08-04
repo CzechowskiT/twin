@@ -146,6 +146,7 @@ export type TranslationKey =
   | `careerLifecycle.${keyof typeof en.careerLifecycle}`
   | `careerStrategy.${keyof typeof en.careerStrategy}`
   | `opportunityIntel.${keyof typeof en.opportunityIntel}`
+  | `searchStrategy.${keyof typeof en.searchStrategy}`
   | `recruiterInbox.${keyof typeof en.recruiterInbox}`
   | `recruiterAudit.${keyof typeof en.recruiterAudit}`
   | `recruiterScorecard.${keyof typeof en.recruiterScorecard}`
@@ -4794,6 +4795,28 @@ eyebrow: "Product roadmap",
     pushDailyOs: "Push to Daily OS / ACAL",
     disclaimer:
       "No fabricated activity or salary. No external apply from TWIN. Phase 3 Agent NOT_STARTED.",
+  },
+  searchStrategy: {
+    eyebrow: "Search Lab",
+    title: "Career Market Radar & Search Strategy",
+    lead: "Build a search portfolio from observed sources. Strategies activate only after your approval — experiments never silently change ranking weights.",
+    loadFailed: "Could not load search strategy lab",
+    actionFailed: "Search strategy action failed — try again",
+    coverageTitle: "Source coverage (observed)",
+    refreshCoverage: "Refresh coverage",
+    labTitle: "Strategy lab",
+    strategyTitle: "Strategy title",
+    createDraft: "Create draft strategy",
+    proposeActivate: "Propose activation",
+    approveActivate: "Approve activation",
+    addThesis: "Add role thesis",
+    refreshPortfolio: "Refresh portfolio",
+    createExperiment: "Start experiment",
+    completeExperiment: "Complete (no silent weights)",
+    simulate: "Simulate",
+    archiveCycle: "Archive cycle",
+    disclaimer:
+      "No whole-market claims. No silent activation or weight changes. Phase 3 Agent NOT_STARTED.",
   },
   productPolish: {
     pilotPreviewBanner: "Pilot preview — not part of public launch.",
@@ -13798,6 +13821,28 @@ const pl: MessageTree = {
     pushDailyOs: "Wyślij do Daily OS / ACAL",
     disclaimer:
       "Bez fabrykowanej aktywności i pensji. Bez zewnętrznego apply z TWIN. Phase 3 Agent NOT_STARTED.",
+  },
+  searchStrategy: {
+    eyebrow: "Search Lab",
+    title: "Market Radar i strategia poszukiwań",
+    lead: "Buduj portfolio poszukiwań z zaobserwowanych źródeł. Strategia aktywuje się dopiero po Twojej zgodzie — eksperymenty nigdy cicho nie zmieniają wag rankingu.",
+    loadFailed: "Nie udało się wczytać Search Strategy Lab",
+    actionFailed: "Akcja strategii poszukiwań nie powiodła się — spróbuj ponownie",
+    coverageTitle: "Pokrycie źródeł (observed)",
+    refreshCoverage: "Odśwież pokrycie",
+    labTitle: "Laboratorium strategii",
+    strategyTitle: "Tytuł strategii",
+    createDraft: "Utwórz draft strategii",
+    proposeActivate: "Zaproponuj aktywację",
+    approveActivate: "Zatwierdź aktywację",
+    addThesis: "Dodaj tezę roli",
+    refreshPortfolio: "Odśwież portfolio",
+    createExperiment: "Start eksperymentu",
+    completeExperiment: "Zakończ (bez cichej zmiany wag)",
+    simulate: "Symuluj",
+    archiveCycle: "Archiwizuj cykl",
+    disclaimer:
+      "Bez twierdzeń o całym rynku. Bez cichej aktywacji i zmiany wag. Phase 3 Agent NOT_STARTED.",
   },
   productPolish: {
     pilotPreviewBanner: "Podgląd pilota — poza publicznym launch.",
