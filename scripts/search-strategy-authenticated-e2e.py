@@ -115,6 +115,26 @@ def main() -> int:
     if not token:
         return 1
 
+    # Shared synth user may remain paused after prior epic privacy revoke — unpause for proof.
+    code, priv = _req(
+        "PATCH",
+        "/api/v1/candidates/me/career-lifecycle/privacy",
+        token=token,
+        body={
+            "paused": False,
+            "orchestration_opt_in": True,
+            "search_opt_in": True,
+            "learning_opt_in": True,
+            "reminders_opt_in": True,
+        },
+    )
+    check(
+        "strategy_role_thesis",
+        "lifecycle_unpaused",
+        code == 200 and (priv.get("paused") is False if isinstance(priv, dict) else False),
+        str(code),
+    )
+
     code, agg = _req("GET", "/api/v1/candidates/me/search-strategy", token=token)
     check("strategy_role_thesis", "aggregate_200", code == 200 and isinstance(agg, dict), str(code))
     check(

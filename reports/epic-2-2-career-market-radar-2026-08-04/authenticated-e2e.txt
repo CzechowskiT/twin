@@ -1,0 +1,93 @@
+PASS [stance] public_health 200
+PASS [stance] launch_nogo NO-GO
+PASS [stance] enrollment_off 
+PASS [stance] phase_3b_blocked 
+PASS [stance] ms_write_off 
+PASS [persistence] four_way_aligned fe=b45eb89b340d api=b45eb89b340d wrk=b45eb89b340d
+PASS [security] mint_synthetic 200
+PASS [security] kpi_excluded 
+PASS [security] synthetic_ne_real 
+PASS [strategy_role_thesis] lifecycle_unpaused 200
+PASS [strategy_role_thesis] aggregate_200 200
+PASS [persistence] alembic_118 118_career_market_radar_search_strategy
+PASS [strategy_role_thesis] schema_v1 
+PASS [security] safety_strategy_activation_without_approval_off False
+PASS [security] safety_silent_thesis_change_off False
+PASS [security] safety_silent_weight_change_off False
+PASS [security] safety_keyword_only_gaps_off False
+PASS [security] safety_whole_market_claims_off False
+PASS [security] safety_fabricated_conversion_off False
+PASS [security] safety_archived_cycles_spawn_tasks_off False
+PASS [security] safety_stale_thesis_after_evidence_delete_off False
+PASS [security] safety_daily_os_separate_ranking_off False
+PASS [security] safety_acal_unapproved_commitments_off False
+PASS [security] safety_search_leaks_off False
+PASS [security] safety_protected_attr_inference_off False
+PASS [security] safety_hiring_probability_claim_off False
+PASS [security] safety_external_apply_off False
+PASS [security] safety_prohibited_scraping_off False
+PASS [security] safety_ats_write_off False
+PASS [security] safety_auto_apply_off False
+PASS [security] safety_microsoft_calendar_write_off False
+PASS [security] safety_workplace_monitoring_off False
+PASS [security] safety_public_search_strategies_off False
+PASS [security] phase_3_agent_not_started NOT_STARTED
+PASS [portfolio_coverage] observed_wording 
+PASS [portfolio_coverage] no_whole_market 
+PASS [strategy_role_thesis] create_draft 201
+PASS [strategy_role_thesis] draft_not_active 
+PASS [strategy_role_thesis] no_silent_activation_flag 
+PASS [strategy_role_thesis] activate_blocked_without_propose 400
+PASS [strategy_role_thesis] propose_activate 200
+PASS [strategy_role_thesis] activate_after_approval 200
+PASS [strategy_role_thesis] thesis_create 201
+PASS [strategy_role_thesis] no_hiring_probability 
+PASS [strategy_role_thesis] thesis_primary 200
+PASS [strategy_role_thesis] thesis_secondary 200
+PASS [strategy_role_thesis] thesis_paused 200
+PASS [portfolio_coverage] coverage_refresh 200
+PASS [portfolio_coverage] portfolio_refresh 200
+PASS [portfolio_coverage] allocation_candidate_approved 200
+PASS [portfolio_coverage] simulate_no_fabricated_conversion 200
+PASS [requirement_gap] gaps_not_keyword_only 200
+PASS [requirement_gap] gap_investment_not_auto 200
+PASS [requirement_gap] conflicts_no_silent_resolve 200
+PASS [experiment_cycle] experiment_create 201
+PASS [experiment_cycle] no_silent_weights_on_create 
+PASS [experiment_cycle] experiment_pause 200
+PASS [experiment_cycle] experiment_resume 200
+PASS [experiment_cycle] experiment_complete_no_weight_change 200
+PASS [experiment_cycle] cycle_pause_no_spawn 200
+PASS [experiment_cycle] cycle_resume 200
+PASS [experiment_cycle] cycle_archive_no_spawn 200
+PASS [experiment_cycle] cycle_restart 200
+PASS [review_quality] weekly_review 201
+PASS [review_quality] weekly_approve 200
+PASS [review_quality] monthly_review 201
+PASS [review_quality] saved_search_quality_field observed_refs
+PASS [review_quality] watchlist_quality_field observed_refs
+PASS [ranking_dailyos_acal] ranking_refresh 201
+PASS [ranking_dailyos_acal] strategy_in_canonical_ranking cands=3
+PASS [ranking_dailyos_acal] no_calibration_bypass 
+PASS [ranking_dailyos_acal] daily_os_reachable 404
+PASS [ranking_dailyos_acal] daily_os_strategy_item activate_push_best_effort
+PASS [deletion_privacy_recovery] evidence_invalidation 200
+PASS [deletion_privacy_recovery] export_safe 200
+PASS [deletion_privacy_recovery] delete_propagated 200
+PASS [security] unauth_denied 401
+PASS [persistence] db_at_head_118 {'current_revision': '118_career_market_radar_search_strategy', 'head_revision': '118_career_market_radar_search_strateg
+PASS [persistence] search_strategy_route /dashboard/search-strategy
+PASS [persistence] approvals_route /dashboard/approvals
+PASS [persistence] jobs_route /dashboard/jobs
+---
+strategy_role_thesis: 14/14
+portfolio_coverage: 6/6
+requirement_gap: 3/3
+experiment_cycle: 9/9
+review_quality: 5/5
+ranking_dailyos_acal: 5/5
+deletion_privacy_recovery: 3/3
+security: 25/25
+persistence: 6/6
+stance: 5/5
+TOTAL: 81/81

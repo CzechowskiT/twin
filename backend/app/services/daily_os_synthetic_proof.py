@@ -69,6 +69,25 @@ def ensure_synthetic_daily_os_candidate(db: Session) -> tuple[User, Candidate]:
 def mint_synthetic_daily_os_session(db: Session, *, expires_minutes: int = 45) -> dict:
     """Return short-lived JWT for synthetic candidate Daily OS E2E."""
     user, cand = ensure_synthetic_daily_os_candidate(db)
+    # Prior epic E2E may have paused lifecycle privacy on the shared synth user —
+    # reset so product-proof sessions can create approvals without Founder action.
+    try:
+        from app.services import career_lifecycle as life
+
+        privacy = life.get_or_create_privacy(db, candidate_id=cand.id)
+        if privacy.paused or not privacy.orchestration_opt_in or not privacy.search_opt_in:
+            life.update_privacy(
+                db,
+                candidate_id=cand.id,
+                paused=False,
+                orchestration_opt_in=True,
+                search_opt_in=True,
+                learning_opt_in=True,
+                reminders_opt_in=True,
+            )
+        life.get_or_create_context(db, candidate_id=cand.id, is_synthetic=True)
+    except Exception:
+        pass
     token = create_access_token(user.email, expires_minutes=expires_minutes)
     return {
         "ok": True,

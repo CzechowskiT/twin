@@ -176,10 +176,31 @@ def propose_activate_strategy(db: Session, *, candidate_id: int, strategy_id: in
         raise ValueError("strategy_already_active")
     if row.archived_at:
         raise ValueError("strategy_archived")
-    ctx = life.get_or_create_context(db, candidate_id=candidate_id)
+    # Respect search privacy pause, but still allow explicit approve flow when
+    # orchestration context is missing (context_id may be null).
+    try:
+        from app.services import career_lifecycle as life_mod
+
+        privacy = life_mod.get_or_create_privacy(db, candidate_id=candidate_id)
+        if privacy.paused:
+            raise ValueError("lifecycle_paused")
+        if privacy.search_opt_in is False:
+            raise ValueError("search_opt_out")
+    except ValueError:
+        raise
+    except Exception:
+        privacy = None
+    ctx_id = None
+    try:
+        ctx = life.get_or_create_context(db, candidate_id=candidate_id)
+        ctx_id = ctx.id
+    except ValueError as exc:
+        if "lifecycle_paused" in str(exc):
+            raise
+        ctx_id = None
     appr = CandidateLifecycleApproval(
         candidate_id=candidate_id,
-        context_id=ctx.id,
+        context_id=ctx_id,
         approval_key=_uuid("apr"),
         approval_kind="search_strategy_activate",
         status="pending",
