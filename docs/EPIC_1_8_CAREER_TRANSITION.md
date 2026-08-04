@@ -1,8 +1,10 @@
 # Epic 1.8 — Career Transition, First 90 Days & Outcome Learning
 
-**Status:** implemented on `cursor/phase1-monorepo-scaffold`  
-**Alembic:** `114_career_transition_outcome_learning`  
-**Surfaces:** FE `/dashboard/career-transition` · API `/api/v1/candidates/me/career-transition`
+**Status:** production-ready on `cursor/phase1-monorepo-scaffold` @ `87020688`  
+**Alembic:** `114_career_transition_outcome_learning` (prod at head)  
+**Surfaces:** FE `/dashboard/career-transition` · API `/api/v1/candidates/me/career-transition`  
+**Proof:** E2E **285/285** · CI [30816728599](https://github.com/CzechowskiT/twin/actions/runs/30816728599) · four-way ALIGNED  
+**Report:** `reports/epic-1-8-career-transition-2026-08-03/`
 
 ## Chain
 
