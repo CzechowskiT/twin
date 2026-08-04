@@ -675,6 +675,30 @@ def _build_nba(db: Session, *, candidate_id: int, ctx: CandidateLifecycleContext
         .filter_by(candidate_id=candidate_id, status="pending")
         .count()
     )
+    # Prefer Epic 2.0 canonical ranking — never a second Daily OS ranking store.
+    try:
+        from app.services import career_strategy as strat
+
+        snap = strat.get_active_ranking(db, candidate_id=candidate_id)
+        if snap:
+            cands = strat._loads(snap.candidates_json, [])
+            top = cands[0] if cands else None
+            if top and not pending:
+                return {
+                    "title": top.get("title") or "Continue ranked action",
+                    "phase": phase,
+                    "deep_link": top.get("deep_link") or deep,
+                    "deep_link_preserves_context": True,
+                    "priority": int(min(95, top.get("score") or 70)),
+                    "claim_kind": "SUGGESTION",
+                    "arbitrated": True,
+                    "pending_approvals": pending,
+                    "canonical_ranking": True,
+                    "ranking_snapshot_id": snap.id,
+                    "separate_ranking": False,
+                }
+    except Exception:
+        pass
     title = "Review pending lifecycle approval" if pending else f"Continue {phase.replace('_', ' ').title()}"
     return {
         "title": title,
@@ -685,6 +709,8 @@ def _build_nba(db: Session, *, candidate_id: int, ctx: CandidateLifecycleContext
         "claim_kind": "SUGGESTION",
         "arbitrated": True,
         "pending_approvals": pending,
+        "canonical_ranking": False,
+        "separate_ranking": False,
     }
 
 

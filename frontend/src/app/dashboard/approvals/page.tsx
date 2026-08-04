@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useTranslation } from "@/components/language-provider";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { Button, Card, Shell } from "@/components/ui";
@@ -13,14 +14,29 @@ type Approval = {
   approval_kind: string;
   status: string;
   bundled?: boolean;
-  before?: { phase?: string };
-  after?: { phase?: string };
+  before?: { phase?: string; weights?: Record<string, number>; version?: number };
+  after?: {
+    phase?: string;
+    weights?: Record<string, number>;
+    from_transition_cal_id?: number | null;
+  };
+};
+
+type StrategyProposal = {
+  id: number;
+  status: string;
+  bundled?: boolean;
+  lifecycle_approval_id?: number | null;
+  before_weights?: Record<string, number>;
+  after_weights?: Record<string, number>;
+  explain?: { silent?: boolean; requires_approval?: boolean };
 };
 
 export default function LifecycleApprovalsPage() {
   const { t } = useTranslation();
   const router = useRouter();
   const [items, setItems] = useState<Approval[]>([]);
+  const [proposals, setProposals] = useState<StrategyProposal[]>([]);
   const [err, setErr] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -30,12 +46,16 @@ export default function LifecycleApprovalsPage() {
       return;
     }
     try {
-      const data = await apiFetch<{ approvals?: Approval[] }>(
-        "/api/v1/candidates/me/career-lifecycle",
-        {},
-        token,
-      );
-      setItems(data.approvals || []);
+      const [life, strat] = await Promise.all([
+        apiFetch<{ approvals?: Approval[] }>("/api/v1/candidates/me/career-lifecycle", {}, token),
+        apiFetch<{ calibration_proposals?: StrategyProposal[] }>(
+          "/api/v1/candidates/me/career-strategy",
+          {},
+          token,
+        ),
+      ]);
+      setItems(life.approvals || []);
+      setProposals(strat.calibration_proposals || []);
       setErr(null);
     } catch (ex) {
       setErr(ex instanceof Error ? ex.message : t("careerLifecycle.loadFailed"));
@@ -63,6 +83,21 @@ export default function LifecycleApprovalsPage() {
     }
   }
 
+  async function resolveCalibration(id: number, approved: boolean) {
+    const token = getToken();
+    if (!token) return;
+    try {
+      await apiFetch(
+        `/api/v1/candidates/me/career-strategy/calibration/${id}/resolve`,
+        { method: "POST", body: JSON.stringify({ approved }) },
+        token,
+      );
+      await load();
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : t("careerStrategy.actionFailed"));
+    }
+  }
+
   return (
     <Shell>
       <CandidateWorkspaceSubnav ariaLabel={t("careerLifecycle.approvals")} />
@@ -74,15 +109,58 @@ export default function LifecycleApprovalsPage() {
             {err}
           </p>
         ) : null}
+
+        <Card>
+          <h2 className="mb-3 text-lg font-semibold">{t("careerStrategy.calibrationTitle")}</h2>
+          <ul className="flex flex-col gap-3 text-sm">
+            {proposals.map((p) => (
+              <li
+                key={`cal-${p.id}`}
+                className="flex flex-col gap-2 border-b border-[var(--twin-border)] py-2"
+              >
+                <span>
+                  calibration #{p.id} · {p.status} · bundled={String(!!p.bundled)} · silent=
+                  {String(!!p.explain?.silent)}
+                </span>
+                <pre className="overflow-auto whitespace-pre-wrap text-xs text-[var(--twin-muted)]">
+                  {JSON.stringify(
+                    { before: p.before_weights, after: p.after_weights },
+                    null,
+                    2,
+                  )}
+                </pre>
+                {p.status === "pending" ? (
+                  <span className="flex gap-2">
+                    <Button type="button" onClick={() => void resolveCalibration(p.id, true)}>
+                      {t("careerStrategy.approveCalibration")}
+                    </Button>
+                    <Button type="button" onClick={() => void resolveCalibration(p.id, false)}>
+                      {t("careerStrategy.rejectCalibration")}
+                    </Button>
+                  </span>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 text-sm">
+            <Link className="twin-link" href="/dashboard/strategy">
+              {t("careerStrategy.eyebrow")}
+            </Link>
+          </p>
+        </Card>
+
         <Card>
           <ul className="flex flex-col gap-3 text-sm">
             {items.map((a) => (
-              <li key={a.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--twin-border)] py-2">
+              <li
+                key={a.id}
+                className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--twin-border)] py-2"
+              >
                 <span>
                   {a.approval_kind} · {a.status} · bundled={String(!!a.bundled)} ·{" "}
-                  {a.before?.phase} → {a.after?.phase}
+                  {a.before?.phase || a.before?.version} → {a.after?.phase || "weights"}
                 </span>
-                {a.status === "pending" ? (
+                {a.status === "pending" && a.approval_kind !== "calibration_merge" ? (
                   <span className="flex gap-2">
                     <Button type="button" onClick={() => void resolve(a.id, true)}>
                       {t("careerLifecycle.approve")}

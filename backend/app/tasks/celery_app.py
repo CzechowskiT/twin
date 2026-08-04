@@ -27,6 +27,7 @@ celery_app.conf.update(
         "app.tasks.founder_command_tasks",
         "app.tasks.activation_matching_tasks",
         "app.tasks.candidate_intelligence_tasks",
+        "app.tasks.career_strategy_tasks",
         "app.tasks.worker_identity",
         "app.tasks.company_invite_tasks",
     ),

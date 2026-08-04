@@ -144,6 +144,7 @@ export type TranslationKey =
   | `interviewDecision.${keyof typeof en.interviewDecision}`
   | `careerTransition.${keyof typeof en.careerTransition}`
   | `careerLifecycle.${keyof typeof en.careerLifecycle}`
+  | `careerStrategy.${keyof typeof en.careerStrategy}`
   | `recruiterInbox.${keyof typeof en.recruiterInbox}`
   | `recruiterAudit.${keyof typeof en.recruiterAudit}`
   | `recruiterScorecard.${keyof typeof en.recruiterScorecard}`
@@ -4737,6 +4738,41 @@ eyebrow: "Product roadmap",
     resume: "Resume",
     disclaimer:
       "Material phase changes need your approval. Focus never deletes other processes. Phase 3 Agent NOT_STARTED.",
+  },
+  careerStrategy: {
+    eyebrow: "Strategy",
+    title: "Outcome-calibrated career strategy",
+    lead: "Rank what matters, approve calibration changes, run only internal reversible steps — you stay in control.",
+    loadFailed: "Could not load career strategy",
+    actionFailed: "Strategy action failed — try again",
+    actionOk: "Done",
+    rankingTitle: "Canonical ranking",
+    topAction: "Top action",
+    weightsVersion: "Weights version",
+    counterfactuals: "Counterfactuals",
+    refreshRanking: "Refresh ranking",
+    feedbackHelpful: "Mark helpful (no silent weight change)",
+    simulate: "Simulate strategy",
+    calibrationTitle: "Calibration proposals",
+    calibrationLead: "Transition learning merges into global ranking only after your explicit approval.",
+    pendingProposal: "Pending proposal",
+    proposeCalibration: "Propose calibration merge",
+    approveCalibration: "Approve calibration",
+    rejectCalibration: "Reject calibration",
+    plansTitle: "Internal execution plans",
+    plansLead: "Internal-only steps. External employer or ATS actions stay CANDIDATE_ACTION_REQUIRED.",
+    createPlan: "Create plan",
+    runPlan: "Run / resume",
+    pausePlan: "Pause",
+    resumePlan: "Resume",
+    cancelPlan: "Cancel",
+    deletionTitle: "Deletion & privacy runners",
+    deletionPreview: "Preview deletion graph",
+    deletionExecute: "Execute deletion",
+    privacyRevoke: "Execute privacy revocation",
+    invalidateStale: "Invalidate stale refs",
+    disclaimer:
+      "Calibration is never silent. Deletion and privacy revocation execute — not preview-only. Phase 3 Agent NOT_STARTED.",
   },
   productPolish: {
     pilotPreviewBanner: "Pilot preview — not part of public launch.",
@@ -13684,6 +13720,43 @@ const pl: MessageTree = {
     resume: "Wznów",
     disclaimer:
       "Materialne zmiany fazy wymagają Twojej zgody. Focus nie usuwa innych procesów. Phase 3 Agent NOT_STARTED.",
+  },
+  careerStrategy: {
+    eyebrow: "Strategia",
+    title: "Strategia kariery kalibrowana wynikami",
+    lead: "Ranking tego, co ważne, zatwierdzanie kalibracji i tylko wewnętrzne odwracalne kroki — Ty masz kontrolę.",
+    loadFailed: "Nie udało się wczytać strategii kariery",
+    actionFailed: "Akcja strategii nie powiodła się — spróbuj ponownie",
+    actionOk: "Gotowe",
+    rankingTitle: "Kanoniczny ranking",
+    topAction: "Najważniejsza akcja",
+    weightsVersion: "Wersja wag",
+    counterfactuals: "Kontrfakty",
+    refreshRanking: "Odśwież ranking",
+    feedbackHelpful: "Oznacz jako pomocne (bez cichej zmiany wag)",
+    simulate: "Symuluj strategię",
+    calibrationTitle: "Propozycje kalibracji",
+    calibrationLead:
+      "Uczenie z transition trafia do globalnego rankingu dopiero po Twojej wyraźnej zgodzie.",
+    pendingProposal: "Oczekująca propozycja",
+    proposeCalibration: "Zaproponuj merge kalibracji",
+    approveCalibration: "Zatwierdź kalibrację",
+    rejectCalibration: "Odrzuć kalibrację",
+    plansTitle: "Wewnętrzne plany wykonania",
+    plansLead:
+      "Tylko kroki wewnętrzne. Akcje zewnętrzne (pracodawca/ATS) pozostają CANDIDATE_ACTION_REQUIRED.",
+    createPlan: "Utwórz plan",
+    runPlan: "Uruchom / wznów",
+    pausePlan: "Wstrzymaj",
+    resumePlan: "Wznów",
+    cancelPlan: "Anuluj",
+    deletionTitle: "Runnery usuwania i prywatności",
+    deletionPreview: "Podgląd grafu usuwania",
+    deletionExecute: "Wykonaj usuwanie",
+    privacyRevoke: "Wykonaj odwołanie prywatności",
+    invalidateStale: "Unieważnij nieaktualne referencje",
+    disclaimer:
+      "Kalibracja nigdy nie jest cicha. Usuwanie i odwołanie prywatności są wykonywane — nie tylko podgląd. Phase 3 Agent NOT_STARTED.",
   },
   productPolish: {
     pilotPreviewBanner: "Podgląd pilota — poza publicznym launch.",

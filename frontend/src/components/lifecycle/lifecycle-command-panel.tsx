@@ -129,6 +129,9 @@ export function LifecycleCommandPanel() {
         <Link className="twin-link inline-flex min-h-[2.75rem] items-center text-sm" href="/dashboard/approvals">
           {t("careerLifecycle.approvals")}
         </Link>
+        <Link className="twin-link inline-flex min-h-[2.75rem] items-center text-sm" href="/dashboard/strategy">
+          {t("careerStrategy.eyebrow")}
+        </Link>
         <Link className="twin-link inline-flex min-h-[2.75rem] items-center text-sm" href="/dashboard/search">
           {t("careerLifecycle.search")}
         </Link>
