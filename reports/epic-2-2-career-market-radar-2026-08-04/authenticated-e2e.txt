@@ -3,7 +3,7 @@ PASS [stance] launch_nogo NO-GO
 PASS [stance] enrollment_off 
 PASS [stance] phase_3b_blocked 
 PASS [stance] ms_write_off 
-PASS [persistence] four_way_aligned fe=b45eb89b340d api=b45eb89b340d wrk=b45eb89b340d
+PASS [persistence] four_way_aligned fe=adaf44fdd689 api=adaf44fdd689 wrk=adaf44fdd689
 PASS [security] mint_synthetic 200
 PASS [security] kpi_excluded 
 PASS [security] synthetic_ne_real 
@@ -67,7 +67,7 @@ PASS [review_quality] monthly_review 201
 PASS [review_quality] saved_search_quality_field observed_refs
 PASS [review_quality] watchlist_quality_field observed_refs
 PASS [ranking_dailyos_acal] ranking_refresh 201
-PASS [ranking_dailyos_acal] strategy_in_canonical_ranking cands=3
+PASS [ranking_dailyos_acal] strategy_in_canonical_ranking cands=2
 PASS [ranking_dailyos_acal] no_calibration_bypass 
 PASS [ranking_dailyos_acal] daily_os_reachable 404
 PASS [ranking_dailyos_acal] daily_os_strategy_item activate_push_best_effort
