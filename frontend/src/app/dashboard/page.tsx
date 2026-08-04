@@ -9,6 +9,7 @@ import { CandidateModuleNav } from "@/components/dashboard/candidate-module-nav"
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { DashboardCommandCenter } from "@/components/dashboard-command-center";
 import { DailyCareerOsPanel } from "@/components/career/daily-career-os-panel";
+import { LifecycleCommandPanel } from "@/components/lifecycle/lifecycle-command-panel";
 import { ProfileCompletenessHint } from "@/components/ux/profile-completeness-hint";
 import { WorkspaceFlowSteps } from "@/components/ux/workspace-flow-steps";
 import { EmailVerificationBanner } from "@/components/email-verification-banner";
@@ -352,6 +353,7 @@ export default function DashboardPage() {
                 todayContext={todayContext}
               />
               <DailyCareerOsPanel compact />
+              <LifecycleCommandPanel />
             </div>
             <div className="dashboard-hero-grid__insights">
               <ProgressDashboard />
@@ -367,6 +369,9 @@ export default function DashboardPage() {
               todayContext={todayContext}
             />
             <DailyCareerOsPanel compact />
+            <div className="mb-4 sm:mb-6">
+              <LifecycleCommandPanel />
+            </div>
             <div className="mb-4 sm:mb-6" aria-label={t("dashboard.coreLinksAria")}>
               <WorkspaceQuickActions actions={DASHBOARD_CORE_QUICK_ACTIONS} />
             </div>

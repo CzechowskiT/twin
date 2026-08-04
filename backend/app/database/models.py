@@ -2733,6 +2733,194 @@ class CandidateTransitionAudit(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
+class CandidateLifecycleContext(Base):
+    """Orchestration context — refs only; never duplicates module payloads."""
+
+    __tablename__ = "candidate_lifecycle_contexts"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "context_key", name="uq_lifecycle_context_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    context_key: Mapped[str] = mapped_column(String(160))
+    active_phase: Mapped[str] = mapped_column(String(48), default="UNDERSTAND")
+    proposed_phase: Mapped[str | None] = mapped_column(String(48), nullable=True)
+    phase_source: Mapped[str] = mapped_column(String(64), default="inferred")
+    phase_confidence: Mapped[str] = mapped_column(String(16), default="low")
+    candidate_phase_confirmed: Mapped[bool] = mapped_column(Boolean, default=False)
+    active_goal: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    focus_type: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    focus_ref: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    refs_json: Mapped[str] = mapped_column(Text, default="{}")
+    unknowns_json: Mapped[str] = mapped_column(Text, default="[]")
+    blocking_json: Mapped[str] = mapped_column(Text, default="[]")
+    nba_json: Mapped[str] = mapped_column(Text, default="{}")
+    readiness_json: Mapped[str] = mapped_column(Text, default="{}")
+    preferences_json: Mapped[str] = mapped_column(Text, default="{}")
+    deep_link_context_json: Mapped[str] = mapped_column(Text, default="{}")
+    context_version: Mapped[int] = mapped_column(Integer, default=1)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="INFERENCE")
+    archived_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    is_synthetic: Mapped[bool] = mapped_column(Boolean, default=False)
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidateLifecycleEvent(Base):
+    """Append-only lifecycle event ledger — refs only, no confidential blobs."""
+
+    __tablename__ = "candidate_lifecycle_events"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "event_key", name="uq_lifecycle_event_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    context_id: Mapped[int | None] = mapped_column(
+        ForeignKey("candidate_lifecycle_contexts.id", ondelete="CASCADE"), nullable=True
+    )
+    event_key: Mapped[str] = mapped_column(String(160))
+    event_type: Mapped[str] = mapped_column(String(64))
+    source_module: Mapped[str] = mapped_column(String(64))
+    source_object_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    source_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    provenance: Mapped[str] = mapped_column(String(64), default="system")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
+    candidate_confirmed: Mapped[bool] = mapped_column(Boolean, default=False)
+    context_version_before: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    context_version_after: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    payload_ref_json: Mapped[str] = mapped_column(Text, default="{}")
+    is_synthetic: Mapped[bool] = mapped_column(Boolean, default=False)
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateLifecycleHandoff(Base):
+    """Module handoff contract — status + snapshot hash, not payloads."""
+
+    __tablename__ = "candidate_lifecycle_handoffs"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "handoff_key", name="uq_lifecycle_handoff_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    context_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    handoff_key: Mapped[str] = mapped_column(String(160))
+    from_module: Mapped[str] = mapped_column(String(64))
+    to_module: Mapped[str] = mapped_column(String(64))
+    from_object_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    to_object_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="pending")
+    snapshot_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidateLifecycleFinding(Base):
+    """Consistency / stale-state findings across modules."""
+
+    __tablename__ = "candidate_lifecycle_findings"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "finding_key", name="uq_lifecycle_finding_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    context_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    finding_key: Mapped[str] = mapped_column(String(160))
+    finding_type: Mapped[str] = mapped_column(String(64))
+    severity: Mapped[str] = mapped_column(String(16), default="info")
+    status: Mapped[str] = mapped_column(String(32), default="open")
+    module_refs_json: Mapped[str] = mapped_column(Text, default="[]")
+    message: Mapped[str] = mapped_column(String(500), default="")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="INFERENCE")
+    stale: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateLifecycleApproval(Base):
+    """Atomic approvals — never bundled silent phase/graph/calibration changes."""
+
+    __tablename__ = "candidate_lifecycle_approvals"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "approval_key", name="uq_lifecycle_approval_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    context_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    approval_key: Mapped[str] = mapped_column(String(160))
+    approval_kind: Mapped[str] = mapped_column(String(64))
+    status: Mapped[str] = mapped_column(String(32), default="pending")
+    bundled: Mapped[bool] = mapped_column(Boolean, default=False)
+    before_json: Mapped[str] = mapped_column(Text, default="{}")
+    after_json: Mapped[str] = mapped_column(Text, default="{}")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="SUGGESTION")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateLifecyclePrivacy(Base):
+    """Lifecycle orchestration privacy — composes with module privacy, does not replace it."""
+
+    __tablename__ = "candidate_lifecycle_privacy"
+    __table_args__ = (UniqueConstraint("candidate_id", name="uq_lifecycle_privacy_candidate"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), unique=True
+    )
+    orchestration_opt_in: Mapped[bool] = mapped_column(Boolean, default=True)
+    search_opt_in: Mapped[bool] = mapped_column(Boolean, default=True)
+    learning_opt_in: Mapped[bool] = mapped_column(Boolean, default=True)
+    reminders_opt_in: Mapped[bool] = mapped_column(Boolean, default=True)
+    export_include_module_notes: Mapped[bool] = mapped_column(Boolean, default=False)
+    paused: Mapped[bool] = mapped_column(Boolean, default=False)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+
+class CandidateLifecycleAudit(Base):
+    """Append-only Unified Career Lifecycle audit."""
+
+    __tablename__ = "candidate_lifecycle_audits"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    context_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    entity_type: Mapped[str] = mapped_column(String(64))
+    entity_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    action: Mapped[str] = mapped_column(String(64))
+    before_json: Mapped[str] = mapped_column(Text, default="{}")
+    after_json: Mapped[str] = mapped_column(Text, default="{}")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
 class CandidateReferralProgram(Base):
     """One referral program per candidate — unique share code (Wave B slice 3)."""
 
