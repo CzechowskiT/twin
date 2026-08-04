@@ -145,6 +145,7 @@ export type TranslationKey =
   | `careerTransition.${keyof typeof en.careerTransition}`
   | `careerLifecycle.${keyof typeof en.careerLifecycle}`
   | `careerStrategy.${keyof typeof en.careerStrategy}`
+  | `opportunityIntel.${keyof typeof en.opportunityIntel}`
   | `recruiterInbox.${keyof typeof en.recruiterInbox}`
   | `recruiterAudit.${keyof typeof en.recruiterAudit}`
   | `recruiterScorecard.${keyof typeof en.recruiterScorecard}`
@@ -4773,6 +4774,26 @@ eyebrow: "Product roadmap",
     invalidateStale: "Invalidate stale refs",
     disclaimer:
       "Calibration is never silent. Deletion and privacy revocation execute — not preview-only. Phase 3 Agent NOT_STARTED.",
+  },
+  opportunityIntel: {
+    eyebrow: "Discovery",
+    title: "Evidence-backed opportunities",
+    lead: "Paste a role or normalize an authorized job — salary and demand stay UNKNOWN unless observed.",
+    loadFailed: "Could not load opportunity intelligence",
+    actionFailed: "Discovery action failed — try again",
+    marketObserved: "Observed jobs",
+    demandTrend: "Demand trend",
+    pasteTitle: "Role title",
+    pasteCompany: "Company",
+    pasteDesc: "Paste description (no scripts)",
+    ingestPaste: "Normalize paste",
+    ingestSelectedJob: "Normalize selected job",
+    refresh: "Refresh freshness",
+    stale: "stale",
+    studioHandoff: "Open in Application Studio",
+    pushDailyOs: "Push to Daily OS / ACAL",
+    disclaimer:
+      "No fabricated activity or salary. No external apply from TWIN. Phase 3 Agent NOT_STARTED.",
   },
   productPolish: {
     pilotPreviewBanner: "Pilot preview — not part of public launch.",
@@ -13757,6 +13778,26 @@ const pl: MessageTree = {
     invalidateStale: "Unieważnij nieaktualne referencje",
     disclaimer:
       "Kalibracja nigdy nie jest cicha. Usuwanie i odwołanie prywatności są wykonywane — nie tylko podgląd. Phase 3 Agent NOT_STARTED.",
+  },
+  opportunityIntel: {
+    eyebrow: "Odkrywanie",
+    title: "Szanse oparte na dowodach",
+    lead: "Wklej rolę lub znormalizuj autoryzowaną ofertę — pensja i popyt zostają UNKNOWN, jeśli niezaobserwowane.",
+    loadFailed: "Nie udało się wczytać opportunity intelligence",
+    actionFailed: "Akcja discovery nie powiodła się — spróbuj ponownie",
+    marketObserved: "Zaobserwowane oferty",
+    demandTrend: "Trend popytu",
+    pasteTitle: "Tytuł roli",
+    pasteCompany: "Firma",
+    pasteDesc: "Wklej opis (bez skryptów)",
+    ingestPaste: "Normalizuj wklejkę",
+    ingestSelectedJob: "Normalizuj wybraną ofertę",
+    refresh: "Odśwież świeżość",
+    stale: "nieaktualne",
+    studioHandoff: "Otwórz w Application Studio",
+    pushDailyOs: "Wyślij do Daily OS / ACAL",
+    disclaimer:
+      "Bez fabrykowanej aktywności i pensji. Bez zewnętrznego apply z TWIN. Phase 3 Agent NOT_STARTED.",
   },
   productPolish: {
     pilotPreviewBanner: "Podgląd pilota — poza publicznym launch.",

@@ -12,6 +12,7 @@ import { InterviewProcessTimeline } from "@/components/job/InterviewProcessTimel
 import { ApplyTrackingCounter } from "@/components/job/ApplyTrackingCounter";
 import { SalaryCalculator } from "@/components/tools/SalaryCalculator";
 import { TechStackIcons } from "@/components/job/TechStackIcons";
+import { OpportunityIntelligencePanel } from "@/components/job/opportunity-intelligence-panel";
 import { CANDIDATE_OFFERS_PAGE_MARKER } from "@/lib/candidate-offers-matches-demo-data";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
@@ -121,6 +122,7 @@ export function CandidateJobDiscovery() {
         </section>
 
         <aside className="space-y-4">
+          <OpportunityIntelligencePanel selectedJobId={selected?.id ?? null} />
           <SalaryCalculator jobMin={selected?.salary_min} jobMax={selected?.salary_max} />
           {selected ? (
             <Card className="space-y-4 p-4">

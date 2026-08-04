@@ -249,6 +249,13 @@ def _collect_candidates(db: Session, *, candidate_id: int, weights: dict) -> lis
                 "deep_link": f"/dashboard/career-transition?id={tr.id}",
             }
         )
+    # Epic 2.1 — opportunity discovery refs into canonical ranking (no second store)
+    try:
+        from app.services import opportunity_intelligence as oi
+
+        out.extend(oi.ranking_refs(db, candidate_id=candidate_id, weights=weights))
+    except Exception:
+        pass
     # Soft-deleted transitions must not appear
     out.sort(key=lambda x: (-float(x["score"]), x["id"]))
     for i, c in enumerate(out):
