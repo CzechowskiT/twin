@@ -263,6 +263,13 @@ def _collect_candidates(db: Session, *, candidate_id: int, weights: dict) -> lis
         out.extend(sslab.ranking_refs(db, candidate_id=candidate_id, weights=weights))
     except Exception:
         pass
+    # Epic 2.3 — pending search-outcome calibrations (approval required)
+    try:
+        from app.services import search_outcome_intelligence as soi
+
+        out.extend(soi.ranking_refs(db, candidate_id=candidate_id, weights=weights))
+    except Exception:
+        pass
     # Soft-deleted transitions must not appear
     out.sort(key=lambda x: (-float(x["score"]), x["id"]))
     for i, c in enumerate(out):

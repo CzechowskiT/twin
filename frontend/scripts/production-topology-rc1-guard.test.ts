@@ -34,7 +34,7 @@ test("PRODUCTION_TOPOLOGY_RC1.json exists and is valid", () => {
   assert.ok(doc.vercel.domains_attached.includes("twin.care"));
   assert.ok(doc.vercel.domains_attached.includes("app.twin.care"));
   assert.equal(doc.vercel.dns_blocker, "afternic_nameservers");
-  assert.equal(doc.railway.alembic_head_expected, "118_career_market_radar_search_strategy");
+  assert.equal(doc.railway.alembic_head_expected, "119_search_outcome_intelligence");
   assert.equal(doc.railway.api_service, "twin");
   assert.equal(doc.railway.worker_service, "enthusiastic-encouragement");
   assert.equal(doc.on_call_roles.never_invent_human_names, true);

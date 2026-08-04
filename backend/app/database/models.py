@@ -3630,6 +3630,207 @@ class CandidateSearchStrategyAudit(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
+class CandidateSearchOutcomeLinkage(Base):
+    """Refs-only linkage across strategy → opportunity → declared outcomes (no payload dump)."""
+
+    __tablename__ = "candidate_search_outcome_linkages"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "linkage_key", name="uq_search_outcome_linkage_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    linkage_key: Mapped[str] = mapped_column(String(160))
+    strategy_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    thesis_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    opportunity_ref_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    saved_search_ref_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    watchlist_ref_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    source_key: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    experiment_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    cycle_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    studio_ref_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    interview_ref_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    outcome_ref_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    stage: Mapped[str] = mapped_column(String(64), default="UNKNOWN")
+    provenance: Mapped[str] = mapped_column(String(64), default="UNKNOWN")
+    refs_json: Mapped[str] = mapped_column(Text, default="{}")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateSearchOutcomeEvent(Base):
+    __tablename__ = "candidate_search_outcome_events"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "event_key", name="uq_search_outcome_event_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    linkage_id: Mapped[int | None] = mapped_column(
+        ForeignKey("candidate_search_outcome_linkages.id", ondelete="CASCADE"), nullable=True
+    )
+    event_key: Mapped[str] = mapped_column(String(160))
+    from_stage: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    to_stage: Mapped[str] = mapped_column(String(64))
+    provenance: Mapped[str] = mapped_column(String(64), default="CANDIDATE_DECLARED")
+    payload_json: Mapped[str] = mapped_column(Text, default="{}")
+    silent_upgrade: Mapped[bool] = mapped_column(Boolean, default=False)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateSearchFunnelSnapshot(Base):
+    __tablename__ = "candidate_search_funnel_snapshots"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "snapshot_key", name="uq_search_funnel_snapshot_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    snapshot_key: Mapped[str] = mapped_column(String(160))
+    strategy_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    counts_json: Mapped[str] = mapped_column(Text, default="{}")
+    ratios_json: Mapped[str] = mapped_column(Text, default="{}")
+    denominators_json: Mapped[str] = mapped_column(Text, default="{}")
+    time_to_stage_json: Mapped[str] = mapped_column(Text, default="{}")
+    unknowns_json: Mapped[str] = mapped_column(Text, default="[]")
+    benchmark_json: Mapped[str] = mapped_column(
+        Text, default='{"status":"NOT_PROVIDED","fabricated":false}'
+    )
+    wording: Mapped[str] = mapped_column(String(64), default="candidate_specific")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="INFERENCE")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    computed_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateSearchOutcomeAttribution(Base):
+    __tablename__ = "candidate_search_outcome_attributions"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "attribution_key", name="uq_search_outcome_attr_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    attribution_key: Mapped[str] = mapped_column(String(160))
+    component_type: Mapped[str] = mapped_column(String(64))
+    component_ref_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    summary_json: Mapped[str] = mapped_column(Text, default="{}")
+    causality_claim: Mapped[bool] = mapped_column(Boolean, default=False)
+    conflicts_json: Mapped[str] = mapped_column(Text, default="[]")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="INFERENCE")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateSearchOutcomeCalibration(Base):
+    """Search-outcome calibration — never silent; applies only after approval."""
+
+    __tablename__ = "candidate_search_outcome_calibrations"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "calibration_key", name="uq_search_outcome_cal_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    calibration_key: Mapped[str] = mapped_column(String(160))
+    strategy_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="pending")
+    before_weights_json: Mapped[str] = mapped_column(Text, default="{}")
+    after_weights_json: Mapped[str] = mapped_column(Text, default="{}")
+    preview_json: Mapped[str] = mapped_column(Text, default="{}")
+    impact_json: Mapped[str] = mapped_column(Text, default="{}")
+    explain_json: Mapped[str] = mapped_column(Text, default="{}")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    lifecycle_approval_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    canonical_proposal_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    reverted_from_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    silent: Mapped[bool] = mapped_column(Boolean, default=False)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="SUGGESTION")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateSearchOutcomeFeedback(Base):
+    __tablename__ = "candidate_search_outcome_feedback"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "feedback_key", name="uq_search_outcome_fb_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    feedback_key: Mapped[str] = mapped_column(String(160))
+    linkage_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    kind: Mapped[str] = mapped_column(String(64), default="usefulness")
+    body_json: Mapped[str] = mapped_column(Text, default="{}")
+    is_offer: Mapped[bool] = mapped_column(Boolean, default=False)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="CANDIDATE_RECOLLECTION")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateSearchOutcomeReview(Base):
+    __tablename__ = "candidate_search_outcome_reviews"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "review_key", name="uq_search_outcome_rev_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    review_key: Mapped[str] = mapped_column(String(160))
+    cadence: Mapped[str] = mapped_column(String(32), default="weekly")
+    body_json: Mapped[str] = mapped_column(Text, default="{}")
+    status: Mapped[str] = mapped_column(String(32), default="pending")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="SUGGESTION")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateSearchOutcomeAudit(Base):
+    __tablename__ = "candidate_search_outcome_audits"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    entity_type: Mapped[str] = mapped_column(String(64))
+    entity_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    action: Mapped[str] = mapped_column(String(64))
+    before_json: Mapped[str] = mapped_column(Text, default="{}")
+    after_json: Mapped[str] = mapped_column(Text, default="{}")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
 class CandidateReferralProgram(Base):
     """One referral program per candidate — unique share code (Wave B slice 3)."""
 

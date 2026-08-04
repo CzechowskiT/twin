@@ -40,12 +40,21 @@ type SearchStrategyPending = {
   lifecycle_approval_id?: number | null;
 };
 
+type OutcomeCalibration = {
+  id: number;
+  status: string;
+  silent?: boolean;
+  before_weights?: Record<string, number>;
+  after_weights?: Record<string, number>;
+};
+
 export default function LifecycleApprovalsPage() {
   const { t } = useTranslation();
   const router = useRouter();
   const [items, setItems] = useState<Approval[]>([]);
   const [proposals, setProposals] = useState<StrategyProposal[]>([]);
   const [searchPending, setSearchPending] = useState<SearchStrategyPending[]>([]);
+  const [outcomeCals, setOutcomeCals] = useState<OutcomeCalibration[]>([]);
   const [err, setErr] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -55,7 +64,7 @@ export default function LifecycleApprovalsPage() {
       return;
     }
     try {
-      const [life, strat, ss] = await Promise.all([
+      const [life, strat, ss, out] = await Promise.all([
         apiFetch<{ approvals?: Approval[] }>("/api/v1/candidates/me/career-lifecycle", {}, token),
         apiFetch<{ calibration_proposals?: StrategyProposal[] }>(
           "/api/v1/candidates/me/career-strategy",
@@ -67,12 +76,18 @@ export default function LifecycleApprovalsPage() {
           {},
           token,
         ),
+        apiFetch<{ calibrations?: OutcomeCalibration[] }>(
+          "/api/v1/candidates/me/search-outcomes",
+          {},
+          token,
+        ),
       ]);
       setItems(life.approvals || []);
       setProposals(strat.calibration_proposals || []);
       setSearchPending(
         (ss.strategies || []).filter((s) => s.status === "pending_approval"),
       );
+      setOutcomeCals((out.calibrations || []).filter((c) => c.status === "pending"));
       setErr(null);
     } catch (ex) {
       setErr(ex instanceof Error ? ex.message : t("careerLifecycle.loadFailed"));
@@ -130,6 +145,21 @@ export default function LifecycleApprovalsPage() {
     }
   }
 
+  async function resolveOutcomeCal(id: number, approved: boolean) {
+    const token = getToken();
+    if (!token) return;
+    try {
+      await apiFetch(
+        `/api/v1/candidates/me/search-outcomes/calibrations/${id}/resolve`,
+        { method: "POST", body: JSON.stringify({ approved }) },
+        token,
+      );
+      await load();
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : t("searchOutcomes.actionFailed"));
+    }
+  }
+
   return (
     <Shell>
       <CandidateWorkspaceSubnav ariaLabel={t("careerLifecycle.approvals")} />
@@ -141,6 +171,36 @@ export default function LifecycleApprovalsPage() {
             {err}
           </p>
         ) : null}
+
+        <Card>
+          <h2 className="mb-3 text-lg font-semibold">{t("searchOutcomes.calibrationTitle")}</h2>
+          <ul className="flex flex-col gap-3 text-sm">
+            {outcomeCals.map((c) => (
+              <li
+                key={`ocal-${c.id}`}
+                className="flex flex-col gap-2 border-b border-[var(--twin-border)] py-2"
+              >
+                <span>
+                  search-outcome calibration #{c.id} · {c.status} · silent=
+                  {String(!!c.silent)}
+                </span>
+                <span className="flex gap-2">
+                  <Button type="button" onClick={() => void resolveOutcomeCal(c.id, true)}>
+                    {t("searchOutcomes.approveCalibration")}
+                  </Button>
+                  <Button type="button" onClick={() => void resolveOutcomeCal(c.id, false)}>
+                    {t("searchOutcomes.rejectCalibration")}
+                  </Button>
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 text-sm">
+            <Link className="twin-link" href="/dashboard/search-outcomes">
+              {t("searchOutcomes.eyebrow")}
+            </Link>
+          </p>
+        </Card>
 
         <Card>
           <h2 className="mb-3 text-lg font-semibold">{t("searchStrategy.eyebrow")}</h2>
@@ -222,7 +282,9 @@ export default function LifecycleApprovalsPage() {
                   {a.approval_kind} · {a.status} · bundled={String(!!a.bundled)} ·{" "}
                   {a.before?.phase || a.before?.version} → {a.after?.phase || "weights"}
                 </span>
-                {a.status === "pending" && a.approval_kind !== "calibration_merge" ? (
+                {a.status === "pending" &&
+                a.approval_kind !== "calibration_merge" &&
+                a.approval_kind !== "search_outcome_calibration" ? (
                   <span className="flex gap-2">
                     <Button type="button" onClick={() => void resolve(a.id, true)}>
                       {t("careerLifecycle.approve")}

@@ -30,8 +30,8 @@ def _require_ops_admin(settings: Settings, authorization: str | None) -> None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid admin token")
 
 
-# Keep in sync with alembic head (118_career_market_radar_search_strategy).
-EXPECTED_ALEMBIC_HEAD = "118_career_market_radar_search_strategy"
+# Keep in sync with alembic head (119_search_outcome_intelligence).
+EXPECTED_ALEMBIC_HEAD = "119_search_outcome_intelligence"
 
 
 def _read_alembic_current(db: Session) -> str | None:

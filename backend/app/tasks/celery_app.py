@@ -30,6 +30,7 @@ celery_app.conf.update(
         "app.tasks.career_strategy_tasks",
         "app.tasks.opportunity_intelligence_tasks",
         "app.tasks.search_strategy_tasks",
+        "app.tasks.search_outcome_tasks",
         "app.tasks.worker_identity",
         "app.tasks.company_invite_tasks",
     ),

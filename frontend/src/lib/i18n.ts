@@ -147,6 +147,7 @@ export type TranslationKey =
   | `careerStrategy.${keyof typeof en.careerStrategy}`
   | `opportunityIntel.${keyof typeof en.opportunityIntel}`
   | `searchStrategy.${keyof typeof en.searchStrategy}`
+  | `searchOutcomes.${keyof typeof en.searchOutcomes}`
   | `recruiterInbox.${keyof typeof en.recruiterInbox}`
   | `recruiterAudit.${keyof typeof en.recruiterAudit}`
   | `recruiterScorecard.${keyof typeof en.recruiterScorecard}`
@@ -4817,6 +4818,27 @@ eyebrow: "Product roadmap",
     archiveCycle: "Archive cycle",
     disclaimer:
       "No whole-market claims. No silent activation or weight changes. Phase 3 Agent NOT_STARTED.",
+  },
+  searchOutcomes: {
+    eyebrow: "Outcomes",
+    title: "Search Outcome Intelligence",
+    lead: "Candidate-specific funnel learning with explicit provenance. Calibration changes ranking only after your approval — never silent, never market benchmarks.",
+    loadFailed: "Could not load search outcomes",
+    actionFailed: "Search outcome action failed — try again",
+    funnelTitle: "Your search funnel",
+    refreshFunnel: "Refresh funnel",
+    linkageTitle: "Linkage & declarations",
+    addLinkage: "Add opportunity-seen linkage",
+    declareApplication: "Declare application",
+    addFeedback: "Add usefulness feedback",
+    calibrationTitle: "Strategy calibration",
+    proposeCalibration: "Propose calibration",
+    approveCalibration: "Approve",
+    rejectCalibration: "Reject",
+    revertCalibration: "Revert",
+    dailyOsLink: "Daily OS",
+    disclaimer:
+      "No fabricated benchmarks or conversion. Feedback is not an offer. Phase 3 Agent NOT_STARTED.",
   },
   productPolish: {
     pilotPreviewBanner: "Pilot preview — not part of public launch.",
@@ -13843,6 +13865,27 @@ const pl: MessageTree = {
     archiveCycle: "Archiwizuj cykl",
     disclaimer:
       "Bez twierdzeń o całym rynku. Bez cichej aktywacji i zmiany wag. Phase 3 Agent NOT_STARTED.",
+  },
+  searchOutcomes: {
+    eyebrow: "Outcomes",
+    title: "Inteligencja wyników poszukiwań",
+    lead: "Nauka lejka tylko z Twoich danych, z jawną proweniencją. Kalibracja zmienia ranking dopiero po Twojej zgodzie — bez cichych zmian i bez benchmarków rynkowych.",
+    loadFailed: "Nie udało się wczytać wyników poszukiwań",
+    actionFailed: "Akcja wyników poszukiwań nie powiodła się — spróbuj ponownie",
+    funnelTitle: "Twój lejek poszukiwań",
+    refreshFunnel: "Odśwież lejek",
+    linkageTitle: "Powiązania i deklaracje",
+    addLinkage: "Dodaj linkage opportunity-seen",
+    declareApplication: "Zadeklaruj aplikację",
+    addFeedback: "Dodaj feedback użyteczności",
+    calibrationTitle: "Kalibracja strategii",
+    proposeCalibration: "Zaproponuj kalibrację",
+    approveCalibration: "Zatwierdź",
+    rejectCalibration: "Odrzuć",
+    revertCalibration: "Cofnij",
+    dailyOsLink: "Daily OS",
+    disclaimer:
+      "Bez fabrykowanych benchmarków i konwersji. Feedback to nie oferta. Phase 3 Agent NOT_STARTED.",
   },
   productPolish: {
     pilotPreviewBanner: "Podgląd pilota — poza publicznym launch.",

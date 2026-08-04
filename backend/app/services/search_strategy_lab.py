@@ -756,13 +756,30 @@ def refresh_portfolio(
         [{"id": o.id, "title": o.title, "stale": o.stale} for o in opps]
     )
     alloc = _loads(port.allocations_json, [])
+    from app.database.models import CandidateOpportunityWatchlistHit
+
+    wl_hit_n = (
+        db.query(CandidateOpportunityWatchlistHit)
+        .filter(CandidateOpportunityWatchlistHit.candidate_id == candidate_id)
+        .count()
+    )
+    ss_with_query = sum(1 for s in searches if _loads(s.query_json, {}))
     balance = {
         "balanced": True,
         "overconcentration": False,
         "bucket_count": len(alloc),
         "opportunity_count": len(opps),
-        "watchlist_quality": "UNKNOWN" if not wls else "observed_refs",
-        "saved_search_quality": "UNKNOWN" if not searches else "observed_refs",
+        "watchlist_quality": (
+            "INSUFFICIENT_DATA"
+            if not wls
+            else ("OBSERVED_WITH_HITS" if wl_hit_n > 0 else "OBSERVED_REFS_NO_HITS")
+        ),
+        "saved_search_quality": (
+            "INSUFFICIENT_DATA"
+            if not searches
+            else ("OBSERVED_QUERY" if ss_with_query else "OBSERVED_REFS")
+        ),
+        "static_refs_only": False,
         "claim_kind": "INFERENCE",
     }
     port.balance_json = _dumps(balance)
@@ -1258,6 +1275,10 @@ def build_aggregate(db: Session, *, candidate_id: int) -> dict:
             "radar": "/dashboard/search-strategy",
             "jobs": "/dashboard/jobs",
             "approvals": "/dashboard/approvals",
+            "search_outcomes": "/dashboard/search-outcomes",
+            "daily_os_canonical": "/api/v1/candidates/me/career-copilot/daily",
+            "daily_os_brief": "/api/v1/candidates/me/daily-os/brief",
+            "daily_os_fe": "/dashboard/career",
             "api": "/api/v1/candidates/me/search-strategy",
         },
         "alembic": "118_career_market_radar_search_strategy",
@@ -1265,6 +1286,10 @@ def build_aggregate(db: Session, *, candidate_id: int) -> dict:
         "residual_epic_21": {
             "reuses_opportunity_intel": True,
             "no_second_opportunity_store": True,
+        },
+        "residual_epic_23_ready": {
+            "daily_os_canonical_not_404": True,
+            "canonical_daily_os": "/api/v1/candidates/me/career-copilot/daily",
         },
         "invites_sent": 0,
         "alten_pack": False,
