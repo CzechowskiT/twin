@@ -270,6 +270,13 @@ def _collect_candidates(db: Session, *, candidate_id: int, weights: dict) -> lis
         out.extend(soi.ranking_refs(db, candidate_id=candidate_id, weights=weights))
     except Exception:
         pass
+    # Epic 2.4 — pending strategy decisions (approval required; never silent)
+    try:
+        from app.services import strategy_review_governance as srg
+
+        out.extend(srg.ranking_refs(db, candidate_id=candidate_id, weights=weights))
+    except Exception:
+        pass
     # Soft-deleted transitions must not appear
     out.sort(key=lambda x: (-float(x["score"]), x["id"]))
     for i, c in enumerate(out):

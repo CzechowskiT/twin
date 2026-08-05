@@ -908,6 +908,12 @@ def invalidate_on_evidence_delete(db: Session, *, candidate_id: int) -> dict:
             sslab.invalidate_theses_on_evidence_delete(db, candidate_id=candidate_id)
         except Exception:
             pass
+    try:
+        from app.services import strategy_review_governance as srg
+
+        srg.invalidate_on_evidence_delete(db, candidate_id=candidate_id)
+    except Exception:
+        pass
     n = 0
     for row in (
         db.query(CandidateNormalizedOpportunity)

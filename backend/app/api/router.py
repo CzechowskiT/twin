@@ -18,6 +18,7 @@ from app.api import (
     opportunity_intelligence,
     search_strategy_lab,
     search_outcome_intelligence,
+    strategy_review_governance,
     chatgpt_twin,
     company,
     company_feedback_persistence,
@@ -178,6 +179,11 @@ api_router.include_router(
     search_outcome_intelligence.router,
     prefix="/candidates",
     tags=["Search Outcome Intelligence"],
+)
+api_router.include_router(
+    strategy_review_governance.router,
+    prefix="/candidates",
+    tags=["Strategy Review Decision Governance"],
 )
 api_router.include_router(
     candidate_intelligence.router, prefix="", tags=["Candidate Intelligence"]

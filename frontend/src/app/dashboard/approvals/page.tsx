@@ -48,6 +48,14 @@ type OutcomeCalibration = {
   after_weights?: Record<string, number>;
 };
 
+type StrategyDecision = {
+  id: number;
+  status: string;
+  stale?: boolean;
+  silent?: boolean;
+  question?: { text?: string };
+};
+
 export default function LifecycleApprovalsPage() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -55,6 +63,7 @@ export default function LifecycleApprovalsPage() {
   const [proposals, setProposals] = useState<StrategyProposal[]>([]);
   const [searchPending, setSearchPending] = useState<SearchStrategyPending[]>([]);
   const [outcomeCals, setOutcomeCals] = useState<OutcomeCalibration[]>([]);
+  const [strategyDecisions, setStrategyDecisions] = useState<StrategyDecision[]>([]);
   const [err, setErr] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -64,7 +73,7 @@ export default function LifecycleApprovalsPage() {
       return;
     }
     try {
-      const [life, strat, ss, out] = await Promise.all([
+      const [life, strat, ss, out, reviews] = await Promise.all([
         apiFetch<{ approvals?: Approval[] }>("/api/v1/candidates/me/career-lifecycle", {}, token),
         apiFetch<{ calibration_proposals?: StrategyProposal[] }>(
           "/api/v1/candidates/me/career-strategy",
@@ -81,13 +90,23 @@ export default function LifecycleApprovalsPage() {
           {},
           token,
         ),
+        apiFetch<{ decisions?: StrategyDecision[] }>(
+          "/api/v1/candidates/me/strategy-reviews",
+          {},
+          token,
+        ),
       ]);
-      setItems(life.approvals || []);
+      setItems(
+        (life.approvals || []).filter((a) => a.approval_kind !== "strategy_decision_change_set"),
+      );
       setProposals(strat.calibration_proposals || []);
       setSearchPending(
         (ss.strategies || []).filter((s) => s.status === "pending_approval"),
       );
       setOutcomeCals((out.calibrations || []).filter((c) => c.status === "pending"));
+      setStrategyDecisions(
+        (reviews.decisions || []).filter((d) => d.status === "pending_approval"),
+      );
       setErr(null);
     } catch (ex) {
       setErr(ex instanceof Error ? ex.message : t("careerLifecycle.loadFailed"));
@@ -160,6 +179,21 @@ export default function LifecycleApprovalsPage() {
     }
   }
 
+  async function resolveStrategyDecision(id: number, action: "approve" | "reject" | "postpone") {
+    const token = getToken();
+    if (!token) return;
+    try {
+      await apiFetch(
+        `/api/v1/candidates/me/strategy-reviews/decisions/${id}/resolve`,
+        { method: "POST", body: JSON.stringify({ action }) },
+        token,
+      );
+      await load();
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : t("decisionJournal.actionFailed"));
+    }
+  }
+
   return (
     <Shell>
       <CandidateWorkspaceSubnav ariaLabel={t("careerLifecycle.approvals")} />
@@ -198,6 +232,51 @@ export default function LifecycleApprovalsPage() {
           <p className="mt-3 text-sm">
             <Link className="twin-link" href="/dashboard/search-outcomes">
               {t("searchOutcomes.eyebrow")}
+            </Link>
+          </p>
+        </Card>
+
+        <Card>
+          <h2 className="mb-3 text-lg font-semibold">{t("decisionJournal.listTitle")}</h2>
+          <ul className="flex flex-col gap-3 text-sm">
+            {strategyDecisions.map((d) => (
+              <li
+                key={`sdec-${d.id}`}
+                className="flex flex-col gap-2 border-b border-[var(--twin-border)] py-2"
+              >
+                <span>
+                  strategy decision #{d.id} · {d.status} · stale={String(!!d.stale)} · silent=
+                  {String(!!d.silent)}
+                </span>
+                <span className="text-[var(--twin-muted)]">{d.question?.text}</span>
+                <span className="flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    disabled={!!d.stale}
+                    onClick={() => void resolveStrategyDecision(d.id, "approve")}
+                  >
+                    {t("decisionJournal.approve")}
+                  </Button>
+                  <Button type="button" onClick={() => void resolveStrategyDecision(d.id, "reject")}>
+                    {t("decisionJournal.reject")}
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => void resolveStrategyDecision(d.id, "postpone")}
+                  >
+                    {t("decisionJournal.postpone")}
+                  </Button>
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 text-sm">
+            <Link className="twin-link" href="/dashboard/decision-journal">
+              {t("decisionJournal.eyebrow")}
+            </Link>
+            {" · "}
+            <Link className="twin-link" href="/dashboard/review-center">
+              {t("reviewCenter.eyebrow")}
             </Link>
           </p>
         </Card>

@@ -37,6 +37,14 @@ from app.database.models import (
     CandidateSearchPortfolio,
     CandidateSearchStrategy,
     CandidateSearchStrategyAudit,
+    CandidateStrategyAssumption,
+    CandidateStrategyChangeSet,
+    CandidateStrategyReviewAudit,
+    CandidateStrategyReviewObservation,
+    CandidateStrategyReviewSession,
+    CandidateDecisionFollowup,
+    CandidateDecisionRecord,
+    CandidateOpportunityClusterSummary,
     Job,
     OpportunitySource,
     User,
@@ -89,6 +97,14 @@ def _setup(monkeypatch):
         CandidateSearchOutcomeFeedback.__table__,
         CandidateSearchOutcomeReview.__table__,
         CandidateSearchOutcomeAudit.__table__,
+        CandidateStrategyReviewSession.__table__,
+        CandidateStrategyReviewObservation.__table__,
+        CandidateOpportunityClusterSummary.__table__,
+        CandidateStrategyAssumption.__table__,
+        CandidateDecisionRecord.__table__,
+        CandidateStrategyChangeSet.__table__,
+        CandidateDecisionFollowup.__table__,
+        CandidateStrategyReviewAudit.__table__,
     ]
     for table in tables:
         table.create(bind=bind, checkfirst=True)
@@ -205,6 +221,10 @@ def test_search_outcome_intelligence_flow(monkeypatch):
         assert comps.status_code == 200
         assert comps.json()["causality_claims"] is False
         assert comps.json()["skill_mastery_inference"] is False
+        # With linkage, clusters must leave unconditional INSUFFICIENT_DATA
+        assert comps.json()["clusters"]["status"] == "OBSERVED"
+        assert comps.json()["clusters"]["demand_claim"] is False
+        assert comps.json()["clusters"]["fabricated_progress"] is False
 
         attr = client.post("/api/v1/candidates/me/search-outcomes/attribution")
         assert attr.status_code == 200
@@ -228,11 +248,16 @@ def test_search_outcome_intelligence_flow(monkeypatch):
             json={"cadence": "weekly"},
         )
         assert weekly.status_code == 201
+        wbody = weekly.json()["review"]
+        assert wbody["consumes_persisted_outcomes"] is True
+        assert wbody["static_form"] is False
+        assert wbody["body"]["lineage_present"] is True
         monthly = client.post(
             "/api/v1/candidates/me/search-outcomes/reviews",
             json={"cadence": "monthly"},
         )
         assert monthly.status_code == 201
+        assert monthly.json()["review"]["consumes_persisted_outcomes"] is True
 
         cal = client.post(
             "/api/v1/candidates/me/search-outcomes/calibrations",

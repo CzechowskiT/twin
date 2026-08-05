@@ -375,6 +375,42 @@ def compute_funnel(db: Session, *, candidate_id: int, strategy_id: int | None = 
     }
 
 
+def _cluster_component_summary(
+    db: Session, *, candidate_id: int, links: list
+) -> dict:
+    """Observed cluster status from linkages — never fabricate progress/demand."""
+    by_source: dict[str, int] = {}
+    for ln in links:
+        key = ln.source_key or "unknown_source"
+        by_source[key] = by_source.get(key, 0) + 1
+    if not by_source:
+        return {
+            "status": "INSUFFICIENT_DATA",
+            "claim_kind": "UNKNOWN",
+            "clusters": [],
+            "demand_claim": False,
+            "fabricated_progress": False,
+        }
+    clusters = [
+        {
+            "cluster_key": f"src:{k}",
+            "opportunity_count": n,
+            "status": "OBSERVED",
+            "demand_claim": False,
+            "fabricated_progress": False,
+            "claim_kind": "INFERENCE",
+        }
+        for k, n in list(by_source.items())[:12]
+    ]
+    return {
+        "status": "OBSERVED",
+        "claim_kind": "INFERENCE",
+        "clusters": clusters,
+        "demand_claim": False,
+        "fabricated_progress": False,
+    }
+
+
 def component_outcomes(db: Session, *, candidate_id: int) -> dict:
     """Role thesis / saved search / watchlist / source / cluster / experiment / cycle summaries."""
     theses = (
@@ -557,7 +593,7 @@ def component_outcomes(db: Session, *, candidate_id: int) -> dict:
         "saved_searches": ss_out,
         "watchlists": wl_out,
         "sources": [{"source_key": k, "linked_outcomes": v, "claim_kind": "INFERENCE"} for k, v in by_source.items()],
-        "clusters": {"status": "INSUFFICIENT_DATA", "claim_kind": "UNKNOWN"},
+        "clusters": _cluster_component_summary(db, candidate_id=candidate_id, links=links),
         "experiments": exp_out,
         "cycles": cyc_out,
         "causality_claims": False,
@@ -882,6 +918,10 @@ def add_feedback(
 def create_review(
     db: Session, *, candidate_id: int, cadence: str = "weekly"
 ) -> dict:
+    """Weekly/monthly review consumes persisted outcomes via Epic 2.4 registry."""
+    from app.services import strategy_review_governance as srg
+
+    session = srg.create_review_session(db, candidate_id=candidate_id, cadence=cadence)
     funnel = compute_funnel(db, candidate_id=candidate_id)
     rev = CandidateSearchOutcomeReview(
         candidate_id=candidate_id,
@@ -890,9 +930,14 @@ def create_review(
         body_json=_dumps(
             {
                 "funnel_snapshot_id": funnel.get("snapshot_id"),
+                "strategy_review_session_id": session.get("id"),
+                "snapshot_hash": session.get("snapshot_hash"),
+                "consumes_persisted_outcomes": True,
+                "static_form": False,
                 "benchmark": False,
                 "silent_changes": False,
                 "unknowns": funnel.get("unknowns"),
+                "lineage_present": True,
             }
         ),
         status="pending",
@@ -908,6 +953,9 @@ def create_review(
         "cadence": rev.cadence,
         "status": rev.status,
         "body": _loads(rev.body_json, {}),
+        "strategy_review": session,
+        "consumes_persisted_outcomes": True,
+        "static_form": False,
     }
 
 
