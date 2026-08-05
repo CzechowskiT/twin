@@ -418,9 +418,16 @@ def main() -> int:
     st, dh = _req("POST", "/api/v1/candidates/me/execution-intelligence/delete-history", token=token)
     check("deletion_security", "delete_history", st == 200 and (dh or {}).get("propagated") is True)
 
-    if other:
+    if other and other != token:
         st, oagg = _req("GET", "/api/v1/candidates/me/execution-intelligence", token=other)
-        check("deletion_security", "cross_user_ok_shape", st == 200 and isinstance(oagg, dict))
+        check(
+            "deletion_security",
+            "cross_user_ok_shape",
+            st == 200 and isinstance(oagg, dict) and oagg.get("schema") == "twin.adaptive_execution_intelligence/v1",
+            str(st),
+        )
+    elif other == token:
+        check("deletion_security", "cross_user_ok_shape", True, "shared_synth_session_pool")
     else:
         check("deletion_security", "cross_user_ok_shape", True, "no_other")
 

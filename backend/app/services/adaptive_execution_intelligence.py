@@ -239,13 +239,18 @@ def get_or_create_estimation_profile(db: Session, *, candidate_id: int) -> Candi
         db.query(CandidateEstimationProfile)
         .filter(
             CandidateEstimationProfile.candidate_id == candidate_id,
-            CandidateEstimationProfile.deleted_at.is_(None),
-            CandidateEstimationProfile.status == "active",
+            CandidateEstimationProfile.profile_key == "default",
         )
         .order_by(CandidateEstimationProfile.id.desc())
         .first()
     )
     if row:
+        if row.deleted_at is not None:
+            row.deleted_at = None
+            row.status = "active"
+            row.updated_at = _utcnow()
+            db.commit()
+            db.refresh(row)
         return row
     row = CandidateEstimationProfile(
         candidate_id=candidate_id,
