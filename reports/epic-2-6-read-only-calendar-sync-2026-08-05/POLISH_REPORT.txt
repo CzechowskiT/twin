@@ -2,10 +2,10 @@
 Epic 2.6 dostarcza read-only calendar intelligence: osobny consent (OFF by default) → least-privilege OAuth (reuse) → zaszyfrowane tokeny → busy-only sync → delty → affected-plan → przeliczenie tylko po decyzji kandydata → ACAL/Daily OS → revoke/disconnect. Private feed opcjonalny, read-only, odwoływalny. Verdict A: READ-ONLY CALENDAR INTELLIGENCE CUSTOMER-USABLE - CONSENT-SAFE AVAILABILITY SYNCHRONIZATION PRODUCTION-READY. Product SHA e2d97bf61c93896c4f02ddad3da9b97862d90fd2; Alembic 122 at head; E2E 77/77 (produkt 69/69); CI success; FE/API/worker ALIGNED; MS write OFF.
 
 2|Canonical Baseline
-Weryfikacja niezależna: tip/product przed 2.6 ≈ f7d6b03b (Epic 2.5) / tip docs 844925b8 / Alembic 121 / E2E 91/91 / CI 30980907753. Po 2.6 product e2d97bf61c93896c4f02ddad3da9b97862d90fd2; Alembic 122; E2E 77/77; CI 30983965644.
+Weryfikacja niezależna: tip/product przed 2.6 ≈ f7d6b03b (Epic 2.5) / tip docs 844925b8 / Alembic 121 / E2E 91/91 / CI 30980907753. Po 2.6 product e2d97bf61c93896c4f02ddad3da9b97862d90fd2; tip docs/proof 5a3dd94cef68252b453421c3a58c10a5e1841d1c; Alembic 122; E2E 77/77; CI product 30983965644.
 
 3|Canonical Final State
-repo/product HEAD e2d97bf61c93896c4f02ddad3da9b97862d90fd2; FE=API=worker=e2d97bf61c93896c4f02ddad3da9b97862d90fd2; Alembic 122_read_only_calendar_sync is_at_head=true; schema twin.read_only_calendar_sync/v1; microsoft_calendar_write_enabled=false.
+product HEAD e2d97bf61c93896c4f02ddad3da9b97862d90fd2; tip 5a3dd94cef68252b453421c3a58c10a5e1841d1c (docs_only_drift vs product); FE=API=worker=e2d97bf6 ALIGNED; Alembic 122_read_only_calendar_sync is_at_head=true; schema twin.read_only_calendar_sync/v1; microsoft_calendar_write_enabled=false.
 
 4|Verdict
 READ-ONLY CALENDAR INTELLIGENCE CUSTOMER-USABLE - CONSENT-SAFE AVAILABILITY SYNCHRONIZATION PRODUCTION-READY
@@ -272,7 +272,7 @@ Live busy-read gate zależny od credentials środowiska; UX polish Consent Cente
 reports/epic-2-6-read-only-calendar-sync-2026-08-05/SUMMARY.md + e2e-final2.txt + aggregate-safe.json
 
 92|Git History
-52775e09 feat Alembic 122 · ec17105b e2e oauth assert · e2d97bf6 idempotency+recalc E2E harden · docs proof tip po commicie.
+52775e09 feat Alembic 122 · ec17105b e2e oauth assert · e2d97bf6 idempotency+recalc E2E harden · 5a3dd94c docs proof.
 
 93|Hard Bans
 Phase 3 Agent NOT_STARTED; public launch NO-GO; enrollment OFF; Phase 3B BLOCKED; MS Calendar write OFF; Graph write scopes absent; no Mail/Contacts/Teams write; no auto-apply; feed ≠ booking; no silent approved-plan rewrite.
@@ -302,7 +302,7 @@ Final Answers 1-100
 FA1|READ-ONLY CALENDAR INTELLIGENCE CUSTOMER-USABLE - CONSENT-SAFE AVAILABILITY SYNCHRONIZATION PRODUCTION-READY
 FA2|e2d97bf61c93896c4f02ddad3da9b97862d90fd2
 FA3|e2d97bf61c93896c4f02ddad3da9b97862d90fd2
-FA4|tip po proof commit (docs); product e2d97bf61c93896c4f02ddad3da9b97862d90fd2
+FA4|5a3dd94cef68252b453421c3a58c10a5e1841d1c (docs_only_drift; product e2d97bf6)
 FA5|e2d97bf61c93896c4f02ddad3da9b97862d90fd2
 FA6|e2d97bf61c93896c4f02ddad3da9b97862d90fd2
 FA7|e2d97bf61c93896c4f02ddad3da9b97862d90fd2
