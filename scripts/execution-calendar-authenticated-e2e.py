@@ -202,13 +202,16 @@ def main() -> int:
     check("persistence", "history_route", routes.get("history") == "/dashboard/execution-calendar?view=history")
     check("persistence", "acal_route", routes.get("acceptance_calendar") == "/dashboard/acceptance")
 
+    # Clear residual capacity/batches from prior synth runs so budget absence is observable
+    _req("POST", "/api/v1/candidates/me/execution-calendar/delete-history", token=token)
+
     # Capacity without budget
     st, cap0 = _req("GET", "/api/v1/candidates/me/execution-calendar/capacity/compute", token=token)
     check(
         "capacity_internal_availability",
         "insufficient_without_budget",
         st == 200 and isinstance(cap0, dict) and cap0.get("status") == "INSUFFICIENT_DATA",
-        str(st),
+        f"{st} status={(cap0 or {}).get('status')}",
     )
     check(
         "capacity_internal_availability",
