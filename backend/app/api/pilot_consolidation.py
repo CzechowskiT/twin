@@ -68,3 +68,4 @@ def post_telemetry(
     if not out.get("ok"):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=out.get("reason") or "rejected")
     return out
+
