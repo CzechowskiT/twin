@@ -567,9 +567,13 @@ def component_outcomes(db: Session, *, candidate_id: int) -> dict:
                 .filter_by(candidate_id=candidate_id, attribution_key=key)
                 .one_or_none()
             )
-            if existing and not existing.deleted_at:
+            if existing:
                 existing.summary_json = _dumps(it)
                 existing.causality_claim = False
+                existing.component_type = ctype
+                existing.component_ref_id = it["id"]
+                existing.claim_kind = it.get("claim_kind") or "INFERENCE"
+                existing.deleted_at = None
                 existing.updated_at = _utcnow()
             else:
                 db.add(
