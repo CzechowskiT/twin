@@ -9,6 +9,7 @@
 |------|--------|
 | Product SHA | `30ce54b50dbbd6424528921aff2c73f80698aac0` |
 | Tip at gate start | `77b69b3c74ec04e2cf69cb3658b4f291086e980b` (docs_only_drift) |
+| Tip after Gate P1 | `abf9614cd724f1f3964e797ec02e620ed8846c70` (evidence/tests only) |
 | FE (live tip) | `77b69b3c…` docs tip |
 | API / worker | `30ce54b5…` ALIGNED |
 | Alembic | `124_evidence_investment_intelligence` `is_at_head=true` |

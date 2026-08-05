@@ -5,7 +5,7 @@ Oczekiwane ~product 30ce54b5 / FE=API=worker ALIGNED / Alembic 124 / CI 30994745
 3|Independently Verified Starting State
 Live public-health: rc1_launch=NO-GO; enrollment=false; invite_only=true; pilot_access=PRODUCTION_READY_INACTIVE; invite_send=false; real_invites=0; real_pilots=0; phase_3b=BLOCKED; ms_write=false; api=worker=30ce54b5; fe_tip=77b69b3c; DB head 124.
 4|Product SHA and Proof Tip
-Product SHA: 30ce54b50dbbd6424528921aff2c73f80698aac0. Tip startu gate: 77b69b3c74ec (docs). Tip po Gate P1: commit z testami lifecycle + skryptem preflight + evidence (bez flipu ACTIVE).
+Product SHA: 30ce54b50dbbd6424528921aff2c73f80698aac0. Tip startu gate: 77b69b3c74ec (docs). Tip po Gate P1: abf9614cd724f1f3964e797ec02e620ed8846c70 (preflight/tests/evidence; bez flipu ACTIVE).
 5|Scope-Freeze Compliance
 Zero net-new product feature. Dozwolone: preflight, testy lifecycle, skrypt E2E, evidence/docs. Brak inteligencji/ranking/calendars/vendorów/Phase 3/public signup/auto expansion/MS write/purchase.
 6|Activation Manifest Status
@@ -151,7 +151,7 @@ PRIVATE PILOT ACTIVATION READY BUT NOT EXECUTED — FOUNDER COHORT OR SEND AUTHO
 Final Answers
 - exact verdict: PRIVATE PILOT ACTIVATION READY BUT NOT EXECUTED — FOUNDER COHORT OR SEND AUTHORIZATION REQUIRED; NO INVITATIONS SENT
 - product SHA: 30ce54b50dbbd6424528921aff2c73f80698aac0
-- repository/proof tip: (post-commit tip on scaffold; start tip 77b69b3c74ec04e2cf69cb3658b4f291086e980b)
+- repository/proof tip: abf9614cd724f1f3964e797ec02e620ed8846c70 (start tip 77b69b3c74ec04e2cf69cb3658b4f291086e980b)
 - FE SHA: 77b69b3c74ec04e2cf69cb3658b4f291086e980b (live tip; product-aligned was 30ce54b5)
 - API SHA: 30ce54b50dbbd6424528921aff2c73f80698aac0
 - worker SHA: 30ce54b50dbbd6424528921aff2c73f80698aac0
