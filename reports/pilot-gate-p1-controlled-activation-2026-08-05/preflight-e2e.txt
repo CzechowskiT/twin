@@ -1,0 +1,46 @@
+PASS [stance] public_health 200
+PASS [stance] launch_nogo NO-GO
+PASS [stance] public_enrollment_off 
+PASS [stance] phase_3b_blocked 
+PASS [stance] ms_write_off 
+PASS [baseline_posture] pilot_access_inactive PRODUCTION_READY_INACTIVE
+PASS [baseline_posture] invite_send_off False
+PASS [baseline_posture] real_invites_zero 0
+PASS [baseline_posture] real_pilots_zero 0
+PASS [baseline_posture] invite_only_flag True
+PASS [persistence] api_worker_aligned fe=77b69b3c74ec api=30ce54b50dbb wrk=30ce54b50dbb
+PASS [persistence] product_sha_present 30ce54b50dbb
+PASS [manifest_auth] no_env_manifest_path env_manifest_absent
+PASS [manifest_auth] no_filesystem_manifest checked_standard_paths_absent
+PASS [manifest_auth] inrepo_doc_not_authorization docs/FIRST_REAL_PILOT_ACTIVATION.json is evidence template only
+PASS [manifest_auth] send_authorization_absent no_separate_send_auth_present
+PASS [manifest_auth] approved_roster_absent no_founder_approved_roster_for_gate_p1
+PASS [manifest_auth] canary_send_blocked no_real_invite_generate_or_send_executed
+PASS [synthetic_boundary] mint_synth 200
+PASS [synthetic_boundary] synth_kpi_excluded 
+PASS [synthetic_boundary] synth_marker 
+PASS [baseline_posture] consolidation_200 200
+PASS [baseline_posture] access_inactive_api PRODUCTION_READY_INACTIVE
+PASS [baseline_posture] enrollment_false_api 
+PASS [baseline_posture] invite_send_false_api 
+PASS [synthetic_boundary] synth_ops_status 401
+PASS [synthetic_boundary] synth_ops_cohorts 405
+PASS [synthetic_boundary] synth_cannot_send_invite 401
+PASS [synthetic_boundary] synth_cannot_cf_send 401
+PASS [invite_lifecycle] ops_dry_run_no_side_effect 200
+PASS [invite_lifecycle] dry_run_default_safe True
+PASS [public_access] uninvited_register_blocked 422
+PASS [public_access] unauth_blocked 401
+PASS [privacy_telemetry] allowlisted_ok 200
+PASS [privacy_telemetry] unknown_rejected 400
+PASS [privacy_telemetry] daily_os_ok 200
+PASS [invite_lifecycle] pilot_os_status 200
+PASS [invite_lifecycle] no_auto_activation status_read_only
+PASS [persistence] db_at_head 124_evidence_investment_intelligence
+PASS [manifest_auth] real_invites_generated_zero gate_p1_no_generate
+PASS [manifest_auth] real_invites_sent_zero gate_p1_no_send
+PASS [stance] phase3_not_started 
+PASS [stance] no_app_submit 
+PASS [stance] no_purchase 
+SUMMARY product=36/36 stance=8/8 all=44/44
+VERDICT_HINT=B_NO_FOUNDER_MANIFEST_NO_INVITES_SENT

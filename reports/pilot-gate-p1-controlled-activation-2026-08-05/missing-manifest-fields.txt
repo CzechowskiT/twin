@@ -1,0 +1,17 @@
+unique_id
+founder_approval
+approval_timestamp
+approved_roster_reference
+hard_cohort_cap (process max 3 — no live Founder value)
+canary_wave_size (process max 1 — no live Founder value)
+invite_expiry
+delivery_channel
+generation_authorization
+separate_send_authorization
+observation_window
+support_owner
+support_channel
+incident_owner
+privacy_notice_version
+consent_version
+rollback_owner

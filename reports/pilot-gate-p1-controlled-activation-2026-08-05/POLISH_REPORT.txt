@@ -1,0 +1,193 @@
+1|Executive Summary
+Pilot Gate P1 zakończony bez aktywacji. Pełny preflight non-mutating PASS; brak Founder-approved activation manifest i osobnej send authorization. Żadne realne zaproszenie nie zostało wygenerowane ani wysłane. Verdict B: PRIVATE PILOT ACTIVATION READY BUT NOT EXECUTED — FOUNDER COHORT OR SEND AUTHORIZATION REQUIRED; NO INVITATIONS SENT. Product SHA 30ce54b50dbbd6424528921aff2c73f80698aac0; public signup/enrollment OFF; pilot_access PRODUCTION_READY_INACTIVE; Launch NO-GO.
+2|Epic 2.9 Canonical Baseline
+Oczekiwane ~product 30ce54b5 / FE=API=worker ALIGNED / Alembic 124 / CI 30994745155 / E2E 41/41 / pilot_access PRODUCTION_READY_INACTIVE / enrollment OFF / invite send OFF / real invites 0 / Launch NO-GO / Phase 3B BLOCKED / Phase 3 Agent NOT_STARTED / MS write OFF / app submission OFF / external purchase OFF — zweryfikowane niezależnie na produkcji (API/worker 30ce54b5; FE tip docs 77b69b3c = docs_only_drift).
+3|Independently Verified Starting State
+Live public-health: rc1_launch=NO-GO; enrollment=false; invite_only=true; pilot_access=PRODUCTION_READY_INACTIVE; invite_send=false; real_invites=0; real_pilots=0; phase_3b=BLOCKED; ms_write=false; api=worker=30ce54b5; fe_tip=77b69b3c; DB head 124.
+4|Product SHA and Proof Tip
+Product SHA: 30ce54b50dbbd6424528921aff2c73f80698aac0. Tip startu gate: 77b69b3c74ec (docs). Tip po Gate P1: commit z testami lifecycle + skryptem preflight + evidence (bez flipu ACTIVE).
+5|Scope-Freeze Compliance
+Zero net-new product feature. Dozwolone: preflight, testy lifecycle, skrypt E2E, evidence/docs. Brak inteligencji/ranking/calendars/vendorów/Phase 3/public signup/auto expansion/MS write/purchase.
+6|Activation Manifest Status
+ABSENT. Brak pliku poza-git, brak env path, brak ENV_KEYS manifetu na Railway. docs/FIRST_REAL_PILOT_ACTIVATION.json = template (signed_file=null, NO_COMPLETE_APPROVAL) — nie jest autoryzacją.
+7|Approved Cohort Cap
+Brak live Founder cap. Procesowy hard max=3; nie zastosowany (brak rosteru). Kod mint nie egzekwuje hard cap 3 — debt dla przyszłego Verdict A.
+8|Approved Canary Size
+Brak live canary. Procesowy max=1; canary NIE utworzony.
+9|Public Signup State
+OFF (server-side). Uninvited register → 422; invite_only=true.
+10|Public Enrollment State
+OFF. rc1_external_pilot_enrollment_enabled=false; enrollment_enabled API=false.
+11|Private Pilot Access State
+PRODUCTION_READY_INACTIVE (nie ACTIVE_INVITE_ONLY). Hardcoded w pilot_consolidation/health_ops.
+12|Invite Issuance State
+BOUNDED_APPROVED_ONLY w architekturze (prepare≠send; dry_run default). Runtime: brak issuance — INACTIVE.
+13|Invite Send Authorization State
+ABSENT / OFF. founder_send_approval_ref wymagany przy real send; brak osobnego Founder send auth dla Gate P1.
+14|Active Real Invitation Count Before
+0
+15|Active Real Invitation Count After
+0 (bez zmian)
+16|Real Pilot User Count
+0
+17|Synthetic Authentication Isolation
+PASS. Mint ops-only; kpi_excluded=true; synth JWT → 401 na ops send/status; nie może zdjąć markera/KPI-eligible real; nie wyzwala real email/invite.
+18|Public-Gate Enforcement
+PASS. Unauth consolidation 401; uninvited register blocked; public enrollment OFF.
+19|Invitation Entropy and Storage
+PASS (unit). secrets.token_urlsafe(32) ≥128-bit (256-bit CSPRNG); SHA-256 hash storage; plaintext nie w DB.
+20|GET Non-Consumption
+PASS (unit). validate_invite_token(consume=False) pozostawia ACTIVE; used_at null.
+21|Single-Use Behavior
+PASS (unit + hardening). consume=True → USED; ponowna walidacja invite_token_used; register bridge zużywa token.
+22|Expiry
+PASS (unit). expires_at past → invite_token_expired; TTL default 14d.
+23|Revocation
+PASS (unit). revoke_invite_token → REVOKED; validate fails invite_token_revoked; allowlist revoke dostępne.
+24|Enumeration Protection
+PASS (arch). Hash-only lookup; email mismatch inkrementuje fail_count; brak publicznego listowania tokenów; masked emails w control plane.
+25|Rate Limiting
+PASS (arch+deletion tests). MAX_VALIDATE_FAILS=12 → revoke; auth/login/delete rate limits; register invite-only.
+26|Token-Leakage Validation
+PASS w zakresie gate. Preflight/evidence bez raw tokenów/PII; mint response plaintext once (caller must not log) — nie wywołane dla real.
+27|Candidate Isolation
+PASS (unit). Token bound to email_hash; mismatch → fail; synth nie eskaluje do cudzych tożsamości.
+28|Privacy Notice and Consent
+Brak Founder privacy_notice_version / consent_version w manifeście (MISSING). Produkt: GDPR consents na register; onboarding privacy step. Nie aktywowano real cohort.
+29|Telemetry Allowlist
+PASS. pilot_* allowlist; unknown event → 400.
+30|Sensitive-Field Rejection
+PASS. Payload z cv_text/email → 400; PII strip w funnel.
+31|Synthetic/Staff KPI Exclusion
+PASS. Mint kpi_excluded; telemetry path kpi_excluded=true.
+32|Export
+PASS (unit). test_candidates_me_export_json + test_export_requests green; candidate-scoped.
+33|Privacy Pause
+PROVEN_IN_PRODUCT (services honor privacy.paused; lifecycle Daily OS). Gate P1 nie uruchamiał real pause na canary (brak canary).
+34|Deletion
+PASS (unit). test_candidate_account_deletion green (confirm, anonymize, legal hold, rate limit).
+35|Support Ownership
+ABSENT w manifeście. Template CS labels (PILOT_ON_CALL_PRIMARY) ≠ Founder-named Gate P1 owner.
+36|Incident Ownership
+ABSENT w manifeście (wymagane: incident_owner + rollback_owner).
+37|Kill-Switch Exercise
+Syntetycznie: invite_send_enabled=false + dry_run default + enrollment OFF = fail-closed. AI_INTEL_KILL_SWITCH unit proven. Brak flipu ACTIVE.
+38|Stop Conditions
+Nie wyzwolone. Brak auth/public/cross-candidate/token/telemetry/export/deletion/MS/submit/purchase P0 w preflight.
+39|Canary Activation
+NOT_EXECUTED. Warunek: valid manifest + gates — niespełniony.
+40|Invitation Provider Status
+N/A — brak send. Provider path istnieje tylko po Founder send auth; dry_run nie wysyła.
+41|Delivery Truth Boundary
+Brak fabricated delivery. real_invites_sent=0; brak PROVIDER_ACCEPTED/DELIVERED claims.
+42|Onboarding Evidence
+Synthetic only (Epic 2.9 journey). Real onboarding count=0.
+43|First-Value Evidence
+Real first-value=0. Synthetic first-value contract z 2.9 nie jest real KPI.
+44|Pilot Funnel with Exact Denominators
+generated=0; sent=0; redeemed=0; enrolled=0; first_value=0; returned=0; retained=0. Denominators all zero — no rates claimed.
+45|Mature versus Immature Observation Windows
+N/A — brak observation_window z manifetu; brak real activity.
+46|Safety Invariant Counts
+P0 unresolved=0 (gate path); safety incidents=0; real invites mutated=0; public enrollment remained OFF.
+47|Backend Tests
+test_pilot_gate_p1_invite_lifecycle 4/4; candidate_first hardening; rc1 invite register; pilot_consolidation; account deletion; export — PASS.
+48|Frontend Tests
+Nie wymagane nowe FE testy (brak FE product change). Epic 2.9 guards pozostają.
+49|Authenticated Synthetic E2E
+scripts/pilot-gate-p1-preflight-e2e.py PASS 44/44 (product 36/36 + stance 8/8).
+50|Fresh-Account E2E
+Uninvited register blocked (422) w preflight; pełny fresh-account 41/41 z Epic 2.9 na product SHA pozostaje bazą (nie re-run full 41 w tym gate — preflight pokrywa public/synth gates).
+51|CI
+Product SHA CI success: https://github.com/CzechowskiT/twin/actions/runs/30994745155 . Tip docs wcześniej failure (oczekiwane docs-only); Gate P1 tip CI po pushu lifecycle tests.
+52|FE Deployment
+Live frontend_commit tip docs 77b69b3c… (docs_only_drift vs product). Product-aligned FE was 30ce54b5 at Epic 2.9 close.
+53|API Deployment
+api_commit=30ce54b50dbbd6424528921aff2c73f80698aac0
+54|Worker Deployment
+worker_commit=30ce54b50dbbd6424528921aff2c73f80698aac0
+55|Production DB
+124_evidence_investment_intelligence is_at_head=true
+56|Four-Way Alignment
+Product API=worker=30ce54b5 ALIGNED; FE tip docs_only_drift. alignment_status=docs_only_drift (nie product misalign).
+57|Closed P0 Findings
+Brak nowych P0. Synthetic-auth boundary proven. Manifest absence ≠ defect.
+58|Closed P1 Findings
+Brak nowych P1 wymagających fix przed Verdict B.
+59|Remaining Blockers
+(1) Founder activation manifest z pełnymi polami; (2) approved roster ≤3; (3) separate send auth; (4) named support/incident/rollback owners; (5) privacy_notice_version + consent_version; (6) opcjonalnie env flip ACTIVE_INVITE_ONLY + hard cohort cap w kodzie przed Verdict A.
+60|External Dependencies
+Founder intake poza-git; email provider przy przyszłym send; brak vendor analytics.
+61|Technical Debt
+Hardcoded PRODUCTION_READY_INACTIVE (brak bezpiecznego env flip); brak hard max cohort=3 / canary=1 w mint path; utcnow warnings; tip docs CI noise.
+62|Product Debt
+Brak canary observation UI dla real (nie budowane w tym gate). ACTIVE string nie w codebase do czasu Founder auth.
+63|Documentation
+reports/pilot-gate-p1-controlled-activation-2026-08-05/; scripts/pilot-gate-p1-preflight-e2e.py; missing-manifest-fields.txt
+64|Git History
+Gate P1: preflight script + lifecycle tests + evidence. Bez empty product commit flipu.
+65|Founder Action
+Dostarczyć securely stored activation manifest (pola w missing-manifest-fields.txt) z approved roster ≤3, canary=1, osobnym send auth, ownerami support/incident/rollback, privacy/consent versions. Dopiero wtedy wznowić Gate P1 canary. Nie startować Epic 3.0 / second wave.
+66|Second-Wave State
+OFF_PENDING_FOUNDER_REVIEW — nie uruchomiona; auto second wave zakazane.
+67|Pilot Outcome Evidence
+INSUFFICIENT_DATA — zero real candidates; brak retention/PMF/outcomes claims.
+68|Frozen Safety Posture
+PUBLIC_LAUNCH=NO_GO · PUBLIC_SIGNUP=OFF · PUBLIC_ENROLLMENT=OFF · ENROLLMENT_MODE=INVITE_ONLY · PRIVATE_PILOT=LIMITED · PILOT_ACCESS=PRODUCTION_READY_INACTIVE · INVITE_ISSUANCE=BOUNDED_APPROVED_ONLY (inactive runtime) · INVITE_SEND=OFF · COHORT_EXPANSION=OFF_PENDING_FOUNDER_REVIEW · PHASE_3_AGENT=NOT_STARTED · MS_WRITE=OFF · APP_SUBMIT=OFF · EXTERNAL_PURCHASE=OFF
+69|Final Evidence Table
+| Check | Result |
+| Preflight E2E | 44/44 PASS |
+| Lifecycle unit | 4/4 PASS |
+| Manifest | ABSENT |
+| Real invites gen/sent | 0/0 |
+| Canary | NOT_EXECUTED |
+| Safety incidents | 0 |
+| Product SHA | 30ce54b5… |
+| DB | 124 head |
+| CI product | success 30994745155 |
+70|Final Verdict
+PRIVATE PILOT ACTIVATION READY BUT NOT EXECUTED — FOUNDER COHORT OR SEND AUTHORIZATION REQUIRED; NO INVITATIONS SENT
+
+Final Answers
+- exact verdict: PRIVATE PILOT ACTIVATION READY BUT NOT EXECUTED — FOUNDER COHORT OR SEND AUTHORIZATION REQUIRED; NO INVITATIONS SENT
+- product SHA: 30ce54b50dbbd6424528921aff2c73f80698aac0
+- repository/proof tip: (post-commit tip on scaffold; start tip 77b69b3c74ec04e2cf69cb3658b4f291086e980b)
+- FE SHA: 77b69b3c74ec04e2cf69cb3658b4f291086e980b (live tip; product-aligned was 30ce54b5)
+- API SHA: 30ce54b50dbbd6424528921aff2c73f80698aac0
+- worker SHA: 30ce54b50dbbd6424528921aff2c73f80698aac0
+- database head: 124_evidence_investment_intelligence (is_at_head=true)
+- CI state and URL: product SUCCESS https://github.com/CzechowskiT/twin/actions/runs/30994745155
+- synthetic E2E result: PASS 44/44 pilot-gate-p1-preflight-e2e.py
+- fresh-account E2E result: uninvited blocked PASS; baseline Epic 2.9 41/41 on product SHA
+- manifest validity: INVALID/ABSENT
+- public signup state: OFF
+- public enrollment state: OFF
+- private pilot access state: PRODUCTION_READY_INACTIVE
+- invitation issuance state: INACTIVE (BOUNDED_APPROVED_ONLY architecture; no live issue)
+- send authorization state: ABSENT/OFF
+- real invitations generated: 0
+- real invitations sent: 0
+- real invitations redeemed: 0
+- real candidates enrolled: 0
+- first-value count: 0
+- D1 eligible/count: 0/0
+- D7 eligible/count: 0/0
+- synthetic-auth isolation result: PASS
+- cross-candidate isolation result: PASS
+- telemetry-sensitive-field result: PASS (reject)
+- synthetic/staff KPI-exclusion result: PASS
+- export result: PASS (unit)
+- deletion result: PASS (unit)
+- privacy-pause result: PROVEN_IN_PRODUCT (no real canary exercise)
+- unresolved P0 count: 0
+- unresolved P1 count: 0 (activation blockers are external auth, not product P1 defects)
+- safety-incident count: 0
+- second-wave state: OFF_PENDING_FOUNDER_REVIEW
+- Launch state: NO-GO
+- Phase 3B state: BLOCKED
+- Phase 3 Agent state: NOT_STARTED
+- Microsoft-write state: OFF
+- application-submission state: OFF
+- external purchase/enrollment state: OFF
+- pilot outcome evidence: INSUFFICIENT_DATA
+- exact Founder action: Provide secure Founder-approved activation manifest (see missing-manifest-fields.txt) with roster≤3, canary=1, separate send auth, owners, privacy/consent versions — then resume canary; do not start Epic 3.0.
