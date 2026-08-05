@@ -7,7 +7,7 @@ PASS [invite_inactive] pilot_access_inactive PRODUCTION_READY_INACTIVE
 PASS [invite_inactive] invite_send_off False
 PASS [invite_inactive] real_invites_zero 0
 PASS [invite_inactive] real_pilots_zero 0
-PASS [persistence] four_way_aligned fe=02b282dfef56 api=02b282dfef56 wrk=02b282dfef56
+PASS [persistence] four_way_aligned fe=30ce54b50dbb api=30ce54b50dbb wrk=30ce54b50dbb
 PASS [deletion_security] mint_fresh 200
 PASS [deletion_security] kpi_excluded 
 PASS [journey_access] privacy_orient 200

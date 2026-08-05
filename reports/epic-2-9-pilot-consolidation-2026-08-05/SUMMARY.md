@@ -1,8 +1,7 @@
-# Epic 2.9 Product Consolidation
+# Epic 2.9
 
-- Verdict: `PRODUCT CONSOLIDATION AND PRIVATE PILOT READINESS PRODUCTION-READY — FRESH-ACCOUNT JOURNEY, PRIVACY-SAFE TELEMETRY AND INACTIVE INVITE-ONLY ACCESS PROVEN`
-- Product SHA: `02b282dfef5612fd8e3a8247c19ab0863ad21269`
-- Alembic: 124 (no new migration)
-- E2E: 41/41 (product 32/32)
-- Four-way: ALIGNED
-- Invite: PRODUCTION_READY_INACTIVE; enrollment OFF; real invites 0
+- Verdict: 
+- SHA: 
+- CI: https://github.com/CzechowskiT/twin/actions/runs/30994745155
+- E2E: 41/41
+- ALIGNED; Alembic 124; Invite INACTIVE
