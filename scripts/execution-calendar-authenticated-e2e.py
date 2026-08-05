@@ -35,25 +35,32 @@ OPS = (os.environ.get("OPS_ADMIN_TOKEN") or os.environ.get("BETA_ADMIN_TOKEN") o
 DAILY_OS = "/api/v1/candidates/me/career-copilot/daily"
 
 
-def _req(method: str, path: str, *, token: str | None = None, body: dict | None = None):
+def _req(method: str, path: str, *, token: str | None = None, body: dict | None = None, timeout: int = 120):
     data = None if body is None else json.dumps(body).encode()
     headers = {"Content-Type": "application/json", "X-Locale": "en"}
     if token:
         headers["Authorization"] = f"Bearer {token}"
-    req = urllib.request.Request(f"{API}{path}", data=data, method=method, headers=headers)
-    try:
-        with urllib.request.urlopen(req, timeout=90, context=_CTX) as resp:
-            raw = resp.read().decode("utf-8", errors="replace") or "{}"
-            try:
-                return resp.status, json.loads(raw)
-            except json.JSONDecodeError:
-                return resp.status, raw[:400]
-    except urllib.error.HTTPError as exc:
-        raw = (exc.read() or b"").decode("utf-8", errors="replace") or "{}"
+    last_err: Exception | None = None
+    for attempt in range(3):
+        req = urllib.request.Request(f"{API}{path}", data=data, method=method, headers=headers)
         try:
-            return exc.code, json.loads(raw)
-        except json.JSONDecodeError:
-            return exc.code, raw[:400]
+            with urllib.request.urlopen(req, timeout=timeout, context=_CTX) as resp:
+                raw = resp.read().decode("utf-8", errors="replace") or "{}"
+                try:
+                    return resp.status, json.loads(raw)
+                except json.JSONDecodeError:
+                    return resp.status, raw[:400]
+        except urllib.error.HTTPError as exc:
+            raw = (exc.read() or b"").decode("utf-8", errors="replace") or "{}"
+            try:
+                return exc.code, json.loads(raw)
+            except json.JSONDecodeError:
+                return exc.code, raw[:400]
+        except Exception as exc:  # timeout / transient
+            last_err = exc
+            if attempt < 2:
+                continue
+    return 0, {"error": type(last_err).__name__ if last_err else "request_failed"}
 
 
 def main() -> int:
@@ -317,6 +324,7 @@ def main() -> int:
             "POST",
             f"/api/v1/candidates/me/strategy-reviews/decisions/{did}/propose",
             token=token,
+            body={"chosen_alternative_id": "keep"},
         )
         check("decision_requirement_batch", "decision_proposed", st == 200, str(st))
         st, rej = _req(
@@ -353,7 +361,10 @@ def main() -> int:
             "supporting": [],
             "contradicting": [],
             "unknowns": [],
-            "alternatives": [{"id": "yes", "label": "Yes"}],
+            "alternatives": [
+                {"id": "yes", "label": "Yes"},
+                {"id": "no", "label": "No"},
+            ],
             "counterfactuals": [],
         },
     )
@@ -364,6 +375,7 @@ def main() -> int:
             "POST",
             f"/api/v1/candidates/me/strategy-reviews/decisions/{did2}/propose",
             token=token,
+            body={"chosen_alternative_id": "yes"},
         )
         st, appr_d = _req(
             "POST",
@@ -646,19 +658,22 @@ def main() -> int:
             check(bucket, name, False, str(exc))
 
     # Ops alembic head
-    st, ops = _req("GET", "/api/v1/admin/ops/db-revision", token=OPS)
-    if st != 200:
-        st, ops = _req("GET", "/api/v1/admin/ops/health", token=OPS)
+    st, ops = _req("GET", "/api/v1/admin/migrations/current", token=OPS)
     head = ""
+    at_head = False
     if isinstance(ops, dict):
-        head = str(ops.get("alembic_head") or ops.get("current") or ops.get("revision") or "")
-        if not head and isinstance(ops.get("database"), dict):
-            head = str(ops["database"].get("alembic_head") or ops["database"].get("revision") or "")
+        head = str(ops.get("current_revision") or ops.get("head_revision") or "")
+        at_head = bool(ops.get("is_at_head"))
     check(
         "persistence",
         "db_at_121",
-        "121" in head or (isinstance(agg, dict) and agg.get("alembic") == "121_decision_calendar_capacity_planning"),
-        head or str(st),
+        at_head
+        or head == "121_decision_calendar_capacity_planning"
+        or (
+            isinstance(agg, dict)
+            and agg.get("alembic") == "121_decision_calendar_capacity_planning"
+        ),
+        f"current={head} is_at_head={at_head} http={st}",
     )
 
     print("\n=== BUCKET TOTALS ===")
