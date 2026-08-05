@@ -23,6 +23,7 @@ from app.api import (
     read_only_calendar_sync,
     adaptive_execution_intelligence,
     evidence_investment_intelligence,
+    pilot_consolidation,
     chatgpt_twin,
     company,
     company_feedback_persistence,
@@ -213,6 +214,11 @@ api_router.include_router(
     evidence_investment_intelligence.router,
     prefix="/candidates",
     tags=["Evidence Investment Intelligence"],
+)
+api_router.include_router(
+    pilot_consolidation.router,
+    prefix="/candidates",
+    tags=["Pilot Consolidation"],
 )
 api_router.include_router(
     candidate_intelligence.router, prefix="", tags=["Candidate Intelligence"]

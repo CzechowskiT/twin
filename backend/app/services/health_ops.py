@@ -74,6 +74,10 @@ def build_health_ops_public(s: Settings) -> dict[str, Any]:
         "rc1_launch": "NO-GO",
         "rc1_phase_3b": "BLOCKED",
         "rc1_kpi_token": "NO_REAL_PILOT_DATA",
+        "rc1_pilot_access_status": "PRODUCTION_READY_INACTIVE",
+        "rc1_invite_send_enabled": False,
+        "rc1_real_invites_sent": 0,
+        "rc1_real_pilot_users_added": 0,
         "rc1_os_verdict": (
             "FIRST CUSTOMER READY — WAITING FOR FIRST APPROVED PILOT ORGANIZATION"
         ),

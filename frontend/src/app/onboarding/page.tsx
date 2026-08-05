@@ -9,14 +9,13 @@ import toast from "react-hot-toast";
 import { useTranslation } from "@/components/language-provider";
 import type { TranslationKey } from "@/lib/i18n";
 import { Card, Shell } from "@/components/ui";
-import { ProfileImport } from "@/components/onboarding/ProfileImport";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 import { trackEvent } from "@/lib/analytics";
-import { PRODUCT_FUNNEL_CLIENT_ENABLED, TTV_MATCHES_REDIRECT_ENABLED } from "@/lib/features";
+import { PRODUCT_FUNNEL_CLIENT_ENABLED } from "@/lib/features";
 
-const STEPS = ["welcome", "profile", "skills", "preferences", "cv"] as const;
-const STORAGE_KEY = "twin_onboarding_step_v1";
+const STEPS = ["welcome", "privacy", "profile", "skills", "preferences"] as const;
+const STORAGE_KEY = "twin_onboarding_step_v2";
 
 type StepKey = (typeof STEPS)[number];
 
@@ -27,10 +26,8 @@ function readStoredStep(): number {
   return Number.isFinite(n) && n >= 0 && n < STEPS.length ? n : 0;
 }
 
+/** Epic 2.9 first-value: land on Home/Today (Daily OS), not a forced module tour. */
 function postOnboardingPath(): string {
-  if (TTV_MATCHES_REDIRECT_ENABLED) {
-    return "/dashboard/matches?activated=1";
-  }
   return "/dashboard";
 }
 
@@ -77,11 +74,11 @@ export default function OnboardingPage() {
     setFinishing(true);
     try {
       await completeOnboarding({ celebrate: true });
-      const path = postOnboardingPath();
-      if (PRODUCT_FUNNEL_CLIENT_ENABLED && TTV_MATCHES_REDIRECT_ENABLED) {
-        trackEvent("activation_ttv_matches_view", { surface: "onboarding_finish" });
+      if (PRODUCT_FUNNEL_CLIENT_ENABLED) {
+        trackEvent("pilot_consent_oriented", { surface: "onboarding_finish" });
+        trackEvent("pilot_first_value_reached", { surface: "onboarding_finish" });
       }
-      router.push(path);
+      router.push(postOnboardingPath());
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t("onboardingFlow.failed"));
     } finally {
@@ -93,11 +90,11 @@ export default function OnboardingPage() {
     setFinishing(true);
     try {
       await completeOnboarding();
-      const path = postOnboardingPath();
-      if (PRODUCT_FUNNEL_CLIENT_ENABLED && TTV_MATCHES_REDIRECT_ENABLED) {
-        trackEvent("activation_ttv_matches_view", { surface: "onboarding_skip" });
+      if (PRODUCT_FUNNEL_CLIENT_ENABLED) {
+        trackEvent("pilot_onboarding_skipped", { surface: "onboarding_skip" });
+        trackEvent("pilot_first_value_reached", { surface: "onboarding_skip" });
       }
-      router.push(path);
+      router.push(postOnboardingPath());
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t("onboardingFlow.failed"));
     } finally {
@@ -146,12 +143,14 @@ export default function OnboardingPage() {
             <p className="twin-muted mb-6 text-sm leading-relaxed">
               {t(`onboardingFlow.${key}Body` as TranslationKey)}
             </p>
-            {key === "cv" ? (
-              <div className="mb-6">
-                <ProfileImport />
-              </div>
+            {key === "privacy" ? (
+              <ul className="twin-muted mb-6 list-disc space-y-2 pl-5 text-sm">
+                <li>{t("pilotConsolidation.privacyBulletConsent")}</li>
+                <li>{t("pilotConsolidation.privacyBulletOptional")}</li>
+                <li>{t("pilotConsolidation.privacyBulletControl")}</li>
+              </ul>
             ) : null}
-            {key !== "welcome" ? profileCta : null}
+            {key !== "welcome" && key !== "privacy" ? profileCta : null}
             <div className="flex flex-wrap gap-3">
               {!isLast ? (
                 <button type="button" className="twin-btn-solid twin-touch-target" onClick={() => setStep((s) => s + 1)}>
@@ -164,9 +163,7 @@ export default function OnboardingPage() {
                   disabled={finishing}
                   onClick={() => void finish()}
                 >
-                  {TTV_MATCHES_REDIRECT_ENABLED
-                    ? t("onboardingFlow.finishSeeMatches")
-                    : t("onboardingFlow.finish")}
+                  {t("onboardingFlow.finish")}
                 </button>
               )}
               {step > 0 ? (

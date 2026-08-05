@@ -52,6 +52,13 @@ FUNNEL_EVENTS = frozenset(
         "company_home_opened",
         "support_ticket_opened",
         "pilot_invite_pack_prepared",
+        # Epic 2.9 private pilot consolidation (non-PII, allowlisted)
+        "pilot_consent_oriented",
+        "pilot_onboarding_skipped",
+        "pilot_first_value_reached",
+        "pilot_daily_os_opened",
+        "pilot_home_opened",
+        "pilot_privacy_opened",
     }
 )
 

@@ -34,6 +34,12 @@ export const REAL_CANDIDATE_ENROLLMENT = "NOT_STARTED" as const;
 export const REAL_RECRUITER_ENROLLMENT = "NOT_STARTED" as const;
 export const PHASE_3B_STANCE = "BLOCKED" as const;
 
+/** Epic 2.9 — invite controls ready but inactive; never auto-activate. */
+export const PILOT_ACCESS_STATUS = "PRODUCTION_READY_INACTIVE" as const;
+export const INVITE_SEND_ENABLED = false as const;
+export const REAL_INVITES_SENT_EPIC_29 = 0 as const;
+export const REAL_PILOT_USERS_ADDED_EPIC_29 = 0 as const;
+
 /** True only for local/dev or explicit demo mode — never production LIVE claims. */
 export function isDemoOrDevSurface(): boolean {
   if (process.env.NODE_ENV === "development") return true;

@@ -18,6 +18,12 @@ export const PRODUCT_FUNNEL_EVENTS = [
   "activation_matching_completed",
   "activation_matching_failed",
   "activation_first_match_created",
+  "pilot_consent_oriented",
+  "pilot_onboarding_skipped",
+  "pilot_first_value_reached",
+  "pilot_daily_os_opened",
+  "pilot_home_opened",
+  "pilot_privacy_opened",
 ] as const;
 
 export type ProductFunnelEventName = (typeof PRODUCT_FUNNEL_EVENTS)[number];
