@@ -1,0 +1,57 @@
+PASS [stance] public_health 200
+PASS [stance] launch_nogo NO-GO
+PASS [stance] enrollment_off 
+PASS [stance] phase_3b_blocked 
+PASS [stance] ms_write_off 
+PASS [persistence] four_way_aligned fe=8e858840814b api=8e858840814b wrk=8e858840814b
+PASS [deletion_security] mint_synthetic 200
+PASS [deletion_security] kpi_excluded 
+PASS [persistence] aggregate_200 200
+PASS [persistence] alembic_124 124_evidence_investment_intelligence
+PASS [investment_gaps] schema 
+PASS [stance] no_absence_skill 
+PASS [stance] no_mastery_infer 
+PASS [stance] no_external_purchase 
+PASS [stance] no_external_enrollment 
+PASS [stance] no_silent_promo 
+PASS [stance] no_draft_rank 
+PASS [stance] no_causal 
+PASS [stance] no_silent_alloc 
+PASS [stance] no_historic_rewrite 
+PASS [stance] phase3_not_started 
+PASS [stance] no_lms 
+PASS [persistence] route_home 
+PASS [investment_gaps] create_question 201
+PASS [investment_gaps] gap_snapshot 201
+PASS [investment_gaps] gap_no_absence_skill 
+PASS [investment_gaps] gap_immutable 
+PASS [experiment_approval] create_experiment 201
+PASS [experiment_approval] no_purchase_on_create 
+PASS [experiment_approval] simulate_no_mutate 201
+PASS [experiment_approval] propose_requires_approval 201
+PASS [experiment_approval] propose_not_silent 
+PASS [experiment_approval] reject_no_commitments 200
+PASS [experiment_approval] approve_experiment 200
+PASS [experiment_approval] review_pause 200
+PASS [artifacts_usefulness] draft_no_rank 201
+PASS [artifacts_usefulness] promo_requires_approval 201
+PASS [artifacts_usefulness] promo_not_silent 
+PASS [artifacts_usefulness] promo_no_rank_influence 200
+PASS [artifacts_usefulness] usefulness_non_causal 201
+PASS [allocation_policy] calib_requires_approval 201
+PASS [allocation_policy] calib_no_historic_rewrite 200
+PASS [allocation_policy] calib_revert 200
+PASS [allocation_policy] policy_create 201
+PASS [allocation_policy] policy_sim_no_mutate 201
+PASS [integrations_dailyos] daily_os_200 200
+PASS [integrations_dailyos] daily_os_canonical 
+PASS [deletion_security] export_ok 200
+PASS [deletion_security] delete_history 200
+PASS [deletion_security] cross_candidate_isolation 200
+PASS [deletion_security] unauth_blocked 401
+PASS [persistence] fe_home 200
+PASS [persistence] fe_experiments 200
+PASS [persistence] fe_portfolio 200
+PASS [persistence] fe_approvals 200
+PASS [persistence] db_at_head_124 {'current_revision': '124_evidence_investment_intelligence', 'head_revision': '124_evidence_investment_intelligence', 'h
+SUMMARY product=40/40 stance=16/16 all=56/56

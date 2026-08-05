@@ -1,0 +1,308 @@
+1|Executive Summary
+Epic 2.8 dostarcza Evidence Investment Intelligence: goal/thesis → luki evidence → pytanie inwestycyjne → pakiet → alternatywy eksperymentu → symulacja wysiłku/pojemności → approve kandydata → wewnętrzny plan → deklarowana egzekucja → szkice artefaktów → usefulness (non-causal) → review continue/revise/pause/archive → kalibracja alokacji (approve/reject/revert). Verdict A: EVIDENCE INVESTMENT INTELLIGENCE CUSTOMER-USABLE - CANDIDATE-CONTROLLED CAREER EXPERIMENTATION PRODUCTION-READY. Product 8e858840814b5172b54de11ea5483d2f7c550f78; Alembic 124; E2E 56/56 (produkt 40/40); CI success; FE/API/worker ALIGNED; brak mastery/purchase/enrollment/silent promotion.
+2|Canonical Baseline
+Przed 2.8: product e1343af2 / tip 001e0667 / Alembic 123 / E2E 44/44 / CI 30987210248. Po 2.8: product 8e858840; Alembic 124; E2E 56/56; CI 30989591173.
+3|Canonical Final State
+product/tip HEAD 8e858840814b5172b54de11ea5483d2f7c550f78; FE=API=worker=8e858840814b5172b54de11ea5483d2f7c550f78; Alembic 124_evidence_investment_intelligence is_at_head=true; schema twin.evidence_investment_intelligence/v1.
+4|Verdict
+EVIDENCE INVESTMENT INTELLIGENCE CUSTOMER-USABLE - CANDIDATE-CONTROLLED CAREER EXPERIMENTATION PRODUCTION-READY
+5|Product Value Delivered
+Kandydat widzi Evidence Investment: pytania, snapshoty luk (absence≠no skill), eksperymenty tylko po approve, szkice bez wpływu na ranking, promocje artefaktów approval-gated, usefulness bez causal hiring, kalibracja alokacji z revert.
+6|Architecture
+Rozszerzenie Career Evidence, Opportunity Intelligence, Execution Intelligence, Daily OS, ACAL, Lifecycle approvals, Decision Journal patterns. Nowy serwis evidence_investment_intelligence + Alembic 124. Brak drugiego Evidence/Graph/LMS/marketplace/autonomous learning agent.
+7|Investment Questions
+CandidateInvestmentQuestion — open status; claim_kind SUGGESTION; kpi_excluded.
+8|Gap Snapshots
+CandidateEvidenceGapSnapshot immutable; absence_means_no_skill=false; inactive/deleted/disputed evidence excluded from ranking influence.
+9|Portfolio Prioritization
+Insight cards + allocation preferences; brak skill mastery score; refs only.
+10|Alternatives
+build_artifact / portfolio_refresh / pause — external_purchase=false external_enrollment=false.
+11|Effort/Capacity Simulation
+CandidateInvestmentSimulation mutates_state=false; capacity via DCC INSUFFICIENT_DATA-safe.
+12|Experiment Model
+CandidateInvestmentExperiment draft→pending_approval→approved/rejected/postponed; silent=false.
+13|Hypotheses
+hypothesis_json SUGGESTION; causal_outcome=false; hiring_probability=null.
+14|Approval
+LifecycleApproval kind=investment_experiment; requires_approval; reject commitments_created=false.
+15|Execution Plan
+plan_json po approve; declared_only steps; no external purchase/enrollment.
+16|Artifact Drafts
+CandidateInvestmentArtifactDraft influences_ranking=false; external_acceptance=false.
+17|Integrity Audit
+CandidateInvestmentAudit + on_evidence_invalidated z Career Evidence delete.
+18|Promotion Proposal
+artifact_promotion LifecycleApproval; silent=false.
+19|Promotion Approval
+approve → promoted_internal; ranking_influenced=false; reject bez silent promote.
+20|Use Registry
+usefulness records refs experiment/draft; content_excluded.
+21|Usefulness
+causal_outcome=false; CANDIDATE_DECLARED; no hiring attribution.
+22|Downstream Linkage
+refs do Execution Intelligence / Portfolio / Approvals; package≠submission.
+23|Experiment Review
+continue/revise/pause/archive/stop candidate-controlled.
+24|Continue/Revise/Pause/Stop
+status mapping active/draft/paused/archived/stopped; observation kind=review.
+25|Allocation Calibration
+CandidateAllocationCalibration SUGGESTION + LifecycleApproval allocation_calibration.
+26|Calibration Approve/Reject/Revert
+approve tworzy immutable portfolio snapshot; reject bez mutacji; revert bez rewrite history.
+27|Allocation Policy
+CandidateAllocationPolicy draft; external_purchase/enrollment/autonomous_agent=false.
+28|Policy Simulation
+mutates_state=false zawsze.
+29|Investment Health
+questions/experiments counts + insight cards; skill_mastery_inferred=false.
+30|Feedback Loop
+canonical: gap→experiment→approval→artifact→usefulness→review→allocation cal.
+31|Ranking
+drafty i invalidated evidence nie wpływają; silent ranking change=false.
+32|Daily OS Integration
+canonical route /api/v1/candidates/me/career-copilot/daily; E2E 200.
+33|ACAL Integration
+brak unapproved ACAL mutation z inwestycji; holds tylko po osobnych approvals.
+34|Execution Intelligence
+cross-link /dashboard/execution-intelligence; capacity reuse w simulate.
+35|Strategy Review
+reuse Lifecycle approvals; nie duplikuje Strategy Review store.
+36|Decision Journal
+nie tworzy drugiego journal; decyzje via approvals.
+37|Search Strategy
+nie mutuje search strategy bez approval; SOI candidate-specific stance retained.
+38|Opportunity Intelligence
+gap snapshots refs-only; brak fabricated demand/salary.
+39|Search Outcomes
+usefulness pattern non-causal jak SOI; package≠submission.
+40|Application Studio
+primary untouched; artifact≠external acceptance.
+41|Interview
+prep≠outcome; brak transcript persist z inwestycji.
+42|Transition
+brak external resignation/negotiation; Phase 3 OFF.
+43|Evidence Invalidation
+delete_all_evidence → on_evidence_invalidated; gap snapshots exclude inactive.
+44|Lifecycle Integration
+privacy pause blocks propose; approval kinds investment_experiment/artifact_promotion/allocation_calibration.
+45|Adaptive Memory
+kpi_excluded na wszystkich entity; brak productivity/motivation scores.
+46|Privacy
+lifecycle privacy gate; paused blocks propose experiment/calibration.
+47|Export
+export_investment skill_mastery_excluded content_excluded kpi_excluded.
+48|Deletion
+delete_investment_history soft-delete propagated=true.
+49|Recovery
+calibration revert; historic snapshots immutable.
+50|Scheduler
+Celery evidence_investment_tasks.refresh_health; silent=false.
+51|Notifications
+brak guilt/mastery notifications; approvals UI reuse.
+52|Security
+candidate-scoped queries; unauth 401; cross-candidate isolation.
+53|Prompt-Injection Safety
+_strip_banned usuwa skill_mastery/productivity/motivation/hiring/salary fields.
+54|Observability
+safety flags w aggregate; audits entity actions.
+55|Reliability
+simulations bez mutacji; reject bez commitments; revive patterns z 2.7 retained.
+56|Performance
+aggregate limits 20; export 50.
+57|FE IA
+/dashboard/evidence-investment views home/experiments/artifacts/allocation + subnav.
+58|UX/a11y/i18n
+EN/PL evidenceInvestment.*; Suspense; role=alert/status; nav aria-label.
+59|Residual Epic 2.7 Closure
+AEI e1343af2 remain ALIGNED under tip; soft-delete revive intact; residual PKCE/utcnow tech debt inherited.
+60|Alembic Migration
+124_evidence_investment_intelligence; EXPECTED_ALEMBIC_HEAD bumped; prod is_at_head=true.
+61|Backend Tests
+tests/test_evidence_investment_intelligence.py PASS (1 flow covering WS loop).
+62|Frontend Tests
+page + i18n type keys; no new errors in touched FE files.
+63|Platform Guards
+Launch NO-GO; Enrollment OFF; Phase 3B BLOCKED; MS write OFF; LMS marketplace=false.
+64|Authenticated Production Synthetic E2E
+scripts/evidence-investment-authenticated-e2e.py PASS 56/56 (product 40/40 + stance 16/16).
+65|E2E Evidence Table
+SHA 8e858840814b5172b54de11ea5483d2f7c550f78 · CI https://github.com/CzechowskiT/twin/actions/runs/30989591173 · E2E 56/56 · Alembic 124 · four-way ALIGNED · proof reports/epic-2-8-evidence-investment-2026-08-05/
+66|E2E Investment/Gaps Count
+5/5
+67|E2E Experiment Approval Count
+8/8
+68|E2E Artifacts/Usefulness Count
+5/5
+69|E2E Allocation/Policy Count
+5/5
+70|E2E Integrations Daily OS Count
+2/2
+71|E2E Deletion/Security Count
+6/6
+72|E2E Persistence Count
+9/9
+73|E2E Stance Count
+16/16 (nie product padding)
+74|CI
+success https://github.com/CzechowskiT/twin/actions/runs/30989591173
+75|FE Deployment
+frontend_commit=8e858840814b5172b54de11ea5483d2f7c550f78
+76|API Deployment
+api_commit=8e858840814b5172b54de11ea5483d2f7c550f78
+77|Worker Deployment
+worker_commit=8e858840814b5172b54de11ea5483d2f7c550f78; Celery evidence_investment_tasks
+78|Production DB
+124_evidence_investment_intelligence is_at_head=true
+79|Four-Way Alignment
+ALIGNED fe=api=worker=8e858840814b5172b54de11ea5483d2f7c550f78; DB 124
+80|Closed P0 Findings
+Brak otwartych P0; experiment without approval / silent promotion / external enrollment zablokowane w safety.
+81|Closed P1 Findings
+Draft ranking influence=false; reject commitments=false; historic snapshots rewritten=false.
+82|Closed Candidate-Relevant P2 Findings
+FE Evidence Investment UX EN/PL; evidence invalidation hook; Daily OS link.
+83|Remaining Blockers
+Brak blockerów Verdict A.
+84|External Validation Limitations
+Shared synth session pool możliwy dla drugiego mint; brak live course vendors (hard ban).
+85|Technical Debt
+PKCE MS OAuth (2.6); Approvals copy polish; utcnow warnings; richer portfolio prioritization UX.
+86|Product Debt
+głębsze linking SOI gap→investment UI; richer artifact review workflow.
+87|Documentation
+reports/epic-2-8-evidence-investment-2026-08-05/
+88|Git History
+8e858840 feat(evidence-investment) Epic 2.8
+89|Hard Bans
+Phase 3 Agent NOT_STARTED; no LMS/marketplace/course purchase/enrollment; no mastery inference; no silent promo/calibration; no causal hiring/salary; MS write OFF; Launch NO-GO.
+90|Exact Founder Action
+ŻADNA.
+91|Exact Next Epic Recommendation
+Kolejny Candidate Intelligence slice: deepen SOI↔investment gap UI / Approvals copy / portfolio prioritization polish — bez Phase 3 Agent, bez LMS, bez external enrollment.
+92|Per-Module Disposition
+Questions/Gaps/Experiments/Simulations/Artifacts/Promotions/Usefulness/AllocationCal/Policy/Health/FE/Celery/Deletion/Invalidation SHIPPED.
+93|Canonical Route Map
+FE /dashboard/evidence-investment*; API /api/v1/candidates/me/evidence-investment*; Daily OS /api/v1/candidates/me/career-copilot/daily.
+94|Truth Labels
+FACT/SOURCE_SUPPORTED/CANDIDATE_*/OBSERVED_INTERNAL_STATE/INFERENCE/SUGGESTION/UNKNOWN/INSUFFICIENT_DATA/CONFLICTING/STALE.
+95|Safety Flags
+absence_means_no_skill=false; skill_mastery_inferred=false; experiment_without_approval=false; rejected_creates_commitments=false; external_purchase=false; external_enrollment=false; silent_artifact_promotion=false; draft_influences_ranking=false; causal_outcome_attribution=false; silent_allocation_calibration=false; historic_snapshots_rewritten=false; lms_marketplace=false.
+96|Neutral Language
+candidate-specific operational copy; no causal/hiring/salary/mastery claims.
+97|Closed Critical/High
+All Cursor-fixable Critical/High for 2.8 closed in this ship.
+98|Deploy Order
+code → FE/API/worker align → Alembic 124 head → E2E → Verdict A.
+99|Residual 2.7 Status
+AEI product e1343af2 superseded by tip 8e858840 ALIGNED; estimate/capacity safety retained; no regression Verdict A 2.7.
+100|Candidate-First Stance
+PRIMARY candidate-controlled; org SECONDARY_B2B untouched.
+101|No Autonomous Agent / LMS
+Phase 3 Career Agent NOT_STARTED; no course-purchasing/autonomous education agent; no external enrollment/payment.
+102|Final Evidence Table
+SHA 8e858840814b5172b54de11ea5483d2f7c550f78 · CI https://github.com/CzechowskiT/twin/actions/runs/30989591173 · E2E 56/56 (40/40 product) · Alembic 124 · four-way ALIGNED.
+103|Final Verdict
+EVIDENCE INVESTMENT INTELLIGENCE CUSTOMER-USABLE - CANDIDATE-CONTROLLED CAREER EXPERIMENTATION PRODUCTION-READY
+
+Final Answers 1-100
+FA1|EVIDENCE INVESTMENT INTELLIGENCE CUSTOMER-USABLE - CANDIDATE-CONTROLLED CAREER EXPERIMENTATION PRODUCTION-READY
+FA2|8e858840814b5172b54de11ea5483d2f7c550f78
+FA3|8e858840814b5172b54de11ea5483d2f7c550f78
+FA4|8e858840814b5172b54de11ea5483d2f7c550f78
+FA5|8e858840814b5172b54de11ea5483d2f7c550f78
+FA6|8e858840814b5172b54de11ea5483d2f7c550f78
+FA7|8e858840814b5172b54de11ea5483d2f7c550f78
+FA8|ALIGNED fe=api=worker=product; DB 124
+FA9|124_evidence_investment_intelligence
+FA10|124_evidence_investment_intelligence (is_at_head=true)
+FA11|success https://github.com/CzechowskiT/twin/actions/runs/30989591173
+FA12|PASS 56/56
+FA13|56/56
+FA14|5/5
+FA15|8/8
+FA16|5/5
+FA17|5/5
+FA18|2/2
+FA19|6/6
+FA20|9/9
+FA21|16/16
+FA22|/dashboard/evidence-investment
+FA23|/dashboard/evidence-investment?view=experiments
+FA24|/dashboard/evidence-investment?view=artifacts
+FA25|/dashboard/evidence-investment?view=allocation
+FA26|SHIPPED investment questions
+FA27|SHIPPED gap snapshots; absence≠skill
+FA28|SHIPPED experiment model + alternatives
+FA29|SHIPPED effort/capacity simulation mutates_state=false
+FA30|approve/reject/postpone required for experiments
+FA31|reject → commitments_created=false
+FA32|approve → plan internal; external_purchase=false
+FA33|review continue/revise/pause/archive/stop SHIPPED
+FA34|SHIPPED artifact drafts influences_ranking=false
+FA35|promotion requires approval; silent=false
+FA36|promo approve ranking_influenced=false
+FA37|usefulness causal_outcome=false
+FA38|SHIPPED allocation calibration proposals
+FA39|allocation reject/postpone without silent apply
+FA40|allocation approve historic_snapshots_rewritten=false
+FA41|allocation revert SHIPPED
+FA42|SHIPPED allocation policy draft
+FA43|policy simulation mutates_state=false
+FA44|policy resolve SHIPPED
+FA45|investment health SHIPPED; skill_mastery_inferred=false
+FA46|insight cards SHIPPED
+FA47|learning only via approved experiments/calibrations
+FA48|no silent ranking changes; drafts inactive for ranking
+FA49|Daily OS canonical 200
+FA50|ACAL not mutated by investment without separate approval
+FA51|Execution Intelligence cross-link SHIPPED
+FA52|Strategy Review approvals reused
+FA53|Decision Journal not duplicated
+FA54|Search Strategy not silently mutated
+FA55|OI gaps refs-only; no fabricated demand
+FA56|Search Outcomes usefulness pattern non-causal
+FA57|Studio/Interview/Transition primary untouched
+FA58|Evidence invalidation hook SHIPPED
+FA59|Lifecycle privacy pause blocks propose
+FA60|Adaptive Memory kpi_excluded
+FA61|privacy delete-history propagated
+FA62|export skill_mastery_excluded
+FA63|deletion soft-delete
+FA64|recovery via calibration revert
+FA65|Celery refresh_health present
+FA66|no mastery/guilt notifications
+FA67|candidate-scoped + unauth 401
+FA68|prompt-injection: mastery/hiring/salary fields stripped
+FA69|audits + safety flags
+FA70|simulations never mutate state
+FA71|aggregate limits for performance
+FA72|FE IA shipped
+FA73|EN/PL i18n shipped
+FA74|a11y: Suspense + nav aria-label
+FA75|absence_means_no_skill DISABLED as product claim
+FA76|skill mastery inference DISABLED
+FA77|course completion≠mastery
+FA78|external purchase DISABLED
+FA79|external enrollment DISABLED
+FA80|silent artifact promotion DISABLED
+FA81|draft artifacts do NOT influence ranking
+FA82|causal outcome attribution DISABLED
+FA83|silent allocation calibration DISABLED
+FA84|historic approved snapshots NOT rewritten
+FA85|Phase 3 Agent NOT_STARTED
+FA86|Microsoft Calendar write OFF
+FA87|Launch NO-GO
+FA88|Enrollment OFF
+FA89|Phase 3B BLOCKED
+FA90|Founder action: NONE
+FA91|Next: deepen SOI↔investment gap UX without Phase 3/LMS
+FA92|truth labels published in aggregate
+FA93|claim_kind SUGGESTION until approved
+FA94|CANDIDATE_DECLARED for observations/usefulness
+FA95|INFERENCE for gap snapshots with absence≠skill
+FA96|four-way ALIGNED at Verdict A
+FA97|DB at Alembic head at Verdict A
+FA98|CI green at product SHA
+FA99|E2E not stance-padded (product 40/40 separate)
+FA100|FROZEN: Launch NO-GO; Enrollment OFF; Phase 3B BLOCKED; Phase 3 Agent NOT_STARTED; Microsoft write OFF; no LMS/marketplace; no external enrollment/purchase
