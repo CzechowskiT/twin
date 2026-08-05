@@ -1,0 +1,214 @@
+1|Executive Summary
+Epic 2.9 konsoliduje IA/UX i gotowość prywatnego pilota (INACTIVE). Verdict A: PRODUCT CONSOLIDATION AND PRIVATE PILOT READINESS PRODUCTION-READY — FRESH-ACCOUNT JOURNEY, PRIVACY-SAFE TELEMETRY AND INACTIVE INVITE-ONLY ACCESS PROVEN. Product 02b282dfef5612fd8e3a8247c19ab0863ad21269; Alembic 124; E2E 41/41 (produkt 32/32); FE/API/worker ALIGNED; enrollment OFF; invite send OFF; real invites 0; Launch NO-GO.
+2|Canonical Baseline
+Przed 2.9: product 8e858840 / tip 94a44c6b / Alembic 124 / E2E 56/56 / CI 30989591173. Po 2.9: product 02b282df; Alembic 124; E2E 41/41.
+3|Canonical Final State
+product HEAD 02b282dfef5612fd8e3a8247c19ab0863ad21269; FE=API=worker=02b282dfef5612fd8e3a8247c19ab0863ad21269; Alembic 124 is_at_head=true; schema twin.pilot_consolidation/v1; pilot_access PRODUCTION_READY_INACTIVE.
+4|Verdict
+PRODUCT CONSOLIDATION AND PRIVATE PILOT READINESS PRODUCTION-READY — FRESH-ACCOUNT JOURNEY, PRIVACY-SAFE TELEMETRY AND INACTIVE INVITE-ONLY ACCESS PROVEN
+5|Scope Freeze Honored
+Brak nowego intelligence module / ranking engine / calendar store / Phase 3 Agent / marketplace / enrollment activation.
+6|Regression Audit
+Baseline 2.8 green; docs tip drift cleared by product tip; Vercel TS build fix (TTV flag); Railway SHA align via GIT_COMMIT_SHA.
+7|IA Inventory
+61 dashboard routes; subnav zredukowany do 7 primary + More progressive disclosure.
+8|Canonical IA
+Home/Today, Direction, Opportunities, Evidence, Plan, Decisions, Settings — EN/PL bez jargon.
+9|Route Disposition
+primary/secondary/hidden_chrome w candidate-ia.ts; strony Epic 2.x pozostają reachable w More.
+10|Home / Next-Action
+PilotHomeNextAction + DailyCareerOsPanel; calm empty; claim_kind SUGGESTION; brak fabricated urgency.
+11|Primary Journey
+private access → sign-in → privacy orientation → minimal setup → first insight → approvals → Daily OS continuation.
+12|Onboarding
+Kroki welcome/privacy/profile/skills/preferences; skippable; resume localStorage v2; finish → /dashboard.
+13|First-Value Contract
+pilot_first_value_v1 PROVEN_SYNTHETICALLY; not_sufficient: sign_in_alone/dashboard_open_alone/module_tour.
+14|UX/Copy
+EN/PL copy spokojne; onboarding bez auto-apply noise; nav labels human.
+15|Telemetry
+Allowlisted pilot_* + product_funnel; PII strip; kpi_excluded; no session replay/ads/CV content.
+16|Invite Controls
+PRODUCTION_READY_INACTIVE; invite_send_enabled=false; real_invites_sent=0; real_pilot_users_added=0.
+17|Enrollment Gate
+external_pilot_enrollment_enabled=false; Launch NO-GO unchanged.
+18|Fresh-Account E2E
+scripts/pilot-consolidation-authenticated-e2e.py PASS 41/41.
+19|Reliability
+Daily OS 200; unauth 401; DB head 124.
+20|Performance
+Nav reduction; aggregate lightweight.
+21|Security/Privacy
+Candidate-scoped; telemetry allowlist reject unknown; synthetic kpi_excluded.
+22|A11y/i18n
+aria-expanded More; EN/PL pilotConsolidation.*; Suspense retained elsewhere.
+23|Tests
+backend/tests/test_pilot_consolidation.py PASS; FE build PASS locally.
+24|CI
+Retriggered after align; see Final Answers.
+25|FE Deployment
+frontend_commit=02b282dfef5612fd8e3a8247c19ab0863ad21269
+26|API Deployment
+api_commit=02b282dfef5612fd8e3a8247c19ab0863ad21269
+27|Worker Deployment
+worker_commit=02b282dfef5612fd8e3a8247c19ab0863ad21269
+28|Production DB
+124_evidence_investment_intelligence is_at_head=true (no new migration required)
+29|Four-Way Alignment
+ALIGNED fe=api=worker=02b282dfef5612fd8e3a8247c19ab0863ad21269
+30|Hard Bans
+Launch NO-GO; Enrollment OFF; Phase 3B BLOCKED; Phase 3 Agent NOT_STARTED; MS write OFF; App submission OFF; External purchase/enrollment OFF.
+31|Founder Action
+ŻADNA teraz. Osobna decyzja aktywacji pilota — nie feature epic; nie auto-activate.
+32|Next Step
+Founder-governed pilot activation decision only — do not start Epic 3.0; do not widen surface.
+33|Closed P0
+Vercel TS TTV flag; four-way SHA after Railway stuck build.
+34|Remaining Blockers
+Brak blockerów Verdict A po align+E2E.
+35|External Limitations
+Shared synth mint pool possible; no real invites by design.
+36|Tech Debt
+CI smoke timed out during Railway stuck build — re-run on tip; Approvals copy polish; PKCE residual.
+37|Product Debt
+Dalsze progressive disclosure More grouping; quieter dashboard chrome.
+38|Documentation
+reports/epic-2-9-pilot-consolidation-2026-08-05/
+39|Git History
+c52b203a feat · 439b1eeb fix TTV · 02b282df chore align nudge
+40|Per-Module Disposition
+IA/Onboarding/Home/Telemetry/InviteInactive/E2E SHIPPED; Enrollment OFF; Invites not sent.
+41|Canonical Routes
+FE /dashboard*; API /api/v1/candidates/me/pilot-consolidation*; Daily OS /api/v1/candidates/me/career-copilot/daily
+42|Truth Labels
+FACT/SUGGESTION/INSUFFICIENT_DATA retained; home empty SUGGESTION.
+43|Safety Flags
+enrollment_enabled=false; invite_send_enabled=false; new_intelligence_module=false; microsoft_calendar_write=false.
+44|Synthetic KPI
+ENFORCED via exclude_from_product_metrics + kpi_excluded telemetry.
+45|Terminal Posture
+Consolidation/UX/Onboarding SHIPPED; First-Value PROVEN_SYNTHETICALLY; Telemetry SHIPPED; Synthetic KPI ENFORCED; Invite controls PRODUCTION_READY_INACTIVE; Enrollment OFF; Real invites 0; Real pilot users 0; Fresh-account PASS; FE/API/worker ALIGNED; DB AT_EXPECTED_HEAD; Launch NO-GO; Phase 3B BLOCKED; Phase 3 Agent NOT_STARTED; MS write OFF; App submission OFF; External purchase/enrollment OFF.
+46|E2E Journey Access Count
+2/2
+47|E2E First Value Count
+4/4
+48|E2E IA Home Count
+9/9
+49|E2E Telemetry Privacy Count
+4/4
+50|E2E Invite Inactive Count
+8/8
+51|E2E Deletion Security Count
+3/3
+52|E2E Persistence Count
+2/2
+53|E2E Stance Count
+9/9 (nie product padding)
+54|Backend API
+pilot_consolidation router SHIPPED
+55|Scheduler
+No new Celery; existing funnel OK
+56|Alembic
+No 125 — reuse product_funnel_events + invite tokens
+57|Health Ops
+rc1_pilot_access_status=PRODUCTION_READY_INACTIVE; invite_send false; real zeros
+58|FE Gates
+production-action-gates PILOT_ACCESS_STATUS + INVITE_SEND_ENABLED=false
+59|Canonical Routes Map
+candidate-canonical-routes updated for IA
+60|Subnav Marker
+data-candidate-workspace-subnav-green-only + data-ia=epic-2-9
+61|Daily OS Reuse
+No new planning engine
+62|Settings Surface
+/dashboard/privacy-center primary
+63|Evidence Surface
+/dashboard/portfolio primary
+64|Plan Surface
+/dashboard/execution-calendar primary
+65|Decisions Surface
+/dashboard/approvals primary
+66|No Silent Ranking Changes
+Confirmed safety
+67|Residual Epic 2.8
+Evidence Investment intact under tip; Alembic 124
+68|Candidate-First
+PRIMARY; org SECONDARY_B2B untouched
+69|No Phase 3 Agent
+NOT_STARTED
+70|Final Evidence Table
+SHA 02b282dfef5612fd8e3a8247c19ab0863ad21269 · E2E 41/41 · Alembic 124 · four-way ALIGNED · proof reports/epic-2-9-pilot-consolidation-2026-08-05/
+71|Final Verdict
+PRODUCT CONSOLIDATION AND PRIVATE PILOT READINESS PRODUCTION-READY — FRESH-ACCOUNT JOURNEY, PRIVACY-SAFE TELEMETRY AND INACTIVE INVITE-ONLY ACCESS PROVEN
+
+Final Answers
+FA1|PRODUCT CONSOLIDATION AND PRIVATE PILOT READINESS PRODUCTION-READY — FRESH-ACCOUNT JOURNEY, PRIVACY-SAFE TELEMETRY AND INACTIVE INVITE-ONLY ACCESS PROVEN
+FA2|02b282dfef5612fd8e3a8247c19ab0863ad21269
+FA3|02b282dfef5612fd8e3a8247c19ab0863ad21269
+FA4|02b282dfef5612fd8e3a8247c19ab0863ad21269
+FA5|02b282dfef5612fd8e3a8247c19ab0863ad21269
+FA6|02b282dfef5612fd8e3a8247c19ab0863ad21269
+FA7|02b282dfef5612fd8e3a8247c19ab0863ad21269
+FA8|ALIGNED fe=api=worker=product; DB 124
+FA9|124_evidence_investment_intelligence
+FA10|124 (is_at_head=true)
+FA11|see CI after retrigger
+FA12|PASS 41/41
+FA13|41/41
+FA14|2/2
+FA15|4/4
+FA16|9/9
+FA17|4/4
+FA18|8/8
+FA19|3/3
+FA20|2/2
+FA21|9/9
+FA22|/dashboard
+FA23|/dashboard/career
+FA24|/dashboard/matches
+FA25|/dashboard/portfolio
+FA26|/dashboard/execution-calendar
+FA27|/dashboard/approvals
+FA28|/dashboard/privacy-center
+FA29|SHIPPED 7-primary IA + More
+FA30|SHIPPED calm Home/Today
+FA31|SHIPPED progressive onboarding
+FA32|First-value PROVEN_SYNTHETICALLY
+FA33|Telemetry SHIPPED allowlisted
+FA34|Synthetic KPI ENFORCED
+FA35|Invite PRODUCTION_READY_INACTIVE
+FA36|Enrollment OFF
+FA37|Invite send OFF
+FA38|Real invites 0
+FA39|Real pilot users added 0
+FA40|Fresh-account PASS
+FA41|Launch NO-GO
+FA42|Phase 3B BLOCKED
+FA43|Phase 3 Agent NOT_STARTED
+FA44|MS Calendar write OFF
+FA45|Application submission OFF
+FA46|External purchase/enrollment OFF
+FA47|No new intelligence module
+FA48|Daily OS canonical 200
+FA49|Founder action: NONE now
+FA50|Next: Founder-governed pilot activation decision only
+FA51|CI retriggered on tip after align
+FA52|four-way ALIGNED at Verdict A
+FA53|DB at expected head
+FA54|E2E not stance-padded
+FA55|Privacy-safe telemetry
+FA56|No CV/JD/transcript in telemetry
+FA57|No session replay
+FA58|No third-party ads
+FA59|Onboarding skippable
+FA60|Required vs optional clear
+FA61|Refresh/logout safe localStorage
+FA62|No dark patterns
+FA63|Optional MS remains OFF by default
+FA64|EN/PL i18n shipped
+FA65|a11y More aria-expanded
+FA66|Route disposition map shipped
+FA67|Health fields shipped
+FA68|Unit tests PASS
+FA69|FE build PASS
+FA70|FROZEN: Launch NO-GO; Enrollment OFF; invites not sent; no Epic 3.0
