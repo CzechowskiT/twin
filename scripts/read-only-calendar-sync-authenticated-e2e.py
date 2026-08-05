@@ -17,6 +17,7 @@ import ssl
 import sys
 import urllib.error
 import urllib.request
+import uuid
 from datetime import datetime, timedelta, timezone
 
 try:
@@ -141,6 +142,7 @@ def main() -> int:
         },
     )
     _req("POST", "/api/v1/candidates/me/calendar-sync/delete-history", token=token)
+    _req("POST", "/api/v1/candidates/me/execution-calendar/delete-history", token=token)
 
     st, agg = _req("GET", "/api/v1/candidates/me/calendar-sync", token=token)
     check("persistence", "aggregate_200", st == 200, str(st))
@@ -232,12 +234,13 @@ def main() -> int:
         isinstance(cons, dict) and ((cons.get("consent") or {}).get("version") or 0) >= 2,
     )
 
+    idemp_key = f"e2e-rocs-{uuid.uuid4().hex[:12]}"
     st, sync1 = _req(
         "POST",
         "/api/v1/candidates/me/calendar-sync/runs",
         token=token,
         body={
-            "idempotency_key": "e2e-rocs-1",
+            "idempotency_key": idemp_key,
             "synthetic_busy": [
                 {"starts_at": busy_start, "ends_at": busy_end, "subject": "STRIP", "attendees": ["x"]}
             ],
@@ -276,7 +279,7 @@ def main() -> int:
         "POST",
         "/api/v1/candidates/me/calendar-sync/runs",
         token=token,
-        body={"idempotency_key": "e2e-rocs-1", "synthetic_busy": []},
+        body={"idempotency_key": idemp_key, "synthetic_busy": []},
     )
     check("busy_normalization_sync", "sync_idempotent", st in (200, 201) and (sync_idemp or {}).get("idempotent") is True)
 
@@ -289,36 +292,227 @@ def main() -> int:
     )
     check("internal_only_recovery", "internal_snapshot", st in (200, 201), str(st))
 
-    # Seed approved hold overlapping busy via execution calendar path if possible
-    # Create capacity + requirement via decision approve is heavy; rely on sync affected after seeding via API if available
-    # Use sync affected_plan field
+    # Seed capacity + approved commitment hold, then overlap busy against actual hold times
+    now = datetime.now(timezone.utc)
+    win_start = (now + timedelta(days=2)).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    win_end = (now + timedelta(days=2, hours=6)).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    _req(
+        "POST",
+        "/api/v1/candidates/me/execution-calendar/capacity",
+        token=token,
+        body={
+            "weekly_budget_minutes": 240,
+            "timezone_name": "Europe/Warsaw",
+            "windows": [{"starts_at": win_start, "ends_at": win_end}],
+            "protected_focus": {"enabled": False, "blocks": []},
+        },
+    )
+    st, snap_seed = _req(
+        "POST",
+        "/api/v1/candidates/me/execution-calendar/availability/snapshots",
+        token=token,
+        body={"use_microsoft_busy": False},
+    )
+    snap_id = ((snap_seed or {}).get("snapshot") or {}).get("id") if isinstance(snap_seed, dict) else None
+    st, weekly = _req(
+        "POST",
+        "/api/v1/candidates/me/strategy-reviews/sessions",
+        token=token,
+        body={"cadence": "weekly"},
+    )
+    rid = ((weekly or {}).get("review") or {}).get("id") if isinstance(weekly, dict) else None
+    st, dec = _req(
+        "POST",
+        "/api/v1/candidates/me/strategy-reviews/decisions",
+        token=token,
+        body={
+            "question": "Seed overlapping hold for calendar-sync recalc?",
+            "review_id": rid,
+            "rationale": "Epic 2.6 E2E",
+            "supporting": [],
+            "contradicting": [],
+            "unknowns": [],
+            "alternatives": [{"id": "yes", "label": "Yes"}, {"id": "no", "label": "No"}],
+            "counterfactuals": [],
+        },
+    )
+    did = ((dec or {}).get("decision") or {}).get("id") if isinstance(dec, dict) else None
+    if did:
+        _req(
+            "POST",
+            f"/api/v1/candidates/me/strategy-reviews/decisions/{did}/propose",
+            token=token,
+            body={"chosen_alternative_id": "yes"},
+        )
+        _req(
+            "POST",
+            f"/api/v1/candidates/me/strategy-reviews/decisions/{did}/resolve",
+            token=token,
+            body={"action": "approve"},
+        )
+        _req(
+            "POST",
+            "/api/v1/candidates/me/execution-calendar/requirements/from-decision",
+            token=token,
+            body={"decision_id": did},
+        )
+    st, batch = _req(
+        "POST",
+        "/api/v1/candidates/me/execution-calendar/batches",
+        token=token,
+        body={"snapshot_id": snap_id} if snap_id else {},
+    )
+    bid = ((batch or {}).get("batch") or {}).get("id") if isinstance(batch, dict) else None
+    hold_items = ((batch or {}).get("batch") or {}).get("items") or []
+    if bid:
+        _req("POST", f"/api/v1/candidates/me/execution-calendar/batches/{bid}/propose", token=token)
+        st, appr_batch = _req(
+            "POST",
+            f"/api/v1/candidates/me/execution-calendar/batches/{bid}/resolve",
+            token=token,
+            body={"action": "approve"},
+        )
+        hold_items = ((appr_batch or {}).get("batch") or {}).get("items") or hold_items
+
+    busy_iso = None
+    for it in hold_items:
+        if it.get("starts_at") and it.get("ends_at") and it.get("status") in ("approved", "proposed", None):
+            try:
+                t0 = datetime.fromisoformat(str(it["starts_at"]).replace("Z", "+00:00"))
+                if t0.tzinfo is None:
+                    t0 = t0.replace(tzinfo=timezone.utc)
+                busy_iso = {
+                    "starts_at": (t0 - timedelta(minutes=15)).isoformat().replace("+00:00", "Z"),
+                    "ends_at": (t0 + timedelta(hours=2)).isoformat().replace("+00:00", "Z"),
+                }
+                break
+            except Exception:
+                continue
+    if not busy_iso:
+        # Fallback window — may not overlap if batch empty
+        t0 = now + timedelta(days=2, hours=1)
+        busy_iso = {
+            "starts_at": t0.replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+            "ends_at": (t0 + timedelta(hours=2)).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+        }
+
+    st, sync_overlap = _req(
+        "POST",
+        "/api/v1/candidates/me/calendar-sync/runs",
+        token=token,
+        body={"synthetic_busy": [busy_iso]},
+    )
+    affected = (sync_overlap or {}).get("affected_plan") if isinstance(sync_overlap, dict) else None
     check(
         "delta_freshness_affected",
         "affected_plan_object",
-        isinstance(sync1, dict) and isinstance(sync1.get("affected_plan"), dict),
+        isinstance(affected, dict) or isinstance((sync1 or {}).get("affected_plan"), dict),
     )
     check(
         "delta_freshness_affected",
         "affected_requires_approval_flag",
-        ((sync1 or {}).get("affected_plan") or {}).get("requires_candidate_approval") is True
+        (isinstance(affected, dict) and affected.get("silent_mutation") is False)
         or ((sync1 or {}).get("affected_plan") or {}).get("silent_mutation") is False,
     )
+    check(
+        "delta_freshness_affected",
+        "overlap_recalc_proposed",
+        isinstance(sync_overlap, dict)
+        and (
+            sync_overlap.get("recalculation") is not None
+            or bool((affected or {}).get("conflicts"))
+            or bool((affected or {}).get("affected_batch_ids"))
+        ),
+        str((sync_overlap or {}).get("recalculation")),
+    )
 
-    # If recalculation exists from overlap, resolve reject then approve path
-    st, agg2 = _req("GET", "/api/v1/candidates/me/calendar-sync", token=token)
-    proposals = (agg2 or {}).get("recalculations") or []
-    pending = [p for p in proposals if p.get("status") == "pending"]
-    if pending:
-        pid = pending[0]["id"]
+    proposals = []
+    if isinstance(sync_overlap, dict) and sync_overlap.get("recalculation"):
+        proposals = [sync_overlap["recalculation"]]
+    else:
+        st, agg2 = _req("GET", "/api/v1/candidates/me/calendar-sync", token=token)
+        proposals = [
+            p for p in ((agg2 or {}).get("recalculations") or []) if p.get("status") == "pending"
+        ]
+    if proposals:
+        pid = proposals[0]["id"]
         st, rej = _req(
             "POST",
             f"/api/v1/candidates/me/calendar-sync/recalculations/{pid}/resolve",
             token=token,
             body={"action": "reject"},
         )
-        check("recalc_dailyos_acal", "reject_no_acal", st == 200 and (rej or {}).get("acal_mutated") is False)
+        check(
+            "recalc_dailyos_acal",
+            "reject_no_acal",
+            st == 200 and (rej or {}).get("acal_mutated") is False,
+            str(rej)[:120],
+        )
+        st, sync_appr = _req(
+            "POST",
+            "/api/v1/candidates/me/calendar-sync/runs",
+            token=token,
+            body={"synthetic_busy": [busy_iso]},
+        )
+        pid2 = ((sync_appr or {}).get("recalculation") or {}).get("id")
+        if not pid2:
+            st, agg3 = _req("GET", "/api/v1/candidates/me/calendar-sync", token=token)
+            pending2 = [
+                p for p in ((agg3 or {}).get("recalculations") or []) if p.get("status") == "pending"
+            ]
+            pid2 = pending2[0]["id"] if pending2 else None
+        if pid2:
+            st, postp = _req(
+                "POST",
+                f"/api/v1/candidates/me/calendar-sync/recalculations/{pid2}/resolve",
+                token=token,
+                body={"action": "postpone"},
+            )
+            check(
+                "recalc_dailyos_acal",
+                "postpone_no_acal",
+                st == 200 and (postp or {}).get("acal_mutated") is False,
+                str(postp)[:120],
+            )
+            st, sync_appr2 = _req(
+                "POST",
+                "/api/v1/candidates/me/calendar-sync/runs",
+                token=token,
+                body={"synthetic_busy": [busy_iso]},
+            )
+            pid3 = ((sync_appr2 or {}).get("recalculation") or {}).get("id")
+            if not pid3:
+                st, agg4 = _req("GET", "/api/v1/candidates/me/calendar-sync", token=token)
+                pending3 = [
+                    p
+                    for p in ((agg4 or {}).get("recalculations") or [])
+                    if p.get("status") == "pending"
+                ]
+                pid3 = pending3[0]["id"] if pending3 else None
+            if pid3:
+                st, appr = _req(
+                    "POST",
+                    f"/api/v1/candidates/me/calendar-sync/recalculations/{pid3}/resolve",
+                    token=token,
+                    body={"action": "approve"},
+                )
+                check(
+                    "recalc_dailyos_acal",
+                    "approve_candidate_reviewed",
+                    st == 200
+                    and (appr or {}).get("acal_mutated") is False
+                    and (appr or {}).get("silent") is False,
+                    str(appr)[:120],
+                )
+            else:
+                check("recalc_dailyos_acal", "approve_candidate_reviewed", False, "no_pending_after_postpone")
+        else:
+            check("recalc_dailyos_acal", "postpone_no_acal", False, "no_pending_after_reject")
+            check("recalc_dailyos_acal", "approve_candidate_reviewed", False, "no_pending_after_reject")
     else:
-        check("recalc_dailyos_acal", "reject_no_acal", True, "no_pending_skip")
+        check("recalc_dailyos_acal", "reject_no_acal", False, "no_pending_recalc")
+        check("recalc_dailyos_acal", "postpone_no_acal", False, "no_pending_recalc")
+        check("recalc_dailyos_acal", "approve_candidate_reviewed", False, "no_pending_recalc")
 
     st, daily = _req("GET", DAILY_OS, token=token)
     check("recalc_dailyos_acal", "daily_os_200", st == 200, str(st))

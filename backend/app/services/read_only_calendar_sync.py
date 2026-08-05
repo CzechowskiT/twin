@@ -402,10 +402,15 @@ def run_sync(
     if idempotency_key:
         existing = (
             db.query(CandidateCalendarSyncRun)
-            .filter_by(candidate_id=candidate_id, idempotency_key=idempotency_key[:160])
-            .one_or_none()
+            .filter(
+                CandidateCalendarSyncRun.candidate_id == candidate_id,
+                CandidateCalendarSyncRun.idempotency_key == idempotency_key[:160],
+                CandidateCalendarSyncRun.deleted_at.is_(None),
+            )
+            .order_by(CandidateCalendarSyncRun.id.desc())
+            .first()
         )
-        if existing and not existing.deleted_at:
+        if existing:
             return {"sync_run": _ser_run(existing), "idempotent": True}
 
     conn = ensure_connection(db, candidate_id=candidate_id, user_id=user_id)
@@ -957,6 +962,9 @@ def delete_sync_history(db: Session, *, candidate_id: int) -> dict:
             if hasattr(row, "deleted_at") and row.deleted_at is None:
                 row.deleted_at = now
                 n += 1
+            # Release idempotency keys so soft-deleted history cannot collide
+            if isinstance(row, CandidateCalendarSyncRun) and row.idempotency_key:
+                row.idempotency_key = None
             if isinstance(row, CandidateCalendarPrivateFeed):
                 row.status = "revoked"
                 row.revoked_at = now
