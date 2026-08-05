@@ -1,0 +1,401 @@
+1|Executive Summary
+Epic 2.7 dostarcza adaptive execution intelligence: obserwacje → estymacje vs zadeklarowany actual → profil → kalibracja tylko po approve kandydata → jakość/fragmentacja/odłożenia → kalibracja pojemności → symulacja polityki. Verdict A: ADAPTIVE EXECUTION INTELLIGENCE CUSTOMER-USABLE — CANDIDATE-CONTROLLED ESTIMATION AND CAPACITY LEARNING PRODUCTION-READY. Product e1343af2c158e5054b699620cd83251f876b4a9d; Alembic 123; E2E 44/44 (produkt 34/34); CI success; FE/API/worker ALIGNED; brak productivity/motivation scores; brak cichych zmian.
+
+2|Canonical Baseline
+Przed 2.7: product e2d97bf6 / tip d6b3777e / Alembic 122 / E2E 77/77 / CI 30983965644. Po 2.7: product e1343af2; Alembic 123; E2E 44/44; CI 30987210248.
+
+3|Canonical Final State
+product/tip HEAD e1343af2c158e5054b699620cd83251f876b4a9d; FE=API=worker=e1343af2c158e5054b699620cd83251f876b4a9d; Alembic 123_adaptive_execution_intelligence is_at_head=true; schema twin.adaptive_execution_intelligence/v1.
+
+4|Verdict
+ADAPTIVE EXECUTION INTELLIGENCE CUSTOMER-USABLE — CANDIDATE-CONTROLLED ESTIMATION AND CAPACITY LEARNING PRODUCTION-READY
+
+5|Product Value Delivered
+Kandydat widzi Execution Intelligence: kalibracje estymacji i pojemności wymagają decyzji, analizy jakości bez scoringu produktywności, symulacje bez mutacji stanu.
+
+6|Architecture
+Rozszerzenie Execution Calendar, ACAL, Daily OS, Lifecycle approvals, Adaptive Memory patterns. Nowy serwis adaptive_execution_intelligence + Alembic 123. Brak drugiego kalendarza/ACAL/Daily OS/rankingu/MS write.
+
+7|Observation Registry
+CandidateExecutionObservation — CANDIDATE_DECLARED / OBSERVED_INTERNAL_STATE; hook z progress.
+
+8|Estimate Snapshots
+CandidateEstimateSnapshot przy approve batch + explicit API; immutable historic.
+
+9|Estimate-vs-Actual
+CandidateEstimateComparison z candidate-declared actual only; inferred_actual=false.
+
+10|Estimation Profile
+CandidateEstimationProfile versioned factors; silent_apply=false; revive po soft-delete.
+
+11|Calibration Proposal
+estimate_calibration SUGGESTION + LifecycleApproval; requires_approval.
+
+12|Calibration Approval
+approve/reject/postpone; reject bez mutacji profilu.
+
+13|Calibration Versioning
+version increment na propose; profile.version przy approve.
+
+14|Calibration Revert
+revert przywraca before_json; historic batches nietknięte.
+
+15|Commitment Quality
+analyze_commitment_quality — INFERENCE; productivity_score=null.
+
+16|Batch Quality
+per-batch analysis body z completed_declared / postponed.
+
+17|Fragmentation + Alternatives
+gap_minutes + alternatives merge_adjacent/keep; bez mutacji external.
+
+18|Postponement + Repeated Review
+postponed_batch_count; guilt=false; streak=false.
+
+19|Dependency Bottlenecks
+shared_requirement FACT hints only.
+
+20|Portfolio Balance
+holds count INFERENCE; nie employment success.
+
+21|Capacity Calibration
+propose z compute_capacity; explicit_budget_only retained.
+
+22|Capacity Approval/Revert
+reject capacity_mutated=false; approve upsert budget; revert before.
+
+23|Execution Policy
+draft policy bez autonomous_external_schedule.
+
+24|Policy Simulation
+mutates_state=false zawsze.
+
+25|Policy Approval
+approve/reject/postpone na policy.
+
+26|Health Overview
+comparisons + postponements + insight cards; productivity_score=null.
+
+27|Insight Cards
+neutral operational copy; INSUFFICIENT_DATA gdy brak actuals.
+
+28|Learning Loop
+tylko po approve kalibracji; nie silent ranking/strategy.
+
+29|Ranking Integration
+brak cichej zmiany ranking weights; reuse Approvals hub.
+
+30|Daily OS Integration
+canonical Daily OS 200; continuity preserved.
+
+31|ACAL Integration
+ACAL approved-only z Epic 2.5; kalibracje nie mutują ACAL.
+
+32|Execution Calendar UX
+progress → observations; link z Intelligence.
+
+33|Strategy Review
+reuse decision→requirements jako seed holdów E2E.
+
+34|Decision Journal
+nie duplikowany; claim labels reuse.
+
+35|Search Strategy/Outcomes
+nie primary; pattern approval-gated calibration reused.
+
+36|Studio/Interview/Transition
+bez zmian primary; no Phase 3 Agent.
+
+37|Evidence
+stale evidence nadal poza scope rewrite; kpi_excluded.
+
+38|Lifecycle Integration
+privacy pause blokuje calibrate; approvals kinds estimate/capacity_calibration.
+
+39|Adaptive Memory
+kpi_excluded; brak learning z productivity.
+
+40|Privacy
+delete-history soft-delete + revive profile.
+
+41|Export
+export observations; productivity_score_excluded.
+
+42|Deletion
+propagated=true na delete-history.
+
+43|Recovery
+revert kalibracji; revive profile.
+
+44|Scheduler
+Celery adaptive_execution_tasks.refresh_quality.
+
+45|Notifications
+brak guilt/streak; Approvals + UI.
+
+46|Security
+candidate-scoped; unauth 401; shared synth pool noted.
+
+47|Prompt-Injection Safety
+neutral language; stripped productivity fields.
+
+48|Observability
+adaptive_execution_audits; safety flags w agregacie.
+
+49|Reliability
+soft-delete revive; idempotent quality refresh.
+
+50|Performance
+limit 20/50 samples; busy-only refs.
+
+51|FE IA
+/dashboard/execution-intelligence views home/estimates/quality/capacity/policy.
+
+52|UX/a11y/i18n
+EN/PL executionIntelligence; Suspense; subnav link.
+
+53|Residual Epic 2.6 Closure
+MS write OFF; busy sync intact; PKCE debt pozostaje zewnętrzny/tech; Approvals kinds rozszerzone estimate/capacity_calibration.
+
+54|Alembic Migration
+123_adaptive_execution_intelligence; EXPECTED_ALEMBIC_HEAD bumped; prod at head.
+
+55|Backend Tests
+test_adaptive_execution_intelligence.py — 1 passed.
+
+56|Frontend Tests
+FE route smoke w E2E persistence.
+
+57|Platform Guards
+NO-GO / enrollment OFF / 3B BLOCKED / ms_write_off / Phase3 NOT_STARTED.
+
+58|Authenticated Production Synthetic E2E
+44/44; osobne buckety; stance nie padduje.
+
+59|E2E Evidence Table
+reports/epic-2-7-adaptive-execution-2026-08-05/e2e-final2.txt — all PASS.
+
+60|E2E Observation/Estimate Count
+5/5
+
+61|E2E Calibration Approval Count
+4/4
+
+62|E2E Quality/Fragmentation Count
+3/3
+
+63|E2E Capacity/Policy Count
+4/4
+
+64|E2E Integrations Daily OS Count
+3/3
+
+65|E2E Deletion/Security Count
+7/7
+
+66|E2E Persistence Count
+8/8
+
+67|E2E Stance Count
+10/10 (nie product padding)
+
+68|CI
+success https://github.com/CzechowskiT/twin/actions/runs/30987210248
+
+69|FE Deployment
+frontend_commit=e1343af2c158e5054b699620cd83251f876b4a9d
+
+70|API Deployment
+api_commit=e1343af2c158e5054b699620cd83251f876b4a9d
+
+71|Worker Deployment
+worker_commit=e1343af2c158e5054b699620cd83251f876b4a9d; Celery adaptive_execution_tasks
+
+72|Production DB
+123_adaptive_execution_intelligence is_at_head=true
+
+73|Four-Way Alignment
+ALIGNED fe=api=worker=e1343af2c158e5054b699620cd83251f876b4a9d; DB 123
+
+74|Closed P0 Findings
+soft-delete profile UniqueConstraint 409 — revive fixed.
+
+75|Closed P1 Findings
+shared synth cross-user check; E2E seeding via exec calendar path.
+
+76|Closed Candidate-Relevant P2 Findings
+FE Execution Intelligence UX EN/PL; Approvals kinds estimate/capacity_calibration.
+
+77|Remaining Blockers
+Brak blockerów Verdict A.
+
+78|External Validation Limitations
+Live MS account nie wymagany (2.6 residual). Shared synth session pool dla drugiego mint.
+
+79|Technical Debt
+PKCE MS OAuth (2.6); Approvals copy polish; utcnow warnings.
+
+80|Product Debt
+głębsze dependency graphs; richer insight cards UX.
+
+81|Documentation
+reports/epic-2-7-adaptive-execution-2026-08-05/
+
+82|Git History
+08f49905 feat · 3919f092 chore · e1343af2 revive fix · docs proof tip.
+
+83|Hard Bans
+Phase 3 Agent NOT_STARTED; no silent estimate/capacity/strategy; no productivity/motivation/mental-health; no historic batch rewrite; MS write OFF; Launch NO-GO.
+
+84|Exact Founder Action
+ŻADNA.
+
+85|Exact Next Epic Recommendation
+Kolejny Candidate Intelligence slice: deepen live busy-read / Approvals UX / estimation UX polish — bez Phase 3 Agent i bez MS write.
+
+86|Per-Module Disposition
+Observation/Estimate/Calibration/Quality/Capacity/Policy/Health/FE/Celery/Deletion SHIPPED.
+
+87|Canonical Route Map
+FE /dashboard/execution-intelligence*; API /api/v1/candidates/me/execution-intelligence*; Daily OS /api/v1/candidates/me/career-copilot/daily.
+
+88|Truth Labels
+FACT/SOURCE_SUPPORTED/CANDIDATE_*/OBSERVED_INTERNAL_STATE/INFERENCE/SUGGESTION/UNKNOWN/INSUFFICIENT_DATA/CONFLICTING/STALE.
+
+89|Safety Flags
+inferred_actual_effort=false; productivity_score=false; silent_*=false; historic_batches_rewritten=false; guilt_streaks=false.
+
+90|Progress Hook
+update_item_progress → on_progress_recorded; inferred_completion remains false.
+
+91|Batch Approve Snapshot
+resolve_batch approve → snapshot_estimates_for_batch.
+
+92|Neutral Language
+operational only; no guilt/streak/worth scoring.
+
+93|Closed Critical/High
+All Cursor-fixable Critical/High for 2.7 closed in this ship.
+
+94|Deploy Order
+code → FE/API/worker align → Alembic 123 head → E2E → Verdict A.
+
+95|Residual 2.6 Status
+docs drift cleared on product tip; PKCE gap remains tech debt; feed/internal-only/no Graph write intact.
+
+96|Candidate-First Stance
+PRIMARY candidate-controlled; org SECONDARY_B2B untouched.
+
+97|No Autonomous Agent
+Phase 3 Career Agent NOT_STARTED; no external schedule/execute.
+
+98|Final Evidence Table
+SHA e1343af2c158e5054b699620cd83251f876b4a9d · CI https://github.com/CzechowskiT/twin/actions/runs/30987210248 · E2E 44/44 · Alembic 123 · four-way ALIGNED.
+
+99|Final Verdict
+ADAPTIVE EXECUTION INTELLIGENCE CUSTOMER-USABLE — CANDIDATE-CONTROLLED ESTIMATION AND CAPACITY LEARNING PRODUCTION-READY
+
+100|Final Answers 1-100
+Patrz Final Answers poniżej.
+
+Final Answers 1-100
+FA1|ADAPTIVE EXECUTION INTELLIGENCE CUSTOMER-USABLE — CANDIDATE-CONTROLLED ESTIMATION AND CAPACITY LEARNING PRODUCTION-READY
+FA2|e1343af2c158e5054b699620cd83251f876b4a9d
+FA3|e1343af2c158e5054b699620cd83251f876b4a9d
+FA4|e1343af2c158e5054b699620cd83251f876b4a9d
+FA5|e1343af2c158e5054b699620cd83251f876b4a9d
+FA6|e1343af2c158e5054b699620cd83251f876b4a9d
+FA7|e1343af2c158e5054b699620cd83251f876b4a9d
+FA8|ALIGNED fe=api=worker=product; DB 123
+FA9|123_adaptive_execution_intelligence
+FA10|123_adaptive_execution_intelligence (is_at_head=true)
+FA11|success https://github.com/CzechowskiT/twin/actions/runs/30987210248
+FA12|PASS 44/44
+FA13|44/44
+FA14|5/5
+FA15|4/4
+FA16|3/3
+FA17|4/4
+FA18|3/3
+FA19|7/7
+FA20|8/8
+FA21|10/10
+FA22|/dashboard/execution-intelligence
+FA23|/dashboard/execution-intelligence?view=estimates
+FA24|/dashboard/execution-intelligence?view=quality
+FA25|/dashboard/execution-intelligence?view=capacity
+FA26|/dashboard/execution-intelligence?view=policy
+FA27|SHIPPED observation registry
+FA28|SHIPPED estimate snapshots
+FA29|SHIPPED estimate-vs-actual (candidate-declared only)
+FA30|SHIPPED estimation profile
+FA31|SHIPPED estimate calibration proposals
+FA32|approve/reject/postpone required
+FA33|reject → profile_mutated=false
+FA34|approve → profile_mutated=true; historic_batches_rewritten=false
+FA35|revert SHIPPED
+FA36|SHIPPED commitment/batch quality
+FA37|SHIPPED fragmentation + alternatives
+FA38|SHIPPED postponement analysis; guilt=false streak=false
+FA39|SHIPPED dependency hints (shared requirement)
+FA40|SHIPPED portfolio balance (holds count)
+FA41|SHIPPED capacity calibration
+FA42|capacity reject → capacity_mutated=false
+FA43|capacity revert SHIPPED
+FA44|SHIPPED execution policy draft
+FA45|simulation mutates_state=false
+FA46|policy resolve SHIPPED
+FA47|health overview SHIPPED; productivity_score=null
+FA48|insight cards SHIPPED
+FA49|learning only via approved calibrations
+FA50|no silent ranking changes
+FA51|Daily OS canonical 200
+FA52|ACAL unchanged by calibrations
+FA53|Execution Calendar progress hook SHIPPED
+FA54|Strategy Review reused for seed
+FA55|Decision Journal not duplicated
+FA56|Search outcomes pattern reused (approval-gated)
+FA57|Studio/Interview/Transition untouched primary
+FA58|Evidence not rewritten by calibrations
+FA59|Lifecycle privacy pause blocks calibrate
+FA60|Adaptive Memory kpi_excluded
+FA61|privacy delete-history propagated
+FA62|export productivity_score_excluded
+FA63|deletion soft-delete + revive
+FA64|recovery via revert
+FA65|Celery refresh_quality present
+FA66|no guilt notifications
+FA67|candidate-scoped + unauth 401
+FA68|prompt-injection: productivity fields stripped
+FA69|audits + safety flags
+FA70|profile revive reliability
+FA71|sample limits for performance
+FA72|FE IA shipped
+FA73|EN/PL i18n shipped
+FA74|a11y: Suspense + nav links
+FA75|inferred actual effort DISABLED
+FA76|productivity score DISABLED
+FA77|motivation/mental-health inference DISABLED
+FA78|silent estimate change DISABLED
+FA79|silent capacity change DISABLED
+FA80|silent strategy/ranking change DISABLED
+FA81|historic approved batches NOT rewritten
+FA82|calendar completion ≠ employment success
+FA83|guilt/streaks DISABLED
+FA84|Phase 3 Agent NOT_STARTED
+FA85|Microsoft Calendar write OFF
+FA86|Launch NO-GO
+FA87|Enrollment OFF
+FA88|Phase 3B BLOCKED
+FA89|Founder action: NONE
+FA90|Next: deepen estimation UX / live busy-read without Phase 3 Agent
+FA91|truth labels published in aggregate
+FA92|claim_kind on calibrations=SUGGESTION until approved
+FA93|CANDIDATE_DECLARED for progress observations
+FA94|OBSERVED_INTERNAL_STATE for comparisons
+FA95|INSUFFICIENT_DATA insight when no actuals
+FA96|four-way ALIGNED at Verdict A
+FA97|DB at Alembic head at Verdict A
+FA98|CI green at product SHA
+FA99|E2E not stance-padded
+FA100|FROZEN: Launch NO-GO; Enrollment OFF; Phase 3B BLOCKED; Phase 3 Agent NOT_STARTED; Microsoft write OFF; no productivity surveillance

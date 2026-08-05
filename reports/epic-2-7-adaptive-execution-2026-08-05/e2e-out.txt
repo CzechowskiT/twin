@@ -1,0 +1,57 @@
+PASS [stance] public_health 200
+PASS [stance] launch_nogo NO-GO
+PASS [stance] enrollment_off 
+PASS [stance] phase_3b_blocked 
+PASS [stance] ms_write_off 
+PASS [persistence] four_way_aligned fe=3919f092a9d5 api=3919f092a9d5 wrk=3919f092a9d5
+PASS [deletion_security] mint_synthetic 200
+PASS [deletion_security] kpi_excluded 
+PASS [persistence] aggregate_200 200
+PASS [persistence] alembic_123 123_adaptive_execution_intelligence
+PASS [observation_estimate] schema 
+PASS [stance] no_productivity 
+PASS [stance] no_silent_estimate 
+PASS [stance] no_silent_capacity 
+PASS [stance] no_historic_rewrite 
+PASS [stance] phase3_not_started 
+PASS [persistence] route_home 
+PASS [observation_estimate] batch_approved 16
+PASS [observation_estimate] progress_actual 200
+PASS [observation_estimate] no_inferred_completion 
+PASS [observation_estimate] snapshot_ok 201
+PASS [calibration_approval] estimate_propose 201
+PASS [calibration_approval] estimate_reject_no_mutate {'calibration': {'id': 1, 'version': 2, 'status': 'rejected', 'before': {'effort_multiplier': 1.0, 'sample_count': 0, 's
+PASS [calibration_approval] estimate_approve {'calibration': {'id': 2, 'version': 2, 'status': 'approved', 'before': {'effort_multiplier': 1.0, 'sample_count': 0, 's
+PASS [calibration_approval] estimate_revert 
+PASS [quality_fragmentation] quality_analyze 201
+PASS [quality_fragmentation] no_productivity_in_quality 
+PASS [quality_fragmentation] postponement_no_guilt 
+PASS [capacity_policy] capacity_propose 201
+PASS [capacity_policy] capacity_reject_no_mutate 
+PASS [capacity_policy] policy_draft 201
+PASS [capacity_policy] sim_no_mutate 
+PASS [integrations_dailyos] daily_os_200 200
+PASS [integrations_dailyos] acal_200 200
+PASS [integrations_dailyos] exec_cal_200 200
+PASS [deletion_security] export_200 200
+PASS [deletion_security] export_no_productivity 
+PASS [deletion_security] delete_history 
+FAIL [deletion_security] cross_user_ok_shape 
+PASS [deletion_security] unauth_denied 401
+PASS [persistence] fe_intel 200
+PASS [persistence] fe_exec 200
+PASS [persistence] fe_approvals 200
+PASS [persistence] db_at_123 {'current_revision': '123_adaptive_execution_intelligence', 'head_revision': '123_adaptive_execution_intelligence', 'hea
+
+=== BUCKET TOTALS ===
+observation_estimate: 5/5
+calibration_approval: 4/4
+quality_fragmentation: 3/3
+capacity_policy: 4/4
+integrations_dailyos: 3/3
+deletion_security: 6/7
+persistence: 8/8
+stance: 10/10
+TOTAL 43/44 (product excl stance 33/34)
+FAILURES:
+  [deletion_security] cross_user_ok_shape: 
