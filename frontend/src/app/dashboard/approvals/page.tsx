@@ -56,6 +56,13 @@ type StrategyDecision = {
   question?: { text?: string };
 };
 
+type CommitmentBatch = {
+  id: number;
+  status: string;
+  items?: { id: number }[];
+  external_created?: boolean;
+};
+
 export default function LifecycleApprovalsPage() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -64,6 +71,7 @@ export default function LifecycleApprovalsPage() {
   const [searchPending, setSearchPending] = useState<SearchStrategyPending[]>([]);
   const [outcomeCals, setOutcomeCals] = useState<OutcomeCalibration[]>([]);
   const [strategyDecisions, setStrategyDecisions] = useState<StrategyDecision[]>([]);
+  const [commitmentBatches, setCommitmentBatches] = useState<CommitmentBatch[]>([]);
   const [err, setErr] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -73,7 +81,7 @@ export default function LifecycleApprovalsPage() {
       return;
     }
     try {
-      const [life, strat, ss, out, reviews] = await Promise.all([
+      const [life, strat, ss, out, reviews, exec] = await Promise.all([
         apiFetch<{ approvals?: Approval[] }>("/api/v1/candidates/me/career-lifecycle", {}, token),
         apiFetch<{ calibration_proposals?: StrategyProposal[] }>(
           "/api/v1/candidates/me/career-strategy",
@@ -95,6 +103,11 @@ export default function LifecycleApprovalsPage() {
           {},
           token,
         ),
+        apiFetch<{ batches?: CommitmentBatch[] }>(
+          "/api/v1/candidates/me/execution-calendar",
+          {},
+          token,
+        ),
       ]);
       setItems(
         (life.approvals || []).filter((a) => a.approval_kind !== "strategy_decision_change_set"),
@@ -106,6 +119,9 @@ export default function LifecycleApprovalsPage() {
       setOutcomeCals((out.calibrations || []).filter((c) => c.status === "pending"));
       setStrategyDecisions(
         (reviews.decisions || []).filter((d) => d.status === "pending_approval"),
+      );
+      setCommitmentBatches(
+        (exec.batches || []).filter((b) => b.status === "pending_approval"),
       );
       setErr(null);
     } catch (ex) {
@@ -194,6 +210,21 @@ export default function LifecycleApprovalsPage() {
     }
   }
 
+  async function resolveCommitmentBatch(id: number, action: "approve" | "reject" | "postpone") {
+    const token = getToken();
+    if (!token) return;
+    try {
+      await apiFetch(
+        `/api/v1/candidates/me/execution-calendar/batches/${id}/resolve`,
+        { method: "POST", body: JSON.stringify({ action }) },
+        token,
+      );
+      await load();
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : t("executionCalendar.actionFailed"));
+    }
+  }
+
   return (
     <Shell>
       <CandidateWorkspaceSubnav ariaLabel={t("careerLifecycle.approvals")} />
@@ -205,6 +236,42 @@ export default function LifecycleApprovalsPage() {
             {err}
           </p>
         ) : null}
+
+        <Card>
+          <h2 className="mb-3 text-lg font-semibold">{t("executionCalendar.batchesTitle")}</h2>
+          <ul className="flex flex-col gap-3 text-sm">
+            {commitmentBatches.map((b) => (
+              <li
+                key={`batch-${b.id}`}
+                className="flex flex-col gap-2 border-b border-[var(--twin-border)] py-2"
+              >
+                <span>
+                  commitment batch #{b.id} · {b.status} · items={b.items?.length ?? 0} ·
+                  external_created={String(!!b.external_created)}
+                </span>
+                <span className="flex gap-2">
+                  <Button type="button" onClick={() => void resolveCommitmentBatch(b.id, "approve")}>
+                    {t("executionCalendar.approve")}
+                  </Button>
+                  <Button type="button" onClick={() => void resolveCommitmentBatch(b.id, "reject")}>
+                    {t("executionCalendar.reject")}
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => void resolveCommitmentBatch(b.id, "postpone")}
+                  >
+                    {t("executionCalendar.postpone")}
+                  </Button>
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 text-sm">
+            <Link className="twin-link" href="/dashboard/execution-calendar">
+              {t("executionCalendar.eyebrow")}
+            </Link>
+          </p>
+        </Card>
 
         <Card>
           <h2 className="mb-3 text-lg font-semibold">{t("searchOutcomes.calibrationTitle")}</h2>

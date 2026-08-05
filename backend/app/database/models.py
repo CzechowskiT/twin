@@ -4030,6 +4030,178 @@ class CandidateStrategyReviewAudit(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 
+class CandidateExecutionRequirement(Base):
+    """Execution work derived from approved decisions only — never from reject/postpone."""
+
+    __tablename__ = "candidate_execution_requirements"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "requirement_key", name="uq_execution_requirement_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    requirement_key: Mapped[str] = mapped_column(String(160))
+    decision_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    change_set_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="open")
+    title: Mapped[str] = mapped_column(String(300))
+    effort_minutes: Mapped[int] = mapped_column(Integer, default=60)
+    priority: Mapped[int] = mapped_column(Integer, default=50)
+    body_json: Mapped[str] = mapped_column(Text, default="{}")
+    stale: Mapped[bool] = mapped_column(Boolean, default=False)
+    spawns_commitments: Mapped[bool] = mapped_column(Boolean, default=True)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="SUGGESTION")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateCapacityProfile(Base):
+    """Explicit candidate time budget only — never inferred private obligations."""
+
+    __tablename__ = "candidate_capacity_profiles"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "profile_key", name="uq_capacity_profile_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    profile_key: Mapped[str] = mapped_column(String(160))
+    weekly_budget_minutes: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    timezone_name: Mapped[str] = mapped_column(String(64), default="UTC")
+    windows_json: Mapped[str] = mapped_column(Text, default="[]")
+    protected_focus_json: Mapped[str] = mapped_column(Text, default="{}")
+    explicit_budget_only: Mapped[bool] = mapped_column(Boolean, default=True)
+    inferred_obligations: Mapped[bool] = mapped_column(Boolean, default=False)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="CANDIDATE_CONFIRMED")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateAvailabilitySnapshot(Base):
+    __tablename__ = "candidate_availability_snapshots"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "snapshot_key", name="uq_availability_snapshot_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    snapshot_key: Mapped[str] = mapped_column(String(160))
+    source_mode: Mapped[str] = mapped_column(String(32), default="internal_only")
+    timezone_name: Mapped[str] = mapped_column(String(64), default="UTC")
+    windows_json: Mapped[str] = mapped_column(Text, default="[]")
+    busy_blocks_json: Mapped[str] = mapped_column(Text, default="[]")
+    snapshot_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    immutable: Mapped[bool] = mapped_column(Boolean, default=False)
+    fabricated: Mapped[bool] = mapped_column(Boolean, default=False)
+    unknown_availability: Mapped[bool] = mapped_column(Boolean, default=False)
+    ms_consent: Mapped[bool] = mapped_column(Boolean, default=False)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="INFERENCE")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateCommitmentBatch(Base):
+    __tablename__ = "candidate_commitment_batches"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "batch_key", name="uq_commitment_batch_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    batch_key: Mapped[str] = mapped_column(String(160))
+    status: Mapped[str] = mapped_column(String(32), default="draft")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    snapshot_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    feasibility_json: Mapped[str] = mapped_column(Text, default="{}")
+    alternatives_json: Mapped[str] = mapped_column(Text, default="[]")
+    lifecycle_approval_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    immutable: Mapped[bool] = mapped_column(Boolean, default=False)
+    external_created: Mapped[bool] = mapped_column(Boolean, default=False)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="SUGGESTION")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateCommitmentBatchItem(Base):
+    __tablename__ = "candidate_commitment_batch_items"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "item_key", name="uq_commitment_batch_item_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    item_key: Mapped[str] = mapped_column(String(160))
+    batch_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_commitment_batches.id", ondelete="CASCADE"), index=True
+    )
+    requirement_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="proposed")
+    title: Mapped[str] = mapped_column(String(300))
+    starts_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    ends_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    effort_minutes: Mapped[int] = mapped_column(Integer, default=60)
+    is_hold: Mapped[bool] = mapped_column(Boolean, default=True)
+    external_created: Mapped[bool] = mapped_column(Boolean, default=False)
+    external_confirmed: Mapped[bool] = mapped_column(Boolean, default=False)
+    acal_item_key: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    progress_json: Mapped[str] = mapped_column(Text, default="{}")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="SUGGESTION")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateCalendarConflict(Base):
+    __tablename__ = "candidate_calendar_conflicts"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "conflict_key", name="uq_calendar_conflict_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    conflict_key: Mapped[str] = mapped_column(String(160))
+    batch_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    kind: Mapped[str] = mapped_column(String(64), default="overlap")
+    body_json: Mapped[str] = mapped_column(Text, default="{}")
+    status: Mapped[str] = mapped_column(String(32), default="open")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateCalendarExecutionAudit(Base):
+    __tablename__ = "candidate_calendar_execution_audits"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    entity_type: Mapped[str] = mapped_column(String(64))
+    entity_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    action: Mapped[str] = mapped_column(String(64))
+    before_json: Mapped[str] = mapped_column(Text, default="{}")
+    after_json: Mapped[str] = mapped_column(Text, default="{}")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
 class CandidateReferralProgram(Base):
     """One referral program per candidate — unique share code (Wave B slice 3)."""
 

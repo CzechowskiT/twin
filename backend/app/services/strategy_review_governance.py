@@ -646,8 +646,17 @@ def resolve_decision(
             cs.execution_json = _dumps(result)
             cs.resolved_at = _utcnow()
         _push_daily_os_decision(db, candidate_id=candidate_id, decision=dec)
+        try:
+            from app.services import decision_calendar_capacity as dcc
+
+            dcc.generate_requirements_from_decision(
+                db, candidate_id=candidate_id, decision_id=dec.id
+            )
+        except Exception as exc:
+            logger.exception("execution requirement generation failed: %s", exc)
         ranking_changed = True
     elif action_u == "postpone":
+        # Explicitly do NOT generate execution requirements / calendar commitments
         dec.status = "postponed"
         if cs:
             cs.status = "postponed"
