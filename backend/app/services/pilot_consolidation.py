@@ -175,3 +175,5 @@ def build_aggregate(db: Session, *, user_id: int | None = None, candidate_id: in
         "kpi_excluded": True,
         "user_scoped": user_id is not None,
     }
+
+# Epic 2.9 deploy align
