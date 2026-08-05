@@ -21,6 +21,7 @@ from app.api import (
     strategy_review_governance,
     decision_calendar_capacity,
     read_only_calendar_sync,
+    adaptive_execution_intelligence,
     chatgpt_twin,
     company,
     company_feedback_persistence,
@@ -201,6 +202,11 @@ api_router.include_router(
     read_only_calendar_sync.public_router,
     prefix="",
     tags=["Private Calendar Feed"],
+)
+api_router.include_router(
+    adaptive_execution_intelligence.router,
+    prefix="/candidates",
+    tags=["Adaptive Execution Intelligence"],
 )
 api_router.include_router(
     candidate_intelligence.router, prefix="", tags=["Candidate Intelligence"]

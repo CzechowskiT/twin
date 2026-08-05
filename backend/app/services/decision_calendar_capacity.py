@@ -734,6 +734,12 @@ def resolve_batch(
         batch.status = "approved_executed"
         _push_daily_os_batch(db, candidate_id=candidate_id, batch=batch)
         acal_ok = True
+        try:
+            from app.services import adaptive_execution_intelligence as aei
+
+            aei.snapshot_estimates_for_batch(db, candidate_id=candidate_id, batch_id=batch.id)
+        except Exception as exc:
+            logger.exception("estimate snapshot on approve failed: %s", exc)
     elif action_u == "postpone":
         batch.status = "postponed"
         for it in items:
@@ -810,6 +816,18 @@ def update_item_progress(
     item.progress_json = _dumps(prog)
     db.commit()
     db.refresh(item)
+    try:
+        from app.services import adaptive_execution_intelligence as aei
+
+        aei.on_progress_recorded(
+            db,
+            candidate_id=candidate_id,
+            item_id=item_id,
+            actual_effort_minutes=actual_effort_minutes,
+            completed=completed,
+        )
+    except Exception:
+        pass
     return _ser_item(item)
 
 

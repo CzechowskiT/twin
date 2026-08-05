@@ -34,6 +34,7 @@ celery_app.conf.update(
         "app.tasks.strategy_review_tasks",
         "app.tasks.decision_calendar_tasks",  # Epic 2.5 decision calendar capacity tasks
         "app.tasks.read_only_calendar_sync_tasks",  # Epic 2.6 read-only calendar sync
+        "app.tasks.adaptive_execution_tasks",  # Epic 2.7 adaptive execution intelligence
         "app.tasks.worker_identity",
         "app.tasks.company_invite_tasks",
     ),

@@ -70,6 +70,9 @@ export function CandidateWorkspaceSubnav({
       <Link href="/dashboard/execution-calendar" className={itemClass}>
         {t("executionCalendar.eyebrow")}
       </Link>
+      <Link href="/dashboard/execution-intelligence" className={itemClass}>
+        {t("executionIntelligence.eyebrow")}
+      </Link>
       <Link href="/dashboard/consent-center" className={itemClass}>
         {t("consentCenter.eyebrow")}
       </Link>

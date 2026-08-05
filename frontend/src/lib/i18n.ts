@@ -151,6 +151,7 @@ export type TranslationKey =
   | `reviewCenter.${keyof typeof en.reviewCenter}`
   | `decisionJournal.${keyof typeof en.decisionJournal}`
   | `executionCalendar.${keyof typeof en.executionCalendar}`
+  | `executionIntelligence.${keyof typeof en.executionIntelligence}`
   | `consentCenter.${keyof typeof en.consentCenter}`
   | `calendarSync.${keyof typeof en.calendarSync}`
   | `recruiterInbox.${keyof typeof en.recruiterInbox}`
@@ -4942,6 +4943,39 @@ eyebrow: "Product roadmap",
     dailyOsLink: "Daily OS",
     disclaimer:
       "Holds and ICS are not external bookings. No Graph write. Capacity is never inferred. Phase 3 Agent NOT_STARTED.",
+  },
+  executionIntelligence: {
+    eyebrow: "Execution Intelligence",
+    title: "Adaptive estimation and capacity learning",
+    lead: "Learn from candidate-declared effort and postponements. Calibrations require your approval — never silent, never a productivity score.",
+    loadFailed: "Could not load execution intelligence",
+    actionFailed: "Action failed — try again",
+    actionOk: "Updated",
+    views: "Execution intelligence views",
+    viewHome: "Home",
+    viewEstimates: "Estimates",
+    viewQuality: "Quality",
+    viewCapacity: "Capacity",
+    viewPolicy: "Policy",
+    estimatesTitle: "Estimate calibration",
+    profileVersion: "Profile version",
+    samples: "Samples",
+    proposeEstimateCal: "Propose estimate calibration",
+    approve: "Approve",
+    reject: "Reject",
+    revert: "Revert",
+    qualityTitle: "Commitment quality",
+    runQuality: "Analyze quality",
+    postponed: "Postponed batches",
+    capacityTitle: "Capacity calibration",
+    proposeCapacityCal: "Propose capacity calibration",
+    policyTitle: "Execution policy simulation",
+    simulatePolicy: "Draft policy + simulate (no state mutation)",
+    safetyTitle: "Safety",
+    execCalLink: "Execution Calendar",
+    approvalsLink: "Approvals",
+    disclaimer:
+      "No inferred actual effort, productivity, motivation, or mental-health scores. No silent capacity or estimate changes. Phase 3 Agent NOT_STARTED.",
   },
   consentCenter: {
     eyebrow: "Consent Center",
@@ -14137,6 +14171,39 @@ const pl: MessageTree = {
     dailyOsLink: "Daily OS",
     disclaimer:
       "Holdy i ICS to nie zewnętrzne bookingi. Bez Graph write. Pojemność nigdy nie jest inferowana. Phase 3 Agent NOT_STARTED.",
+  },
+  executionIntelligence: {
+    eyebrow: "Inteligencja wykonania",
+    title: "Adaptacyjna estymacja i kalibracja pojemności",
+    lead: "Uczy się z zadeklarowanego przez kandydata wysiłku i odłożeń. Kalibracje wymagają Twojej zgody — nigdy ciche, nigdy jako score produktywności.",
+    loadFailed: "Nie udało się wczytać inteligencji wykonania",
+    actionFailed: "Akcja nie powiodła się — spróbuj ponownie",
+    actionOk: "Zaktualizowano",
+    views: "Widoki inteligencji wykonania",
+    viewHome: "Start",
+    viewEstimates: "Estymacje",
+    viewQuality: "Jakość",
+    viewCapacity: "Pojemność",
+    viewPolicy: "Polityka",
+    estimatesTitle: "Kalibracja estymacji",
+    profileVersion: "Wersja profilu",
+    samples: "Próbki",
+    proposeEstimateCal: "Zaproponuj kalibrację estymacji",
+    approve: "Zatwierdź",
+    reject: "Odrzuć",
+    revert: "Cofnij",
+    qualityTitle: "Jakość zobowiązań",
+    runQuality: "Analizuj jakość",
+    postponed: "Odłożone batche",
+    capacityTitle: "Kalibracja pojemności",
+    proposeCapacityCal: "Zaproponuj kalibrację pojemności",
+    policyTitle: "Symulacja polityki wykonania",
+    simulatePolicy: "Szkic polityki + symulacja (bez mutacji stanu)",
+    safetyTitle: "Bezpieczeństwo",
+    execCalLink: "Kalendarz wykonania",
+    approvalsLink: "Zatwierdzenia",
+    disclaimer:
+      "Bez inferowanego wysiłku, produktywności, motywacji ani zdrowia psychicznego. Bez cichych zmian estymacji/pojemności. Phase 3 Agent NOT_STARTED.",
   },
   consentCenter: {
     eyebrow: "Centrum zgód",
