@@ -1,0 +1,105 @@
+PASS [stance] public_health 200
+PASS [stance] launch_nogo NO-GO
+PASS [stance] enrollment_off 
+PASS [stance] phase_3b_blocked 
+PASS [stance] ms_write_off 
+PASS [persistence] four_way_aligned fe=f7d6b03b28f0 api=f7d6b03b28f0 wrk=f7d6b03b28f0
+PASS [security] mint_synthetic 200
+PASS [security] kpi_excluded 
+PASS [approval_acal_dailyos] lifecycle_unpaused 200
+PASS [persistence] aggregate_200 200
+PASS [persistence] alembic_121 121_decision_calendar_capacity_planning
+PASS [decision_requirement_batch] schema 
+PASS [stance] reject_generates_requirements_false 
+PASS [stance] capacity_inferred_false 
+PASS [stance] fabricated_availability_false 
+PASS [stance] internal_calendar_requires_ms_false 
+PASS [stance] holds_as_external_booking_false 
+PASS [stance] ics_as_confirmation_false 
+PASS [stance] autonomous_reschedule_false 
+PASS [stance] phase3_not_started 
+PASS [microsoft_readonly_consent] ms_write_off 
+PASS [microsoft_readonly_consent] no_readwrite_scope 
+PASS [microsoft_readonly_consent] scopes_safe 
+PASS [microsoft_readonly_consent] no_subject_storage 
+PASS [microsoft_readonly_consent] no_attendee_storage 
+PASS [microsoft_readonly_consent] token_logging_false 
+PASS [microsoft_readonly_consent] internal_only_mode 
+PASS [persistence] execution_calendar_route 
+PASS [persistence] batches_route 
+PASS [persistence] capacity_route 
+PASS [persistence] availability_route 
+PASS [persistence] conflicts_route 
+PASS [persistence] history_route 
+PASS [persistence] acal_route 
+PASS [capacity_internal_availability] insufficient_without_budget 200 status=INSUFFICIENT_DATA
+PASS [capacity_internal_availability] explicit_budget_only 
+PASS [capacity_internal_availability] not_inferred 
+PASS [capacity_internal_availability] capacity_saved 200
+PASS [capacity_internal_availability] internal_snapshot 201
+PASS [capacity_internal_availability] not_fabricated 
+PASS [capacity_internal_availability] source_internal 
+PASS [microsoft_readonly_consent] ms_path_without_consent 201
+PASS [microsoft_readonly_consent] consent_blocks_busy internal_only_ms_consent_false
+PASS [decision_requirement_batch] review_session 201
+PASS [decision_requirement_batch] decision_created 201
+PASS [decision_requirement_batch] decision_proposed 200
+PASS [decision_requirement_batch] decision_rejected 200
+PASS [decision_requirement_batch] reject_no_requirements {'generated': False, 'reason': 'decision_rejected', 'requirements': [], 'spawns_commitments': False}
+PASS [decision_requirement_batch] decision2_created 201
+PASS [decision_requirement_batch] decision_approved 200
+PASS [decision_requirement_batch] requirements_present {'generated': False, 'reason': 'already_exists', 'requirements': [{'id': 4, 'decision_id': 26, 'status': 'open', 'title'
+PASS [feasibility_conflict_proposal] batch_proposed 201
+PASS [feasibility_conflict_proposal] not_external 
+PASS [feasibility_conflict_proposal] holds_not_booking 
+PASS [feasibility_conflict_proposal] no_autonomous_reschedule 
+PASS [feasibility_conflict_proposal] batch_has_items 1
+PASS [feasibility_conflict_proposal] feasibility_present 
+PASS [approval_acal_dailyos] batch_pending_approval 200
+PASS [approval_acal_dailyos] requires_approval 
+PASS [approval_acal_dailyos] reject_no_acal 
+PASS [approval_acal_dailyos] approve_creates_acal {'batch': {'id': 11, 'status': 'approved_executed', 'version': 1, 'snapshot_id': 11, 'feasibility': {'autonomous_resched
+PASS [approval_acal_dailyos] approve_not_external 
+PASS [approval_acal_dailyos] approve_holds_not_booking 
+PASS [approval_acal_dailyos] daily_os_200 200
+PASS [approval_acal_dailyos] daily_os_brief_200 200
+PASS [approval_acal_dailyos] acal_200 200
+PASS [progress_effort_followup] progress_saved 200
+PASS [progress_effort_followup] no_inferred_completion 
+PASS [progress_effort_followup] no_productivity_score 
+PASS [progress_effort_followup] actual_effort 
+PASS [progress_effort_followup] internal_reschedule 200
+PASS [ics_history_external_confirm] candidate_declared_confirm 200
+PASS [ics_history_external_confirm] ics_200 200
+PASS [ics_history_external_confirm] ics_no_attendees 
+PASS [ics_history_external_confirm] ics_no_organizer 
+PASS [ics_history_external_confirm] ics_not_confirmation 
+PASS [ics_history_external_confirm] ics_not_external_booking 
+PASS [ics_history_external_confirm] ics_body_flags 
+PASS [ics_history_external_confirm] history_batches_visible 
+PASS [deletion_privacy_recovery] invalidate_stale_guard 
+PASS [deletion_privacy_recovery] privacy_pause 200
+PASS [deletion_privacy_recovery] pause_blocks_snapshots 400
+PASS [deletion_privacy_recovery] export_200 200
+PASS [deletion_privacy_recovery] delete_history 200
+PASS [security] cross_user_denied 404
+PASS [security] unauth_denied 401
+PASS [persistence] fe_execution_calendar 200
+PASS [persistence] fe_approvals 200
+PASS [persistence] fe_decision_journal 200
+PASS [persistence] fe_acceptance 200
+PASS [persistence] db_at_121 current=121_decision_calendar_capacity_planning is_at_head=True http=200
+
+=== BUCKET TOTALS ===
+decision_requirement_batch: 9/9
+capacity_internal_availability: 7/7
+microsoft_readonly_consent: 9/9
+feasibility_conflict_proposal: 6/6
+approval_acal_dailyos: 10/10
+progress_effort_followup: 5/5
+ics_history_external_confirm: 8/8
+deletion_privacy_recovery: 5/5
+security: 4/4
+persistence: 15/15
+stance: 13/13
+TOTAL 91/91 (product excl stance 78/78)
