@@ -3,7 +3,7 @@ Epic 2.8 dostarcza Evidence Investment Intelligence: goal/thesis → luki eviden
 2|Canonical Baseline
 Przed 2.8: product e1343af2 / tip 001e0667 / Alembic 123 / E2E 44/44 / CI 30987210248. Po 2.8: product 8e858840; Alembic 124; E2E 56/56; CI 30989591173.
 3|Canonical Final State
-product/tip HEAD 8e858840814b5172b54de11ea5483d2f7c550f78; FE=API=worker=8e858840814b5172b54de11ea5483d2f7c550f78; Alembic 124_evidence_investment_intelligence is_at_head=true; schema twin.evidence_investment_intelligence/v1.
+product HEAD 8e858840814b5172b54de11ea5483d2f7c550f78; tip docs_only_drift (proof commit after product); FE=API=worker=8e858840814b5172b54de11ea5483d2f7c550f78; Alembic 124_evidence_investment_intelligence is_at_head=true; schema twin.evidence_investment_intelligence/v1.
 4|Verdict
 EVIDENCE INVESTMENT INTELLIGENCE CUSTOMER-USABLE - CANDIDATE-CONTROLLED CAREER EXPERIMENTATION PRODUCTION-READY
 5|Product Value Delivered
