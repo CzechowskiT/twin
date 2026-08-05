@@ -32,7 +32,7 @@ celery_app.conf.update(
         "app.tasks.search_strategy_tasks",
         "app.tasks.search_outcome_tasks",
         "app.tasks.strategy_review_tasks",
-        "app.tasks.decision_calendar_tasks",
+        "app.tasks.decision_calendar_tasks",  # Epic 2.5 decision calendar capacity tasks
         "app.tasks.worker_identity",
         "app.tasks.company_invite_tasks",
     ),
