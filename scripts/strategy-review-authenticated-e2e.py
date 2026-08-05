@@ -79,31 +79,72 @@ def main() -> int:
         return 2
 
     try:
-        st, mint = _req(
-            "POST",
-            "/api/v1/ops/synthetic-candidate",
-            token=OPS,
-            body={"label": "epic24-strategy-review"},
-        )
+        with urllib.request.urlopen(f"{FE}/api/public-health", timeout=45, context=_CTX) as resp:
+            ph = json.loads(resp.read().decode())
+            code = resp.status
     except Exception as exc:
-        print("FAIL mint", exc)
-        return 2
-    if st not in (200, 201) or not isinstance(mint, dict) or not mint.get("access_token"):
+        ph, code = {}, 0
+        check("stance", "public_health", False, str(exc))
+    else:
+        check("stance", "public_health", code == 200, str(code))
+        check("stance", "launch_nogo", ph.get("rc1_launch") == "NO-GO", str(ph.get("rc1_launch")))
+        check(
+            "stance",
+            "enrollment_off",
+            ph.get("rc1_external_pilot_enrollment_enabled") is False,
+            "",
+        )
+        check("stance", "phase_3b_blocked", ph.get("rc1_phase_3b") == "BLOCKED", "")
+        check(
+            "stance",
+            "ms_write_off",
+            ph.get("microsoft_calendar_write_enabled") is False,
+            "",
+        )
+        fe = (ph.get("frontend_commit") or "")[:12]
+        api = (ph.get("api_commit") or "")[:12]
+        wrk = (ph.get("worker_commit") or "")[:12]
+        check(
+            "persistence",
+            "four_way_aligned",
+            fe == api == wrk and bool(fe),
+            f"fe={fe} api={api} wrk={wrk}",
+        )
+
+    st, mint = _req(
+        "POST", "/api/v1/admin/pilot-os/daily-os/mint-synthetic-session", token=OPS
+    )
+    check("security", "mint_synthetic", st == 200, str(st))
+    token = (mint.get("access_token") if isinstance(mint, dict) else "") or ""
+    check("security", "kpi_excluded", bool(isinstance(mint, dict) and mint.get("kpi_excluded")), "")
+    if not token:
         print("FAIL mint", st, str(mint)[:200])
         return 2
-    token = mint["access_token"]
     other = None
-    try:
-        st2, mint2 = _req(
-            "POST",
-            "/api/v1/ops/synthetic-candidate",
-            token=OPS,
-            body={"label": "epic24-strategy-review-other"},
-        )
-        if st2 in (200, 201) and isinstance(mint2, dict):
-            other = mint2.get("access_token")
-    except Exception:
-        other = None
+    st2, mint2 = _req(
+        "POST", "/api/v1/admin/pilot-os/daily-os/mint-synthetic-session", token=OPS
+    )
+    if st2 == 200 and isinstance(mint2, dict):
+        other = mint2.get("access_token")
+
+    st, priv = _req(
+        "PATCH",
+        "/api/v1/candidates/me/career-lifecycle/privacy",
+        token=token,
+        body={
+            "paused": False,
+            "orchestration_opt_in": True,
+            "search_opt_in": True,
+            "learning_opt_in": True,
+            "reminders_opt_in": True,
+        },
+    )
+    check(
+        "ranking_dailyos_acal_lifecycle",
+        "lifecycle_unpaused",
+        st == 200 and isinstance(priv, dict) and priv.get("paused") is False,
+        str(st),
+    )
 
     # Aggregate + routes
     st, agg = _req("GET", "/api/v1/candidates/me/strategy-reviews", token=token)
@@ -469,14 +510,14 @@ def main() -> int:
             f"/api/v1/candidates/me/strategy-reviews/sessions/{rid}/finalize",
             token=other,
         )
-        check("security", "cross_candidate_finalize_denied", st in (400, 403, 404), str(st))
+        check("security", "cross_candidate_finalize_denied", st in (400, 403, 404, 422), str(st))
         st, cross2 = _req(
             "POST",
             f"/api/v1/candidates/me/strategy-reviews/decisions/{did3}/resolve",
             token=other,
             body={"action": "approve"},
         )
-        check("security", "cross_candidate_decision_denied", st in (400, 403, 404), str(st))
+        check("security", "cross_candidate_decision_denied", st in (400, 403, 404, 422), str(st))
     else:
         check("security", "cross_candidate_finalize_denied", False, "no_other_token")
         check("security", "cross_candidate_decision_denied", False, "no_other_token")

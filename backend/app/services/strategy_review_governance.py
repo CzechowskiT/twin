@@ -159,12 +159,14 @@ def compute_cluster_outcomes(db: Session, *, candidate_id: int) -> dict:
             .filter_by(candidate_id=candidate_id, cluster_key=ck)
             .one_or_none()
         )
-        if existing and not existing.deleted_at:
+        if existing:
             existing.summary_json = _dumps(summary)
             existing.opportunity_refs_json = _dumps([{"id": i} for i in uniq[:40]])
             existing.status = status
             existing.demand_claim = False
             existing.fabricated_progress = False
+            existing.claim_kind = claim
+            existing.deleted_at = None
             existing.computed_at = _utcnow()
             row = existing
         else:
