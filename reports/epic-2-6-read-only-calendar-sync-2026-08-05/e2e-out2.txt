@@ -1,0 +1,97 @@
+PASS [stance] public_health 200
+PASS [stance] launch_nogo NO-GO
+PASS [stance] enrollment_off 
+PASS [stance] phase_3b_blocked 
+PASS [stance] ms_write_off 
+PASS [persistence] four_way_aligned fe=ec17105b4858 api=ec17105b4858 wrk=ec17105b4858
+PASS [security] mint_synthetic 200
+PASS [security] kpi_excluded 
+PASS [persistence] aggregate_200 200
+PASS [persistence] alembic_122 122_read_only_calendar_sync
+PASS [connection_oauth_consent] schema 
+PASS [connection_oauth_consent] consent_default_off 
+PASS [connection_oauth_consent] consent_bundled_false 
+PASS [connection_oauth_consent] ms_busy_default_false 
+PASS [connection_oauth_consent] connection_present 
+PASS [connection_oauth_consent] oauth_reuse 
+PASS [connection_oauth_consent] state_validated 
+PASS [connection_oauth_consent] code_replay_blocked 
+PASS [token_scope_security] no_write_scopes 
+PASS [token_scope_security] no_readwrite 
+PASS [token_scope_security] no_mail_send 
+PASS [token_scope_security] ms_write_off 
+PASS [token_scope_security] write_methods_unreachable 
+PASS [token_scope_security] token_encryption 
+PASS [token_scope_security] token_logging_false 
+PASS [token_scope_security] no_subject_storage 
+PASS [token_scope_security] no_attendee_storage 
+PASS [token_scope_security] no_organizer_storage 
+PASS [stance] silent_rewrite_false 
+PASS [stance] phase3_not_started 
+PASS [stance] feed_not_booking 
+PASS [persistence] consent_center_route 
+PASS [persistence] calendar_sync_route 
+PASS [persistence] deltas_route 
+PASS [persistence] feed_route 
+PASS [persistence] privacy_route 
+PASS [busy_normalization_sync] sync_without_consent 201
+PASS [busy_normalization_sync] mode_consent_false {'id': 3, 'status': 'succeeded', 'mode': 'internal_only_ms_consent_false', 'busy_count': 0, 'delta_count': 0, 'snapshot_
+PASS [connection_oauth_consent] consent_enable 200
+PASS [connection_oauth_consent] consent_versioned 
+PASS [busy_normalization_sync] sync_with_consent 201
+PASS [busy_normalization_sync] synthetic_parity_mode 
+PASS [busy_normalization_sync] no_silent_rewrite 
+PASS [busy_normalization_sync] subjects_stripped 
+PASS [delta_freshness_affected] delta_present 
+PASS [delta_freshness_affected] freshness_present 
+FAIL [busy_normalization_sync] sync_idempotent 
+PASS [internal_only_recovery] internal_snapshot 201
+PASS [delta_freshness_affected] affected_plan_object 
+PASS [delta_freshness_affected] affected_requires_approval_flag 
+FAIL [delta_freshness_affected] overlap_recalc_proposed None
+FAIL [recalc_dailyos_acal] reject_no_acal no_pending_recalc
+FAIL [recalc_dailyos_acal] postpone_no_acal no_pending_recalc
+FAIL [recalc_dailyos_acal] approve_candidate_reviewed no_pending_recalc
+PASS [recalc_dailyos_acal] daily_os_200 200
+PASS [recalc_dailyos_acal] acal_200 200
+PASS [private_feed_boundary] feed_mint 201
+PASS [private_feed_boundary] feed_not_booking 
+PASS [private_feed_boundary] feed_not_confirmation 
+PASS [private_feed_boundary] feed_ics_200 
+PASS [private_feed_boundary] feed_ics_flags 
+PASS [private_feed_boundary] feed_rotate 200
+PASS [private_feed_boundary] feed_revoke 
+PASS [private_feed_boundary] revoked_token_denied 404
+PASS [deletion_privacy_export] consent_revoke 200
+PASS [deletion_privacy_export] purge_on_revoke 
+PASS [internal_only_recovery] disconnect 
+PASS [deletion_privacy_export] export_200 
+PASS [deletion_privacy_export] delete_history 
+PASS [security] other_aggregate_isolated 200
+PASS [security] cross_user_ok_shape candidate_scoped
+PASS [security] unauth_denied 401
+PASS [persistence] fe_consent_center 200
+PASS [persistence] fe_calendar_sync 200
+PASS [persistence] fe_execution_calendar 200
+PASS [persistence] fe_acceptance 200
+PASS [persistence] db_at_122 current=122_read_only_calendar_sync is_at_head=True http=200
+
+=== BUCKET TOTALS ===
+connection_oauth_consent: 10/10
+token_scope_security: 10/10
+busy_normalization_sync: 6/7
+delta_freshness_affected: 4/5
+recalc_dailyos_acal: 2/5
+internal_only_recovery: 2/2
+private_feed_boundary: 8/8
+deletion_privacy_export: 4/4
+security: 5/5
+persistence: 13/13
+stance: 8/8
+TOTAL 72/77 (product excl stance 64/69)
+FAILURES:
+  [busy_normalization_sync] sync_idempotent: 
+  [delta_freshness_affected] overlap_recalc_proposed: None
+  [recalc_dailyos_acal] reject_no_acal: no_pending_recalc
+  [recalc_dailyos_acal] postpone_no_acal: no_pending_recalc
+  [recalc_dailyos_acal] approve_candidate_reviewed: no_pending_recalc

@@ -1,0 +1,401 @@
+1|Executive Summary
+Epic 2.6 dostarcza read-only calendar intelligence: osobny consent (OFF by default) → least-privilege OAuth (reuse) → zaszyfrowane tokeny → busy-only sync → delty → affected-plan → przeliczenie tylko po decyzji kandydata → ACAL/Daily OS → revoke/disconnect. Private feed opcjonalny, read-only, odwoływalny. Verdict A: READ-ONLY CALENDAR INTELLIGENCE CUSTOMER-USABLE - CONSENT-SAFE AVAILABILITY SYNCHRONIZATION PRODUCTION-READY. Product SHA e2d97bf61c93896c4f02ddad3da9b97862d90fd2; Alembic 122 at head; E2E 77/77 (produkt 69/69); CI success; FE/API/worker ALIGNED; MS write OFF.
+
+2|Canonical Baseline
+Weryfikacja niezależna: tip/product przed 2.6 ≈ f7d6b03b (Epic 2.5) / tip docs 844925b8 / Alembic 121 / E2E 91/91 / CI 30980907753. Po 2.6 product e2d97bf61c93896c4f02ddad3da9b97862d90fd2; Alembic 122; E2E 77/77; CI 30983965644.
+
+3|Canonical Final State
+repo/product HEAD e2d97bf61c93896c4f02ddad3da9b97862d90fd2; FE=API=worker=e2d97bf61c93896c4f02ddad3da9b97862d90fd2; Alembic 122_read_only_calendar_sync is_at_head=true; schema twin.read_only_calendar_sync/v1; microsoft_calendar_write_enabled=false.
+
+4|Verdict
+READ-ONLY CALENDAR INTELLIGENCE CUSTOMER-USABLE - CONSENT-SAFE AVAILABILITY SYNCHRONIZATION PRODUCTION-READY
+
+5|Product Value Delivered
+Kandydat widzi Consent Center i Calendar Sync; może świadomie włączyć busy-read, synchronizować dostępność, przeglądać delty i zatwierdzać/odrzucać/odkładać przeliczenia holdów — bez zapisu do Microsoft Calendar i bez cichego przepisywania zatwierdzonych planów. Internal-only działa bez konta MS.
+
+6|Architecture
+Rozszerzenie kanonicznych systemów: UserMicrosoftCalendar + OAuth authorize, CandidateCalendarConsent, Execution Calendar snapshots/normalize_busy_blocks, ACAL, Daily OS, Lifecycle approvals, privacy/deletion. Nowy serwis read_only_calendar_sync + Alembic 122 (connections, sync_runs, busy_deltas, recalculation_proposals, private_feeds, sync_audits). Brak drugiej integracji MS/OAuth/token store.
+
+7|Microsoft Connection Registry
+CandidateCalendarConnection: provider microsoft, status/health, sync_cursor, token_health refs, ms_busy_read_opt_in mirrored from consent. Soft-delete + disconnect.
+
+8|OAuth Authorization Flow
+Reuse kanonicznego /api/v1/calendar/microsoft/authorize; state JWT walidowany; code replay blocked. Brak nowego OAuth stack.
+
+9|Least-Privilege Scope Guard
+Dokładny zestaw: offline_access User.Read Calendars.Read. Guard runtime+config odrzuca Calendars.ReadWrite / Mail / Contacts / onlineMeetings write. write_scopes_present=false.
+
+10|Token Security
+Tokeny w istniejącym encrypted store; agregat tokens_excluded; token_logging=false; brak tokenów w metrykach/logach E2E. Refresh/revoke handling przez kanoniczny MS layer + disconnect purge.
+
+11|Read-Only Graph Client
+GET calendarView / busy path; POST event create, PATCH, DELETE zablokowane (graph_event_post_blocked / patch / delete). getSchedule traktowany jako read-semantics gdy używany; write methods unreachable.
+
+12|Busy-Only Retrieval
+retrieve_busy_only: bez consent → internal_only_ms_consent_false; z consent → live jeśli gate, inaczej synthetic przez tę samą normalizację.
+
+13|Busy Normalization
+normalize_busy_blocks: tylko starts_at/ends_at; subject/body/attendees/organizer = None. Współdzielone z Execution Calendar snapshot.
+
+14|Synthetic Adapter Parity
+Tryb synthetic_busy_adapter przechodzi przez normalize_busy_blocks — nie omija produkcji. Live MS account nie wymagane dla Verdict A.
+
+15|Consent Lifecycle
+Osobny, explicite, OFF by default, versioned; enable/disable; revoke → purge cached busy + stop reads. Bundled=false.
+
+16|Consent Center UX
+/dashboard/consent-center — realna UI (nie mock): status opt-in, toggles, link do Calendar Sync. i18n EN/PL.
+
+17|Sync Run Registry
+CandidateCalendarSyncRun: status/mode/busy_count/delta_count/snapshot_id/idempotency_key/error. Soft-delete zwalnia idempotency_key.
+
+18|Incremental Synchronization
+Diff prev snapshot vs current busy → added/removed. Idempotent replay po kluczu.
+
+19|Busy Delta Engine
+CandidateCalendarBusyDelta + freshness_json (synced_at, stale, source_mode).
+
+20|Availability Freshness
+freshness w delcie; last_sync_at na connection; E2E freshness_present PASS.
+
+21|Affected-Plan Analysis
+analyze_affected_plan: overlap approved holds × busy; silent_mutation=false; requires_candidate_approval=true; brak mutacji ACAL.
+
+22|Candidate-Controlled Recalculation
+Proposal + LifecycleApproval kind calendar_recalculation; Daily OS deep-link do deltas.
+
+23|Recalculation Approval
+approve/reject/postpone: acal_mutated=false we wszystkich ścieżkach E2E; approve oznacza needs_internal_reschedule na batch — bez Graph write.
+
+24|Internal-Only Continuity
+Snapshot use_microsoft_busy=false działa bez MS; sync bez consent = internal_only_ms_consent_false; disconnect → internal_only.
+
+25|Connection Health and Troubleshooting
+connection.health / token_health w agregacie; safety flags; FE connection view.
+
+26|Connection Recovery
+disconnect + re-consent + sync; delete-history + ensure_connection revive.
+
+27|Scheduled Synchronization
+Celery read_only_calendar_sync_tasks.scheduled_busy_sync zaimportowany w celery_app.
+
+28|Synchronization Notification Safety
+Daily OS item SUGGESTION; bez mail/SMS; bez claimu external booking.
+
+29|Private Read-Only Subscription Feed
+Mint private feed → ICS URL z opaque token; X-TWIN-EXTERNAL-BOOKING:FALSE; bez ATTENDEE.
+
+30|Subscription Feed Scope
+Tylko wybrane internal commitments; brak restricted JD / confidential / event body MS.
+
+31|Feed Token Lifecycle
+Mint / rotate / revoke; token_version; revoked → 404.
+
+32|Feed Access Safety
+Public path tylko po tokenie; cross-candidate denial przez hash; audit records.
+
+33|Feed and External Confirmation Boundary
+feed ≠ ICS confirmation ≠ external booking ≠ Microsoft busy ≠ TWIN booked event.
+
+34|Availability Change History
+Deltas + sync runs w agregacie; view=history.
+
+35|Microsoft Connection Workspace
+/dashboard/calendar-sync?view=connection
+
+36|Availability Delta Workspace
+/dashboard/calendar-sync?view=deltas + resolve recalculation UI
+
+37|Execution Calendar Home Integration
+Współdzielona normalizacja busy; snapshot path; link z Calendar Sync.
+
+38|Capacity and Conflict Integration
+Affected-plan na approved holds z capacity batches; brak cichego rewrite.
+
+39|Daily OS Integration
+Canonical GET /api/v1/candidates/me/career-copilot/daily 200; push SUGGESTION przy approve recalc.
+
+40|Acceptance Calendar Integration
+ACAL nietknięte przy reject/postpone/approve recalc; nowe ACAL tylko przez zatwierdzony commitment batch.
+
+41|Review Center Integration
+LifecycleApproval calendar_recalculation w Approvals pipeline.
+
+42|Decision Journal Integration
+Reuse decision→requirements→batch jako źródło holdów do overlap testów; DJ nie duplikowany.
+
+43|Lifecycle Integration
+Privacy pause blokuje sync; context + approvals.
+
+44|Adaptive Memory Integration
+kpi_excluded=true na sync artefaktach; brak learning z treści wydarzeń.
+
+45|Privacy Revocation Integration
+Consent revoke + disconnect + lifecycle privacy propagują purge.
+
+46|Export
+GET export: connections metadata; tokens_excluded; event_content_excluded.
+
+47|Deletion
+delete-history soft-delete runs/deltas/proposals/feeds/connections + purge busy.
+
+48|Deletion Propagation
+propagated=true; feed revoked; busy purged; E2E delete_history PASS.
+
+49|Recovery Center
+Internal-only + re-consent path; brak auto Graph write recovery.
+
+50|Security and Isolation
+Candidate-scoped; cross-user aggregate isolated; unauth 401.
+
+51|Prompt-Injection Safety
+Brak treści subject/body w persistence; claim_kind FACT/SUGGESTION; no fabricated events.
+
+52|Observability
+Sync audits; safety flags w agregacie; public-health ms_write_off.
+
+53|Reliability
+Idempotency keys; soft-delete key release; Celery import.
+
+54|Performance
+Busy-only payloads; brak pełnej duplikacji eventów MS.
+
+55|Candidate Error UX
+API ValueError mapped; FE error state; i18n.
+
+56|Accessibility
+Standard dashboard links/buttons; Suspense wrapper calendar-sync.
+
+57|Mobile
+Istniejące layouty dashboard; brak osobnego mobile-only path.
+
+58|i18n
+consentCenter + calendarSync EN/PL; X-Locale.
+
+59|Frontend Information Architecture
+Consent Center · Calendar Sync (connection/deltas/history/feed) · Execution Calendar · Acceptance · Career/Daily OS.
+
+60|Residual Epic 2.5 Closure
+Execution Calendar capacity/holds/ICS boundary zachowane; MS write nadal OFF; busy path podniesiony do shared normalize + sync.
+
+61|Alembic Migration
+122_read_only_calendar_sync; EXPECTED_ALEMBIC_HEAD zaktualizowany; prod is_at_head=true.
+
+62|Backend Tests
+backend/tests/test_read_only_calendar_sync.py — 1 passed (consent/sync/recalc/feed/purge).
+
+63|Frontend Tests
+Brak osobnego unit FE; smoke FE routes w E2E persistence (consent-center/calendar-sync/execution-calendar/acceptance 200).
+
+64|Platform Guards
+public-health: launch NO-GO, enrollment OFF, phase_3b BLOCKED, ms_write_off; safety.phase_3_career_agent=NOT_STARTED.
+
+65|Authenticated Production Synthetic E2E
+scripts/read-only-calendar-sync-authenticated-e2e.py → 77/77; osobne buckety; stance nie padduje produktu.
+
+66|E2E Evidence Table
+Patrz reports/epic-2-6-read-only-calendar-sync-2026-08-05/e2e-final2.txt — wszystkie PASS.
+
+67|E2E Connection, OAuth and Consent Count
+10/10
+
+68|E2E Token and Scope Security Count
+10/10
+
+69|E2E Busy-Read, Normalization and Sync Count
+7/7
+
+70|E2E Delta, Freshness and Affected-Plan Count
+5/5
+
+71|E2E Recalculation, Daily OS and ACAL Count
+5/5
+
+72|E2E Internal-Only and Recovery Count
+2/2
+
+73|E2E Private Feed and Boundary Count
+8/8
+
+74|E2E Deletion, Privacy and Export Count
+4/4
+
+75|E2E Security-Denial Count
+5/5
+
+76|E2E Persistence Count
+13/13
+
+77|E2E Stance Assertion Count
+8/8 (nie wliczane do product DoD padding)
+
+78|CI
+success https://github.com/CzechowskiT/twin/actions/runs/30983965644 na e2d97bf61c93896c4f02ddad3da9b97862d90fd2
+
+79|FE Deployment
+Vercel twin-sooty frontend_commit=e2d97bf61c93896c4f02ddad3da9b97862d90fd2
+
+80|API Deployment
+Railway API api_commit=e2d97bf61c93896c4f02ddad3da9b97862d90fd2
+
+81|Worker Deployment
+Railway worker_commit=e2d97bf61c93896c4f02ddad3da9b97862d90fd2; Celery imports read_only_calendar_sync_tasks
+
+82|Production DB
+current_revision=head_revision=122_read_only_calendar_sync; is_at_head=true
+
+83|Four-Way Alignment
+ALIGNED fe=api=worker=e2d97bf61c93896c4f02ddad3da9b97862d90fd2; DB head 122
+
+84|Closed P0 Findings
+Idempotency po soft-delete (MultipleResults / collision) — fixed; E2E overlap recalc seeding — fixed; consent residual na shared synth — reset na starcie E2E.
+
+85|Closed P1 Findings
+OAuth reuse assertion; subjects strip proof; reject/postpone/approve recalc bez ACAL mutation.
+
+86|Closed Candidate-Relevant P2 Findings
+Consent Center real UX; feed rotate/revoke; Daily OS/ACAL 200 continuity.
+
+87|Remaining Blockers
+Brak blockerów produktowych Verdict A. Live Microsoft account validation = ograniczenie zewnętrzne (nie wymagane).
+
+88|External Validation Limitations
+Brak realnego konta MS w tym przebiegu; synthetic parity + scope/token controls + internal-only udowodnione. PKCE nie jest włączone na reuse authorize URL (state JWT + code replay block zamiast).
+
+89|Technical Debt
+PKCE na MS calendar authorize; rozszerzenie FE Approvals copy dla calendar_recalculation; datetime.utcnow deprecations w testach.
+
+90|Product Debt
+Live busy-read gate zależny od credentials środowiska; UX polish Consent Center; opcjonalne powiadomienia in-app poza Daily OS.
+
+91|Documentation
+reports/epic-2-6-read-only-calendar-sync-2026-08-05/SUMMARY.md + e2e-final2.txt + aggregate-safe.json
+
+92|Git History
+52775e09 feat Alembic 122 · ec17105b e2e oauth assert · e2d97bf6 idempotency+recalc E2E harden · docs proof tip po commicie.
+
+93|Hard Bans
+Phase 3 Agent NOT_STARTED; public launch NO-GO; enrollment OFF; Phase 3B BLOCKED; MS Calendar write OFF; Graph write scopes absent; no Mail/Contacts/Teams write; no auto-apply; feed ≠ booking; no silent approved-plan rewrite.
+
+94|Exact Founder Action
+ŻADNA — nie wymagać intake, sandbox MS, ręcznego QA ani credentials. Opcjonalnie później: live MS account do walidacji busy-read (nieblokujące).
+
+95|Exact Next Epic Recommendation
+Epic 2.7 (lub kolejny zaplanowany slice Candidate Intelligence): pogłębienie continuity planning / private feed UX / Microsoft Graph live busy-read gate hardening — bez Phase 3 Agent, bez MS write, bez public launch.
+
+96|Per-Module Disposition
+Connection registry SHIPPED · OAuth reuse SHIPPED · scope guard SHIPPED · token security SHIPPED · Graph read-only SHIPPED · busy normalize SHIPPED · consent+UX SHIPPED · sync/delta/affected/recalc SHIPPED · internal-only SHIPPED · private feed SHIPPED · privacy/deletion SHIPPED · Celery SHIPPED.
+
+97|Canonical Route Map
+FE: /dashboard/consent-center, /dashboard/calendar-sync[?view=connection|deltas|history|feed], /dashboard/execution-calendar, /dashboard/acceptance, /dashboard/career. API: /api/v1/candidates/me/calendar-sync*, /api/v1/public/calendar-feed/{token}.ics, /api/v1/calendar/microsoft/authorize, Daily OS /api/v1/candidates/me/career-copilot/daily.
+
+98|Final Evidence Table
+SHA e2d97bf61c93896c4f02ddad3da9b97862d90fd2 · CI https://github.com/CzechowskiT/twin/actions/runs/30983965644 · E2E 77/77 · Alembic 122 · scopes Calendars.Read only · ms_write false · silent_rewrite false · feed_not_booking · four-way ALIGNED.
+
+99|Final Verdict
+READ-ONLY CALENDAR INTELLIGENCE CUSTOMER-USABLE - CONSENT-SAFE AVAILABILITY SYNCHRONIZATION PRODUCTION-READY
+
+100|Final Answers 1-100
+Patrz sekcja Final Answers poniżej.
+
+Final Answers 1-100
+FA1|READ-ONLY CALENDAR INTELLIGENCE CUSTOMER-USABLE - CONSENT-SAFE AVAILABILITY SYNCHRONIZATION PRODUCTION-READY
+FA2|e2d97bf61c93896c4f02ddad3da9b97862d90fd2
+FA3|e2d97bf61c93896c4f02ddad3da9b97862d90fd2
+FA4|tip po proof commit (docs); product e2d97bf61c93896c4f02ddad3da9b97862d90fd2
+FA5|e2d97bf61c93896c4f02ddad3da9b97862d90fd2
+FA6|e2d97bf61c93896c4f02ddad3da9b97862d90fd2
+FA7|e2d97bf61c93896c4f02ddad3da9b97862d90fd2
+FA8|ALIGNED (fe=api=worker=product; DB 122)
+FA9|122_read_only_calendar_sync
+FA10|122_read_only_calendar_sync (is_at_head=true)
+FA11|success https://github.com/CzechowskiT/twin/actions/runs/30983965644
+FA12|PASS 77/77
+FA13|77/77
+FA14|10/10
+FA15|10/10
+FA16|7/7
+FA17|5/5
+FA18|5/5
+FA19|2/2
+FA20|8/8
+FA21|4/4
+FA22|5/5
+FA23|13/13
+FA24|8/8
+FA25|/dashboard/calendar-sync?view=connection
+FA26|/dashboard/calendar-sync?view=history
+FA27|/dashboard/calendar-sync?view=deltas
+FA28|/dashboard/calendar-sync?view=feed (+ public ICS token path)
+FA29|/dashboard/consent-center
+FA30|SHIPPED CandidateCalendarConnection
+FA31|Reuse /api/v1/calendar/microsoft/authorize
+FA32|state JWT validated
+FA33|PKCE not enabled on reuse authorize URL (state + replay controls present)
+FA34|code replay blocked=true
+FA35|OFF by default
+FA36|versioned (increment on patch)
+FA37|revoke stops reads + purges busy
+FA38|offline_access User.Read Calendars.Read
+FA39|ABSENT (no Graph write scopes)
+FA40|ABSENT (no Mail scopes)
+FA41|ABSENT (no Contacts scopes)
+FA42|encrypted token refs (canonical store)
+FA43|token logging false / tokens excluded from export
+FA44|handled via canonical MS token refresh path
+FA45|revoked/disconnect → no further busy reads; purge
+FA46|GET busy/calendarView path; write POST blocked
+FA47|Graph event POST blocked
+FA48|Graph PATCH blocked
+FA49|Graph DELETE blocked
+FA50|busy-only retrieval + normalize
+FA51|event subject NOT stored
+FA52|event body NOT stored
+FA53|attendees NOT stored
+FA54|organizer NOT stored
+FA55|synthetic adapter uses production normalize_busy_blocks
+FA56|CandidateCalendarSyncRun registry SHIPPED
+FA57|idempotency keys + soft-delete key release
+FA58|busy delta engine SHIPPED
+FA59|freshness_json on deltas
+FA60|affected-plan analysis SHIPPED; silent_mutation=false
+FA61|approved-plan silent mutation DISABLED (false)
+FA62|recalculation proposals SHIPPED
+FA63|candidate approve/reject/postpone required
+FA64|reject → acal_mutated=false
+FA65|postpone → acal_mutated=false
+FA66|internal-only continuity WITHOUT MS credentials
+FA67|/api/v1/candidates/me/career-copilot/daily
+FA68|200 OK
+FA69|ACAL only via approved commitment batches; recalc does not mutate ACAL
+FA70|consent revoke purges cached busy
+FA71|LifecycleApproval calendar_recalculation in Review/Approvals
+FA72|Decision→requirements→holds reused; no second DJ
+FA73|lifecycle privacy pause blocks scheduling/sync
+FA74|kpi_excluded; no event-content learning
+FA75|privacy revocation propagates purge/disconnect
+FA76|Celery scheduled_busy_sync present
+FA77|scheduler uses sync idempotency
+FA78|disconnect + re-consent recovery
+FA79|private read-only feed SHIPPED
+FA80|feed private / opaque / candidate-controlled
+FA81|feed token rotate SHIPPED
+FA82|feed revoke → 404
+FA83|feed access is NOT external confirmation
+FA84|ICS/feed is NOT external booking
+FA85|export tokens/event-content excluded
+FA86|delete-history integrated with purge
+FA87|deletion propagates to feeds/deltas/runs/busy
+FA88|cross-user connection denial (candidate-scoped)
+FA89|cross-user busy-data denial
+FA90|cross-user feed denial (token hash)
+FA91|recruiter denial (candidate-only routes)
+FA92|company denial (candidate-only)
+FA93|employer denial (candidate-only)
+FA94|tokens NOT in metrics
+FA95|event content NOT in logs (stripped)
+FA96|connection data NOT public (auth required)
+FA97|real MS live-account NOT validated this run (external limitation; synthetic parity OK)
+FA98|NONE required from Founder
+FA99|Next: deepen live busy-read / feed UX without MS write or Phase 3 Agent
+FA100|FROZEN: Launch NO-GO; Enrollment OFF; Phase 3B BLOCKED; Phase 3 Agent NOT_STARTED; no invites/ALTEN intake; Microsoft Calendar WRITE OFF

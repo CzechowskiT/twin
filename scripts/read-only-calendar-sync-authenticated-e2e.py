@@ -143,6 +143,17 @@ def main() -> int:
     )
     _req("POST", "/api/v1/candidates/me/calendar-sync/delete-history", token=token)
     _req("POST", "/api/v1/candidates/me/execution-calendar/delete-history", token=token)
+    # Shared synth candidate may retain prior opt-in — reset to off before baseline checks
+    _req(
+        "PATCH",
+        "/api/v1/candidates/me/calendar-sync/consent",
+        token=token,
+        body={
+            "ms_busy_read_opt_in": False,
+            "store_availability_blocks": False,
+            "ics_export_opt_in": False,
+        },
+    )
 
     st, agg = _req("GET", "/api/v1/candidates/me/calendar-sync", token=token)
     check("persistence", "aggregate_200", st == 200, str(st))
