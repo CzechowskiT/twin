@@ -328,35 +328,19 @@ def create_availability_snapshot(
             # Consent revoke / never granted → do not read; stay internal
             source_mode = "internal_only_ms_consent_false"
         else:
+            from app.services.read_only_calendar_sync import normalize_busy_blocks
+
             settings = get_settings()
+            # Always normalize through shared busy-times-only path (synthetic parity)
+            busy = normalize_busy_blocks(synthetic_busy or [])
             if not bool(getattr(settings, "microsoft_busy_read_enabled", False)):
-                # Synthetic adapter parity when live Graph gated off
-                busy = [
-                    {
-                        "starts_at": b.get("starts_at"),
-                        "ends_at": b.get("ends_at"),
-                        "subject": None,
-                        "attendees": None,
-                        "synthetic": True,
-                    }
-                    for b in (synthetic_busy or [])
-                    if b.get("starts_at") and b.get("ends_at")
-                ]
                 source_mode = "synthetic_busy_adapter"
             else:
-                # Live busy-read path — store minimal busy only (no subjects/attendees)
-                busy = [
-                    {
-                        "starts_at": b.get("starts_at"),
-                        "ends_at": b.get("ends_at"),
-                        "subject": None,
-                        "attendees": None,
-                        "synthetic": False,
-                    }
-                    for b in (synthetic_busy or [])
-                    if b.get("starts_at") and b.get("ends_at")
-                ]
-                source_mode = "microsoft_busy_read_only"
+                source_mode = (
+                    "microsoft_busy_read_only"
+                    if busy
+                    else "synthetic_busy_adapter"
+                )
 
     payload = {
         "windows": windows,

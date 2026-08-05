@@ -151,6 +151,8 @@ export type TranslationKey =
   | `reviewCenter.${keyof typeof en.reviewCenter}`
   | `decisionJournal.${keyof typeof en.decisionJournal}`
   | `executionCalendar.${keyof typeof en.executionCalendar}`
+  | `consentCenter.${keyof typeof en.consentCenter}`
+  | `calendarSync.${keyof typeof en.calendarSync}`
   | `recruiterInbox.${keyof typeof en.recruiterInbox}`
   | `recruiterAudit.${keyof typeof en.recruiterAudit}`
   | `recruiterScorecard.${keyof typeof en.recruiterScorecard}`
@@ -4940,6 +4942,56 @@ eyebrow: "Product roadmap",
     dailyOsLink: "Daily OS",
     disclaimer:
       "Holds and ICS are not external bookings. No Graph write. Capacity is never inferred. Phase 3 Agent NOT_STARTED.",
+  },
+  consentCenter: {
+    eyebrow: "Consent Center",
+    title: "Calendar consent lifecycle",
+    lead: "Busy-read and feeds stay off by default. Revoke stops reads and purges cached busy blocks. No bundled consent.",
+    loadFailed: "Could not load consent center",
+    actionFailed: "Consent action failed — try again",
+    saved: "Consent updated",
+    togglesTitle: "Explicit consent toggles",
+    msBusyRead: "Microsoft busy-read (read-only)",
+    storeBusy: "Store redacted busy blocks",
+    icsExport: "ICS / private feed export",
+    internalCalendar: "Internal calendar planning",
+    enable: "Enable",
+    revoke: "Revoke",
+    connectionTitle: "Connection health",
+    disclaimer:
+      "Default off. Revoke purges busy cache. Microsoft Calendar write remains OFF. Phase 3 Agent NOT_STARTED.",
+  },
+  calendarSync: {
+    eyebrow: "Calendar Sync",
+    title: "Read-only availability sync",
+    lead: "Consent-gated busy sync, deltas, and candidate-reviewed recalculation. Internal-only continues without Microsoft.",
+    loadFailed: "Could not load calendar sync",
+    actionFailed: "Calendar sync action failed — try again",
+    actionOk: "Action completed",
+    views: "Calendar sync views",
+    viewHome: "Home",
+    viewConnection: "Connection",
+    viewDeltas: "Deltas",
+    viewHistory: "History",
+    viewFeed: "Private feed",
+    runSync: "Run busy sync",
+    disconnect: "Disconnect / purge",
+    recalcTitle: "Recalculation proposals",
+    deltasTitle: "Busy deltas",
+    runsTitle: "Sync runs",
+    feedTitle: "Private read-only feed",
+    mintFeed: "Mint private feed",
+    rotateFeed: "Rotate token",
+    revokeFeed: "Revoke",
+    feedTokenOnce: "Token shown once — treat as secret",
+    feedDisclaimer:
+      "Feed is read-only, opaque, revocable. Never an external booking or confirmation.",
+    approve: "Approve",
+    reject: "Reject",
+    postpone: "Postpone",
+    dailyOsLink: "Daily OS",
+    disclaimer:
+      "No Graph write. No silent approved-plan rewrite. Holds/ICS/feed ≠ external booking. Phase 3 Agent NOT_STARTED.",
   },
   productPolish: {
     pilotPreviewBanner: "Pilot preview — not part of public launch.",
@@ -14085,6 +14137,56 @@ const pl: MessageTree = {
     dailyOsLink: "Daily OS",
     disclaimer:
       "Holdy i ICS to nie zewnętrzne bookingi. Bez Graph write. Pojemność nigdy nie jest inferowana. Phase 3 Agent NOT_STARTED.",
+  },
+  consentCenter: {
+    eyebrow: "Centrum zgód",
+    title: "Cykl życia zgód kalendarza",
+    lead: "Busy-read i feedy są domyślnie wyłączone. Odwołanie zatrzymuje odczyty i czyści cache busy. Bez zgód zbiorczych.",
+    loadFailed: "Nie udało się wczytać centrum zgód",
+    actionFailed: "Akcja zgody nie powiodła się — spróbuj ponownie",
+    saved: "Zaktualizowano zgodę",
+    togglesTitle: "Jawne przełączniki zgód",
+    msBusyRead: "Microsoft busy-read (tylko odczyt)",
+    storeBusy: "Przechowuj zredagowane bloki busy",
+    icsExport: "Eksport ICS / prywatny feed",
+    internalCalendar: "Wewnętrzne planowanie kalendarza",
+    enable: "Włącz",
+    revoke: "Odwołaj",
+    connectionTitle: "Stan połączenia",
+    disclaimer:
+      "Domyślnie OFF. Odwołanie czyści cache busy. Microsoft Calendar write pozostaje OFF. Phase 3 Agent NOT_STARTED.",
+  },
+  calendarSync: {
+    eyebrow: "Sync kalendarza",
+    title: "Sync dostępności tylko-do-odczytu",
+    lead: "Busy sync po zgodzie, delty i przeliczenie planu po akceptacji kandydata. Tryb internal-only działa bez Microsoft.",
+    loadFailed: "Nie udało się wczytać sync kalendarza",
+    actionFailed: "Akcja sync nie powiodła się — spróbuj ponownie",
+    actionOk: "Akcja zakończona",
+    views: "Widoki sync",
+    viewHome: "Start",
+    viewConnection: "Połączenie",
+    viewDeltas: "Delty",
+    viewHistory: "Historia",
+    viewFeed: "Prywatny feed",
+    runSync: "Uruchom busy sync",
+    disconnect: "Rozłącz / wyczyść",
+    recalcTitle: "Propozycje przeliczenia",
+    deltasTitle: "Delty busy",
+    runsTitle: "Przebiegi sync",
+    feedTitle: "Prywatny feed tylko-do-odczytu",
+    mintFeed: "Utwórz prywatny feed",
+    rotateFeed: "Obróć token",
+    revokeFeed: "Odwołaj",
+    feedTokenOnce: "Token pokazywany raz — traktuj jako sekret",
+    feedDisclaimer:
+      "Feed jest tylko-do-odczytu, nieprzejrzysty i odwoływalny. Nigdy nie jest zewnętrzną rezerwacją ani potwierdzeniem.",
+    approve: "Zatwierdź",
+    reject: "Odrzuć",
+    postpone: "Odłóż",
+    dailyOsLink: "Daily OS",
+    disclaimer:
+      "Bez Graph write. Bez cichego przepisywania zatwierdzonych planów. Hold/ICS/feed ≠ zewnętrzna rezerwacja. Phase 3 Agent NOT_STARTED.",
   },
   productPolish: {
     pilotPreviewBanner: "Podgląd pilota — poza publicznym launch.",

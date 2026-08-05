@@ -20,6 +20,7 @@ from app.api import (
     search_outcome_intelligence,
     strategy_review_governance,
     decision_calendar_capacity,
+    read_only_calendar_sync,
     chatgpt_twin,
     company,
     company_feedback_persistence,
@@ -190,6 +191,16 @@ api_router.include_router(
     decision_calendar_capacity.router,
     prefix="/candidates",
     tags=["Decision Calendar Capacity Planning"],
+)
+api_router.include_router(
+    read_only_calendar_sync.router,
+    prefix="/candidates",
+    tags=["Read-Only Calendar Sync"],
+)
+api_router.include_router(
+    read_only_calendar_sync.public_router,
+    prefix="",
+    tags=["Private Calendar Feed"],
 )
 api_router.include_router(
     candidate_intelligence.router, prefix="", tags=["Candidate Intelligence"]
