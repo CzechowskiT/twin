@@ -31,7 +31,6 @@ from app.database.models import (
     CandidateExecutionSimulation,
     CandidateLifecycleApproval,
 )
-from app.services import career_copilot as cc
 from app.services import career_lifecycle as life
 from app.services import decision_calendar_capacity as dcc
 
