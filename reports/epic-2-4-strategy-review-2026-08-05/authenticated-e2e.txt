@@ -1,0 +1,88 @@
+PASS [stance] public_health 200
+PASS [stance] launch_nogo NO-GO
+PASS [stance] enrollment_off 
+PASS [stance] phase_3b_blocked 
+PASS [stance] ms_write_off 
+PASS [persistence] four_way_aligned fe=5c38c471894f api=5c38c471894f wrk=5c38c471894f
+PASS [security] mint_synthetic 200
+PASS [security] kpi_excluded 
+PASS [ranking_dailyos_acal_lifecycle] lifecycle_unpaused 200
+PASS [persistence] aggregate_200 200
+PASS [persistence] alembic_120 120_strategy_review_decision_governance
+PASS [review_registry_obs_snapshots] schema 
+PASS [stance] silent_strategy_change_false 
+PASS [stance] fabricated_cluster_false 
+PASS [stance] phase3_not_started 
+PASS [stance] public_decision_journal_false 
+PASS [stance] external_action_false 
+PASS [persistence] review_center_route 
+PASS [persistence] decision_journal_route 
+PASS [cluster_role_search_watch_source] linkage_created 201
+PASS [cluster_role_search_watch_source] clusters_200 200
+PASS [cluster_role_search_watch_source] clusters_observed OBSERVED
+PASS [cluster_role_search_watch_source] no_demand_claim 
+PASS [cluster_role_search_watch_source] no_fabricated_progress 
+PASS [cluster_role_search_watch_source] components_200 
+PASS [cluster_role_search_watch_source] components_have_clusters 
+PASS [weekly_monthly_compare] weekly_created 201
+PASS [review_registry_obs_snapshots] review_id 1
+PASS [review_registry_obs_snapshots] observations_lineage 
+PASS [review_registry_obs_snapshots] no_silent_on_create 
+PASS [weekly_monthly_compare] consumes_outcomes 
+PASS [weekly_monthly_compare] monthly_created 
+PASS [review_registry_obs_snapshots] finalize_immutable 
+PASS [weekly_monthly_compare] compare_200 
+PASS [weekly_monthly_compare] compare_fact 
+PASS [assumption_question_evidence] assumption_created 
+PASS [assumption_question_evidence] assumption_eval_no_causality 
+PASS [assumption_question_evidence] decision_created 201
+PASS [assumption_question_evidence] evidence_package 
+PASS [assumption_question_evidence] unknowns_present 
+PASS [alternative_counterfactual_approval] alts_with_impact_preview 
+PASS [alternative_counterfactual_approval] cf_simulation_only 
+PASS [alternative_counterfactual_approval] requires_approval 
+PASS [alternative_counterfactual_approval] not_silent 
+PASS [alternative_counterfactual_approval] propose_200 200
+PASS [alternative_counterfactual_approval] propose_requires_approval 
+PASS [execution_followup_revise_revert] reject_200 
+PASS [execution_followup_revise_revert] reject_no_ranking 
+PASS [execution_followup_revise_revert] reject_no_mutate 
+PASS [execution_followup_revise_revert] postpone_no_mutate 
+PASS [execution_followup_revise_revert] approve_ranking 
+PASS [execution_followup_revise_revert] approve_no_external 
+PASS [execution_followup_revise_revert] followup_201 
+PASS [execution_followup_revise_revert] reconfirm_200 
+PASS [execution_followup_revise_revert] revert_restores 
+PASS [deletion_privacy_recovery] invalidate_stale_guard 
+PASS [execution_followup_revise_revert] stale_blocked 
+PASS [weekly_monthly_compare] archive_no_spawn 
+PASS [ranking_dailyos_acal_lifecycle] daily_os_200 200
+PASS [ranking_dailyos_acal_lifecycle] daily_os_not_404 
+PASS [ranking_dailyos_acal_lifecycle] daily_os_brief_exists 200
+PASS [ranking_dailyos_acal_lifecycle] career_strategy_200 
+PASS [persistence] fe_review_center 200
+PASS [persistence] fe_decision_journal 200
+PASS [persistence] fe_approvals 200
+PASS [persistence] fe_daily_os 200
+PASS [deletion_privacy_recovery] export_secrets_excluded 
+PASS [deletion_privacy_recovery] export_no_transcripts 
+PASS [deletion_privacy_recovery] delete_propagated 
+PASS [security] cross_candidate_finalize_denied 404
+PASS [security] cross_candidate_decision_denied 404
+PASS [security] unauth_aggregate_401 401
+PASS [security] unauth_daily_os_not_404 401
+PASS [persistence] expected_alembic_120 topology_skipped
+
+=== BUCKET COUNTS ===
+review_registry_obs_snapshots: 5/5
+weekly_monthly_compare: 6/6
+cluster_role_search_watch_source: 7/7
+assumption_question_evidence: 5/5
+alternative_counterfactual_approval: 6/6
+execution_followup_revise_revert: 10/10
+ranking_dailyos_acal_lifecycle: 5/5
+deletion_privacy_recovery: 4/4
+security: 6/6
+persistence: 10/10
+stance: 10/10
+TOTAL: 74/74
