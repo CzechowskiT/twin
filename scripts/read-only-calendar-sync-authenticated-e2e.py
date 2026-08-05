@@ -165,7 +165,11 @@ def main() -> int:
     )
     check("connection_oauth_consent", "connection_present", bool((agg or {}).get("connection")))
     oauth = (agg or {}).get("oauth") or {}
-    check("connection_oauth_consent", "oauth_reuse", "microsoft/authorize" in str(oauth.get("authorize_available") and oauth.get("reuse_canonical") or ""))
+    check(
+        "connection_oauth_consent",
+        "oauth_reuse",
+        bool(oauth.get("reuse_canonical")) and "microsoft/authorize" in str(oauth.get("reuse_canonical")),
+    )
     check("connection_oauth_consent", "state_validated", oauth.get("state_validated") is True)
     check("connection_oauth_consent", "code_replay_blocked", oauth.get("code_replay_blocked") is True)
 
