@@ -58,7 +58,7 @@ export default function OnboardingPage() {
       if (PRODUCT_FUNNEL_CLIENT_ENABLED) {
         trackEvent("onboarding_completed", {
           surface: "onboarding",
-          ttv_matches_redirect: TTV_MATCHES_REDIRECT_ENABLED,
+          ttv_matches_redirect: false,
         });
       }
       if (opts?.celebrate) {
