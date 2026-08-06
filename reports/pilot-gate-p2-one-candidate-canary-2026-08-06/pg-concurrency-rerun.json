@@ -1,0 +1,2 @@
+{"bucket_key_prefix": "synth_p2_canary_concurrency_gate", "cap_overshoot": 0, "claim_kind": "FACT", "elapsed_sec": 7.066, "final_used_count_at_peak": 1, "kpi_excluded": true, "mutates_real_invites": false, "passed": true, "post_expire_reject": "cap_exceeded", "post_full_reject": "cap_exceeded", "post_release_reserve_ok": true, "reject_reasons": ["cap_exceeded"], "rejected_excess_reservations": 11, "run_id": "dca618003c", "schema": "twin.pilot_gate_p2_pg_concurrency/v1", "successful_reservations": 1, "worker_pids_unique": 12, "workers": 12}
+PASS pg_concurrency_cap1
