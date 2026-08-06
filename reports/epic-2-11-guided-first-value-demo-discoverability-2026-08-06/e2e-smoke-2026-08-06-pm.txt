@@ -1,0 +1,52 @@
+PASS [A_stance] launch_nogo 
+PASS [A_stance] enrollment_off 
+PASS [A_stance] invite_send_off 
+PASS [A_stance] real_invites_zero 0
+PASS [A_stance] access_ready_inactive OPERATIONALLY_READY_INACTIVE
+PASS [A_stance] phase_3b 
+PASS [A_stance] ms_write_off 
+PASS [A_stance] eff_caps_zero 
+PASS [A_stance] mint_synth 200
+PASS [A_stance] kpi_excluded 
+PASS [B_guided_fv] catalog 200
+PASS [B_guided_fv] entries_3 
+PASS [B_guided_fv] fv_contract_v1 
+PASS [B_guided_fv] status 200
+PASS [B_guided_fv] entry_my_data 200
+PASS [B_guided_fv] starter_direction 200
+PASS [B_guided_fv] pause PAUSED
+PASS [B_guided_fv] resume 
+PASS [C_isolated_demo] start 200
+PASS [C_isolated_demo] kpi_excluded 
+PASS [C_isolated_demo] writes_0 0
+PASS [C_isolated_demo] no_promote 
+PASS [C_isolated_demo] demo_seen True
+PASS [C_isolated_demo] demo_vs_real_separate 
+PASS [C_isolated_demo] contamination_pass 
+PASS [C_isolated_demo] kpi_contam_0 
+PASS [C_isolated_demo] exit_clean 
+PASS [D_discoverability] endpoint 200
+PASS [D_discoverability] primary_7 7
+PASS [D_discoverability] no_8th 
+PASS [D_discoverability] no_silent_scores 
+PASS [D_discoverability] tour_7 
+PASS [D_discoverability] tour_ne_fv 
+PASS [D_discoverability] preview_ready_inactive 
+PASS [D_discoverability] empty_complete 
+PASS [D_discoverability] loading_ne_empty 
+PASS [E_empty_privacy] help_available 200
+PASS [E_empty_privacy] ops_aggregate 200
+PASS [E_empty_privacy] contract_starter ['actionable_empty_state', 'enrolled', 'feedback_submitted', 'first_value', 'invites_generated', 'invites_redeemed', 'in
+PASS [F_telemetry] tour_event_ok 200
+PASS [F_telemetry] unknown_rejected 400
+PASS [A_stance] consol_ok 200
+PASS [A_stance] invite_send_still_off 
+PASS [A_stance] real_invites_still_0 
+BUCKET A_stance 13/13
+BUCKET B_guided_fv 8/8
+BUCKET C_isolated_demo 9/9
+BUCKET D_discoverability 9/9
+BUCKET E_empty_privacy 3/3
+BUCKET F_telemetry 2/2
+SUMMARY all=44/44
+VERDICT_HINT=EPIC_211_PASS
