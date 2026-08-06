@@ -87,6 +87,12 @@ def execute_candidate_account_deletion(
         raise ValueError("legal_hold_blocks_self_service_deletion")
 
     deleted_at = _utcnow()
+    try:
+        from app.services import pilot_support_ops as support_ops
+
+        support_ops.soft_delete_all_for_candidate(db, candidate_id=candidate.id)
+    except Exception:
+        pass
     _anonymize_candidate(candidate)
     _anonymize_user(user)
 

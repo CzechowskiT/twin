@@ -24,6 +24,7 @@ from app.api import (
     adaptive_execution_intelligence,
     evidence_investment_intelligence,
     pilot_consolidation,
+    pilot_operations,
     chatgpt_twin,
     company,
     company_feedback_persistence,
@@ -219,6 +220,16 @@ api_router.include_router(
     pilot_consolidation.router,
     prefix="/candidates",
     tags=["Pilot Consolidation"],
+)
+api_router.include_router(
+    pilot_operations.router,
+    prefix="/candidates",
+    tags=["Pilot Operations"],
+)
+api_router.include_router(
+    pilot_operations.admin_router,
+    prefix="/admin",
+    tags=["Pilot Operations Admin"],
 )
 api_router.include_router(
     candidate_intelligence.router, prefix="", tags=["Candidate Intelligence"]

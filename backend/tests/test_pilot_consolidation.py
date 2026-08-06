@@ -57,7 +57,7 @@ def test_pilot_consolidation_aggregate_and_gates(monkeypatch):
     assert agg.status_code == 200, agg.text
     body = agg.json()
     assert body["schema"] == "twin.pilot_consolidation/v1"
-    assert body["pilot_access"]["pilot_access_status"] == "PRODUCTION_READY_INACTIVE"
+    assert body["pilot_access"]["pilot_access_status"] == "OPERATIONALLY_READY_INACTIVE"
     assert body["pilot_access"]["enrollment_enabled"] is False
     assert body["pilot_access"]["invite_send_enabled"] is False
     assert body["pilot_access"]["real_invites_sent"] == 0

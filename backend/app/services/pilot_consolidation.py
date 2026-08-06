@@ -18,7 +18,7 @@ from app.services import product_funnel as funnel
 logger = logging.getLogger(__name__)
 
 SCHEMA = "twin.pilot_consolidation/v1"
-PILOT_ACCESS_STATUS = "PRODUCTION_READY_INACTIVE"
+PILOT_ACCESS_STATUS = "OPERATIONALLY_READY_INACTIVE"
 FIRST_VALUE_CONTRACT_ID = "pilot_first_value_v1"
 
 # Allowlisted pilot-funnel events (extend product_funnel.FUNNEL_EVENTS)
@@ -51,6 +51,10 @@ def pilot_access_snapshot(db: Session | None = None) -> dict[str, Any]:
         "invite_send_enabled": False,
         "real_invites_sent": 0,
         "real_pilot_users_added": 0,
+        "real_invite_generation": "OFF",
+        "real_invite_redemption": "OFF",
+        "effective_cohort_cap": 0,
+        "effective_canary_cap": 0,
         "launch": "NO-GO",
         "phase_3b": "BLOCKED",
         "phase_3_agent": "NOT_STARTED",

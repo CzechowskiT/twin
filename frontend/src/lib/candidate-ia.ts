@@ -44,6 +44,9 @@ export const CANDIDATE_PRIMARY_IA = [
 
 /** Secondary / advanced — reachable but not primary nav. */
 export const CANDIDATE_SECONDARY_IA = [
+  { href: "/dashboard/help", labelKey: "pilotOps.navHelp" as const, disposition: "keep_secondary" },
+  { href: "/dashboard/help/report-problem", labelKey: "pilotOps.navReport" as const, disposition: "keep_secondary" },
+  { href: "/dashboard/help/feedback", labelKey: "pilotOps.navFeedback" as const, disposition: "keep_secondary" },
   { href: "/profile", labelKey: "nav.profile" as const, disposition: "keep_secondary" },
   { href: "/dashboard/jobs", labelKey: "nav.jobs" as const, disposition: "keep_secondary" },
   { href: "/dashboard/strategy", labelKey: "pilotConsolidation.moreStrategy" as const, disposition: "keep_secondary" },
@@ -73,6 +76,9 @@ export const CANDIDATE_ROUTE_DISPOSITION: Record<string, "primary" | "secondary"
   "/dashboard/execution-calendar": "primary",
   "/dashboard/approvals": "primary",
   "/dashboard/privacy-center": "primary",
+  "/dashboard/help": "secondary",
+  "/dashboard/help/report-problem": "secondary",
+  "/dashboard/help/feedback": "secondary",
   "/profile": "secondary",
   "/dashboard/jobs": "secondary",
   "/dashboard/strategy": "secondary",
@@ -116,7 +122,7 @@ export const FIRST_VALUE_CONTRACT = {
   not_sufficient: ["sign_in_alone", "dashboard_open_alone", "module_tour"],
 } as const;
 
-export const PILOT_ACCESS_STATUS = "PRODUCTION_READY_INACTIVE" as const;
+export const PILOT_ACCESS_STATUS = "OPERATIONALLY_READY_INACTIVE" as const;
 export const INVITE_SEND_ENABLED = false;
 export const REAL_INVITES_SENT_EPIC_29 = 0;
 export const REAL_PILOT_USERS_ADDED_EPIC_29 = 0;

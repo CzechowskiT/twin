@@ -7172,3 +7172,123 @@ class CandidatePilotAllowlist(Base):
     active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class PilotRuntimeState(Base):
+    """Fail-closed pilot runtime singleton — Epic 2.10."""
+
+    __tablename__ = "pilot_runtime_states"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    singleton_key: Mapped[str] = mapped_column(String(32), unique=True, default="global")
+    state: Mapped[str] = mapped_column(String(48), default="OPERATIONALLY_READY_INACTIVE", index=True)
+    access_enabled: Mapped[bool] = mapped_column(Boolean, default=False)
+    generation_enabled: Mapped[bool] = mapped_column(Boolean, default=False)
+    send_enabled: Mapped[bool] = mapped_column(Boolean, default=False)
+    redemption_enabled: Mapped[bool] = mapped_column(Boolean, default=False)
+    telemetry_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    support_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    updated_by_label: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    audit_json: Mapped[str] = mapped_column(Text, default="{}")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class PilotCapBucket(Base):
+    """Transactional hard-cap ledger — Epic 2.10 (effective real caps = 0)."""
+
+    __tablename__ = "pilot_cap_buckets"
+    __table_args__ = (UniqueConstraint("bucket_key", name="uq_pilot_cap_bucket"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    bucket_key: Mapped[str] = mapped_column(String(64), index=True)
+    absolute_max: Mapped[int] = mapped_column(Integer, default=0)
+    effective_limit: Mapped[int] = mapped_column(Integer, default=0)
+    used_count: Mapped[int] = mapped_column(Integer, default=0)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateSupportCase(Base):
+    """Candidate-owned support / problem case — Epic 2.10."""
+
+    __tablename__ = "candidate_support_cases"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "case_key", name="uq_support_case_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    case_key: Mapped[str] = mapped_column(String(64))
+    kind: Mapped[str] = mapped_column(String(32), default="problem")
+    category: Mapped[str] = mapped_column(String(64), default="general")
+    status: Mapped[str] = mapped_column(String(32), default="DRAFT", index=True)
+    subject: Mapped[str] = mapped_column(String(200), default="")
+    body_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    diagnostic_opt_in: Mapped[bool] = mapped_column(Boolean, default=False)
+    diagnostic_json: Mapped[str] = mapped_column(Text, default="{}")
+    recovery_json: Mapped[str] = mapped_column(Text, default="[]")
+    operator_note: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    closed_reason: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    withdrawn_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidatePilotFeedback(Base):
+    """Withdrawable pilot feedback — not telemetry / ranking / training."""
+
+    __tablename__ = "candidate_pilot_feedback"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "feedback_key", name="uq_pilot_feedback_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    feedback_key: Mapped[str] = mapped_column(String(64))
+    category: Mapped[str] = mapped_column(String(64), default="ux")
+    rating: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    page_path: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="SUBMITTED", index=True)
+    used_for_ranking: Mapped[bool] = mapped_column(Boolean, default=False)
+    used_for_training: Mapped[bool] = mapped_column(Boolean, default=False)
+    withdrawn_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="CANDIDATE_CONFIRMED")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class PilotIncidentExercise(Base):
+    """Synthetic incident / rollback exercises — never mutates live pilot activation."""
+
+    __tablename__ = "pilot_incident_exercises"
+    __table_args__ = (UniqueConstraint("exercise_key", name="uq_pilot_incident_exercise"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    exercise_key: Mapped[str] = mapped_column(String(80))
+    kind: Mapped[str] = mapped_column(String(48), default="synthetic_rollback")
+    result: Mapped[str] = mapped_column(String(32), default="PASS")
+    detail_json: Mapped[str] = mapped_column(Text, default="{}")
+    mutates_state: Mapped[bool] = mapped_column(Boolean, default=False)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)

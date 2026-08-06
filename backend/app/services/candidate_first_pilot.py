@@ -603,7 +603,11 @@ def execute_candidate_send(
 
     dry_run=True: evaluate gate only; no mint, no pack status change, no mail.
     dry_run=False: requires send-safety PASS; marks SENT; mints tokens + allowlist.
+    Epic 2.10: runtime kill switches + effective hard caps (0) block real send.
     """
+    from app.services import pilot_hard_caps as caps
+    from app.services import pilot_runtime as runtime
+
     gate = evaluate_candidate_send_safety(
         db,
         settings,
@@ -611,16 +615,40 @@ def execute_candidate_send(
         founder_send_approval_ref=founder_send_approval_ref,
     )
     if dry_run:
+        send_ok, send_reason = runtime.assert_send_allowed(db)
         return {
             "ok": True,
             "dry_run": True,
             "send_executed": False,
-            "would_send": bool(gate.get("can_send")),
+            "would_send": bool(gate.get("can_send")) and send_ok,
             "tokens_minted": 0,
             "gate": gate,
+            "runtime_block": None if send_ok else send_reason,
+            "hard_caps": caps.caps_snapshot(db),
             "note": "Dry-run only — no mail, no tokens, pack stays READY_UNSENT",
         }
+    send_ok, send_reason = runtime.assert_send_allowed(db)
+    if not send_ok:
+        return {
+            "ok": False,
+            "dry_run": False,
+            "send_executed": False,
+            "tokens_minted": 0,
+            "gate": gate,
+            "error": send_reason,
+        }
+    reserved, cap_reason = caps.try_reserve(db, bucket_key=caps.BUCKET_SEND, n=1)
+    if not reserved:
+        return {
+            "ok": False,
+            "dry_run": False,
+            "send_executed": False,
+            "tokens_minted": 0,
+            "gate": gate,
+            "error": cap_reason,
+        }
     if not gate.get("can_send"):
+        caps.release_reservation(db, bucket_key=caps.BUCKET_SEND, n=1)
         return {
             "ok": False,
             "dry_run": False,

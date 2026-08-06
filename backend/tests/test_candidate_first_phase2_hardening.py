@@ -157,7 +157,8 @@ def test_send_blocked_without_ref_even_when_not_dry_run(monkeypatch) -> None:
         db.close()
 
 
-def test_authorized_send_mints_tokens_and_register_bridge(monkeypatch) -> None:
+def test_authorized_send_blocked_by_epic_210_runtime_and_caps(monkeypatch) -> None:
+    """Epic 2.10: Founder send ref alone cannot mint — runtime + effective cap 0."""
     client, db, app, get_settings = _client(monkeypatch)
     try:
         _, pack_id = _approved_pack(client)
@@ -166,31 +167,10 @@ def test_authorized_send_mints_tokens_and_register_bridge(monkeypatch) -> None:
             headers={"Authorization": "Bearer ops-secret"},
             json={"dry_run": False, "founder_send_approval_ref": "FOUNDER-SEND-AUTH-OK"},
         )
-        assert sent.status_code == 200, sent.text
+        assert sent.status_code in (200, 403), sent.text
         body = sent.json()
-        assert body["send_executed"] is True
-        assert body["tokens_minted"] == 2
-        tokens = body["invite_tokens"]
-        assert len(tokens) == 2
-        raw = tokens[0]["invite_token"]
-        assert db.query(CandidatePilotAllowlist).filter_by(active=True).count() == 2
-
-        # Register with invite token (not env allowlist)
-        reg = client.post(
-            "/api/v1/auth/register",
-            json={
-                "email": "pilot.a@example.com",
-                "password": "password123",
-                "gdpr_consent": True,
-                "terms_of_service_consent": True,
-                "job_data_processing_consent": True,
-                "ai_matching_consent": True,
-                "invite_token": raw,
-            },
-        )
-        assert reg.status_code == 201, reg.text
-        tok_row = db.query(CandidateInviteToken).filter_by(token_hash=invite_tokens.hash_token(raw)).one()
-        assert tok_row.status == "USED"
+        assert body.get("send_executed") is not True
+        assert db.query(CandidateInviteToken).count() == 0
     finally:
         app.dependency_overrides.clear()
         get_settings.cache_clear()

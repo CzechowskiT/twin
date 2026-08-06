@@ -129,6 +129,7 @@ export type TranslationKey =
   | `onboarding.${keyof typeof en.onboarding}`
   | `onboardingFlow.${keyof typeof en.onboardingFlow}`
   | `pilotConsolidation.${keyof typeof en.pilotConsolidation}`
+  | `pilotOps.${keyof typeof en.pilotOps}`
   | `help.${keyof typeof en.help}`
   | `tutorial.${keyof typeof en.tutorial}`
   | `feedback.${keyof typeof en.feedback}`
@@ -1907,6 +1908,32 @@ const en = {
     homeOpenEvidence: "Add evidence",
     homeOpenDecisions: "Open decisions",
     claimKind: "SUGGESTION",
+  },
+  pilotOps: {
+    navHelp: "Help",
+    navReport: "Report a problem",
+    navFeedback: "Pilot feedback",
+    title: "Help Center",
+    lead: "Guides, problem reports, and withdrawable feedback — no attachments or screenshots.",
+    reportTitle: "Report a problem",
+    reportLead: "Describe what went wrong. Preview diagnostics before sharing. Nothing is emailed automatically.",
+    feedbackTitle: "Pilot feedback",
+    feedbackLead: "Feedback is separate from telemetry and never used for ranking or training.",
+    category: "Category",
+    subject: "Subject",
+    details: "Details",
+    submit: "Submit",
+    withdraw: "Withdraw",
+    diagnosticOptIn: "Include privacy-safe diagnostic preview",
+    diagnosticPreview: "Diagnostic preview",
+    recovery: "Recovery steps",
+    noAttachments: "Attachments and screenshots are not accepted.",
+    rating: "Rating (1–5)",
+    successProblem: "Problem submitted.",
+    successFeedback: "Feedback submitted.",
+    withdrawn: "Feedback withdrawn.",
+    openPrivacy: "Open Privacy Center",
+    openHome: "Open Home",
   },
   help: {
     widgetTitle: "Help",
@@ -11201,6 +11228,32 @@ const pl: MessageTree = {
     homeOpenEvidence: "Dodaj evidence",
     homeOpenDecisions: "Otwórz decyzje",
     claimKind: "SUGGESTION",
+  },
+  pilotOps: {
+    navHelp: "Pomoc",
+    navReport: "Zgłoś problem",
+    navFeedback: "Opinia pilota",
+    title: "Centrum pomocy",
+    lead: "Poradniki, zgłoszenia problemów i opinie z możliwością wycofania — bez załączników i zrzutów.",
+    reportTitle: "Zgłoś problem",
+    reportLead: "Opisz, co poszło nie tak. Podejrzyj diagnostykę przed udostępnieniem. Nic nie jest wysyłane mailem automatycznie.",
+    feedbackTitle: "Opinia pilota",
+    feedbackLead: "Opinie są oddzielne od telemetrii i nie służą do rankingu ani treningu.",
+    category: "Kategoria",
+    subject: "Temat",
+    details: "Szczegóły",
+    submit: "Wyślij",
+    withdraw: "Wycofaj",
+    diagnosticOptIn: "Dołącz podgląd bezpiecznej diagnostyki",
+    diagnosticPreview: "Podgląd diagnostyki",
+    recovery: "Kroki naprawcze",
+    noAttachments: "Załączniki i zrzuty ekranu nie są przyjmowane.",
+    rating: "Ocena (1–5)",
+    successProblem: "Problem zgłoszony.",
+    successFeedback: "Opinia wysłana.",
+    withdrawn: "Opinia wycofana.",
+    openPrivacy: "Otwórz Centrum prywatności",
+    openHome: "Otwórz Start",
   },
   help: {
     widgetTitle: "Pomoc",

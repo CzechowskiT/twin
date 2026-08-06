@@ -167,7 +167,20 @@ def mint_tokens_for_pack(
     intake_rows: list[CandidatePilotIntakeRow],
     ttl_days: int = TOKEN_TTL_DAYS,
 ) -> list[dict[str, Any]]:
-    """Mint ACTIVE tokens + allowlist rows. Returns plaintext tokens once (caller must not log)."""
+    """Mint ACTIVE tokens + allowlist rows. Returns plaintext tokens once (caller must not log).
+
+    Epic 2.10: real generation blocked by runtime + effective hard cap 0.
+    """
+    from app.services import pilot_hard_caps as caps
+    from app.services import pilot_runtime as runtime
+
+    gen_ok, gen_reason = runtime.assert_generation_allowed(db)
+    if not gen_ok:
+        raise RuntimeError(f"invite_generation_blocked:{gen_reason}")
+    n = max(1, len(intake_rows))
+    reserved, cap_reason = caps.try_reserve(db, bucket_key=caps.BUCKET_GENERATION, n=n)
+    if not reserved:
+        raise RuntimeError(f"invite_generation_cap:{cap_reason}")
     now = _utcnow()
     expires = now + timedelta(days=ttl_days)
     minted: list[dict[str, Any]] = []
