@@ -1,13 +1,13 @@
 1|Executive Summary
-Pilot Gate P2 zakończony bez aktywacji canary. Brak secure Founder-approved activation manifesto. Pełny preflight non-mutating PASS (39/39). Bramka współbieżności PostgreSQL PASS (1 sukces / 11 odrzuceń / overshoot 0). Żadne realne zaproszenie nie zostało wygenerowane ani wysłane. Verdict: ONE-CANDIDATE CANARY ACTIVATION BLOCKED — SECURE MANIFEST, SEND AUTHORIZATION OR PRE-ACTIVATION GATE INCOMPLETE; NO UNAUTHORIZED INVITATION SENT. Product e6328c3c; Alembic 126; Launch NO-GO.
+Pilot Gate P2 zakończony bez aktywacji canary. Brak secure Founder-approved activation manifesto. Pełny preflight non-mutating PASS (39/39). Bramka współbieżności PostgreSQL PASS (1 sukces / 11 odrzuceń / overshoot 0). Żadne realne zaproszenie nie zostało wygenerowane ani wysłane. Verdict: ONE-CANDIDATE CANARY ACTIVATION BLOCKED — SECURE MANIFEST, SEND AUTHORIZATION OR PRE-ACTIVATION GATE INCOMPLETE; NO UNAUTHORIZED INVITATION SENT. Live tip 73755bf2 ALIGNED; Alembic 126; Launch NO-GO.
 2|Canonical Baseline
 Epic 2.10 product e6328c3c / tip f1e2de25 / FE tip docs_only_drift vs API=worker e6328c3c / Alembic 126 / CI 31077376617 / E2E 27/27 / OPERATIONALLY_READY_INACTIVE / effective caps 0 / absolute cohort 3 canary 1 / enrollment OFF / invites 0 / Launch NO-GO — zweryfikowane niezależnie.
 3|Verified Starting State
 Live: launch=NO-GO; enrollment=false; invite_only=true; access=OPERATIONALLY_READY_INACTIVE; invite_send=false; real_invites=0; real_pilots=0; eff caps 0; phase_3b=BLOCKED; ms_write=false; api=worker=e6328c3c; DB 126 head.
 4|Product SHA
-e6328c3c746eab6cd828adcc22881ec537a80a52 (API/worker product). Tip startu f1e2de25 (docs). Tip Gate P2: 236e88d73afa8f41b90607fe1eae5cd065f516ae (atomic hard-caps + evidence; bez aktywacji).
+Live product surfaces 73755bf266296c0d5b83a36536cb4068deabfdae (FE=API=worker). Baseline startu e6328c3c; tip startu f1e2de25 (docs). Atomic fix 236e88d7; tip report 73755bf2. Bez aktywacji canary.
 5|Proof Tip
-236e88d73afa8f41b90607fe1eae5cd065f516ae (atomic caps + evidence). Product surfaces at gate close: redeploy may follow for API atomic path; baseline product e6328c3c.
+73755bf266296c0d5b83a36536cb4068deabfdae. Live FE=API=worker ALIGNED na tip; atomic hard-caps w runtime. Baseline startu e6328c3c.
 6|Manifest Validation
 ABSENT / INVALID. Brak pliku poza-git, brak ENV path, brak Railway ENV_KEYS. In-repo docs/FIRST_REAL_PILOT_ACTIVATION.json = template (signed_file=null) — nie jest autoryzacją. Puste dry-run validate → valid=false.
 7|Founder Authorization
@@ -101,17 +101,17 @@ pilot-gate-p2-preflight-e2e.py PASS 39/39.
 51|Public-Gate Regression
 PASS — uninvited blocked; enrollment OFF.
 52|CI
-Product e6328c3c SUCCESS https://github.com/CzechowskiT/twin/actions/runs/31077376617 . Tip docs in_progress/pending; Gate P2 tip CI po pushu atomic caps.
+Product baseline e6328c3c SUCCESS https://github.com/CzechowskiT/twin/actions/runs/31077376617 . Tip 73755bf2 CI SUCCESS https://github.com/CzechowskiT/twin/actions/runs/31078452090 (po realignment FE=API=worker).
 53|FE Deployment
-Live tip docs f1e2de25… vs product e6328c3c (docs_only_drift) at gate start.
+Gate close: frontend_commit=73755bf2 (ALIGNED).
 54|API Deployment
-e6328c3c746eab6cd828adcc22881ec537a80a52
+73755bf266296c0d5b83a36536cb4068deabfdae
 55|Worker Deployment
-e6328c3c746eab6cd828adcc22881ec537a80a52
+73755bf266296c0d5b83a36536cb4068deabfdae
 56|Production DB
 126_fix_support_diagnostic_opt_in is_at_head=true
 57|Four-Way Alignment
-API=worker product ALIGNED; FE tip docs_only_drift.
+FE=API=worker ALIGNED at 73755bf2; DB 126 head.
 58|Closed P0
 PostgreSQL concurrency for cap=1 CLOSED (atomic UPDATE proven; multi-process PASS).
 59|Closed P1
@@ -134,7 +134,7 @@ Dostarczyć securely stored activation manifesto (pola w missing-manifest-fields
 | Real invites gen/sent | 0/0 |
 | Canary activation | NOT_EXECUTED |
 | Safety incidents | 0 |
-| Product SHA | e6328c3c… |
+| Product/tip live | 73755bf2… |
 | DB | 126 head |
 66|Activation Verdict
 ONE-CANDIDATE CANARY ACTIVATION BLOCKED — SECURE MANIFEST, SEND AUTHORIZATION OR PRE-ACTIVATION GATE INCOMPLETE; NO UNAUTHORIZED INVITATION SENT
@@ -144,11 +144,13 @@ NOT_EVALUABLE
 Final Answers
 - activation_verdict: ONE-CANDIDATE CANARY ACTIVATION BLOCKED — SECURE MANIFEST, SEND AUTHORIZATION OR PRE-ACTIVATION GATE INCOMPLETE; NO UNAUTHORIZED INVITATION SENT
 - canary_technical_status: NOT_EVALUABLE
-- product_SHA: e6328c3c746eab6cd828adcc22881ec537a80a52
-- proof_tip: 236e88d73afa8f41b90607fe1eae5cd065f516ae
-- FE/API/worker: tip docs_only_drift / e6328c3c / e6328c3c
+- product_SHA_live: 73755bf266296c0d5b83a36536cb4068deabfdae
+- baseline_product_SHA: e6328c3c746eab6cd828adcc22881ec537a80a52
+- proof_tip: 73755bf266296c0d5b83a36536cb4068deabfdae (atomic 236e88d7)
+- FE/API/worker: ALIGNED 73755bf2 / 73755bf2 / 73755bf2
 - database_head: 126_fix_support_diagnostic_opt_in
-- CI_product: SUCCESS 31077376617
+- CI_product_baseline: SUCCESS 31077376617
+- CI_tip: SUCCESS 31078452090
 - PG_concurrency: PASS (successes=1 rejects=11 overshoot=0)
 - manifest: ABSENT
 - invitations_generated: 0

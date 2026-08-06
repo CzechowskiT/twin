@@ -4,7 +4,7 @@
 **Branch:** `cursor/phase1-monorepo-scaffold`  
 **Activation Verdict:** BLOCKED — `ONE-CANDIDATE CANARY ACTIVATION BLOCKED — SECURE MANIFEST, SEND AUTHORIZATION OR PRE-ACTIVATION GATE INCOMPLETE; NO UNAUTHORIZED INVITATION SENT`
 
-## Baseline (independent)
+## Baseline (independent at start)
 | Item | Value |
 |------|--------|
 | Product (API/worker) | `e6328c3c746e…` |
@@ -14,6 +14,9 @@
 | Access | OPERATIONALLY_READY_INACTIVE |
 | Effective caps | 0 |
 | Real invites | 0 |
+
+## Gate close alignment
+FE=API=worker=`73755bf266296c0d5b83a36536cb4068deabfdae` (ALIGNED). Atomic hard-cap fix `236e88d7`. DB 126 head. Access still OPERATIONALLY_READY_INACTIVE; effective caps 0; real invites 0.
 
 ## Manifest
 **ABSENT** — no secure non-Git Founder activation manifest. See `missing-manifest-fields.txt`.
