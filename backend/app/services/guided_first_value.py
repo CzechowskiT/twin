@@ -17,6 +17,7 @@ from app.database.models import CandidateGuidedFirstValue
 from app.services import pilot_metric_contracts as metrics
 
 SCHEMA = "twin.guided_first_value/v1"
+# Epic 2.11 alignment marker 2026-08-06
 CONTRACT_ID = "starter_path_v1"
 
 STATES = frozenset(
