@@ -1,181 +1,139 @@
 1|Executive Summary
-Epic 2.11 już był dostarczony (Verdict A). Re-weryfikacja 2026-08-06 potwierdza: zakres shipped, E2E 44/44 PASS, demo contamination 0, empty 7/7, tour 7, pilot INACTIVE, Launch NO-GO. Brak re-implementacji. Live product tip 6d3c3c43 (API=worker); FE tip ea94588e docs_only_drift; Alembic 127 (tabele guided/demo używane w E2E); CI tip product SUCCESS 31085205368. Verdict A utrzymany.
+Epic 2.11 wykonany do Verdict A: Guided First Value, izolowane DEMO, actionable empty (w tym Home), tour 7 obszarów, inventory 31/31. Zamknięto lukę ALIGNED (FE docs_only_drift → FE=API=worker 88c229bb). E2E 44/44; unit 4/4; CI SUCCESS; pilot INACTIVE; caps 0; invites 0; Launch NO-GO. Verdict: GUIDED FIRST VALUE AND CAPABILITY DISCOVERABILITY CUSTOMER-USABLE — ISOLATED DEMO WORKSPACE, ACTIONABLE EMPTY STATES AND ACCESSIBLE PRODUCT TOUR PRODUCTION-READY.
 2|Canonical Baseline
-Oczekiwane w promptcie ~73755bf2 było PRE-2.11 — niezależnie zweryfikowano: feature 1f9d5e2c, tip product 6d3c3c43, seal docs ea94588e; nie kopiowano stale baseline.
+Prompt ~73755bf2 / Alembic 126 = PRE-2.11 — zweryfikowano CURRENT: feature 1f9d5e2c → tip execution 88c229bb; Alembic 127.
 3|Canonical Final State
-product feature 1f9d5e2cc403946f71b86c7dff877abb09882cf8; product tip 6d3c3c43b52097c09f396167e1dabf39d247a847; repo_head ea94588e2702b3128e98855b7f6233e8f1b87931 (docs); Alembic 127_guided_first_value_demo; PILOT_ACCESS=OPERATIONALLY_READY_INACTIVE; effective caps 0; public preview READY_INACTIVE (not enabled).
+product 88c229bb5fe70a26b88214942661d45a2232e566; FE=API=worker ALIGNED; Alembic 127_guided_first_value_demo; PILOT_ACCESS=OPERATIONALLY_READY_INACTIVE; effective caps 0; public preview READY_INACTIVE not enabled.
 4|Verdict
 GUIDED FIRST VALUE AND CAPABILITY DISCOVERABILITY CUSTOMER-USABLE — ISOLATED DEMO WORKSPACE, ACTIONABLE EMPTY STATES AND ACCESSIBLE PRODUCT TOUR PRODUCTION-READY
 5|Product Value Delivered
-Kandydat ma skippable/pausable guided entry (demo / moje dane / wznów), 4 starter paths bez CV/MS, izolowane DEMO z etykietą SIMULATED, tour 7 obszarów, actionable empty na primary IA oraz Help recovery — bez włączania public preview ani pilota.
+Skippable guided entry (demo / moje dane / wznów), 4 starter paths bez CV/MS, DEMO SIMULATED izolowane, tour 7 IA, empty states na 7 primary (Home włączone), Help recovery — bez aktywacji pilota/preview.
 6|Scope Compliance
-Tylko authorized Epic 2.11. Re-submit: brak nowej implementacji. Brak aktywacji manifesto/roster/send; brak Epic 3.0 / Phase 3 Agent; brak 8. nav.
+Tylko Epic 2.11. Brak manifesto activation; brak Epic 3.0 / Phase 3 Agent; brak 8. nav; brak parallel ranking.
 7|Architecture
-Kanoniczne: guided_first_value, isolated_demo, capability_discoverability, migration 127, FE GuidedFirstValueEntry / IaActionableEmpty / IA tour, metric contracts starter_path_v1 / actionable_empty_state_v1 / isolated_demo_v1 / mechanical_discoverability_v1 + pilot_first_value_v1.
+guided_first_value + isolated_demo + capability_discoverability + migration 127 + FE entry/empty/tour + contracts starter_path_v1 / actionable_empty_state_v1 / isolated_demo_v1 / mechanical_discoverability_v1 + pilot_first_value_v1.
 8|Route Inventory
-7/7 primary z empty dispositions; evidence reports/epic-2-11-guided-first-value-demo-discoverability-2026-08-06/route-inventory.md.
+Primary empty 7/7; disposition map 31/31 (CANDIDATE_ROUTE_DISPOSITION); reports/.../route-inventory.md.
 9|Guided First Value Entry
-EXPLORE_SAFE_DEMO / START_WITH_MY_DATA / RESUME_EXISTING_SETUP — skippable, pausable, resumable; guilt_free; no_scores. Re-verify PASS.
+EXPLORE_SAFE_DEMO / START_WITH_MY_DATA / RESUME_EXISTING_SETUP — skippable/pausable/resumable; no guilt/scores. PASS.
 10|Guided States
-NOT_STARTED → ENTRY/IN_PROGRESS/PAUSED/COMPLETED/SKIPPED/DELETED.
+NOT_STARTED…DELETED. PASS pause/resume.
 11|Starter Paths
-direction, first_evidence, opportunity_review, organize_current_actions — CV/MS not required; idempotent. Re-verify PASS.
+direction, first_evidence, opportunity_review, organize_current_actions — no CV/MS; idempotent. PASS.
 12|First Value Integrity
-Tylko pilot_first_value_v1; brak v2; demo_first_value_seen ≠ real_first_value_reached.
+pilot_first_value_v1 only; demo_first_value_seen ≠ real_first_value_reached; false positives rejected by allowlist. PASS.
 13|Isolated Demo Workspace
-scenario_version demo_scenario_v1; mode=DEMO; kpi_excluded; persistent DEMO marker; SIMULATED labels.
+demo_scenario_v1; mode=DEMO; kpi_excluded; DEMO marker; SIMULATED. PASS.
 14|Demo Contamination
-canonical_writes=0; external_calls=0; copy_to_canonical=0; kpi_contamination=0; promote_to_real=false. Re-verify PASS.
+writes=0; external=0; copy=0; KPI=0; promote=false. PASS.
 15|Demo Exit
-exit_to_my_data soft-delete; demo_mode=false; no residual promote. Re-verify PASS.
+exit_to_my_data clean. PASS.
 16|Product Tour
-7 steps = 7 IA areas; skippable; accessible dialog; tour ≠ first value.
+7 areas; skippable; accessible; tour ≠ first value. PASS.
 17|Public Preview
-READY_INACTIVE; code_ready=true; enabled_in_production=false. Re-verify PASS.
+READY_INACTIVE; enabled_in_production=false. PASS.
 18|Actionable Empty States
-7/7 applicable; loading≠empty; error≠empty; positive_empty_ok.
+7/7 including Home IaActionableEmpty; loading≠empty; error≠empty; positive empty OK.
 19|Capability Discoverability
-mechanical_discoverability_v1; journey groups; no 8th nav; no silent personalization scores. Re-verify primary_count=7.
+mechanical_discoverability_v1; journey groups; no silent scores; primary_count=7. PASS.
 20|Home Integration
-GuidedFirstValueEntry + PilotHomeNextAction + Daily OS + Help link.
+GuidedFirstValueEntry + IaActionableEmpty(home) + PilotHomeNextAction + Daily OS + Help.
 21|Help Feedback Recovery
-recovery journeys guided_first_value + isolated_demo; Help copy recovery.
+guided_first_value + isolated_demo recovery; Help copy. PASS help 200.
 22|Measurement Contracts
-starter_path_v1, actionable_empty_state_v1, isolated_demo_v1, pilot_first_value_v1, mechanical_discoverability_v1 — READY_TO_MEASURE. Re-verify contracts present.
-23|Privacy Export
-guided_first_value_and_demo w user export.
-24|Deletion
-soft_delete guided + demo w account deletion path.
-25|Pause
-Privacy Center pause honorowany; guided pause niezależny. Re-verify pause/resume PASS.
-26|Security Prompt Injection
-Telemetry allowlist; unknown events rejected 400. Re-verify PASS.
-27|EN PL
-guidedFv.* + tutorial IA keys EN/PL.
-28|Terminal Posture
+starter_path_v1, actionable_empty_state_v1, isolated_demo_v1, mechanical_discoverability_v1, pilot_first_value_v1 — READY_TO_MEASURE. PASS.
+23|Terminal Posture
 PUBLIC_LAUNCH=NO-GO; PUBLIC_SIGNUP=OFF; PUBLIC_ENROLLMENT=OFF; PRIVATE_PILOT=INACTIVE; EFFECTIVE_REAL_PILOT_CAP=0; REAL_INVITE_GENERATION=OFF; REAL_INVITE_SEND=OFF; REAL_INVITE_REDEMPTION=OFF; ACTIVE_REAL_INVITES=0; REAL_PILOT_USERS=0; PHASE_3B=BLOCKED; PHASE_3_AGENT=NOT_STARTED; MICROSOFT_CALENDAR_WRITE=OFF; APPLICATION_SUBMISSION=OFF; EMPLOYER_CONTACT=OFF; EXTERNAL_PURCHASE_OR_ENROLLMENT=OFF; PUBLIC_PREVIEW=READY_INACTIVE_NOT_ENABLED.
-29|Accessibility
-Tour dialog aria-modal/labelledby; empty CTAs; min touch targets Help.
-30|Responsive
-Home cards + empty states mobile wrap.
-31|Backend Tests
-test_epic_211_guided_first_value 4/4 PASS (re-run).
-32|Frontend Tests
-epic-211-guided-fv-guard PASS (re-run).
-33|Synthetic E2E
-epic-2-11-guided-first-value-e2e.py 44/44 PASS (re-verify 2026-08-06).
-34|Matrix A Stance
-PASS — NO-GO, enrollment off, caps 0, invites 0, READY_INACTIVE.
-35|Matrix B Guided FV
-PASS — catalog/entry/starter/pause/resume.
-36|Matrix C Isolated Demo
-PASS — DEMO, writes 0, contamination 0, exit clean, demo flag separate.
-37|Matrix D Discoverability
-PASS — primary 7, no 8th, tour 7, preview READY_INACTIVE, empty complete.
-38|Matrix E Privacy Help
-PASS — help + ops metrics contracts include starter/isolated/first_value.
-39|Matrix F Telemetry
-PASS — allowlisted tour event; unknown rejected.
-40|CI
-Feature 1f9d5e2c SUCCESS https://github.com/CzechowskiT/twin/actions/runs/31084948118 ; tip product 6d3c3c43 SUCCESS https://github.com/CzechowskiT/twin/actions/runs/31085205368 . Docs seals ea94588e/e551a90a production-regression FAIL = SHA wait docs_only_drift (expected).
-41|FE Deployment
-frontend_commit=ea94588e2702b3128e98855b7f6233e8f1b87931 (docs seal; docs_only_drift vs product tip).
-42|API Deployment
-6d3c3c43b52097c09f396167e1dabf39d247a847
-43|Worker Deployment
-6d3c3c43b52097c09f396167e1dabf39d247a847
-44|Production DB
-127_guided_first_value_demo — tabele guided/demo używane w live E2E (db_ok=true).
-45|Four-Way Alignment
-API=worker ALIGNED 6d3c3c43; FE docs_only_drift ea94588e; DB 127; product CI green.
-46|Demo Writes Count
+24|Privacy Export Deletion Pause
+export guided+demo; soft-delete on account deletion; guided pause + Privacy Center. PASS.
+25|Security
+Telemetry allowlist; unknown rejected 400; no PII in evidence. PASS.
+26|EN PL A11y
+guidedFv EN/PL; tour aria-modal. PASS.
+27|Gaps Closed This Execution
+(1) FE/API/worker ALIGNED 88c229bb; (2) Home IaActionableEmpty; (3) full route inventory 31/31.
+28|Product Tests
+B_guided_fv 8/8; C_isolated_demo 9/9; D_discoverability 9/9; E_empty_privacy 3/3; F_telemetry 2/2 — product_total 31/31.
+29|Stance Tests
+A_stance 13/13 (NO-GO, enrollment off, caps 0, invites 0, READY_INACTIVE, phase_3b, ms_write off, mint kpi_excluded, consol).
+30|Synthetic E2E Total
+44/44 PASS (stance 13 + product 31).
+31|Backend Unit
+test_epic_211_guided_first_value 4/4 PASS.
+32|Frontend Guard
+epic-211-guided-fv-guard PASS.
+33|CI
+SUCCESS https://github.com/CzechowskiT/twin/actions/runs/31101772863 (88c229bb).
+34|FE API Worker
+ALIGNED 88c229bb5fe70a26b88214942661d45a2232e566.
+35|Production DB
+127 head; guided/demo tables live (E2E). db_ok=true.
+36|P0 Open
 0
-47|Demo External Calls
+37|P1 Open
 0
-48|Demo Copy Contamination
+38|Demo Writes
 0
-49|Demo KPI Contamination
+39|Demo External
 0
-50|Labeled Demo
-PASS — SIMULATED + DEMO banner.
-51|Tour Shipped
-PASS — 7-area DashboardTutorial.
-52|Empty States Complete
+40|Demo KPI Contamination
+0
+41|Empty States
 7/7
-53|IA Unchanged Count
-7 primary destinations.
-54|P0 Open
+42|Primary IA
+7
+43|Real Invites
 0
-55|P1 Open
+44|Real Pilot Users
 0
-56|Pilot Inactive
-OPERATIONALLY_READY_INACTIVE
-57|Effective Caps
-cohort=0 canary=0 generation=0 send=0
-58|Real Invites
-generated=0 sent=0 redeemed=0
-59|Real Pilot Users
-0
-60|Launch
+45|Launch
 NO-GO
-61|Phase 3B
+46|Phase 3B
 BLOCKED
-62|Phase 3 Agent
+47|Phase 3 Agent
 NOT_STARTED
-63|MS Calendar Write
+48|MS Write
 OFF
-64|Application Submission
-OFF
-65|Employer Contact
-OFF
-66|External Purchase Enrollment
-OFF
-67|Human Discoverability
+49|Human Discoverability
 NOT_EVALUATED
-68|Real Candidate Value
+50|Real Candidate Value
 NOT_EVALUATED
-69|Retention
+51|Retention
 NOT_EVALUATED
-70|Product Market Fit
+52|Product Market Fit
 NOT_EVALUATED
-71|Evidence Dir
-reports/epic-2-11-guided-first-value-demo-discoverability-2026-08-06/ (+ e2e-reverify-2026-08-06.txt)
-72|Evidence Limitations
-Brak real candidate activity; human discoverability / PMF nie mierzone — by design. Re-submit nie wymagał zmian kodu.
-73|Founder Choice Recommended
+53|Evidence Dir
+reports/epic-2-11-guided-first-value-demo-discoverability-2026-08-06/
+54|Founder Choice
 (1) enable public preview OR (2) one-candidate canary OR (3) next candidate-first scope — do NOT auto-activate.
-74|Do Not Auto Activate
-Confirmed — no manifesto activation; no public preview enable; no canary send; no re-implementation.
-75|Safety Incidents
+55|Do Not Auto Activate
+Confirmed.
+56|Safety Incidents
 0
-76|Token Leaks In Evidence
-0
-77|Public Signup Bypass Attempts
-0
-78|Reliability
-Fail-closed pilot; demo isolation; alembic on boot; re-verify green.
-79|Performance
-Lekkie JSON scenario; brak LLM/workers w demo.
-80|Next Recommended Batch
-Founder wybiera: (1) włączenie public preview READY→ACTIVE_PREVIEW pod osobnym gate, (2) wznowienie Gate P2 one-candidate canary po secure manifesto, lub (3) kolejny candidate-first slice — bez Epic 3.0. Nie wklejać ponownie Epic 2.11 jako nowego epica.
-81|Activation Stance Reminder
-PRIVATE_PILOT remains INACTIVE; PUBLIC_PREVIEW remains READY_INACTIVE not enabled.
+57|Next Batch
+Founder wybiera preview gate / Gate P2 canary po manifesto / kolejny candidate-first — bez Epic 3.0.
+58|Feature Ancestry
+1f9d5e2c (feat) → 6d3c3c43 (e2e fix) → 88c229bb (ALIGNED + home empty + inventory).
+59|Reliability
+Fail-closed pilot; demo isolation; alembic on boot.
+60|Performance
+No LLM/workers in demo path.
 
 Final Answers
 - verdict: GUIDED FIRST VALUE AND CAPABILITY DISCOVERABILITY CUSTOMER-USABLE — ISOLATED DEMO WORKSPACE, ACTIONABLE EMPTY STATES AND ACCESSIBLE PRODUCT TOUR PRODUCTION-READY
-- re_verify: PASS_NO_REIMPLEMENTATION
-- product_SHA: 1f9d5e2cc403946f71b86c7dff877abb09882cf8
-- tip_SHA: 6d3c3c43b52097c09f396167e1dabf39d247a847
-- repo_head: ea94588e2702b3128e98855b7f6233e8f1b87931
+- product_SHA: 88c229bb5fe70a26b88214942661d45a2232e566
+- FE/API/worker: ALIGNED 88c229bb / 88c229bb / 88c229bb
 - alembic: 127_guided_first_value_demo
-- E2E: 44/44 PASS (re-verify)
-- CI_product: SUCCESS 31084948118
-- CI_tip: SUCCESS 31085205368
-- FE/API/worker: docs_only_drift ea94588e / ALIGNED 6d3c3c43 / ALIGNED 6d3c3c43
+- E2E_total: 44/44
+- E2E_stance: 13/13
+- E2E_product: 31/31
+- unit_backend: 4/4
+- CI: SUCCESS 31101772863
 - demo_canonical_writes: 0
 - demo_external_calls: 0
 - demo_kpi_contamination: 0
 - empty_states: 7/7
+- route_disposition: 31/31
 - primary_ia: 7
 - public_preview: READY_INACTIVE (not enabled)
 - pilot_access: OPERATIONALLY_READY_INACTIVE
