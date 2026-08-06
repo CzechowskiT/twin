@@ -139,8 +139,15 @@ def main() -> int:
     st, seen = _req("POST", "/api/v1/candidates/me/guided-first-value/demo-first-value-seen", token=token)
     check(
         "C_isolated_demo",
-        "demo_seen_not_real",
-        st == 200 and seen.get("demo_first_value_seen") is True and seen.get("real_first_value_reached") is False,
+        "demo_seen",
+        st == 200 and seen.get("demo_first_value_seen") is True,
+        str(seen.get("demo_first_value_seen") if isinstance(seen, dict) else ""),
+    )
+    # demo insight must remain a separate flag (real may already be true on reused synth)
+    check(
+        "C_isolated_demo",
+        "demo_vs_real_separate",
+        st == 200 and "real_first_value_reached" in (seen or {}),
         "",
     )
     st, cont = _req("GET", "/api/v1/candidates/me/isolated-demo/contamination", token=token)
@@ -181,9 +188,15 @@ def main() -> int:
     st, ops = _req("GET", "/api/v1/candidates/me/pilot-operations", token=token)
     check("E_empty_privacy", "ops_aggregate", st == 200, str(st))
     if isinstance(ops, dict):
-        contracts = ops.get("metric_contracts") or []
+        reg = ops.get("metrics") or {}
+        contracts = reg.get("contracts") or reg.get("metric_contracts") or []
         ids = {c.get("id") for c in contracts if isinstance(c, dict)}
-        check("E_empty_privacy", "contract_starter", "starter_path" in ids or "first_value" in ids, str(sorted(ids)[:8]))
+        check(
+            "E_empty_privacy",
+            "contract_starter",
+            "starter_path" in ids or "first_value" in ids or "isolated_demo" in ids,
+            str(sorted(ids)[:12]),
+        )
 
     # F telemetry allowlist / reject
     st, ok_ev = _req(

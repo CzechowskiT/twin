@@ -41,6 +41,8 @@ def build_ops_aggregate(db: Session, *, user_id: int | None = None, candidate_id
             "privacy": support.recovery_guidance(journey="privacy"),
             "invite": support.recovery_guidance(journey="invite"),
             "daily_os": support.recovery_guidance(journey="daily_os"),
+            "guided_first_value": support.recovery_guidance(journey="guided_first_value"),
+            "isolated_demo": support.recovery_guidance(journey="isolated_demo"),
         },
         "safety": {
             "public_launch": "NO-GO",
