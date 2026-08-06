@@ -1,5 +1,5 @@
 1|Executive Summary
-Epic 2.11 dostarcza Guided First Value, izolowane DEMO workspace, actionable empty states i dostępny tour 7 obszarów IA — bez aktywacji pilota. Verdict A: GUIDED FIRST VALUE AND CAPABILITY DISCOVERABILITY CUSTOMER-USABLE — ISOLATED DEMO WORKSPACE, ACTIONABLE EMPTY STATES AND ACCESSIBLE PRODUCT TOUR PRODUCTION-READY. Product 1f9d5e2c; tip 6d3c3c43; Alembic 127; E2E 44/44; CI product SUCCESS; pilot INACTIVE; caps 0; invites 0; Launch NO-GO.
+Epic 2.11 dostarcza Guided First Value, izolowane DEMO workspace, actionable empty states i dostępny tour 7 obszarów IA — bez aktywacji pilota. Verdict A: GUIDED FIRST VALUE AND CAPABILITY DISCOVERABILITY CUSTOMER-USABLE — ISOLATED DEMO WORKSPACE, ACTIONABLE EMPTY STATES AND ACCESSIBLE PRODUCT TOUR PRODUCTION-READY. Live FE=API=worker ALIGNED 6d3c3c43; feature product 1f9d5e2c; Alembic 127; E2E 44/44; CI tip SUCCESS 31085205368; pilot INACTIVE; caps 0; invites 0; Launch NO-GO. Evidence seal e551a90a (docs).
 2|Canonical Baseline
 Live start ~73755bf2 / seal 772781ea / FE docs drift → API=worker 73755bf2 / Alembic 126 / CI 31078452090 / P2 39/39 / PG 1/11/0 / OPERATIONALLY_READY_INACTIVE / caps 0 / invites 0 — zweryfikowane; drift FE naprawiony w deployu 2.11.
 3|Canonical Final State
@@ -77,7 +77,7 @@ PASS — help + ops metrics contracts include starter/isolated/first_value.
 39|Matrix F Telemetry
 PASS — allowlisted tour event; unknown rejected.
 40|CI
-Product 1f9d5e2c SUCCESS https://github.com/CzechowskiT/twin/actions/runs/31084948118 ; tip 6d3c3c43 follow-up.
+Feature 1f9d5e2c SUCCESS https://github.com/CzechowskiT/twin/actions/runs/31084948118 ; tip 6d3c3c43 SUCCESS https://github.com/CzechowskiT/twin/actions/runs/31085205368 .
 41|FE Deployment
 Aligned to product tip after Vercel (1f9d5e2c / 6d3c3c43).
 42|API Deployment
@@ -165,10 +165,12 @@ Final Answers
 - verdict: GUIDED FIRST VALUE AND CAPABILITY DISCOVERABILITY CUSTOMER-USABLE — ISOLATED DEMO WORKSPACE, ACTIONABLE EMPTY STATES AND ACCESSIBLE PRODUCT TOUR PRODUCTION-READY
 - product_SHA: 1f9d5e2cc403946f71b86c7dff877abb09882cf8
 - tip_SHA: 6d3c3c43b52097c09f396167e1dabf39d247a847
+- evidence_seal: e551a90a (docs_only)
 - alembic: 127_guided_first_value_demo
 - E2E: 44/44 PASS
 - CI_product: SUCCESS 31084948118
-- FE/API/worker: ALIGNED Epic 2.11
+- CI_tip: SUCCESS 31085205368
+- FE/API/worker: ALIGNED 6d3c3c43
 - demo_canonical_writes: 0
 - demo_external_calls: 0
 - demo_kpi_contamination: 0
