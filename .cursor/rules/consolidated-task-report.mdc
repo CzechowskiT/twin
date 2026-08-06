@@ -1,37 +1,40 @@
 ---
-description: Always return one consolidated Polish report in a single copyable fenced code block — never duplicate or split
+description: Always end with one full Polish report in a single copyable fenced code block — never summarize-only or split
 alwaysApply: true
 ---
 
 # Consolidated task report (mandatory)
 
-After every task, subagent batch, or multi-step session, return **exactly one** consolidated report in Polish.
+After every completed task, gate, epic, subagent batch, or multi-step session, return **exactly one** consolidated report in Polish.
 
-## Copyable delivery (mandatory)
+## Copyable delivery (mandatory — Founder mandate)
+
+The final message **must** end with a full pasteable report. Never finish with only a brief third-person confirmation when the user expects the copy block.
 
 Present the **full** consolidated Polish report inside **one** plain fenced code block so the user can click once and copy everything.
 
-- Short intro **outside** the fence is OK, e.g. `Poniżej raport w jednym bloku — kliknij i skopiuj:`
-- Then wrap the **entire** report (all required sections) in a single markdown code fence (triple backticks). Plain fence or `text` is fine.
+- Short intro **outside** the fence is required, e.g. `Poniżej raport do skopiowania:` (or `Poniżej raport w jednym bloku — kliknij i skopiuj:`)
+- Then wrap the **entire** report (all required sections) in a **single** markdown code fence (triple backticks). Plain fence or `text` is fine.
 - **No nested code fences** inside the report body (they break one-click copy). Prefer indented tables/lists or plain text separators instead of inner fences.
 - Do **not** split the report across multiple messages or multiple copy blocks
 - Do **not** replace the full report with only a short summary — if a full report was produced, put that full report in the copy block
-- Applies to consolidated-task-report, Epic reports, and Final Answers alike
+- Applies to consolidated-task-report, Epic reports, gates, and Final Answers alike
 
-### Shape
+### Shape (every completed task)
 
 Message structure:
 
-1. Optional one-line intro outside the fence
+1. Required one-line intro outside the fence
 2. Opening triple-backtick fence
 3. Full Polish report (sections 1–6 below)
 4. Closing triple-backtick fence
 
-Example intro line: `Poniżej raport w jednym bloku — kliknij i skopiuj:`
+Example intro line: `Poniżej raport do skopiowania:`
 
 ## Never do this
 
 - Do not send a short confirmation **and then** a full report.
+- Do not end with only a brief third-person confirmation when the pasteable report is due.
 - Do not repeat the same information in two messages (e.g. "subagent completed" + full recap).
 - Do not restate subagent `user_visible_high_level_summary` and then expand it again unless the user asks.
 - Do not add a follow-up synthesis message after the user already saw the subagent result unless new action was taken.
@@ -40,7 +43,7 @@ Example intro line: `Poniżej raport w jednym bloku — kliknij i skopiuj:`
 
 ## Always do this
 
-One message containing **one** structured report the user can paste into GPT to generate the next Cursor prompt — delivered in **one** copyable fenced block as above.
+One message containing **one** structured report the user can paste into GPT to generate the next Cursor prompt — delivered in **one** copyable fenced block as above, at the **end** of every completed task/gate/epic.
 
 ### Required sections (use what applies; omit empty)
 
