@@ -30,8 +30,8 @@ def _require_ops_admin(settings: Settings, authorization: str | None) -> None:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid admin token")
 
 
-# Keep in sync with alembic head (124_evidence_investment_intelligence). Epic 2.8 product alignment.
-EXPECTED_ALEMBIC_HEAD = "124_evidence_investment_intelligence"
+# Keep in sync with alembic head (126_fix_support_diagnostic_opt_in). Epic 2.10.
+EXPECTED_ALEMBIC_HEAD = "126_fix_support_diagnostic_opt_in"
 
 
 def _read_alembic_current(db: Session) -> str | None:

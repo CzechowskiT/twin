@@ -83,7 +83,7 @@ def upgrade() -> None:
         # DRAFT|SUBMITTED|TRIAGED|IN_PROGRESS|WAITING_CANDIDATE|RESOLVED|CLOSED|WITHDRAWN|DELETED
         sa.Column("subject", sa.String(length=200), nullable=False, server_default=""),
         sa.Column("body_text", sa.Text(), nullable=True),
-        sa.Column("severity_opt_in", sa.Boolean(), nullable=False, server_default=sa.text("false")),
+        sa.Column("diagnostic_opt_in", sa.Boolean(), nullable=False, server_default=sa.text("false")),
         sa.Column("diagnostic_json", sa.Text(), nullable=False, server_default="{}"),
         sa.Column("recovery_json", sa.Text(), nullable=False, server_default="[]"),
         sa.Column("operator_note", sa.String(length=500), nullable=True),
