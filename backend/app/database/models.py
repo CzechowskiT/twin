@@ -7292,3 +7292,57 @@ class PilotIncidentExercise(Base):
     kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateGuidedFirstValue(Base):
+    """Guided First Value progress — Epic 2.11 (pilot_first_value_v1 integrity only)."""
+
+    __tablename__ = "candidate_guided_first_value"
+    __table_args__ = (UniqueConstraint("candidate_id", name="uq_guided_fv_candidate"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    state: Mapped[str] = mapped_column(String(32), default="NOT_STARTED", index=True)
+    entry_choice: Mapped[str | None] = mapped_column(String(48), nullable=True)
+    starter_path: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    progress_json: Mapped[str] = mapped_column(Text, default="{}")
+    demo_first_value_seen: Mapped[bool] = mapped_column(Boolean, default=False)
+    real_first_value_reached: Mapped[bool] = mapped_column(Boolean, default=False)
+    paused_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateIsolatedDemoSession(Base):
+    """Isolated DEMO workspace metadata — never writes canonical product tables."""
+
+    __tablename__ = "candidate_isolated_demo_sessions"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "session_key", name="uq_demo_session_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    session_key: Mapped[str] = mapped_column(String(64))
+    scenario_version: Mapped[str] = mapped_column(String(32), default="demo_scenario_v1")
+    mode: Mapped[str] = mapped_column(String(16), default="DEMO")
+    status: Mapped[str] = mapped_column(String(32), default="ACTIVE", index=True)
+    scenario_json: Mapped[str] = mapped_column(Text, default="{}")
+    canonical_writes: Mapped[int] = mapped_column(Integer, default=0)
+    external_calls: Mapped[int] = mapped_column(Integer, default=0)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    exited_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)

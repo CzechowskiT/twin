@@ -10,6 +10,7 @@ import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subna
 import { DashboardCommandCenter } from "@/components/dashboard-command-center";
 import { DailyCareerOsPanel } from "@/components/career/daily-career-os-panel";
 import { PilotHomeNextAction } from "@/components/dashboard/pilot-home-next-action";
+import { GuidedFirstValueEntry } from "@/components/dashboard/guided-first-value-entry";
 import { LifecycleCommandPanel } from "@/components/lifecycle/lifecycle-command-panel";
 import { ProfileCompletenessHint } from "@/components/ux/profile-completeness-hint";
 import { WorkspaceFlowSteps } from "@/components/ux/workspace-flow-steps";
@@ -353,6 +354,7 @@ export default function DashboardPage() {
                 showScrapeUi={showScrapePanel}
                 todayContext={todayContext}
               />
+              <GuidedFirstValueEntry />
               <PilotHomeNextAction />
               <DailyCareerOsPanel compact />
               <LifecycleCommandPanel />
@@ -370,6 +372,7 @@ export default function DashboardPage() {
               showScrapeUi={showScrapePanel}
               todayContext={todayContext}
             />
+            <GuidedFirstValueEntry />
             <PilotHomeNextAction />
             <DailyCareerOsPanel compact />
             <div className="mb-4 sm:mb-6">

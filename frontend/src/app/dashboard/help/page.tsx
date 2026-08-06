@@ -46,6 +46,7 @@ export default function HelpCenterPage() {
       <main className="mx-auto max-w-2xl px-4 py-8">
         <h1 className="text-2xl font-semibold tracking-tight">{t("pilotOps.title")}</h1>
         <p className="mt-2 text-sm opacity-80">{t("pilotOps.lead")}</p>
+        <p className="text-sm opacity-80">{t("guidedFv.helpRecovery")}</p>
         <p className="mt-2 text-sm opacity-70">{t("pilotOps.noAttachments")}</p>
         {err ? <p className="mt-4 text-sm text-red-700">{err}</p> : null}
         <ul className="mt-6 space-y-4">

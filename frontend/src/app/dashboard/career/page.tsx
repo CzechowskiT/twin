@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
+import { IaActionableEmpty } from "@/components/dashboard/ia-actionable-empty";
 import { CandidateReadinessFlowBanner } from "@/components/candidate/candidate-readiness-flow-banner";
 import { WorkspaceStatusBadge } from "@/components/workspace/workspace-status-badge";
 import { useTranslation } from "@/components/language-provider";
@@ -196,6 +197,8 @@ export default function CareerCompassPage() {
       </div>
 
       <CandidateReadinessFlowBanner context="career_brief" />
+
+      <IaActionableEmpty areaId="direction" show />
 
       <Card variant="soft" className="mb-6" data-career-compass-completion>
         <p className="text-sm leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.careerCompassPageLead")}</p>

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/components/language-provider";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
+import { IaActionableEmpty } from "@/components/dashboard/ia-actionable-empty";
 import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
@@ -70,6 +71,7 @@ export default function PrivacyCenterPage() {
       <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8">
         <h1 className="text-3xl font-semibold">{t("careerLifecycle.privacyTitle")}</h1>
         <p className="text-sm text-[var(--twin-muted)]">{t("careerLifecycle.privacyLead")}</p>
+        <IaActionableEmpty areaId="settings" show={!err} isLoading={priv === null && !err} isError={Boolean(err)} />
         {err ? (
           <p className="text-sm text-red-700" role="alert">
             {err}

@@ -59,6 +59,19 @@ FUNNEL_EVENTS = frozenset(
         "pilot_daily_os_opened",
         "pilot_home_opened",
         "pilot_privacy_opened",
+        # Epic 2.11 guided first value / demo / discoverability (non-PII)
+        "guided_fv_entry_chosen",
+        "guided_fv_starter_selected",
+        "guided_fv_paused",
+        "guided_fv_skipped",
+        "guided_fv_completed",
+        "isolated_demo_started",
+        "isolated_demo_exited",
+        "demo_first_value_seen",
+        "product_tour_started",
+        "product_tour_completed",
+        "product_tour_skipped",
+        "actionable_empty_cta",
     }
 )
 

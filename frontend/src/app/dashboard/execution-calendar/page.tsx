@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useTranslation } from "@/components/language-provider";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
+import { IaActionableEmpty } from "@/components/dashboard/ia-actionable-empty";
 import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
@@ -142,6 +143,8 @@ function ExecutionCalendarContent() {
             {statusMsg}
           </p>
         ) : null}
+
+        <IaActionableEmpty areaId="plan" show={!err} isError={Boolean(err)} />
 
         <nav className="flex flex-wrap gap-3 text-sm" aria-label={t("executionCalendar.views")}>
           {(["home", "batches", "capacity", "availability", "conflicts", "history"] as const).map(

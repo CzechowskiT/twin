@@ -24,6 +24,18 @@ export const PRODUCT_FUNNEL_EVENTS = [
   "pilot_daily_os_opened",
   "pilot_home_opened",
   "pilot_privacy_opened",
+  "guided_fv_entry_chosen",
+  "guided_fv_starter_selected",
+  "guided_fv_paused",
+  "guided_fv_skipped",
+  "guided_fv_completed",
+  "isolated_demo_started",
+  "isolated_demo_exited",
+  "demo_first_value_seen",
+  "product_tour_started",
+  "product_tour_completed",
+  "product_tour_skipped",
+  "actionable_empty_cta",
 ] as const;
 
 export type ProductFunnelEventName = (typeof PRODUCT_FUNNEL_EVENTS)[number];

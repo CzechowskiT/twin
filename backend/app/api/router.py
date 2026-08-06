@@ -25,6 +25,7 @@ from app.api import (
     evidence_investment_intelligence,
     pilot_consolidation,
     pilot_operations,
+    guided_first_value,
     chatgpt_twin,
     company,
     company_feedback_persistence,
@@ -225,6 +226,11 @@ api_router.include_router(
     pilot_operations.router,
     prefix="/candidates",
     tags=["Pilot Operations"],
+)
+api_router.include_router(
+    guided_first_value.router,
+    prefix="/candidates",
+    tags=["Guided First Value"],
 )
 api_router.include_router(
     pilot_operations.admin_router,

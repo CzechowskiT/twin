@@ -65,6 +65,38 @@ def metric_contracts() -> list[dict[str, Any]]:
             "denominator": "real_candidates_enrolled",
             "forbidden": ["training_use", "ranking_use"],
         },
+        {
+            "id": "starter_path",
+            "status": READY,
+            "contract": "starter_path_v1",
+            "numerator": "guided_starter_completed",
+            "denominator": "guided_entry_started",
+            "forbidden": ["guilt_scores", "personalization_scores"],
+        },
+        {
+            "id": "actionable_empty_state",
+            "status": READY,
+            "contract": "actionable_empty_state_v1",
+            "numerator": "empty_cta_activated",
+            "denominator": "empty_state_impressions",
+            "forbidden": ["loading_as_empty", "error_as_empty"],
+        },
+        {
+            "id": "isolated_demo",
+            "status": READY,
+            "contract": "isolated_demo_v1",
+            "numerator": "demo_sessions_started",
+            "denominator": "guided_demo_entries",
+            "forbidden": ["kpi_contamination", "canonical_writes"],
+        },
+        {
+            "id": "mechanical_discoverability",
+            "status": READY,
+            "contract": "mechanical_discoverability_v1",
+            "numerator": "tour_completed_or_skipped",
+            "denominator": "tour_started",
+            "forbidden": ["silent_personalization_scores"],
+        },
     ]
 
 

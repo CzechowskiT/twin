@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "@/components/language-provider";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
+import { IaActionableEmpty } from "@/components/dashboard/ia-actionable-empty";
 import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
@@ -193,6 +194,13 @@ export default function PortfolioPage() {
       </div>
 
       {err ? <p className="mb-3 text-sm text-red-700">{err}</p> : null}
+
+      <IaActionableEmpty
+        areaId="evidence"
+        show={!err && (evidence?.evidence?.length ?? 0) === 0 && (portfolio?.evidence?.length ?? 0) === 0}
+        isLoading={portfolio === null && !err}
+        isError={Boolean(err)}
+      />
 
       <Card className="mb-4">
         <p className="text-xs text-neutral-500">{t("careerEvidence.privacyBanner")}</p>

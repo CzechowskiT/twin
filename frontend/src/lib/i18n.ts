@@ -53,6 +53,10 @@ import {
   FOUNDER_COMMAND_MESSAGES_EN,
   FOUNDER_COMMAND_MESSAGES_PL,
 } from "./founder-command-messages";
+import {
+  GUIDED_FV_MESSAGES_EN,
+  GUIDED_FV_MESSAGES_PL,
+} from "./guided-first-value-messages";
 
 export type Locale = "en" | "pl" | "es" | "it" | "fr" | "de" | "zh" | "ar" | "ja";
 
@@ -111,6 +115,7 @@ export type TranslationKey =
   | `home.${keyof typeof en.home}`
   | `candidateRewards.${keyof typeof CANDIDATE_REWARDS_MESSAGES_EN}`
   | `founderCommand.${keyof typeof FOUNDER_COMMAND_MESSAGES_EN}`
+  | `guidedFv.${keyof typeof GUIDED_FV_MESSAGES_EN}`
   | `faq.${keyof typeof FAQ_MESSAGES_EN}`
   | `site.${keyof typeof SITE_MESSAGES_EN}`
   | `calculator.${keyof typeof en.calculator}`
@@ -604,6 +609,7 @@ const en = {
   },
   candidateRewards: CANDIDATE_REWARDS_MESSAGES_EN,
   founderCommand: FOUNDER_COMMAND_MESSAGES_EN,
+  guidedFv: GUIDED_FV_MESSAGES_EN,
   faq: FAQ_MESSAGES_EN,
   site: SITE_MESSAGES_EN,
   dashboard: {
@@ -1944,14 +1950,18 @@ const en = {
   },
   tutorial: {
     stepLabel: "Tip",
-    matchesTitle: "Recommended matches",
-    matchesBody: "Scores reflect skills, titles, and location — help us rate fit from the shortlist.",
-    calendarTitle: "Calendar strip",
-    calendarBody: "Connect OAuth calendars or copy WebCal for Apple and other clients.",
-    applicationsTitle: "Applications pipeline",
-    applicationsBody: "Track status, recruiter feedback, and placement verification in one panel.",
-    feedbackTitle: "Tell us what you think",
-    feedbackBody: "Quick ratings help us reduce noise and improve acceptance-ready slots.",
+    matchesTitle: "Opportunities",
+    matchesBody: "Review matches when ready — nothing is submitted without your approval.",
+    calendarTitle: "Plan",
+    calendarBody: "Organize actions on a calendar you control. Calendar write stays optional.",
+    applicationsTitle: "Evidence",
+    applicationsBody: "Capture proof of your work at your pace — CV upload is optional.",
+    feedbackTitle: "Decisions & Settings",
+    feedbackBody: "Approve when needed, and keep privacy, pause, export, and deletion under your control.",
+    homeTitle: "Home",
+    homeBody: "Today’s calm next step lives here — not a noisy dashboard.",
+    directionTitle: "Direction",
+    directionBody: "Clarify where you are heading without uploading a CV.",
     next: "Next",
     skip: "Skip tour",
     done: "Done",
@@ -9906,6 +9916,7 @@ const pl: MessageTree = {
   },
   candidateRewards: CANDIDATE_REWARDS_MESSAGES_PL,
   founderCommand: FOUNDER_COMMAND_MESSAGES_PL,
+  guidedFv: GUIDED_FV_MESSAGES_PL,
   faq: FAQ_MESSAGES_PL,
   site: SITE_MESSAGES_PL,
   dashboard: {
@@ -11264,14 +11275,18 @@ const pl: MessageTree = {
   },
   tutorial: {
     stepLabel: "Wskazówka",
-    matchesTitle: "Rekomendowane dopasowania",
-    matchesBody: "Wynik uwzględnia umiejętności, tytuły i lokalizację — pomóż ocenić trafność na shortliście.",
-    calendarTitle: "Pasek kalendarza",
-    calendarBody: "OAuth Google/Microsoft lub WebCal pod Apple i inne klienty.",
-    applicationsTitle: "Pipeline aplikacji",
-    applicationsBody: "Status, feedback rekrutera i weryfikacja placementu w jednym miejscu.",
-    feedbackTitle: "Twoja opinia",
-    feedbackBody: "Krótkie oceny pomagają ograniczać szum i poprawiać wartościowe terminy.",
+    matchesTitle: "Szanse",
+    matchesBody: "Przeglądaj dopasowania, gdy będziesz gotowy/a — nic nie wychodzi bez zgody.",
+    calendarTitle: "Plan",
+    calendarBody: "Organizuj działania w kalendarzu, który kontrolujesz. Zapis do kalendarza opcjonalny.",
+    applicationsTitle: "Evidence",
+    applicationsBody: "Dodawaj dowody pracy we własnym tempie — CV opcjonalne.",
+    feedbackTitle: "Decyzje i ustawienia",
+    feedbackBody: "Zatwierdzaj, gdy trzeba, i trzymaj prywatność, pauzę, eksport oraz usuwanie u siebie.",
+    homeTitle: "Start",
+    homeBody: "Spokojny kolejny krok jest tutaj — bez hałaśliwego pulpitu.",
+    directionTitle: "Kierunek",
+    directionBody: "Uściślij cel bez wgrywania CV.",
     next: "Dalej",
     skip: "Pomiń tour",
     done: "Gotowe",

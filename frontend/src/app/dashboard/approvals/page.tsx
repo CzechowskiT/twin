@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useTranslation } from "@/components/language-provider";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
+import { IaActionableEmpty } from "@/components/dashboard/ia-actionable-empty";
 import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
@@ -231,6 +232,7 @@ export default function LifecycleApprovalsPage() {
       <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8">
         <h1 className="text-3xl font-semibold">{t("careerLifecycle.approvalsTitle")}</h1>
         <p className="text-sm text-[var(--twin-muted)]">{t("careerLifecycle.approvalsLead")}</p>
+        <IaActionableEmpty areaId="decisions" show />
         {err ? (
           <p className="text-sm text-red-700" role="alert">
             {err}

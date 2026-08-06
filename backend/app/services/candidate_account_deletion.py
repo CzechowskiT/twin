@@ -91,6 +91,11 @@ def execute_candidate_account_deletion(
         from app.services import pilot_support_ops as support_ops
 
         support_ops.soft_delete_all_for_candidate(db, candidate_id=candidate.id)
+        from app.services import guided_first_value as gfv
+        from app.services import isolated_demo as demo
+
+        gfv.soft_delete_for_candidate(db, candidate_id=candidate.id)
+        demo.soft_delete_for_candidate(db, candidate_id=candidate.id)
     except Exception:
         pass
     _anonymize_candidate(candidate)

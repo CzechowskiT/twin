@@ -9,36 +9,50 @@ export const CANDIDATE_PRIMARY_IA = [
     id: "home",
     href: "/dashboard",
     labelKey: "pilotConsolidation.navHome" as const,
+    emptyStateKey: "home" as const,
+    starterHref: "/dashboard",
   },
   {
     id: "direction",
     href: "/dashboard/career",
     labelKey: "pilotConsolidation.navDirection" as const,
+    emptyStateKey: "direction" as const,
+    starterHref: "/dashboard/career",
   },
   {
     id: "opportunities",
     href: "/dashboard/matches",
     labelKey: "pilotConsolidation.navOpportunities" as const,
+    emptyStateKey: "opportunities" as const,
+    starterHref: "/dashboard/matches",
   },
   {
     id: "evidence",
     href: "/dashboard/portfolio",
     labelKey: "pilotConsolidation.navEvidence" as const,
+    emptyStateKey: "evidence" as const,
+    starterHref: "/dashboard/portfolio",
   },
   {
     id: "plan",
     href: "/dashboard/execution-calendar",
     labelKey: "pilotConsolidation.navPlan" as const,
+    emptyStateKey: "plan" as const,
+    starterHref: "/dashboard/execution-calendar",
   },
   {
     id: "decisions",
     href: "/dashboard/approvals",
     labelKey: "pilotConsolidation.navDecisions" as const,
+    emptyStateKey: "decisions" as const,
+    starterHref: "/dashboard/approvals",
   },
   {
     id: "settings",
     href: "/dashboard/privacy-center",
     labelKey: "pilotConsolidation.navSettings" as const,
+    emptyStateKey: "settings" as const,
+    starterHref: "/dashboard/privacy-center",
   },
 ] as const;
 
@@ -121,6 +135,20 @@ export const FIRST_VALUE_CONTRACT = {
   proven_by: "fresh_account_synthetic_e2e",
   not_sufficient: ["sign_in_alone", "dashboard_open_alone", "module_tour"],
 } as const;
+
+/** Epic 2.11 — demo insight is never real first value. */
+export const DEMO_FIRST_VALUE_SEEN_SEPARATE = true as const;
+
+export const PUBLIC_PREVIEW_STATUS = "READY_INACTIVE" as const;
+export const PUBLIC_PREVIEW_ENABLED_IN_PRODUCTION = false as const;
+
+export const MEASUREMENT_CONTRACTS_211 = [
+  "starter_path_v1",
+  "actionable_empty_state_v1",
+  "isolated_demo_v1",
+  "pilot_first_value_v1",
+  "mechanical_discoverability_v1",
+] as const;
 
 export const PILOT_ACCESS_STATUS = "OPERATIONALLY_READY_INACTIVE" as const;
 export const INVITE_SEND_ENABLED = false;

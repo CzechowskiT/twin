@@ -42,6 +42,9 @@ export function PilotHomeNextAction() {
         <Link className="twin-link" href="/dashboard/approvals">
           {t("pilotConsolidation.homeOpenDecisions")}
         </Link>
+        <Link className="twin-link" href="/dashboard/help">
+          {t("pilotOps.navHelp")}
+        </Link>
       </nav>
       <p className="mt-2 text-xs opacity-60">{t("pilotConsolidation.claimKind")}</p>
     </Card>

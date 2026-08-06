@@ -157,6 +157,16 @@ def recovery_guidance(*, journey: str = "home") -> list[dict[str, Any]]:
             {"id": "home", "href": "/dashboard", "label": "Open Daily OS"},
             {"id": "report", "href": "/dashboard/help/report-problem", "label": "Report Daily OS issue"},
         ],
+        "guided_first_value": [
+            {"id": "home", "href": "/dashboard", "label": "Resume guided start"},
+            {"id": "help", "href": "/dashboard/help", "label": "Help Center"},
+            {"id": "demo_exit", "href": "/dashboard", "label": "Exit demo to my data"},
+        ],
+        "isolated_demo": [
+            {"id": "home", "href": "/dashboard", "label": "Open Home"},
+            {"id": "exit_demo", "href": "/dashboard", "label": "Start with my data"},
+            {"id": "report", "href": "/dashboard/help/report-problem", "label": "Report demo issue"},
+        ],
     }
     return catalog.get(journey, catalog["home"])
 

@@ -236,4 +236,16 @@ def build_user_owned_export_payload(
             if candidate
             else {"support_cases": [], "pilot_feedback": []}
         ),
+        "guided_first_value_and_demo": (
+            {
+                **__import__(
+                    "app.services.guided_first_value", fromlist=["export_for_candidate"]
+                ).export_for_candidate(db, candidate_id=candidate.id),
+                **__import__(
+                    "app.services.isolated_demo", fromlist=["export_for_candidate"]
+                ).export_for_candidate(db, candidate_id=candidate.id),
+            }
+            if candidate
+            else {"guided_first_value": None, "isolated_demo_sessions": []}
+        ),
     }
