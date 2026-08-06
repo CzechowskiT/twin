@@ -1,0 +1,28 @@
+PASS [stance] launch_nogo 
+PASS [stance] enrollment_off 
+PASS [stance] invite_send_off 
+PASS [stance] real_invites_zero 0
+PASS [stance] access_ready_inactive OPERATIONALLY_READY_INACTIVE
+PASS [stance] phase_3b 
+PASS [stance] ms_write_off 
+PASS [runtime_caps] mint_synth 200
+PASS [runtime_caps] kpi_excluded 
+PASS [runtime_caps] ops_aggregate 200
+PASS [runtime_caps] state_ready_inactive OPERATIONALLY_READY_INACTIVE
+PASS [runtime_caps] eff_cohort_0 {'real_cohort': 0, 'canary': 0, 'generation': 0, 'send': 0}
+PASS [runtime_caps] eff_canary_0 {'real_cohort': 0, 'canary': 0, 'generation': 0, 'send': 0}
+PASS [runtime_caps] eff_gen_0 {'real_cohort': 0, 'canary': 0, 'generation': 0, 'send': 0}
+PASS [runtime_caps] eff_send_0 {'real_cohort': 0, 'canary': 0, 'generation': 0, 'send': 0}
+PASS [stance] gen_off 
+PASS [stance] redeem_off 
+PASS [support_loop] help_en 200
+PASS [support_loop] diag_reject_email 200
+PASS [support_loop] problem_submit 200
+PASS [support_loop] feedback_submit 200
+PASS [support_loop] feedback_withdraw 200
+PASS [ops_gates] manifest_dry_run 200
+PASS [ops_gates] activate_blocked 200
+PASS [ops_gates] incident_synth 200
+PASS [ops_gates] db_head 126_fix_support_diagnostic_opt_in
+PASS [runtime_caps] synth_cannot_send 401
+SUMMARY product=18/18 stance=9/9 all=27/27

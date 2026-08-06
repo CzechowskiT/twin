@@ -209,7 +209,7 @@ def main() -> int:
         st == 200
         and isinstance(mig, dict)
         and mig.get("is_at_head") is True
-        and str(mig.get("current_revision") or "").startswith("125"),
+        and str(mig.get("current_revision") or "").startswith("126"),
         str((mig or {}).get("current_revision") if isinstance(mig, dict) else st),
     )
 

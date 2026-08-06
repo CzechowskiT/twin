@@ -1,0 +1,189 @@
+1|Executive Summary
+Epic 2.10 dostarcza operacyjną gotowość pilota bez aktywacji: fail-closed runtime OPERATIONALLY_READY_INACTIVE, transakcyjne hard caps (effective real=0), Help/Report/Feedback z prywatną diagnostyką, metric contracts READY_TO_MEASURE. Verdict A: PILOT OPERATIONS, CANDIDATE SUPPORT AND FEEDBACK READINESS PRODUCTION-READY — SERVER-SIDE HARD CAPS, FAIL-CLOSED RUNTIME GATES AND PRIVACY-SAFE SUPPORT LOOP PROVEN. Product e6328c3c746eab6cd828adcc22881ec537a80a52; Alembic 126; E2E 27/27; CI success; FE=API=worker ALIGNED; real invites 0.
+2|Canonical Baseline
+Epic 2.9 product 30ce54b5 / P1 tip 196a4d37 / Alembic 124 / CI 30994745155 / E2E 41/41 + P1 44/44 / PRODUCTION_READY_INACTIVE / enrollment OFF / invites 0 — zweryfikowane przed startem 2.10.
+3|Canonical Final State
+product e6328c3c746eab6cd828adcc22881ec537a80a52; Alembic 126_fix_support_diagnostic_opt_in is_at_head=true; PILOT_ACCESS=OPERATIONALLY_READY_INACTIVE; effective caps 0; schema twin.pilot_operations/v1.
+4|Verdict
+PILOT OPERATIONS, CANDIDATE SUPPORT AND FEEDBACK READINESS PRODUCTION-READY — SERVER-SIDE HARD CAPS, FAIL-CLOSED RUNTIME GATES AND PRIVACY-SAFE SUPPORT LOOP PROVEN
+5|Product Value Delivered
+Kandydat ma Help Center, zgłoszenie problemu z podglądem diagnostyki, wycofywalny feedback; operator ma dry-run bramki, hard caps, metric contracts i agregat jakości bez PII — bez włączania realnego pilota.
+6|Scope Compliance
+Tylko allowed WS1–WS17. Brak nowego intelligence/ranking/calendar/Privacy Center pipeline; brak chatbotu; brak session replay; brak aktywacji/rosteru/send.
+7|Architecture
+Rozszerzenie kanoniczne: pilot_runtime, pilot_hard_caps, pilot_support_ops, diagnostic_envelope, pilot_metric_contracts, pilot_operations API; FE Help w More; export/deletion hooks; health_ops + consolidation status.
+8|Runtime Pilot State Model
+DISABLED / OPERATIONALLY_READY_INACTIVE / ACTIVE_INVITE_ONLY / PAUSED / INCIDENT_LOCKDOWN. Epic kończy na OPERATIONALLY_READY_INACTIVE; ACTIVE_TRANSITION_ALLOWED=false.
+9|Fail-Closed Behavior
+Gen/send/redeem wymagają ACTIVE + kill switches; domyślnie OFF. Dry-run ACTIVATE zawsze zablokowany (manifest + epic block).
+10|Hard-Cap Model
+Absolute cohort≤3, canary≤1. Effective production podczas 2.10: real_cohort=canary=generation=send=0.
+11|Transactional Enforcement
+pilot_cap_buckets + try_reserve atomic (FOR UPDATE / retry). Mint/send zablokowane przy cap_exceeded.
+12|Concurrency
+Reserve retry loop; test sequential single-slot + release/retry.
+13|Retry and Idempotency
+try_reserve 3 próby; release_reservation; dry_run send bez side-effect.
+14|Kill-Switch Matrix
+access/generation/send/redemption OFF; telemetry/support ON (support da się wyłączyć). Niezależne w PilotRuntimeState.
+15|Manifest Validator
+DRY-RUN ONLY; reject unknown + forbidden PII keys; mutates_state=false; no activate/gen/send/redeem.
+16|Candidate Help Center
+/dashboard/help EN/PL articles; API /me/pilot-operations/help.
+17|Help IA Placement
+More (secondary) — nie 8. primary; Settings/Privacy linkowane.
+18|Problem Reporting
+/dashboard/help/report-problem; kategorie; candidate-controlled; bez attachments/screenshots/CV; bez auto email.
+19|Candidate Feedback
+Oddzielna tabela candidate_pilot_feedback; used_for_ranking/training=false; withdrawable.
+20|Diagnostic Envelope
+build_preview_envelope; candidate preview + opt-out.
+21|Diagnostic Allowlist
+ALLOWED_TOP surfaces/route/locale/error_code/…; recursive sanitize depth≤4.
+22|Sensitive-Field Rejection
+Reject email/token/cv/notes/nested sensitive; E2E diag_reject_email PASS.
+23|Support Lifecycle
+DRAFT→SUBMITTED→…→CLOSED/WITHDRAWN/DELETED; CLOSED wymaga closed_reason; brak silent closure; brak CRM.
+24|Candidate Control
+Withdraw feedback; transition własnych case’ów; soft-delete przy account deletion.
+25|Recovery Guidance
+Katalog home/onboarding/privacy/invite/daily_os z deep linkami.
+26|Metric-Contract Registry
+READY_TO_MEASURE; exact denominators; vanity/open-rate/inferred delivery/satisfaction/retention/employment OFF.
+27|First-Value Derivation
+Server-side signals (daily_os + useful surface); sign-in/page-view insufficient.
+28|Journey Measurement
+Contracts: generated/sent/redeemed/enrolled/first_value/support/feedback — counts real=0.
+29|Aggregate Operations View
+GET /admin/pilot-operations/quality — counts only, no PII/content.
+30|Operator Authorization
+Ops Bearer na admin routes; synth JWT nie może send (401).
+31|Dry-Run Decision Gates
+ACTIVATE/CONTINUE/PAUSE/STOP; mutates_state=false always; ACTIVATE blocked.
+32|Incident Conditions
+Synthetic exercise zapisuje PASS bez live activation.
+33|Rollback
+Ćwiczenie: kill switches + STOP→LOCKDOWN dry-run checklist; real invites revoked=0.
+34|Synthetic Authentication Isolation
+Mint ops-only; kpi_excluded; cannot send invites.
+35|Candidate Isolation
+Case/feedback scoped candidate_id; synth nie eskaluje.
+36|Prompt-Injection Safety
+Scrub ignore previous / script markers w subject/body.
+37|Privacy
+Allowlist diagnostyki; no attachments; feedback ≠ training.
+38|Privacy Pause
+Istniejący Privacy Center honorowany; support nie omija.
+39|Export
+user_data_export + pilot_support_and_feedback section.
+40|Deletion
+soft_delete_all_for_candidate w account deletion path.
+41|Retention
+kpi_excluded default true; soft-delete deleted_at.
+42|EN
+pilotOps.* EN strings.
+43|PL
+pilotOps.* PL strings.
+44|Accessibility
+aria-label na formach; min-h touch; More aria-expanded inherited.
+45|Responsive UX
+max-w-2xl Shell; mobile-friendly forms.
+46|Reliability
+Fail-closed caps/runtime; 503 schema fixed via 126; health aligned.
+47|Performance
+Lekkie agregaty count-only; brak ciężkich joinów PII.
+48|Backend Tests
+test_pilot_operations_epic_210 7 PASS; consolidation PASS; hardening updated for caps.
+49|Frontend Tests
+pilot-ops-help-guard 2 PASS.
+50|Hard-Cap Race Tests
+Sequential reserve/release PASS (effective override path).
+51|Diagnostic Security Tests
+Nested sensitive reject PASS; injection scrub PASS.
+52|Authenticated Synthetic E2E
+27/27 PASS scripts/epic-2-10-pilot-operations-e2e.py
+53|Fresh-Account Regression
+Uninvited register nadal gated (invite-only); enrollment OFF.
+54|Product E2E Count
+27 product+stance combined (18 product / 9 stance).
+55|Stance Check Count
+9/9 PASS.
+56|Alembic
+126_fix_support_diagnostic_opt_in (via 125 tables + rename fix).
+57|CI
+success https://github.com/CzechowskiT/twin/actions/runs/31077376617
+58|FE Deployment
+frontend_commit=e6328c3c746eab6cd828adcc22881ec537a80a52
+59|API Deployment
+api_commit=e6328c3c746eab6cd828adcc22881ec537a80a52
+60|Worker Deployment
+worker_commit=e6328c3c746eab6cd828adcc22881ec537a80a52
+61|Production DB
+126_fix_support_diagnostic_opt_in is_at_head=true
+62|Four-Way Alignment
+ALIGNED fe=api=worker=e6328c3c746eab6cd828adcc22881ec537a80a52
+63|Closed P0
+Hard caps missing; hardcoded inactive; typo severity_opt_in schema mismatch — CLOSED.
+64|Closed P1
+Support/feedback loop; diagnostic envelope; metric contracts; dry-run gates; incident synth — CLOSED.
+65|Remaining Blockers
+Founder secure activation manifest + roster≤3 + separate send auth — required before canary (not product defect).
+66|External Limitations
+Brak real candidate activity by design; email provider unused; no Founder QA screenshots.
+67|Technical Debt
+utcnow warnings; SQLite FOR UPDATE limited; tip CI noise history.
+68|Product Debt
+ACTIVE flip nadal wymaga przyszłego Founder gate; hard abs caps w mint path zależą od runtime ACTIVE.
+69|Documentation
+reports/epic-2-10-pilot-operations-support-feedback-2026-08-06/
+70|Git History
+91c286ec feat 2.10 · e6328c3c fix diagnostic_opt_in 126
+71|Product SHA
+e6328c3c746eab6cd828adcc22881ec537a80a52
+72|Proof Tip
+e6328c3c746eab6cd828adcc22881ec537a80a52 (+ evidence commit if any)
+73|Frozen Safety State
+PUBLIC_LAUNCH=NO_GO · PUBLIC_SIGNUP=OFF · PUBLIC_ENROLLMENT=OFF · PILOT_ACCESS=OPERATIONALLY_READY_INACTIVE · REAL_INVITE_GENERATION=OFF · REAL_INVITE_SEND=OFF · REAL_INVITE_REDEMPTION=OFF · ACTIVE_REAL_INVITES=0 · REAL_PILOT_USERS_ADDED=0 · PHASE_3B=BLOCKED · PHASE_3_AGENT=NOT_STARTED · MS_CALENDAR_WRITE=OFF · APPLICATION_SUBMISSION=OFF · EMPLOYER_CONTACT=OFF · EXTERNAL_PURCHASE_OR_ENROLLMENT=OFF
+74|Founder Action
+Nie aktywować automatycznie. Wybrać: (1) one-candidate canary via secure manifest, LUB (2) kontynuacja product development pod nowym candidate-first scope. Nie startować Epic 3.0 autonomicznie.
+75|Exact Next Recommendation
+Founder-authorized one-candidate canary via secure activation manifest (cap≤3, canary=1, separate send auth) — OR Founder decision to continue product development under new candidate-first scope. Do not auto-activate; do not auto-start next epic.
+76|Final Evidence Table
+| Check | Result |
+| E2E | 27/27 PASS |
+| Unit ops | 7/7 PASS |
+| CI | success 31077376617 |
+| Alembic | 126 head |
+| Alignment | FE=API=worker e6328c3c |
+| Real invites | 0 |
+| Caps effective | 0/0/0/0 |
+| ACTIVATE dry-run | blocked |
+77|Final Verdict
+PILOT OPERATIONS, CANDIDATE SUPPORT AND FEEDBACK READINESS PRODUCTION-READY — SERVER-SIDE HARD CAPS, FAIL-CLOSED RUNTIME GATES AND PRIVACY-SAFE SUPPORT LOOP PROVEN
+
+Final Answers
+- exact verdict: PILOT OPERATIONS, CANDIDATE SUPPORT AND FEEDBACK READINESS PRODUCTION-READY — SERVER-SIDE HARD CAPS, FAIL-CLOSED RUNTIME GATES AND PRIVACY-SAFE SUPPORT LOOP PROVEN
+- product SHA: e6328c3c746eab6cd828adcc22881ec537a80a52
+- repository/proof tip: e6328c3c746eab6cd828adcc22881ec537a80a52
+- FE SHA: e6328c3c746eab6cd828adcc22881ec537a80a52
+- API SHA: e6328c3c746eab6cd828adcc22881ec537a80a52
+- worker SHA: e6328c3c746eab6cd828adcc22881ec537a80a52
+- database head: 126_fix_support_diagnostic_opt_in (is_at_head=true)
+- CI state and URL: SUCCESS https://github.com/CzechowskiT/twin/actions/runs/31077376617
+- synthetic E2E result: PASS 27/27
+- fresh-account / stance: enrollment OFF; invite-only preserved
+- pilot access: OPERATIONALLY_READY_INACTIVE
+- real invite generation/send/redemption: OFF/OFF/OFF
+- active real invites: 0
+- real pilot users added: 0
+- effective caps: cohort=0 canary=0 gen=0 send=0
+- absolute caps: cohort=3 canary=1
+- Launch: NO-GO
+- Phase 3B: BLOCKED
+- Phase 3 Agent: NOT_STARTED
+- MS write: OFF
+- application submission: OFF
+- external purchase/enrollment: OFF
+- unresolved P0: 0
+- safety incidents: 0
+- next: Founder canary via secure manifest OR continue product under new scope — no auto-activate / no Epic 3.0
