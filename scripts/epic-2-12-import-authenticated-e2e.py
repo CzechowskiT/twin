@@ -263,15 +263,31 @@ def main() -> int:
     ditems = ((dprev or {}).get("preview") or {}).get("items") or []
     check("product", "conflict_dup_marked", any(isinstance(it, dict) and it.get("dup") for it in ditems), "")
 
-    # F first-value: upload ≠ first value (GFV still not completed by import alone)
-    code, gfv = _req("GET", "/api/v1/candidates/me/guided-first-value", token=token)
+    # F first-value: upload/parse/preview alone must not flip pilot_first_value_v1
+    code, gfv0 = _req("GET", "/api/v1/candidates/me/guided-first-value", token=token)
+    before_fv = bool(isinstance(gfv0, dict) and gfv0.get("real_first_value_reached"))
+    code, fv_batch = _req(
+        "POST", "/api/v1/candidates/me/import/batches", token=token, body={"family": "document"}
+    )
+    fbk = (fv_batch.get("batch_key") if isinstance(fv_batch, dict) else "") or ""
+    code, _ = _multipart_upload(token, fbk, b"Preview only note\n\nNo commit.\n", "synth.txt")
+    code, fv_prev = _req("POST", f"/api/v1/candidates/me/import/batches/{fbk}/process", token=token)
+    code, gfv1 = _req("GET", "/api/v1/candidates/me/guided-first-value", token=token)
+    after_preview = bool(isinstance(gfv1, dict) and gfv1.get("real_first_value_reached"))
     check(
         "product",
-        "upload_not_first_value",
+        "upload_preview_not_first_value",
         code == 200
-        and isinstance(gfv, dict)
-        and not bool(gfv.get("real_first_value_reached")),
-        str((gfv or {}).get("real_first_value_reached")),
+        and isinstance(fv_prev, dict)
+        and fv_prev.get("canonical_mutations") == 0
+        and after_preview == before_fv,
+        f"before={before_fv} after={after_preview} state={(fv_prev or {}).get('state')}",
+    )
+    check(
+        "product",
+        "catalog_denies_preview_as_fv",
+        isinstance(cat, dict) and "upload_parse_preview_do_not_satisfy" in str(cat.get("first_value")),
+        "",
     )
 
     # PP1 preview still on
