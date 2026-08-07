@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTranslation } from "@/components/language-provider";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
-import type { WORKSPACE_SEARCH_MESSAGES_EN } from "@/lib/workspace-search-messages";
+import type { TranslationKey } from "@/lib/i18n";
 
 type SearchHit = {
   group?: string;
@@ -28,10 +28,8 @@ type SearchResponse = {
   mutations?: number;
 };
 
-type MsgKey = keyof typeof WORKSPACE_SEARCH_MESSAGES_EN;
-
-function tWs(t: (k: string) => string, key: MsgKey): string {
-  return t(`workspaceSearch.${key}`);
+function ws(key: string): TranslationKey {
+  return `workspaceSearch.${key}` as TranslationKey;
 }
 
 /** Cmd/Ctrl+K palette — retrieval only; no query persistence. */
@@ -101,7 +99,7 @@ export function WorkspaceSearchPalette() {
           if (!cancelled) setData(res);
         })
         .catch(() => {
-          if (!cancelled) setErr(tWs(t, "error"));
+          if (!cancelled) setErr(t(ws("error")));
         })
         .finally(() => {
           if (!cancelled) setBusy(false);
@@ -136,8 +134,8 @@ export function WorkspaceSearchPalette() {
         data-testid="workspace-search-open"
         aria-keyshortcuts="Meta+K Control+K"
       >
-        {tWs(t, "nav")}
-        <span className="ml-2 text-xs opacity-60">{tWs(t, "openShortcut")}</span>
+        {t(ws("nav"))}
+        <span className="ml-2 text-xs opacity-60">{t(ws("openShortcut"))}</span>
       </button>
     );
   }
@@ -159,16 +157,16 @@ export function WorkspaceSearchPalette() {
         <div className="mb-3 flex items-start justify-between gap-2">
           <div>
             <h2 id={titleId} className="text-lg font-medium">
-              {tWs(t, "title")}
+              {t(ws("title"))}
             </h2>
-            <p className="text-xs opacity-70">{tWs(t, "noHistory")}</p>
+            <p className="text-xs opacity-70">{t(ws("noHistory"))}</p>
           </div>
           <button type="button" className="twin-btn-ghost text-sm" onClick={close}>
-            {tWs(t, "close")}
+            {t(ws("close"))}
           </button>
         </div>
         <label className="sr-only" htmlFor="workspace-search-q">
-          {tWs(t, "placeholder")}
+          {t(ws("placeholder"))}
         </label>
         <input
           id="workspace-search-q"
@@ -176,7 +174,7 @@ export function WorkspaceSearchPalette() {
           className="min-h-[2.75rem] w-full rounded-md border border-[var(--twin-border)] bg-transparent px-3"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder={tWs(t, "placeholder")}
+          placeholder={t(ws("placeholder"))}
           autoComplete="off"
           autoCorrect="off"
           spellCheck={false}
@@ -188,33 +186,28 @@ export function WorkspaceSearchPalette() {
             checked={includeArchived}
             onChange={(e) => setIncludeArchived(e.target.checked)}
           />
-          {tWs(t, "includeArchived")}
+          {t(ws("includeArchived"))}
         </label>
-        {busy ? <p className="mt-2 text-sm opacity-70">{tWs(t, "loading")}</p> : null}
+        {busy ? <p className="mt-2 text-sm opacity-70">{t(ws("loading"))}</p> : null}
         {err ? (
           <p className="mt-2 text-sm text-red-700" role="alert">
             {err}
           </p>
         ) : null}
         {q.trim().length > 0 && q.trim().length < 2 ? (
-          <p className="mt-2 text-sm opacity-70">{tWs(t, "emptyShort")}</p>
+          <p className="mt-2 text-sm opacity-70">{t(ws("emptyShort"))}</p>
         ) : null}
         {data?.privacy_paused ? (
-          <p className="mt-2 text-sm opacity-80">{tWs(t, "emptyPaused")}</p>
+          <p className="mt-2 text-sm opacity-80">{t(ws("emptyPaused"))}</p>
         ) : null}
         {showEmpty ? (
           <p className="mt-3 text-sm opacity-80">
-            {data?.empty_reason === "privacy_pause" ? tWs(t, "emptyPaused") : tWs(t, "empty")}
+            {data?.empty_reason === "privacy_pause" ? t(ws("emptyPaused")) : t(ws("empty"))}
           </p>
         ) : null}
-        <ResultGroup
-          title={tWs(t, "groupCapability")}
-          items={caps}
-          onPick={go}
-          t={t}
-        />
-        <ResultGroup title={tWs(t, "groupRecord")} items={recs} onPick={go} t={t} />
-        <p className="mt-3 text-xs opacity-60">{tWs(t, "truthNote")}</p>
+        <ResultGroup title={t(ws("groupCapability"))} items={caps} onPick={go} label={t} />
+        <ResultGroup title={t(ws("groupRecord"))} items={recs} onPick={go} label={t} />
+        <p className="mt-3 text-xs opacity-60">{t(ws("truthNote"))}</p>
       </div>
     </div>
   );
@@ -224,12 +217,12 @@ function ResultGroup({
   title,
   items,
   onPick,
-  t,
+  label,
 }: {
   title: string;
   items: SearchHit[];
   onPick: (href: string) => void;
-  t: (k: string) => string;
+  label: (k: TranslationKey) => string;
 }) {
   if (!items.length) return null;
   return (
@@ -245,13 +238,13 @@ function ResultGroup({
             >
               <span className="font-medium">{hit.title}</span>
               {hit.status === "archived" ? (
-                <span className="ml-2 text-xs opacity-60">{tWs(t, "archivedLabel")}</span>
+                <span className="ml-2 text-xs opacity-60">{label(ws("archivedLabel"))}</span>
               ) : null}
               <span className="mt-0.5 block text-xs opacity-70">{hit.excerpt}</span>
               <span className="mt-0.5 block text-xs opacity-50">
-                {tWs(t, "truth")}: {hit.truth} · {tWs(t, "source")}: {hit.source}
+                {label(ws("truth"))}: {hit.truth} · {label(ws("source"))}: {hit.source}
                 {hit.match_reasons?.length
-                  ? ` · ${tWs(t, "matchReasons")}: ${hit.match_reasons.join(", ")}`
+                  ? ` · ${label(ws("matchReasons"))}: ${hit.match_reasons.join(", ")}`
                   : ""}
               </span>
             </button>
