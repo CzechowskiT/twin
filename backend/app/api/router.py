@@ -28,6 +28,7 @@ from app.api import (
     pilot_consolidation,
     pilot_operations,
     guided_first_value,
+    private_canary,
     chatgpt_twin,
     company,
     company_feedback_persistence,
@@ -243,6 +244,16 @@ api_router.include_router(
     unified_workspace_search.router,
     prefix="/candidates",
     tags=["Unified Workspace Search"],
+)
+api_router.include_router(
+    private_canary.router,
+    prefix="/candidates",
+    tags=["Private Canary Journey"],
+)
+api_router.include_router(
+    private_canary.admin_router,
+    prefix="/admin",
+    tags=["Private Canary Admin"],
 )
 api_router.include_router(
     pilot_operations.admin_router,

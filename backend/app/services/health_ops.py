@@ -83,6 +83,10 @@ def build_health_ops_public(s: Settings) -> dict[str, Any]:
         "rc1_pilot_runtime_state": "OPERATIONALLY_READY_INACTIVE",
         "rc1_effective_cohort_cap": 0,
         "rc1_effective_canary_cap": 0,
+        "rc1_one_candidate_canary_ready": False,
+        "rc1_one_candidate_canary_state": "READY_INACTIVE",
+        "rc1_one_candidate_canary_active": False,
+        "rc1_canary_activation_command": "PREPARED_NOT_EXECUTED",
         "rc1_os_verdict": (
             "FIRST CUSTOMER READY — WAITING FOR FIRST APPROVED PILOT ORGANIZATION"
         ),
@@ -152,6 +156,32 @@ def build_health_ops_public(s: Settings) -> dict[str, Any]:
                 out["customer_usable_verdict"] = cu.get("verdict") or out[
                     "customer_usable_verdict"
                 ]
+            except Exception:
+                pass
+            # Epic 2.14 — live canary control + caps (fail-closed defaults preserved)
+            try:
+                from app.services import private_canary as canary
+                from app.services import pilot_hard_caps as hard_caps
+                from app.services import pilot_runtime as prt
+
+                cs = canary.snapshot(db_sess)
+                out["rc1_one_candidate_canary_ready"] = bool(cs.get("gate_ready"))
+                out["rc1_one_candidate_canary_state"] = str(cs.get("state") or "READY_INACTIVE")
+                out["rc1_one_candidate_canary_active"] = bool(cs.get("active_one_candidate"))
+                out["rc1_canary_activation_command"] = str(
+                    cs.get("activation_command") or "PREPARED_NOT_EXECUTED"
+                )
+                cap_s = hard_caps.caps_snapshot(db_sess)
+                eff = cap_s.get("effective") or {}
+                out["rc1_effective_cohort_cap"] = int(eff.get("real_cohort") or 0)
+                out["rc1_effective_canary_cap"] = int(eff.get("canary") or 0)
+                rt = prt.runtime_snapshot(db_sess)
+                out["rc1_pilot_runtime_state"] = str(rt.get("state") or "OPERATIONALLY_READY_INACTIVE")
+                out["rc1_pilot_access_status"] = str(rt.get("pilot_access_status") or rt.get("state"))
+                ks = rt.get("kill_switches") or {}
+                out["rc1_invite_send_enabled"] = bool(ks.get("send_enabled"))
+                out["rc1_real_invite_generation"] = "ON" if ks.get("generation_enabled") else "OFF"
+                out["rc1_real_invite_redemption"] = "ON" if ks.get("redemption_enabled") else "OFF"
             except Exception:
                 pass
         # Avoid heavy market_coverage_report COUNTs on the public health path — use Redis scrape snapshot only.

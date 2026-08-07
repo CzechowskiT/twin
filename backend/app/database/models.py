@@ -7311,12 +7311,62 @@ class CandidateGuidedFirstValue(Base):
     progress_json: Mapped[str] = mapped_column(Text, default="{}")
     demo_first_value_seen: Mapped[bool] = mapped_column(Boolean, default=False)
     real_first_value_reached: Mapped[bool] = mapped_column(Boolean, default=False)
+    # Epic 2.14 ladder — still pilot_first_value_v1 (no v2)
+    fv_ladder: Mapped[str] = mapped_column(String(32), default="READY")
+    fv_viewed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    fv_acknowledged_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    fv_actioned_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     paused_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
     kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class OneCandidateCanaryControl(Base):
+    """Epic 2.14 — private one-candidate canary control plane (Founder-gated)."""
+
+    __tablename__ = "one_candidate_canary_control"
+    __table_args__ = (UniqueConstraint("singleton_key", name="uq_canary_control_singleton"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    singleton_key: Mapped[str] = mapped_column(String(32), default="global")
+    state: Mapped[str] = mapped_column(String(48), default="READY_INACTIVE", index=True)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    max_real_candidates: Mapped[int] = mapped_column(Integer, default=1)
+    max_real_invites: Mapped[int] = mapped_column(Integer, default=1)
+    real_candidates_bound: Mapped[int] = mapped_column(Integer, default=0)
+    real_invites_created: Mapped[int] = mapped_column(Integer, default=0)
+    activation_command: Mapped[str] = mapped_column(String(64), default="PREPARED_NOT_EXECUTED")
+    gate_ready: Mapped[bool] = mapped_column(Boolean, default=False)
+    checklist_json: Mapped[str] = mapped_column(Text, default="{}")
+    audit_json: Mapped[str] = mapped_column(Text, default="[]")
+    abort_reason: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateCanaryFrictionEvent(Base):
+    """Content-free friction events for canary instrumentation (no raw query/PII)."""
+
+    __tablename__ = "candidate_canary_friction_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    event_code: Mapped[str] = mapped_column(String(64), index=True)
+    surface: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    lane: Mapped[str] = mapped_column(String(16), default="SYNTHETIC")
+    payload_json: Mapped[str] = mapped_column(Text, default="{}")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
 

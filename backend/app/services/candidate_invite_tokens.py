@@ -90,6 +90,15 @@ def validate_invite_token(
     consume: bool = False,
 ) -> tuple[bool, str]:
     """Validate invite token; rate-limits brute force via validate_fail_count."""
+    # Epic 2.14 — redeem kill switch fail-closed (generation/send already gated)
+    try:
+        from app.services.pilot_runtime import assert_redeem_allowed
+
+        ok_r, reason_r = assert_redeem_allowed(db)
+        if not ok_r:
+            return False, reason_r
+    except Exception:
+        return False, "runtime_redeem_check_failed"
     th = hash_token(raw_token)
     row = (
         db.query(CandidateInviteToken)
