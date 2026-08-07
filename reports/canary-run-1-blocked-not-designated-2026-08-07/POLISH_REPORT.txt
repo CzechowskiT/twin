@@ -33,7 +33,7 @@ No invent/infer identity; no second invite; no broader pilot; no signup/enrollme
 17|Final Counts
 cap_canary=0 · cap_cohort=0 · real_invites_created=0 · real_candidates_bound=0 · real_pilot_users=0 · designated_count=0.
 18|SHAs
-repo_head/tip=e873377a3f83cdb7b3109aa9b5cf00690aa4de58 · product/FE_docs_vs_API=product 2393311bbfa60d2e6b13007995363449f295b6f7 (API+worker) · FE_tip=e873377a3f83cdb7b3109aa9b5cf00690aa4de58 · alignment=product ALIGNED (API=worker=2393311b); docs_only_drift=true · alembic=129 · CI_product=SUCCESS 31177003054.
+repo_head/tip=3875d25edf4acc337b67f556420f583a0de22e75 · product/FE_docs_vs_API=product 2393311bbfa60d2e6b13007995363449f295b6f7 (API+worker) · FE_tip=e873377a3f83cdb7b3109aa9b5cf00690aa4de58 · alignment=product ALIGNED (API=worker=2393311b); docs_only_drift=true · alembic=129 · CI_product=SUCCESS 31177003054.
 19|Verdict
 CANARY ACTIVATION BLOCKED EXTERNALLY - REAL_CANARY_CANDIDATE_NOT_DESIGNATED
 20|Stop
@@ -66,7 +66,7 @@ Final Answers
 24|epic_215_started: false
 25|epic_30_started: false
 26|product_SHA: 2393311bbfa60d2e6b13007995363449f295b6f7
-27|tip_SHA: e873377a3f83cdb7b3109aa9b5cf00690aa4de58
+27|tip_SHA: 3875d25edf4acc337b67f556420f583a0de22e75
 28|FE_SHA: e873377a3f83cdb7b3109aa9b5cf00690aa4de58
 29|API_SHA: 2393311bbfa60d2e6b13007995363449f295b6f7
 30|worker_SHA: 2393311bbfa60d2e6b13007995363449f295b6f7
