@@ -1,0 +1,15 @@
+User-Agent: *
+Allow: /
+Disallow: /api/
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /login
+Disallow: /register
+Disallow: /auth/
+Disallow: /consent/
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /onboarding-assistant
+Disallow: /admin
+Disallow: /preview
+

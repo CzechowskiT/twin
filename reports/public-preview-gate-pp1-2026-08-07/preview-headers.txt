@@ -1,0 +1,19 @@
+HTTP/2 200 
+age: 0
+cache-control: private, no-cache, no-store, max-age=0, must-revalidate
+content-security-policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
+content-type: text/html; charset=utf-8
+date: Fri, 07 Aug 2026 07:04:27 GMT
+link: </_next/static/media/797e433ab948586e-s.p.08e28id.o-okb.woff2>; rel=preload; as="font"; crossorigin=""; type="font/woff2", </_next/static/media/caa3a2e1cccd8315-s.p.09~u27dqhyhd6.woff2>; rel=preload; as="font"; crossorigin=""; type="font/woff2"
+permissions-policy: camera=(), microphone=(), geolocation=(), interest-cohort=(), browsing-topics=()
+referrer-policy: no-referrer
+server: Vercel
+strict-transport-security: max-age=63072000; includeSubDomains; preload
+vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+x-content-type-options: nosniff
+x-frame-options: DENY
+x-matched-path: /preview
+x-robots-tag: noindex, nofollow, noarchive, nosnippet, noimageindex
+x-vercel-cache: MISS
+x-vercel-id: arn1::iad1::4t47h-1786086267686-288dfe45f1b7
+
