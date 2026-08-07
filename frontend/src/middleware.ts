@@ -2,10 +2,24 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { shouldBlockLikelyBot } from "@/lib/bot-guard";
-import { isPublicPreviewEnabled } from "@/lib/public-preview-gate";
+import {
+  isAllowlistedPreviewScenario,
+  isPublicPreviewEnabled,
+} from "@/lib/public-preview-gate";
 
 const PREVIEW_ROBOTS =
   "noindex, nofollow, noarchive, nosnippet, noimageindex";
+
+const PREVIEW_CSP =
+  "default-src 'self'; " +
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+  "style-src 'self' 'unsafe-inline'; " +
+  "img-src 'self' data:; " +
+  "font-src 'self' data:; " +
+  "connect-src 'self'; " +
+  "frame-ancestors 'none'; " +
+  "base-uri 'self'; " +
+  "form-action 'self'";
 
 function hasLikelyAuthCookie(request: NextRequest): boolean {
   const cookie = request.headers.get("cookie") || "";
@@ -26,6 +40,7 @@ function applyPreviewSecurityHeaders(
     "Permissions-Policy",
     "camera=(), microphone=(), geolocation=(), interest-cohort=(), browsing-topics=()",
   );
+  response.headers.set("Content-Security-Policy", PREVIEW_CSP);
   response.headers.set(
     "Cache-Control",
     privateCache
@@ -57,6 +72,28 @@ export function middleware(request: NextRequest) {
 
   if (pathname === "/preview" || pathname.startsWith("/preview/")) {
     if (!isPublicPreviewEnabled()) {
+      return new NextResponse("Not Found", {
+        status: 404,
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+          "Cache-Control": "private, no-store",
+          "X-Robots-Tag": PREVIEW_ROBOTS,
+        },
+      });
+    }
+    const method = request.method.toUpperCase();
+    if (!["GET", "HEAD", "OPTIONS"].includes(method)) {
+      return new NextResponse("Method Not Allowed", {
+        status: 405,
+        headers: {
+          Allow: "GET, HEAD, OPTIONS",
+          "Cache-Control": "private, no-store",
+          "X-Robots-Tag": PREVIEW_ROBOTS,
+        },
+      });
+    }
+    const scenario = request.nextUrl.searchParams.get("scenario");
+    if (scenario && !isAllowlistedPreviewScenario(scenario)) {
       return new NextResponse("Not Found", {
         status: 404,
         headers: {

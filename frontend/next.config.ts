@@ -69,9 +69,10 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   async headers() {
     return [
+      { source: "/:path*", headers: securityHeaders },
+      // Preview-specific headers must win over the catch-all (last match for same key).
       { source: "/preview", headers: previewHeaders },
       { source: "/preview/:path*", headers: previewHeaders },
-      { source: "/:path*", headers: securityHeaders },
     ];
   },
   // API proxy: `src/app/api/v1/[[...path]]/route.ts` (reliable on Vercel + standalone).
