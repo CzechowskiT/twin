@@ -19,6 +19,18 @@ const CSP_POLICY =
   "form-action 'self'; " +
   "report-uri /api/v1/csp-report";
 
+/** Stricter CSP for PP1 public synthetic preview — no third-party analytics connect. */
+const PREVIEW_CSP_POLICY =
+  "default-src 'self'; " +
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+  "style-src 'self' 'unsafe-inline'; " +
+  "img-src 'self' data:; " +
+  "font-src 'self' data:; " +
+  "connect-src 'self'; " +
+  "frame-ancestors 'none'; " +
+  "base-uri 'self'; " +
+  "form-action 'self'";
+
 const securityHeaders = [
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -33,12 +45,34 @@ const securityHeaders = [
   },
 ];
 
+const previewHeaders = [
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "no-referrer" },
+  {
+    key: "Permissions-Policy",
+    value: "camera=(), microphone=(), geolocation=(), interest-cohort=(), browsing-topics=()",
+  },
+  {
+    key: "Content-Security-Policy",
+    value: PREVIEW_CSP_POLICY,
+  },
+  {
+    key: "X-Robots-Tag",
+    value: "noindex, nofollow, noarchive, nosnippet, noimageindex",
+  },
+];
+
 const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
   poweredByHeader: false,
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/preview", headers: previewHeaders },
+      { source: "/preview/:path*", headers: previewHeaders },
+      { source: "/:path*", headers: securityHeaders },
+    ];
   },
   // API proxy: `src/app/api/v1/[[...path]]/route.ts` (reliable on Vercel + standalone).
   images: {

@@ -92,8 +92,9 @@ def test_discoverability_seven_areas_no_eighth():
     assert reg["primary_count"] == 7
     assert reg["eighth_nav_item"] is False
     assert reg["silent_personalization_scores"] is False
-    assert reg["public_preview"]["status"] == "READY_INACTIVE"
-    assert reg["public_preview"]["enabled_in_production"] is False
+    assert reg["public_preview"]["status"] in ("READY_INACTIVE", "ENABLED")
+    assert reg["public_preview"]["enabled_in_production"] is discover.public_preview_enabled()
+    assert reg["public_preview"]["independent_of_launch_gates"] is True
     assert len(reg["tour"]["steps"]) == 7
     assert reg["tour"]["equals_first_value"] is False
     empty = discover.empty_state_contract()

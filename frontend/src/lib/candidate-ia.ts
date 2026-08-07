@@ -139,8 +139,14 @@ export const FIRST_VALUE_CONTRACT = {
 /** Epic 2.11 — demo insight is never real first value. */
 export const DEMO_FIRST_VALUE_SEEN_SEPARATE = true as const;
 
-export const PUBLIC_PREVIEW_STATUS = "READY_INACTIVE" as const;
-export const PUBLIC_PREVIEW_ENABLED_IN_PRODUCTION = false as const;
+export const PUBLIC_PREVIEW_STATUS = (
+  (process.env.PUBLIC_PREVIEW || process.env.NEXT_PUBLIC_PUBLIC_PREVIEW) ===
+  "READ_ONLY_SYNTHETIC"
+    ? "ENABLED"
+    : "READY_INACTIVE"
+) as "ENABLED" | "READY_INACTIVE";
+export const PUBLIC_PREVIEW_ENABLED_IN_PRODUCTION = ((process.env.PUBLIC_PREVIEW ||
+  process.env.NEXT_PUBLIC_PUBLIC_PREVIEW) === "READ_ONLY_SYNTHETIC") as boolean;
 
 export const MEASUREMENT_CONTRACTS_211 = [
   "starter_path_v1",

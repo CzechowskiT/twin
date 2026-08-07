@@ -12,9 +12,12 @@ import { isPilotPreviewChromePath } from "@/lib/product-polish-p0";
 /** Hide global marketing chrome on immersive `/waitlist` landing and lean admin surfaces. */
 export function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? "";
-  const immersive = pathname === "/waitlist" || pathname.startsWith("/waitlist/");
+  const publicPreview = pathname === "/preview" || pathname.startsWith("/preview/");
+  const immersive =
+    publicPreview || pathname === "/waitlist" || pathname.startsWith("/waitlist/");
   const adminSurface = pathname === "/admin" || pathname.startsWith("/admin/");
-  const showPilotPreview = !immersive && !adminSurface && isPilotPreviewChromePath(pathname);
+  const showPilotPreview =
+    !immersive && !adminSurface && !publicPreview && isPilotPreviewChromePath(pathname);
 
   return (
     <>

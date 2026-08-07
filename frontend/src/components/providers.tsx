@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { usePathname } from "next/navigation";
 
 import { AnalyticsInit } from "@/components/analytics-init";
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
@@ -14,7 +15,21 @@ import { PersonaRouteGuard } from "@/components/persona-route-guard";
 import { PersonaProvider } from "@/components/persona-provider";
 import { Toaster } from "react-hot-toast";
 
+function isPublicPreviewPath(pathname: string): boolean {
+  return pathname === "/preview" || pathname.startsWith("/preview/");
+}
+
+/** Zero-storage, zero-analytics shell for PP1 public synthetic preview. */
+function PublicPreviewProviders({ children }: { children: ReactNode }) {
+  return <>{children}</>;
+}
+
 export function Providers({ children }: { children: ReactNode }) {
+  const pathname = usePathname() ?? "";
+  if (isPublicPreviewPath(pathname)) {
+    return <PublicPreviewProviders>{children}</PublicPreviewProviders>;
+  }
+
   return (
     <LanguageProvider>
       <CookieConsentProvider>

@@ -89,6 +89,14 @@ def build_health_ops_public(s: Settings) -> dict[str, Any]:
         "rc1_founder_approved_real_orgs": 0,
         "rc1_pilot_health_score": 80,
         "rc1_launch_go_readiness_score": 0,
+        "rc1_public_preview_status": (
+            "ENABLED"
+            if (getattr(s, "public_preview", "") or "").strip() == "READ_ONLY_SYNTHETIC"
+            else "READY_INACTIVE"
+        ),
+        "rc1_public_preview_enabled": (
+            (getattr(s, "public_preview", "") or "").strip() == "READ_ONLY_SYNTHETIC"
+        ),
         "customer_usable_pass": 11,
         "hard_live_core_pass_technical": 143,
         "hard_live_is_technical_only": True,

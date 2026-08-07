@@ -9,7 +9,26 @@ from typing import Any
 
 SCHEMA = "twin.mechanical_discoverability/v1"
 EMPTY_SCHEMA = "twin.actionable_empty_state/v1"
-PREVIEW_STATUS = "READY_INACTIVE"  # code ready; not enabled in production
+PREVIEW_VALUE = "READ_ONLY_SYNTHETIC"
+
+
+def _public_preview_env() -> str:
+    import os
+
+    return (os.environ.get("PUBLIC_PREVIEW") or os.environ.get("NEXT_PUBLIC_PUBLIC_PREVIEW") or "").strip()
+
+
+def public_preview_enabled() -> bool:
+    """Independent kill switch — does not flip launch/enrollment/signup/pilot."""
+    return _public_preview_env() == PREVIEW_VALUE
+
+
+def public_preview_status_code() -> str:
+    return "ENABLED" if public_preview_enabled() else "READY_INACTIVE"
+
+
+# Legacy alias — prefer public_preview_status_code()
+PREVIEW_STATUS = "READY_INACTIVE"  # overwritten at call sites via helpers
 
 PRIMARY_IA = [
     {"id": "home", "href": "/dashboard", "empty_key": "home"},
@@ -124,9 +143,11 @@ def discoverability_registry() -> dict[str, Any]:
             "equals_first_value": False,
         },
         "public_preview": {
-            "status": PREVIEW_STATUS,
-            "enabled_in_production": False,
+            "status": public_preview_status_code(),
+            "enabled_in_production": public_preview_enabled(),
+            "mode": _public_preview_env() or None,
             "code_ready": True,
+            "independent_of_launch_gates": True,
         },
         "claim_kind": "FACT",
         "kpi_excluded": True,
@@ -152,8 +173,10 @@ def empty_state_contract() -> dict[str, Any]:
 
 def public_preview_status() -> dict[str, Any]:
     return {
-        "status": PREVIEW_STATUS,
-        "enabled_in_production": False,
+        "status": public_preview_status_code(),
+        "enabled_in_production": public_preview_enabled(),
+        "mode": _public_preview_env() or None,
         "code_ready": True,
+        "independent_of_launch_gates": True,
         "claim_kind": "FACT",
     }

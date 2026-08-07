@@ -9,11 +9,18 @@ import {
   PUBLIC_PREVIEW_STATUS,
 } from "../src/lib/candidate-ia.ts";
 import { PRODUCT_FUNNEL_EVENTS } from "../src/lib/product-funnel-events.ts";
+import {
+  isPublicPreviewEnabled,
+  publicPreviewStatus,
+} from "../src/lib/public-preview-gate.ts";
 
 assert.equal(CANDIDATE_PRIMARY_IA.length, 7);
 assert.equal(FIRST_VALUE_CONTRACT.id, "pilot_first_value_v1");
-assert.equal(PUBLIC_PREVIEW_STATUS, "READY_INACTIVE");
-assert.equal(PUBLIC_PREVIEW_ENABLED_IN_PRODUCTION, false);
+assert.ok(
+  PUBLIC_PREVIEW_STATUS === "READY_INACTIVE" || PUBLIC_PREVIEW_STATUS === "ENABLED",
+);
+assert.equal(PUBLIC_PREVIEW_STATUS, publicPreviewStatus());
+assert.equal(PUBLIC_PREVIEW_ENABLED_IN_PRODUCTION, isPublicPreviewEnabled());
 assert.equal(EMPTY_STATE_CONTRACT.complete, 7);
 assert.equal(EMPTY_STATE_CONTRACT.loadingEqualsEmpty, false);
 assert.equal(EMPTY_STATE_CONTRACT.errorEqualsEmpty, false);

@@ -457,6 +457,9 @@ class Settings(BaseSettings):
     # Controlled pilot registration — invite-only when enabled (default off in unit tests).
     # Production Railway: set PILOT_REGISTRATION_INVITE_ONLY=true + PILOT_EMAIL_ALLOWLIST.
     external_pilot_enrollment_enabled: bool = False
+    # PP1 independent kill switch — does not flip launch/enrollment/signup/pilot/invite.
+    # Exact enable value: READ_ONLY_SYNTHETIC
+    public_preview: str = ""
     pilot_registration_invite_only: bool = False
     pilot_email_allowlist: str = ""
     # Role placeholders only — never invent human names in code.
