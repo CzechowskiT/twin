@@ -1,4 +1,4 @@
-/** Epic 2.14 — canary journey / first-value ladder / admin control copy. */
+/** Epic 2.14+ — canary journey / admin control / designation copy. */
 
 export const CANARY_JOURNEY_MESSAGES_EN = {
   fvTitle: "Your first useful moment",
@@ -26,6 +26,22 @@ export const CANARY_JOURNEY_MESSAGES_EN = {
   adminClose: "Close",
   adminRealInvites: "Real invites created",
   adminNeverAuto: "Never auto ACTIVE_ONE_CANDIDATE",
+  desTitle: "Real canary candidate designation",
+  desLead:
+    "Save exactly one delivery identity. This does not raise caps, send an invite, create an account, or activate the canary.",
+  desStatus: "Designation status",
+  desGate: "Gate REAL_CANARY_CANDIDATE_DESIGNATED_READY",
+  desMasked: "Masked identity",
+  desRoster: "Secure roster reference (optional)",
+  desIdentity: "Delivery identity (email)",
+  desSave: "Save designation",
+  desRevoke: "Revoke designation",
+  desReplaceHint: "Saving replaces any previous active designation.",
+  ladderProduct: "Product ready",
+  ladderDesignated: "Candidate designated",
+  ladderActivation: "Activation not executed",
+  ladderInvite: "Invite not created",
+  ladderInactive: "Canary inactive",
 } as const;
 
 export const CANARY_JOURNEY_MESSAGES_PL: Record<keyof typeof CANARY_JOURNEY_MESSAGES_EN, string> = {
@@ -54,4 +70,20 @@ export const CANARY_JOURNEY_MESSAGES_PL: Record<keyof typeof CANARY_JOURNEY_MESS
   adminClose: "Zamknij",
   adminRealInvites: "Utworzone realne zaproszenia",
   adminNeverAuto: "Nigdy auto ACTIVE_ONE_CANDIDATE",
+  desTitle: "Desygnacja realnego kandydata canary",
+  desLead:
+    "Zapisz dokładnie jedną tożsamość dostawy. To nie podnosi capów, nie wysyła zaproszenia, nie tworzy konta i nie aktywuje canary.",
+  desStatus: "Status desygnacji",
+  desGate: "Brama REAL_CANARY_CANDIDATE_DESIGNATED_READY",
+  desMasked: "Zamaskowana tożsamość",
+  desRoster: "Bezpieczna referencja rosteru (opcjonalnie)",
+  desIdentity: "Tożsamość dostawy (email)",
+  desSave: "Zapisz desygnację",
+  desRevoke: "Odwołaj desygnację",
+  desReplaceHint: "Zapis zastępuje poprzednią aktywną desygnację.",
+  ladderProduct: "Produkt gotowy",
+  ladderDesignated: "Kandydat desygnowany",
+  ladderActivation: "Aktywacja nie wykonana",
+  ladderInvite: "Zaproszenie nie utworzone",
+  ladderInactive: "Canary nieaktywny",
 };

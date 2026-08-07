@@ -26,4 +26,17 @@ assert.match(panel, /SYNTHETIC/);
 assert.match(admin, /CanaryControlPanel/);
 assert.doesNotMatch(preview, /CanaryFirstValuePanel/);
 assert.match(msgs, /adminNeverAuto/);
+assert.match(msgs, /desTitle/);
+assert.match(msgs, /REAL_CANARY_CANDIDATE_DESIGNATED_READY/);
+const desBff = readFileSync(
+  join(root, "src/app/api/ops-admin/canary/designation/route.ts"),
+  "utf8"
+);
+assert.match(desBff, /admin\/canary\/designation/);
+const adminPanel = readFileSync(
+  join(root, "src/components/admin/canary-control-panel.tsx"),
+  "utf8"
+);
+assert.match(adminPanel, /canary-designation-panel/);
+assert.match(adminPanel, /never mints|never raises|does not raise/i);
 console.log("epic-214-canary-readiness-guard: ok");

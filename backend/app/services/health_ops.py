@@ -87,6 +87,9 @@ def build_health_ops_public(s: Settings) -> dict[str, Any]:
         "rc1_one_candidate_canary_state": "READY_INACTIVE",
         "rc1_one_candidate_canary_active": False,
         "rc1_canary_activation_command": "PREPARED_NOT_EXECUTED",
+        "rc1_real_canary_candidate_designated_ready": False,
+        "rc1_real_canary_designation_status": "NOT_DESIGNATED",
+        "rc1_real_canary_designation_count": 0,
         "rc1_os_verdict": (
             "FIRST CUSTOMER READY — WAITING FOR FIRST APPROVED PILOT ORGANIZATION"
         ),
@@ -171,6 +174,10 @@ def build_health_ops_public(s: Settings) -> dict[str, Any]:
                 out["rc1_canary_activation_command"] = str(
                     cs.get("activation_command") or "PREPARED_NOT_EXECUTED"
                 )
+                des = cs.get("designation") or {}
+                out["rc1_real_canary_candidate_designated_ready"] = bool(des.get("gate_ready"))
+                out["rc1_real_canary_designation_status"] = str(des.get("status") or "NOT_DESIGNATED")
+                out["rc1_real_canary_designation_count"] = int(des.get("active_count") or 0)
                 cap_s = hard_caps.caps_snapshot(db_sess)
                 eff = cap_s.get("effective") or {}
                 out["rc1_effective_cohort_cap"] = int(eff.get("real_cohort") or 0)

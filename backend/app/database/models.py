@@ -7351,6 +7351,33 @@ class OneCandidateCanaryControl(Base):
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
 
+class RealCanaryCandidateDesignation(Base):
+    """Founder-controlled single real canary delivery identity (encrypted at rest)."""
+
+    __tablename__ = "real_canary_candidate_designations"
+    __table_args__ = (UniqueConstraint("designation_id", name="uq_canary_designation_id"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    designation_id: Mapped[str] = mapped_column(String(64), index=True)
+    status: Mapped[str] = mapped_column(String(32), default="DESIGNATED_READY", index=True)
+    delivery_channel: Mapped[str] = mapped_column(String(32), default="email")
+    delivery_identity_ciphertext: Mapped[str] = mapped_column(Text)
+    delivery_identity_hash: Mapped[str] = mapped_column(String(64), index=True)
+    delivery_identity_masked: Mapped[str] = mapped_column(String(128))
+    secure_roster_reference: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    designated_by_actor: Mapped[str] = mapped_column(String(64), default="ops_admin")
+    audit_json: Mapped[str] = mapped_column(Text, default="[]")
+    lane: Mapped[str] = mapped_column(String(16), default="REAL")
+    is_synthetic: Mapped[bool] = mapped_column(Boolean, default=False)
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
+    designated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
 class CandidateCanaryFrictionEvent(Base):
     """Content-free friction events for canary instrumentation (no raw query/PII)."""
 

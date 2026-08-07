@@ -12,6 +12,7 @@ from app.database.models import Candidate, User
 from app.services import canary_journey as journey
 from app.services import first_value_ladder as ladder
 from app.services import private_canary as canary
+from app.services import canary_designation as designation
 
 router = APIRouter()
 admin_router = APIRouter()
@@ -47,6 +48,17 @@ class FrictionIn(BaseModel):
     surface: str | None = Field(default=None, max_length=64)
     lane: str = Field(default="SYNTHETIC", max_length=16)
     payload: dict | None = None
+
+
+class DesignateIn(BaseModel):
+    delivery_identity: str = Field(max_length=254)
+    delivery_channel: str = Field(default="email", max_length=32)
+    secure_roster_reference: str | None = Field(default=None, max_length=128)
+    replace_existing: bool = True
+
+
+class RevokeDesignationIn(BaseModel):
+    designation_id: str | None = Field(default=None, max_length=64)
 
 
 # --- Candidate ---
@@ -159,3 +171,66 @@ def admin_evaluate_gate(
 ) -> dict:
     _require_ops(settings, authorization)
     return canary.evaluate_gate(db)
+
+
+@admin_router.get("/canary/designation")
+def admin_designation_get(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    _require_ops(settings, authorization)
+    return designation.designation_status(db)
+
+
+@admin_router.post("/canary/designation")
+def admin_designation_set(
+    body: DesignateIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    """Persist Founder designation — never activates, never sends invite, never raises caps."""
+    _require_ops(settings, authorization)
+    try:
+        return designation.designate(
+            db,
+            delivery_identity=body.delivery_identity,
+            delivery_channel=body.delivery_channel,
+            secure_roster_reference=body.secure_roster_reference,
+            replace_existing=body.replace_existing,
+            actor="ops_admin",
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from None
+
+
+@admin_router.post("/canary/designation/revoke")
+def admin_designation_revoke(
+    body: RevokeDesignationIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    _require_ops(settings, authorization)
+    return designation.revoke(db, designation_id=body.designation_id, actor="ops_admin")
+
+
+@admin_router.get("/canary/activation-preflight")
+def admin_activation_preflight(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    """Read-only preflight — never executes activation."""
+    _require_ops(settings, authorization)
+    tech = canary.snapshot(db)
+    des = designation.activation_preflight(db)
+    return {
+        **des,
+        "technical_gate_ready": bool(tech.get("gate_ready")),
+        "technical_gate_name": tech.get("gate_name"),
+        "canary_state": tech.get("state"),
+        "activation_command": tech.get("activation_command"),
+        "effective_caps_unchanged": True,
+    }

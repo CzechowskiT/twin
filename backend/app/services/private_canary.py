@@ -204,6 +204,9 @@ def snapshot(db: Session | None = None) -> dict[str, Any]:
         }
     row = ensure_row(db)
     checklist = _loads(row.checklist_json, {})
+    from app.services import canary_designation as designation
+
+    des = designation.designation_status(db)
     return {
         "schema": SCHEMA,
         "contract_id": CONTRACT_ID,
@@ -225,6 +228,9 @@ def snapshot(db: Session | None = None) -> dict[str, Any]:
         "checklist": checklist,
         "founder_actions": sorted(FOUNDER_ACTIONS),
         "never_auto_active": True,
+        "designation": des,
+        "designation_gate_name": designation.GATE_NAME,
+        "designation_gate_ready": bool(des.get("gate_ready")),
         "claim_kind": "FACT",
         "kpi_excluded": True,
     }
