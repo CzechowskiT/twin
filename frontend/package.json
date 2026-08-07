@@ -171,6 +171,7 @@
     "test:pp1-public-preview-guard": "npx --yes tsx scripts/pp1-public-preview-guard.test.ts",
     "test:epic-211-guided-fv-guard": "npx --yes tsx scripts/epic-211-guided-fv-guard.test.ts",
     "test:epic-212-import-center-guard": "npx --yes tsx scripts/epic-212-import-center-guard.test.ts",
+    "test:epic-213-workspace-search-guard": "npx --yes tsx scripts/epic-213-workspace-search-guard.test.ts",
     "test:hard-live-evidence-guard": "npx --yes tsx --test scripts/hard-live-evidence-guard.test.ts",
     "test:product-inclusion-taxonomy-guard": "npx --yes tsx --test scripts/product-inclusion-taxonomy-guard.test.ts",
     "test:production-topology-rc1-guard": "npx --yes tsx --test scripts/production-topology-rc1-guard.test.ts",
