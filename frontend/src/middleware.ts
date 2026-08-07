@@ -16,7 +16,6 @@ function hasLikelyAuthCookie(request: NextRequest): boolean {
 
 function applyPreviewSecurityHeaders(
   response: NextResponse,
-  *,
   privateCache: boolean,
 ): NextResponse {
   response.headers.set("X-Robots-Tag", PREVIEW_ROBOTS);
@@ -68,9 +67,9 @@ export function middleware(request: NextRequest) {
       });
     }
     const response = NextResponse.next();
-    return applyPreviewSecurityHeaders(response, {
-      privateCache: hasLikelyAuthCookie(request) || Boolean(request.headers.get("authorization")),
-    });
+    const privateCache =
+      hasLikelyAuthCookie(request) || Boolean(request.headers.get("authorization"));
+    return applyPreviewSecurityHeaders(response, privateCache);
   }
 
   // Private app surfaces must never be publicly cached.
