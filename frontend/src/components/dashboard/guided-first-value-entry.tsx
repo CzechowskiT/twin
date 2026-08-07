@@ -151,6 +151,14 @@ export function GuidedFirstValueEntry() {
 
       {status?.entry_choice && status.state !== "PAUSED" ? (
         <div className="mt-4">
+          {status.entry_choice === "START_WITH_MY_DATA" ? (
+            <p className="mb-3 text-sm">
+              <Link href="/dashboard/import" className="twin-link font-medium" data-testid="guided-fv-import-cta">
+                {t("importCenter.nav")}
+              </Link>
+              <span className="mt-1 block text-xs opacity-70">{t("importCenter.notFirstValue")}</span>
+            </p>
+          ) : null}
           <p className="text-sm font-medium">{t("guidedFv.starterTitle")}</p>
           <nav className="mt-2 flex flex-wrap gap-2 text-sm" aria-label={t("guidedFv.starterTitle")}>
             {STARTERS.map((s) => (
@@ -165,6 +173,9 @@ export function GuidedFirstValueEntry() {
                 {t(s.labelKey)}
               </Link>
             ))}
+            <Link href="/dashboard/import" className="twin-link" data-testid="guided-fv-import-starter">
+              {t("importCenter.nav")}
+            </Link>
           </nav>
         </div>
       ) : null}

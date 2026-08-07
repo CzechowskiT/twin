@@ -163,3 +163,45 @@ def test_cross_candidate_impossible():
     batch = coi.create_batch(db2, candidate_id=c1.id, user_id=u1.id, family="document")
     with pytest.raises(LookupError):
         coi.get_batch(db2, candidate_id=c2.id, batch_key=batch["batch_key"])
+
+
+def test_reject_cancel_and_dup_marking():
+    db, user, cand = _db()
+    # Reject ZIP disguised as document
+    batch = coi.create_batch(db, candidate_id=cand.id, user_id=user.id, family="document")
+    bad = coi.upload_bytes(
+        db,
+        candidate_id=cand.id,
+        batch_key=batch["batch_key"],
+        content=b"PK\x03\x04not-a-real-zip",
+        declared_name="note.txt",
+    )
+    assert bad["state"] == "REJECTED"
+    assert bad["canonical_mutations"] == 0
+    # Cancel a clean draft
+    batch2 = coi.create_batch(db, candidate_id=cand.id, user_id=user.id, family="document")
+    cancelled = coi.cancel_or_delete(db, candidate_id=cand.id, batch_key=batch2["batch_key"])
+    assert cancelled["state"] in {"CANCELLED", "DELETED"}
+    assert cancelled["canonical_mutations"] == 0
+    # Dup / conflict marking on tracker
+    batch3 = coi.create_batch(db, candidate_id=cand.id, user_id=user.id, family="tracker")
+    csv_dup = b"title,company,status\nSame Role,Co A,review\nSame Role,Co B,review\n"
+    coi.upload_bytes(
+        db,
+        candidate_id=cand.id,
+        batch_key=batch3["batch_key"],
+        content=csv_dup,
+        declared_name="tracker.csv",
+    )
+    prev = coi.process_to_preview(db, candidate_id=cand.id, batch_key=batch3["batch_key"])
+    assert prev["state"] == "PREVIEW_READY"
+    assert prev["canonical_mutations"] == 0
+    dups = [it for it in prev["preview"]["items"] if it.get("dup")]
+    assert len(dups) >= 1
+
+
+def test_catalog_first_value_gate():
+    cat = coi.catalog()
+    assert cat["canonical_mutations_before_approval"] == 0
+    assert "pilot_first_value_v1" in cat["first_value"]
+    assert cat["malware_scanner"] == "unavailable_fail_closed"
