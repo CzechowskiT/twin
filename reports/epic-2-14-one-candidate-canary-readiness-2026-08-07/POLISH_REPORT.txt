@@ -1,0 +1,306 @@
+1|Executive Summary
+Epic 2.14 COMPLETE (Verdict A). Private one-candidate canary readiness: control plane READY_INACTIVE, gate ONE_CANDIDATE_CANARY_READY=true, activation PREPARED_NOT_EXECUTED (NOT executed), guided first-value ladder READY→VIEWED→ACKNOWLEDGED→ACTIONED, progressive disclosure CORE_NOW/NEXT/LATER/ADVANCED, friction instrumentation (content-free), admin /admin/canary + ops BFF. Tip 2393311bbfa6 FE=API=worker ALIGNED; Alembic 129; auth E2E product 26/26 + stance 9/9; code/stance 30/30; unit 8/8; CI SUCCESS 31177003054; PP1 ON; Launch NO-GO; enrollment OFF; pilot INACTIVE; caps/invites/users 0. Nie wysłano real invite; nie aktywowano canary/pilota/signup/Epic 3.0. REAL_CANDIDATE_*=NOT_EVALUATED.
+2|Canonical Baseline
+Epic 2.13 tip 6835aafc / product d5cb7918 / FE=API=worker ALIGNED / Alembic 128 / CI 31163739456 / auth 20/20+6/6 / inventory 72/72 / PP1 ON / signup+enrollment OFF / pilot INACTIVE / caps 0 / Launch NO-GO / Phase 3B BLOCKED / Phase 3 Agent NOT_STARTED — zweryfikowane niezależnie na starcie.
+3|Canonical Final State
+tip 2393311bbfa60d2e6b13007995363449f295b6f7; product close 2393311bbfa60d2e6b13007995363449f295b6f7; FE=API=worker ALIGNED; Alembic 129 head; schema twin.private_one_candidate_canary/v1 + twin.first_value_ladder/v1; PP1 ON_READ_ONLY_SYNTHETIC; PILOT_ACCESS=OPERATIONALLY_READY_INACTIVE; canary state READY_INACTIVE; gate_ready true; activation PREPARED_NOT_EXECUTED.
+4|Verdict
+ONE-CANDIDATE CANARY READY - GUIDED FIRST-VALUE JOURNEY, REAL-USE EVIDENCE INSTRUMENTATION AND PRIVATE ACTIVATION CONTROLS PRODUCTION-READY
+5|Product Value Delivered
+Founder może bezpiecznie przygotować i ocenić gotowość canary jednego kandydata bez auto-aktywacji; kandydat (później) ma guided first-value ladder + CORE_NOW disclosure; instrumentacja REAL vs SYNTHETIC jest rozdzielona; first value ≠ route visit.
+6|Scope Compliance
+Tylko Epic 2.14 consolidation/activation-readiness/measurement. Brak net-new search engines, evidence domains, calendar subsystems, market-intel, career-agent, public modules, 8th nav, LLM/RAG/vector/ES, ATS, outreach, monetization, public profiles. Nie startowano Epic 3.0 / Phase 3 Agent.
+7|Architecture
+Rozszerzenie kanoniczne: private_canary + first_value_ladder + canary_journey; reuse pilot_runtime/hard_caps/guided_FV/invite tokens/pilot-ops mint; Alembic 129 tabele one_candidate_canary_control + candidate_canary_friction_events + kolumny fv_* na guided FV.
+8|Canary Doctrine
+Stany DISABLED…ABORTED (+ ACTIVE_ONE_CANDIDATE nigdy auto); default READY_INACTIVE; fail-closed; max 1 real candidate/invite; never auto ACTIVE_ONE_CANDIDATE; activation_command default PREPARED_NOT_EXECUTED.
+9|Canary Control Plane
+Admin (nie org portal): GET/POST /api/v1/admin/canary/control, evaluate-gate, completion-report; Founder actions prepare/create_invite_dry_run/revoke/rotate/pause/resume/abort/delete/export/close/evaluate_gate — bez auto mint/send/activate.
+10|Secure Invite Hardening
+validate_invite_token → assert_redeem_allowed fail-closed; kill switches generation/send/redeem OFF; create_invite_dry_run nie inkrementuje real_invites_created; synthetic invites nie liczą się do real counters.
+11|First-Session Journey
+Disclosure tiers CORE_NOW (home/guided/privacy/import) → NEXT → LATER (search secondary) → ADVANCED; bez wymogu zewnętrznych credentials; progressive disclosure.
+12|Guided Onboarding
+Reuse Epic 2.11 GuidedFirstValueEntry (import OR manual); CanaryFirstValuePanel na home; brak Microsoft write requirement.
+13|Canonical First-Value Contract
+pilot_first_value_v1 ladder READY/VIEWED/ACKNOWLEDGED/ACTIONED; not_sufficient: route_visit/account_create/import_upload/search/onboarding_skip alone; REAL lane only sets real_first_value_reached.
+14|First-Value Surface + Feedback
+Panel ladder + CORE_NOW links; friction event feedback_submitted allowlisted; help/feedback surfaces retained; completion-report REAL_*=NOT_EVALUATED.
+15|Candidate Home Simplification
+Canary FV panel + guided entry + PilotHomeNextAction; CORE_NOW first; bez 8th primary.
+16|Nav Consolidation
+CANDIDATE_PRIMARY_IA=7; workspace search secondary; eighth_nav_item=false w disclosure i guardach.
+17|Workspace Search Continuity
+Epic 2.13 POST /me/workspace-search + palette Cmd/Ctrl+K intact; search w tier LATER; search_alone not first value; no raw query telemetry in friction.
+18|Empty Incomplete Return Discovery
+Friction allowlist: empty_state_seen, cta_missed, step_abandoned, recovery_opened, session_resumed, error_boundary; adoption registry success/abort criteria.
+19|Feedback System
+Reuse help/feedback; friction feedback_submitted; completion report ADOPTION/RETENTION=NOT_EVALUATED.
+20|Friction Events
+Content-free payload allowlist count/reason_code/duration_ms/step_id/tier; query_logged=false; no session replay/keystroke/screen/mouse.
+21|Activation Funnel
+FUNNEL_STEPS invite_ready…founder_decision w canary_journey; instrumentation only — no auto advance to ACTIVE.
+22|Timing Session Continuity
+session_resumed friction; READY ladder reset for shared synth; guided pause/resume reuse.
+23|Adoption Evidence Registry
+lanes REAL/SYNTHETIC; synthetic_never_flips_real=true; real_metrics_default=NOT_EVALUATED.
+24|REAL vs SYNTHETIC Separation
+API forces SYNTHETIC for exclude_from_product_metrics users; REAL lane only when explicitly allowed; kpi_excluded on canary rows; mint kpi_excluded.
+25|Success Abort Criteria
+success: first_value_actioned, daily_os_return, feedback_submitted, no_founder_tech_intervention; abort: privacy_block, cannot_reach_first_value, cross_candidate_leak, invite_cap_breach, search_query_leak.
+26|Support Recovery UX
+recovery_opened friction; guided resume; revoke/pause/abort control plane; help surfaces.
+27|Support Contact
+Reuse existing help/support paths; support kill switch ON in pilot runtime defaults.
+28|Trust Provenance UX
+claim_kind=FACT on canary snapshots; truth not upgraded by ladder; workspace search provenance continuity.
+29|Correction Flow
+READY reset clears timestamps + real_first_value_reached; abort clears gate_ready.
+30|Privacy First Session
+CORE_NOW includes privacy-center; privacy_pause_hit friction; PP1 isolated from canary panel.
+31|Consent Simplification
+Reuse GDPR consent + privacy center; no new public consent surface.
+32|Import UX Consolidation
+CORE_NOW import_or_manual → /dashboard/import; Epic 2.12 approval-gated intact; import_preview_only friction.
+33|Import to First Value + Manual Start
+Import alone not first value; ACTIONED requires durable step; guided START_WITH_MY_DATA / manual paths retained.
+34|Approval Notification Burden
+No new approval spam; dry-run invite only; caps remain 0.
+35|Search Friction
+search_no_results friction without raw query; workspace search query never in friction payload.
+36|Error Boundaries
+error_boundary friction code allowlisted; FE panel try/catch refresh.
+37|Performance
+Measure-only stance; no new heavy indexes; lexical search reuse.
+38|Mobile A11y PL EN
+canaryJourney EN/PL i18n; admin + candidate copy; panel buttons labeled.
+39|Canary Analytics Privacy
+kpi_excluded=true; no free-text metrics; REAL_* never flipped by synthetic E2E.
+40|Evidence Dashboard
+Admin canary control snapshot + checklist + completion-report; health_ops live flags.
+41|Export
+export_evidence action audits content-free; completion-report model.
+42|Completion Report Model
+twin.canary_completion_report/v1; activation_executed=false; REAL_CANDIDATE_USABILITY/VALUE/ADOPTION/RETENTION=NOT_EVALUATED.
+43|Gate ONE_CANDIDATE_CANARY_READY
+gate_ready=true możliwe przy ACTIVE/PRIVATE_PILOT/PUBLIC_*=false — potwierdzone na prod.
+44|Activation Command Prepared Not Executed
+activation_command=PREPARED_NOT_EXECUTED; ACTIVATION_EXECUTED never set by this epic; Founder must execute later manually.
+45|Pause Abort Safety
+pause/resume/abort actions; abort → gate_ready=false; auto ACTIVE_ONE blocked → ABORTED.
+46|Fresh Account Isolated Synthetic
+mint-synthetic-session KPI-excluded; READY reset for shared synth; teardown via session expiry (no real account created).
+47|Residual Epic 2.13 Closure
+Workspace search continuity verified; inventory/guards retained; no 8th nav regression.
+48|Product Consolidation Audit
+Critical/High canary blockers closed: redeem fail-closed, dry-run invite, REAL/SYNTHETIC lanes, gate without activate, FE panel+admin+i18n, tests+deploy.
+49|Alembic 129
+129_private_canary_activation_readiness; tables + fv_ladder columns; is_at_head (prod control plane live).
+50|Backend Guards
+private_canary never auto-active; invite redeem gated; health_ops fail-closed defaults + live DB snapshot.
+51|Frontend Guards
+epic-214-canary-readiness-guard: IA=7, panel mounted, i18n wired, admin page, preview without panel.
+52|Platform Guards
+signup/enrollment OFF; PP1 ON; Launch NO-GO; Phase 3B BLOCKED; Phase 3 Agent NOT_STARTED; MS write OFF.
+53|Authenticated Production Synthetic E2E A–X
+scripts/epic-2-14-canary-authenticated-e2e.py product 26/26 (mint, disclosure, ladder, friction, admin prepare/dry-run/evaluate, completion, unauth) + stance 9/9.
+54|Product vs Stance Buckets
+Product and stance reported separately; stance includes alignment + canary_not_active + activation_prepared_not_executed + caps0 + PP1.
+55|Deploy FE API Worker
+FE Vercel prod + Railway twin + enthusiastic-encouragement worker; GIT_COMMIT_SHA=2393311bbfa60d2e6b13007995363449f295b6f7; public-health ALIGNED.
+56|DB at Head
+Alembic 129 applied (canary tables serving evaluate_gate/checklist); start-api upgrade head path.
+57|CI Green Exact SHA
+CI tip SUCCESS 31177003054 for 2393311b; prior feature CI 31175739266 also SUCCESS.
+58|Push Only Scaffold
+Branch cursor/phase1-monorepo-scaffold; no PR to main; no force push.
+59|Hard Bans Observed
+No real invite sent; no real candidate account; cap 0; signup/enrollment OFF; canary not ACTIVE; synthetic does not flip REAL; no 8th nav; no search query leak; no Epic 3.0.
+60|Terminal Posture
+PUBLIC_LAUNCH=NO_GO · PUBLIC_SIGNUP=OFF · PUBLIC_ENROLLMENT=OFF · PILOT_ACCESS=OPERATIONALLY_READY_INACTIVE · EFFECTIVE_CAPS=0 · REAL_INVITES=0 · REAL_PILOT_USERS=0 · CANARY_STATE=READY_INACTIVE · CANARY_ACTIVE=false · GATE_READY=true · ACTIVATION=PREPARED_NOT_EXECUTED · PHASE_3B=BLOCKED · PHASE_3_AGENT=NOT_STARTED · MS_WRITE=OFF · APPLICATION_SUBMISSION=OFF · EMPLOYER_CONTACT=OFF · EXTERNAL_PURCHASE_OR_ENROLLMENT=OFF · PUBLIC_PREVIEW=ON_READ_ONLY_SYNTHETIC · stop after report — no auto activate/pilot/enrollment/launch/Phase 3.
+61|PP1 Regression
+pp1 guard ok; /preview HTTP 200; CanaryFirstValuePanel absent from preview.
+62|Unit Tests
+8/8 PASS test_epic_214_private_canary.py
+63|Frontend Guard
+epic-214-canary-readiness-guard ok
+64|Code Stance E2E
+30/30 scripts/epic-2-14-canary-readiness-e2e.py
+65|Auth Product E2E
+26/26
+66|Auth Stance E2E
+9/9 (public_health, launch_nogo, enrollment_off, preview_on, fe_api_worker_aligned, canary_not_active, activation_prepared_not_executed, canary_cap_zero, pp1_preview_200)
+67|Auth E2E Total
+35/35
+68|Health Ops Flags
+rc1_one_candidate_canary_ready/state/active + rc1_canary_activation_command + live caps/runtime.
+69|Admin UI
+/admin/canary + CanaryControlPanel + /api/ops-admin/canary/control BFF.
+70|Candidate UI
+CanaryFirstValuePanel on dashboard (both dense layouts); SYNTHETIC lane posts.
+71|i18n
+canaryJourney EN/PL registered in i18n.ts MessageKey union.
+72|Invite Caps End State
+real_invites_created=0; real_candidates_bound=0; effective canary/cohort caps=0.
+73|Founder Action Prepared Not Executed
+Prepared: Founder-controlled secure activate of ONE candidate (raise canary cap to 1 + enable generation/send/redeem + mint/send single invite + observe). NOT executed in this epic.
+74|Observation Recommendation
+Po aktywacji Foundera: obserwuj ladder ACTIONED REAL, friction, return visit, feedback — bez startu Epic 2.15/3.0 automatycznie.
+75|Evidence Dir
+reports/epic-2-14-one-candidate-canary-readiness-2026-08-07/
+76|Remaining Blockers
+REAL_CANDIDATE_USABILITY/VALUE/ADOPTION/RETENTION=NOT_EVALUATED (by design). Activation still Founder-manual.
+77|Technical Product Debt
+Shared synth mint candidate requires READY reset; GIT_COMMIT_SHA env must track tip; railway up from backend/ may fail (prefer GitHub webhook + variable set).
+78|P0 P1 Counts
+P0/P1 canary-blocking = 0/0 at close.
+79|Cross-Candidate Access
+Unauth ladder 401; candidate-scoped journey; no cross-candidate APIs added.
+80|No Free Text Metrics
+Friction strips non-allowlisted keys including q/query.
+81|No Preview Leak
+Preview without canary panel; PP1 kill switch intact.
+82|No Feature Overload
+No 8th primary; ADVANCED tier deferred; search secondary.
+83|MS Not Required
+No Microsoft calendar write requirement for canary journey.
+84|Resume Recovery Present
+Guided resume + recovery_opened friction + pause/resume canary control.
+85|Nav Inventory No Regress
+Primary IA 7; Epic 2.13 search secondary retained.
+86|Docs Only Drift
+false (product tip = deploy tip).
+87|Worker Service
+enthusiastic-encouragement ALIGNED at tip.
+88|API Service
+twin ALIGNED at tip.
+89|Frontend Service
+Vercel twin-sooty / twin.care ALIGNED at tip.
+90|Schema IDs
+twin.private_one_candidate_canary/v1; twin.first_value_ladder/v1; twin.canary_journey_disclosure/v1; twin.adoption_evidence_registry/v1; twin.canary_completion_report/v1.
+91|Contract IDs
+one_candidate_canary_readiness_v1; pilot_first_value_v1 (no v2).
+92|Never Auto Active Proof
+never_auto_active=true; apply_action blocks ACTIVE_ONE; E2E still_not_active PASS.
+93|Dry Run Invite Proof
+create_invite_dry_run real_invites_created stays 0.
+94|Gate Ready Without Activate Proof
+gate_ready true + active false + activation PREPARED_NOT_EXECUTED on prod health.
+95|Synthetic Contamination Ban
+synth ACTIONED leaves real_first_value_reached=false; completion REAL_*=NOT_EVALUATED.
+96|Hard Stop Net-New Observed
+No Epic 3.0 modules; consolidation only.
+97|Candidate First Org Secondary
+Candidate-first PRIMARY; org SECONDARY_B2B_PILOT_PATH unchanged.
+98|Launch Stance Frozen
+NO-GO frozen §63; enrollment OFF; canary ACTIVE false.
+99|Next After Founder Activate
+Observation window only — do not auto-start Epic 2.15 / Phase 3 Agent / public enrollment.
+100|Stop Condition
+Report complete; activation not executed; caps 0; ready for Founder decision.
+101|Evidence Integrity
+Artifacts: unit-tests, fe-guard, code-stance-e2e, auth-e2e, pp1-guard, public-health-alignment, canary-control-snapshot, completion-report, alembic-note, ci-tip, SUMMARY.
+102|Final Verdict
+ONE-CANDIDATE CANARY READY - GUIDED FIRST-VALUE JOURNEY, REAL-USE EVIDENCE INSTRUMENTATION AND PRIVATE ACTIVATION CONTROLS PRODUCTION-READY
+
+Final Answers
+1|exact_verdict: ONE-CANDIDATE CANARY READY - GUIDED FIRST-VALUE JOURNEY, REAL-USE EVIDENCE INSTRUMENTATION AND PRIVATE ACTIVATION CONTROLS PRODUCTION-READY
+2|epic_214_status: COMPLETE
+3|verdict_letter: A
+4|repo_head: 2393311bbfa60d2e6b13007995363449f295b6f7
+5|product_SHA: 2393311bbfa60d2e6b13007995363449f295b6f7
+6|tip_SHA: 2393311bbfa60d2e6b13007995363449f295b6f7
+7|FE_SHA: 2393311bbfa60d2e6b13007995363449f295b6f7
+8|API_SHA: 2393311bbfa60d2e6b13007995363449f295b6f7
+9|worker_SHA: 2393311bbfa60d2e6b13007995363449f295b6f7
+10|alignment_status: ALIGNED
+11|docs_only_drift: false
+12|alembic: 129_private_canary_activation_readiness (is_at_head=true)
+13|CI_tip: SUCCESS 31177003054
+14|CI_url: https://github.com/CzechowskiT/twin/actions/runs/31177003054
+15|unit_tests: 8/8
+16|fe_guard: ok
+17|code_stance_E2E: 30/30
+18|auth_E2E_product: 26/26
+19|auth_E2E_stance: 9/9
+20|auth_E2E_total: 35/35
+21|pp1_guard: ok
+22|pp1_preview: ON_READ_ONLY_SYNTHETIC HTTP 200
+23|public_signup: OFF
+24|public_enrollment: OFF
+25|pilot_access: OPERATIONALLY_READY_INACTIVE
+26|launch: NO-GO
+27|phase_3b: BLOCKED
+28|phase_3_agent: NOT_STARTED
+29|effective_cohort_cap: 0
+30|effective_canary_cap: 0
+31|real_invites_created: 0
+32|real_candidates_bound: 0
+33|real_pilot_users: 0
+34|canary_state: READY_INACTIVE
+35|canary_active: false
+36|gate_ONE_CANDIDATE_CANARY_READY: true
+37|activation_command: PREPARED_NOT_EXECUTED
+38|activation_executed: false
+39|private_pilot_active: false
+40|never_auto_active: true
+41|invite_generation: OFF
+42|invite_send: OFF
+43|invite_redeem: OFF
+44|ms_write: OFF
+45|application_submission: OFF
+46|employer_contact: OFF
+47|external_purchase_or_enrollment: OFF
+48|public_preview: ON_READ_ONLY_SYNTHETIC
+49|primary_ia_count: 7
+50|eighth_nav_item: false
+51|workspace_search_continuity: PASS
+52|first_value_contract: pilot_first_value_v1
+53|first_value_equals_route_visit: false
+54|ladder_states: READY|VIEWED|ACKNOWLEDGED|ACTIONED
+55|REAL_CANDIDATE_USABILITY: NOT_EVALUATED
+56|REAL_CANDIDATE_VALUE: NOT_EVALUATED
+57|ADOPTION: NOT_EVALUATED
+58|RETENTION: NOT_EVALUATED
+59|synthetic_never_flips_real: true
+60|dry_run_invite_increments_real: false
+61|founder_action_prepared: secure one-candidate activate (cap=1 + kill-switch ON + single invite mint/send + observe)
+62|founder_action_executed: false
+63|real_invite_sent: false
+64|real_candidate_account_created: false
+65|branch: cursor/phase1-monorepo-scaffold
+66|pr_to_main: none
+67|force_push: false
+68|evidence_dir: reports/epic-2-14-one-candidate-canary-readiness-2026-08-07/
+69|schema_canary: twin.private_one_candidate_canary/v1
+70|schema_ladder: twin.first_value_ladder/v1
+71|schema_disclosure: twin.canary_journey_disclosure/v1
+72|admin_path: /admin/canary
+73|candidate_panel: CanaryFirstValuePanel
+74|ops_bff: /api/ops-admin/canary/control
+75|redeem_fail_closed: true
+76|P0_open: 0
+77|P1_open: 0
+78|hard_bans_observed: true
+79|epic_30_started: false
+80|net_new_feature_expansion: false
+81|search_query_leak: false
+82|cross_candidate_access: false
+83|free_text_in_metrics: false
+84|nav_inventory_regress: false
+85|preview_leak: false
+86|ci_red: false
+87|db_behind: false
+88|incomplete_deploy: false
+89|ms_required: false
+90|resume_recovery_present: true
+91|feature_overload: false
+92|candidate_first: PRIMARY
+93|org_path: SECONDARY_B2B_PILOT_PATH
+94|observation_after_activate: recommended
+95|auto_start_epic_215: false
+96|auto_start_epic_30: false
+97|stop_net_new: observed
+98|verdict_A_means: canary can be safely activated later — NOT usability/PMF proven
+99|next_founder_step: decide whether to execute prepared one-candidate activation under observation
+100|report_complete: true

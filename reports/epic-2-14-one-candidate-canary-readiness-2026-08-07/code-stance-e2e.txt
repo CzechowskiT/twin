@@ -1,0 +1,32 @@
+PASS  svc_private_canary
+PASS  svc_ladder
+PASS  svc_journey
+PASS  api
+PASS  alembic_129
+PASS  fe_panel
+PASS  fe_admin
+PASS  fe_bff
+PASS  unit_tests
+PASS  never_auto_active
+PASS  dry_run_only
+PASS  prepared_not_executed
+PASS  no_execute_in_epic
+PASS  ladder_states
+PASS  not_route_visit
+PASS  synthetic_lane
+PASS  primary_ia_7
+PASS  eighth_false
+PASS  friction_no_query
+PASS  redeem_fail_closed
+PASS  health_canary_flags
+PASS  health_activation_cmd
+PASS  no_8th_primary
+PASS  secondary_search
+PASS  panel_mounted
+PASS  preview_no_canary_panel
+PASS  pp1_gate
+PASS  prod_launch_nogo
+PASS  enrollment_off
+PASS  preview_on
+
+Epic 2.14 code/stance E2E: 30 pass / 0 fail

@@ -1,0 +1,37 @@
+PASS [stance] public_health 200
+PASS [stance] launch_nogo NO-GO
+PASS [stance] enrollment_off 
+PASS [stance] preview_on 
+PASS [stance] fe_api_worker_aligned fe=2393311bbfa6 api=2393311bbfa6 wrk=2393311bbfa6
+PASS [stance] canary_not_active False
+PASS [stance] activation_prepared_not_executed PREPARED_NOT_EXECUTED
+PASS [stance] canary_cap_zero 0
+PASS [product] mint_synthetic 200
+PASS [product] kpi_excluded 
+PASS [product] disclosure_200 200
+PASS [product] disclosure_ia_7 {'schema': 'twin.canary_journey_disclosure/v1', 'primary_ia_count': 7, 'eighth_n
+PASS [product] adoption_registry 200
+PASS [product] synthetic_never_flips_real 
+PASS [product] ladder_get 200
+PASS [product] contract_v1 
+PASS [product] not_route_alone 
+PASS [product] ladder_reset_ready {'schema': 'twin.first_value_ladder/v1', 'contract_id': 'pilot_first_value_v1', 'ladder': 'READY', 'viewed_at': None, 'a
+PASS [product] ladder_viewed 200
+PASS [product] ladder_actioned_synth 200
+PASS [product] synth_not_real_fv False
+PASS [product] friction_ok 200
+PASS [product] friction_no_query_log 
+PASS [product] admin_control_get 200
+PASS [product] admin_not_active 
+PASS [product] admin_prepare 200
+PASS [product] admin_dry_run 200
+PASS [product] dry_run_no_invite_inc 0
+PASS [product] evaluate_gate 200
+PASS [product] still_not_executed PREPARED_NOT_EXECUTED
+PASS [product] still_not_active 
+PASS [product] completion_report 200
+PASS [product] real_usability_not_evaluated 
+PASS [product] unauth_ladder_blocked 401
+PASS [stance] pp1_preview_200 200
+
+product 26/26 · stance 9/9
