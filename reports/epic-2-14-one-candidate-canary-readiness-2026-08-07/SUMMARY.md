@@ -4,7 +4,7 @@
 
 | Field | Value |
 |-------|-------|
-| tip / product | `2393311b` |
+| tip | `2d91bc85` (docs) · product `2393311b` ALIGNED |
 | FE=API=worker | **ALIGNED** |
 | Alembic | **129_private_canary_activation_readiness** |
 | CI tip | SUCCESS [31177003054](https://github.com/CzechowskiT/twin/actions/runs/31177003054) |
