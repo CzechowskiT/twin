@@ -19,9 +19,12 @@ function isPublicPreviewPath(pathname: string): boolean {
   return pathname === "/preview" || pathname.startsWith("/preview/");
 }
 
-/** Zero-storage, zero-analytics shell for PP1 public synthetic preview. */
+/**
+ * PP1 shell: LanguageProvider without persistence (root loading.tsx needs t()),
+ * but no cookies, analytics, persona storage, or toasts.
+ */
 function PublicPreviewProviders({ children }: { children: ReactNode }) {
-  return <>{children}</>;
+  return <LanguageProvider persist={false}>{children}</LanguageProvider>;
 }
 
 export function Providers({ children }: { children: ReactNode }) {
