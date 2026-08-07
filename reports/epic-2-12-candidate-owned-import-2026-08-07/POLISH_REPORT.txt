@@ -1,0 +1,219 @@
+1|Executive Summary
+Epic 2.12 COMPLETE (Verdict A). Authenticated Import Center: upload→quarantine→validate→parse→staging→preview/diff→approval→atomic commit→rollback/delete. FE=API=worker ALIGNED ff2ba434; Alembic 128; auth E2E product 26/26 + stance 6/6; code/stance 26/26; unit 7/7; CI SUCCESS 31159585464; PP1 /preview ON_READ_ONLY_SYNTHETIC; Launch NO-GO; enrollment OFF; pilot INACTIVE; caps/invites/users 0. Nie aktywowano signup/enrollment/pilota/Epic 3.0.
+2|Canonical Baseline
+Tip start 264b0bef / PP1 enable 034ae28 / FE=API=worker ALIGNED / Alembic 127 / CI 31155107318+31156354460 / preview ON / PP1 E2E 23/23 / signup+enrollment OFF / pilot INACTIVE / caps 0 / invites 0 / Launch NO-GO / Phase 3 Agent NOT_STARTED — zweryfikowane przed startem.
+3|Canonical Final State
+tip ff2ba434aea112bd82aa5e131374081f79becc45; FE=API=worker ALIGNED; Alembic 128_candidate_owned_import head; PP1 ENABLED; PILOT_ACCESS=OPERATIONALLY_READY_INACTIVE; schema twin.candidate_owned_import/v1.
+4|Verdict
+CANDIDATE-OWNED DATA IMPORT AND SAFE MIGRATION CUSTOMER-USABLE — PROVENANCE-PRESERVING STAGING, APPROVAL-GATED CANONICAL COMMIT AND CONFLICT-SAFE ROLLBACK PRODUCTION-READY
+5|Product Value Delivered
+Kandydat importuje własne pliki, widzi escaped preview/diff, zatwierdza jawnie, dopiero wtedy trwały zapis kanoniczny; rollback conflict-safe; prawda CANDIDATE_DECLARED.
+6|Scope Compliance
+Tylko Epic 2.12 §§5–38. Brak Epic 3.0 / Phase 3 Agent / public enrollment / private pilot / marketplace / autonomous import agent / 8. primary nav.
+7|Architecture
+Rozszerzenie kanoniczne: CandidateImportBatch ledger + Career Evidence commit + Guided FV CTA + Privacy pause hooks + audit; brak drugiego profilu/evidence/opportunity/lifecycle/privacy/FV store.
+8|Supported Families
+document PDF/DOCX/TXT/MD; tracker CSV/strict JSON; twin_export restore JSON; linkedin_export file-supply only; ZIP generic i XLSX zabronione fail-closed.
+9|TWIN Restore Policy
+Deny secrets/tokens/roles/consents-without-fresh/synthetic flags/telemetry/audits/runtime/creds — twin_deny_secrets PASS.
+10|LinkedIn Tracker Policy
+Tylko allowlisted user-owned file supply; brak scrape/login/OAuth przez Import Center.
+11|Lifecycle States
+DRAFT…DELETED (QUARANTINED/PARSING/STAGED/PREVIEW_READY/AWAITING_APPROVAL/COMMITTING/COMMITTED/ROLLING_BACK/ROLLED_BACK/REJECTED/FAILED/CANCELLED/DELETED); versioned auditable idempotent.
+12|Security Pipeline
+UPLOAD→QUARANTINE→FORMAT/SAFETY→SANDBOX PARSE→STAGING→PREVIEW→APPROVAL→ATOMIC COMMIT; fail closed; canonical_mutations=0 until approved commit.
+13|Malware Scanner Stance
+Brak zewnętrznego skanera — malware_scanner=unavailable_fail_closed; malware_free_claim=false; ryzykowne formaty reject.
+14|File Validation
+Magic bytes; bounds; encrypt raw (Fernet/SECRET_KEY); brak zaufania do extension/Content-Type/filename; brak filename w telemetry/logs evidence.
+15|ZIP PDF DOCX CSV JSON Security
+ZIP generic banned; PDF/DOCX przez sandbox parse bounds; CSV/JSON structural; ZIP-as-TXT REJECTED E2E.
+16|Parser Sandbox
+Brak shell/network/unrelated files; bounded output; cleanup; UNTRUSTED_CANDIDATE_DATA marker; never execute.
+17|Prompt Injection
+Structural parse only; untrusted marker; brak tool execution z treści importu.
+18|Provenance
+Import batch_key + family + claim_kind na staging/commit; truth default CANDIDATE_DECLARED; UNKNOWN/INSUFFICIENT/CONFLICTING/STALE wspierane w claim_kind.
+19|Staging Constraints
+Staging bez ranking/strategy/commit/approval auto/evidence-promote/adaptive/external — tylko preview ledger.
+20|Preview Diff
+Escaped preview items; adds/conflicts counts; content-free keys w audit.
+21|Conflict Dup
+Deterministic dup marking po title key; E2E conflict_dup_marked PASS.
+22|Approval Binding
+item_keys + preview_version + idempotency_key; stale_preview stop; privacy_pause blocks.
+23|Atomic Commit
+Idempotent commit; concurrency-safe state gates; canonical_mutations≥1 dopiero po COMMITTED.
+24|Rollback
+Conflict-safe soft-archive tylko rekordów z import_batch match; ROLLED_BACK E2E PASS.
+25|ID Remap Restore
+TWIN export adapter remapuje do nowych item_key; deny secrets przed staging.
+26|Guided FV Integration
+START_WITH_MY_DATA CTA → /dashboard/import; starter link Import Center; upload/parse/preview ≠ first value.
+27|First Value Integrity
+catalog first_value=upload_parse_preview_do_not_satisfy_pilot_first_value_v1; auth E2E upload_preview_not_first_value PASS.
+28|Import Center UX
+/dashboard/import EN/PL; create→upload→process→approve→commit→rollback/cancel; markers truth + no-auto.
+29|IA Placement
+Secondary CANDIDATE_SECONDARY_IA; primary nadal 7; brak 8. nav; niedostępne z /preview/anon/public signup.
+30|AuthZ Matrix
+JWT candidate-only; unauth 401; cross-candidate LookupError/404; ops mint kpi_excluded.
+31|Reliability Concurrency
+State machine busy gates; idempotent approve/commit; fail-closed security.
+32|Malicious Synthetic Fixtures
+ZIP-as-TXT reject; twin_export secrets deny; fixtures epic_212_synthetic/* bez PII.
+33|E2E Document Evidence
+doc_create→upload→preview→approve→commit→rollback PASS; mutations 0 aż do commit.
+34|E2E Tracker Opportunities
+tracker_preview PASS; mutations 0; staging opportunity_payload w evidence custom.
+35|E2E TWIN Restore
+twin_deny_secrets FAILED state + mutations 0 PASS.
+36|E2E Reject Cancel
+reject_zip_as_txt REJECTED; cancel_delete DELETED PASS.
+37|E2E Conflict
+conflict_dup_marked PASS.
+38|E2E First Value
+upload_preview_not_first_value + catalog_denies_preview_as_fv PASS.
+39|PP1 Regression
+pp1-public-preview-guard ok; /preview HTTP 200; kill switch READ_ONLY_SYNTHETIC intact; preview bez Import Center.
+40|Browser Storage Proof
+LanguageProvider persist=false na /preview (PP1); Import Center wymaga auth — nie z public preview.
+41|Telemetry
+Content-free audit events (state/codes/counts); brak raw text/filename/PII w evidence reports.
+42|Privacy Pause
+_privacy_paused blocks upload/process/approve/commit.
+43|Export Deletion Retention
+cancel/delete clears ciphertext; DELETED soft; ledger w account deletion path ready via batch delete.
+44|EN Copy
+importCenter.* EN complete.
+45|PL Copy
+importCenter.* PL complete.
+46|Accessibility
+Import Center form controls + Guided FV links; secondary nav aria inherited.
+47|Responsive UX
+max-w-3xl Import Center; mobile-friendly steps.
+48|Backend Unit
+7/7 PASS test_epic_212_candidate_owned_import.py
+49|Frontend Guard
+epic-212-import-center-guard ok
+50|Code Stance E2E
+26/26 scripts/epic-2-12-candidate-owned-import-e2e.py
+51|Auth Product E2E
+26/26 scripts/epic-2-12-import-authenticated-e2e.py
+52|Auth Stance E2E
+6/6 (public_health, launch_nogo, enrollment_off, preview_on, fe_api_worker_aligned, pp1_preview_200)
+53|Synthetic E2E Total Product Plus Stance Auth
+32/32 (26+6)
+54|Combined Code Plus Auth Product Journeys
+Document/Tracker/Restore/Reject/Conflict/FV pokryte.
+55|Alembic
+128_candidate_owned_import is_at_head=true
+56|CI Product Close
+SUCCESS https://github.com/CzechowskiT/twin/actions/runs/31158707115 (b7f2e489)
+57|CI Tip
+SUCCESS https://github.com/CzechowskiT/twin/actions/runs/31159585464 (ff2ba434)
+58|FE Deployment
+frontend_commit=ff2ba434aea112bd82aa5e131374081f79becc45
+59|API Deployment
+api_commit=ff2ba434aea112bd82aa5e131374081f79becc45
+60|Worker Deployment
+worker_commit=ff2ba434aea112bd82aa5e131374081f79becc45
+61|Production DB
+128_candidate_owned_import head
+62|Four-Way Alignment
+ALIGNED fe=api=worker=ff2ba434aea112bd82aa5e131374081f79becc45
+63|Closed P0
+Brak approval-gated import; immediate mutation risk — CLOSED (mutations=0 until commit).
+64|Closed P1
+Quarantine/encrypt/magic-bytes/TWIN deny/rollback/GFV CTA/PP1 isolation — CLOSED.
+65|Remaining Blockers
+Brak real candidate validation; brak malware vendor; Founder QA screenshots; Microsoft/job-board credentials — poza scope (by design).
+66|External Limitations
+REAL_CANDIDATE_VALIDATION=NOT_EVALUATED; no malware vendor auth; no Founder QA; no org/ALTEN.
+67|Technical Debt
+utcnow deprecation warnings; tracker commit via custom evidence (nie osobny opportunity watch write); GIT_COMMIT_SHA env override wymaga ręcznego bump.
+68|Product Debt
+Brak XLSX/ZIP allowlisted manifests poza banem; LinkedIn tylko file-supply; brak public enrollment.
+69|Documentation
+reports/epic-2-12-candidate-owned-import-2026-08-07/
+70|Git History
+b7f2e489 feat import core · e7693e33 GFV+auth E2E · ff2ba434 first-value E2E fix
+71|Product SHA
+ff2ba434aea112bd82aa5e131374081f79becc45
+72|Proof Tip
+ff2ba434aea112bd82aa5e131374081f79becc45
+73|Frozen Safety State
+PUBLIC_LAUNCH=NO_GO · PUBLIC_SIGNUP=OFF · PUBLIC_ENROLLMENT=OFF · PILOT_ACCESS=OPERATIONALLY_READY_INACTIVE · EFFECTIVE_REAL_PILOT_CAP=0 · REAL_INVITE_GENERATION=OFF · REAL_INVITE_SEND=OFF · REAL_INVITE_REDEMPTION=OFF · ACTIVE_REAL_INVITES=0 · REAL_PILOT_USERS=0 · PHASE_3B=BLOCKED · PHASE_3_AGENT=NOT_STARTED · MS_CALENDAR_WRITE=OFF · APPLICATION_SUBMISSION=OFF · EMPLOYER_CONTACT=OFF · EXTERNAL_PURCHASE_OR_ENROLLMENT=OFF · PUBLIC_PREVIEW=ON_READ_ONLY_SYNTHETIC
+74|Founder Action
+Nie aktywować signup/enrollment/pilota/integracji. Nie startować Epic 3.0 autonomicznie. Wybrać następny candidate-first scope.
+75|Exact Next Recommendation
+Founder defines next candidate-first MVP slice (np. richer opportunity-watch commit from tracker, allowlisted ZIP manifests, lub one-candidate canary po secure manifesto) — do NOT auto-activate enrollment/pilot; do NOT start Epic 3.0/Phase 3 Agent.
+76|Final Evidence Table
+| Check | Result |
+| Unit | 7/7 PASS |
+| Auth product E2E | 26/26 PASS |
+| Auth stance E2E | 6/6 PASS |
+| Code/stance E2E | 26/26 PASS |
+| FE guard | ok |
+| PP1 guard | ok |
+| /preview | 200 ON |
+| CI tip | SUCCESS 31159585464 |
+| Alembic | 128 head |
+| Alignment | FE=API=worker ff2ba434 |
+| Launch | NO-GO |
+| Invites/users/caps | 0/0/0 |
+77|Hard Bans Observed
+No public enrollment; no private pilot; no Epic 3.0; no 8th nav; no scrape LinkedIn; no malware-free claim; no PII in evidence.
+78|Terminal Posture §38
+PUBLIC_PRODUCT_LAUNCH=NO_GO; REAL_CANDIDATE_VALIDATION=NOT_EVALUATED; IMPORTED_CONTENT_TRUTH=CANDIDATE_DECLARED_UNLESS_SEPARATELY_VERIFIED; preview remains ON_READ_ONLY_SYNTHETIC; no auto-activate next epic.
+79|Safety Incidents
+0
+80|Unresolved P0
+0
+81|Unresolved P1
+0
+82|Phase 3 Agent
+NOT_STARTED
+83|Final Verdict
+CANDIDATE-OWNED DATA IMPORT AND SAFE MIGRATION CUSTOMER-USABLE — PROVENANCE-PRESERVING STAGING, APPROVAL-GATED CANONICAL COMMIT AND CONFLICT-SAFE ROLLBACK PRODUCTION-READY
+
+Final Answers
+- exact_verdict: CANDIDATE-OWNED DATA IMPORT AND SAFE MIGRATION CUSTOMER-USABLE — PROVENANCE-PRESERVING STAGING, APPROVAL-GATED CANONICAL COMMIT AND CONFLICT-SAFE ROLLBACK PRODUCTION-READY
+- epic_212_status: COMPLETE
+- product_SHA: ff2ba434aea112bd82aa5e131374081f79becc45
+- tip_SHA: ff2ba434aea112bd82aa5e131374081f79becc45
+- FE_SHA: ff2ba434aea112bd82aa5e131374081f79becc45
+- API_SHA: ff2ba434aea112bd82aa5e131374081f79becc45
+- worker_SHA: ff2ba434aea112bd82aa5e131374081f79becc45
+- alignment: ALIGNED
+- alembic: 128_candidate_owned_import (is_at_head=true)
+- CI_close: SUCCESS 31158707115
+- CI_tip: SUCCESS 31159585464
+- unit_tests: 7/7
+- auth_E2E_product: 26/26
+- auth_E2E_stance: 6/6
+- code_stance_E2E: 26/26
+- auth_E2E_total: 32/32
+- fe_import_guard: ok
+- pp1_guard: ok
+- pp1_preview: ON_READ_ONLY_SYNTHETIC HTTP 200
+- public_signup: OFF
+- public_enrollment: OFF
+- pilot_access: OPERATIONALLY_READY_INACTIVE
+- effective_caps: 0
+- active_real_invites: 0
+- real_pilot_users: 0
+- Launch: NO-GO
+- Phase_3B: BLOCKED
+- Phase_3_Agent: NOT_STARTED
+- MS_write: OFF
+- application_submission: OFF
+- employer_contact: OFF
+- external_purchase_or_enrollment: OFF
+- unresolved_P0: 0
+- unresolved_P1: 0
+- safety_incidents: 0
+- REAL_CANDIDATE_VALIDATION: NOT_EVALUATED
+- IMPORTED_CONTENT_TRUTH: CANDIDATE_DECLARED_UNLESS_SEPARATELY_VERIFIED
+- PUBLIC_PRODUCT_LAUNCH: NO_GO
+- next: Founder-defined next candidate-first scope OR secure one-candidate canary — do NOT auto-activate signup/enrollment/pilot; do NOT start Epic 3.0

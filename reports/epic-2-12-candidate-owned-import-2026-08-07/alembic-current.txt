@@ -1,0 +1,4 @@
+Using SSH key from file /Users/tomek/.ssh/id_ed25519_github.pub: twin-deploy
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+128_candidate_owned_import (head)
