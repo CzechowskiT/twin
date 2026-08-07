@@ -9,6 +9,7 @@ from app.api import (
     admin_ops,
     ats_completion,
     candidate_intelligence,
+    candidate_owned_import,
     career_evidence,
     application_studio,
     interview_decision,
@@ -231,6 +232,11 @@ api_router.include_router(
     guided_first_value.router,
     prefix="/candidates",
     tags=["Guided First Value"],
+)
+api_router.include_router(
+    candidate_owned_import.router,
+    prefix="/candidates",
+    tags=["Candidate Owned Import"],
 )
 api_router.include_router(
     pilot_operations.admin_router,

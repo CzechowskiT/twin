@@ -7346,3 +7346,42 @@ class CandidateIsolatedDemoSession(Base):
     updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     exited_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateImportBatch(Base):
+    """Epic 2.12 — candidate-owned import ledger (staging only until approved commit)."""
+
+    __tablename__ = "candidate_import_batches"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "batch_key", name="uq_import_batch_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    batch_key: Mapped[str] = mapped_column(String(64))
+    family: Mapped[str] = mapped_column(String(32))
+    state: Mapped[str] = mapped_column(String(32), default="DRAFT", index=True)
+    schema_version: Mapped[str] = mapped_column(String(32), default="candidate_owned_import_v1")
+    content_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    byte_size: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    ext: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    # Encrypted raw bytes (base64 Fernet) — never log plaintext
+    ciphertext_b64: Mapped[str | None] = mapped_column(Text, nullable=True)
+    staging_json: Mapped[str] = mapped_column(Text, default="[]")
+    preview_json: Mapped[str] = mapped_column(Text, default="{}")
+    approval_json: Mapped[str] = mapped_column(Text, default="{}")
+    commit_json: Mapped[str] = mapped_column(Text, default="{}")
+    rollback_json: Mapped[str] = mapped_column(Text, default="{}")
+    audit_json: Mapped[str] = mapped_column(Text, default="[]")
+    idempotency_key: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    rejection_code: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    canonical_mutations: Mapped[int] = mapped_column(Integer, default=0)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    preview_version: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)

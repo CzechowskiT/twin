@@ -58,6 +58,10 @@ import {
   GUIDED_FV_MESSAGES_PL,
 } from "./guided-first-value-messages";
 import {
+  IMPORT_CENTER_MESSAGES_EN,
+  IMPORT_CENTER_MESSAGES_PL,
+} from "./import-center-messages";
+import {
   PUBLIC_PREVIEW_MESSAGES_EN,
   PUBLIC_PREVIEW_MESSAGES_PL,
 } from "./public-preview-messages";
@@ -120,6 +124,7 @@ export type TranslationKey =
   | `candidateRewards.${keyof typeof CANDIDATE_REWARDS_MESSAGES_EN}`
   | `founderCommand.${keyof typeof FOUNDER_COMMAND_MESSAGES_EN}`
   | `guidedFv.${keyof typeof GUIDED_FV_MESSAGES_EN}`
+  | `importCenter.${keyof typeof IMPORT_CENTER_MESSAGES_EN}`
   | `publicPreview.${keyof typeof PUBLIC_PREVIEW_MESSAGES_EN}`
   | `faq.${keyof typeof FAQ_MESSAGES_EN}`
   | `site.${keyof typeof SITE_MESSAGES_EN}`
@@ -615,6 +620,7 @@ const en = {
   candidateRewards: CANDIDATE_REWARDS_MESSAGES_EN,
   founderCommand: FOUNDER_COMMAND_MESSAGES_EN,
   guidedFv: GUIDED_FV_MESSAGES_EN,
+  importCenter: IMPORT_CENTER_MESSAGES_EN,
   publicPreview: PUBLIC_PREVIEW_MESSAGES_EN,
   faq: FAQ_MESSAGES_EN,
   site: SITE_MESSAGES_EN,
@@ -9923,6 +9929,7 @@ const pl: MessageTree = {
   candidateRewards: CANDIDATE_REWARDS_MESSAGES_PL,
   founderCommand: FOUNDER_COMMAND_MESSAGES_PL,
   guidedFv: GUIDED_FV_MESSAGES_PL,
+  importCenter: IMPORT_CENTER_MESSAGES_PL,
   publicPreview: PUBLIC_PREVIEW_MESSAGES_PL,
   faq: FAQ_MESSAGES_PL,
   site: SITE_MESSAGES_PL,
