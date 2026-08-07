@@ -21,9 +21,11 @@ export const PUBLIC_PREVIEW_MESSAGES_EN = {
   backHome: "TWIN home",
   inactiveTitle: "Preview unavailable",
   inactiveBody: "The public synthetic preview is not enabled.",
-} as const;
+} as const satisfies Record<string, string>;
 
-export const PUBLIC_PREVIEW_MESSAGES_PL: typeof PUBLIC_PREVIEW_MESSAGES_EN = {
+export type PublicPreviewMessageKey = keyof typeof PUBLIC_PREVIEW_MESSAGES_EN;
+
+export const PUBLIC_PREVIEW_MESSAGES_PL: Record<PublicPreviewMessageKey, string> = {
   title: "Podgląd produktu TWIN",
   lead: "Statyczny wgląd w produkt kandydata wyłącznie na fikcyjnych danych.",
   brand: "TWIN",
