@@ -1,0 +1,101 @@
+1|Executive Summary
+Epic 2.13 COMPLETE (Verdict A). Authenticated unified workspace search: Cmd/Ctrl+K + secondary entry; capability + committed-record groups; provenance-preserving results; POST-only private queries; mutations=0. Tip 4d7833f0 FE=API=worker ALIGNED; Alembic 128 (129 not required); auth E2E product 20/20 + stance 6/6; code/stance 25/25; unit 6/6; route inventory 72/72; CI SUCCESS 31163411049; PP1 ON; Launch NO-GO; enrollment OFF; pilot INACTIVE; caps/invites/users 0. Nie aktywowano signup/enrollment/pilota/Epic 3.0.
+2|Canonical Baseline
+Epic 2.12 tip e04cf63b / product ff2ba434 / FE=API=worker ALIGNED / Alembic 128 / CI 31160357852 / auth 26/26+6/6 / preview ON / signup+enrollment OFF / pilot INACTIVE / caps 0 / Launch NO-GO / Phase 3B BLOCKED / Phase 3 Agent NOT_STARTED — zweryfikowane.
+3|Canonical Final State
+tip 4d7833f091fa7aea47e87464c7c440f51be49724; product close d5cb7918576a80e62fd42ee18649b26486232e3c (+ TS fix); FE=API=worker ALIGNED; Alembic 128 head; schema twin.unified_career_workspace_search/v1; PP1 ON_READ_ONLY_SYNTHETIC; PILOT_ACCESS=OPERATIONALLY_READY_INACTIVE.
+4|Verdict
+UNIFIED CAREER WORKSPACE SEARCH AND SOURCE-LINKED KNOWLEDGE CONTINUITY CUSTOMER-USABLE — CANDIDATE-SCOPED RETRIEVAL, PROVENANCE-PRESERVING RESULTS AND PRIVACY-SAFE INDEX LIFECYCLE PRODUCTION-READY
+5|Product Value Delivered
+Kandydat otwiera wyszukiwanie, wpisuje prywatne zapytanie, widzi grupy „Go to capability” i „My career records” z source/truth/match-reason, otwiera kanoniczny deep link — bez mutacji i bez first value.
+6|Scope Compliance
+Tylko Epic 2.13. Brak rebuildu prior epics; brak Epic 3.0/Phase 3B/Agent; brak 8. primary nav; brak Elasticsearch/vector/LLM/RAG/web search; brak saved searches/Ask TWIN.
+7|Architecture
+Rozszerzenie kanoniczne: unified_workspace_search + adapters + route inventory; reuse Epic 2.11 capability registry; lexical adapters na istniejących tabelach; bez derived projection / Alembic 129.
+8|Route Inventory
+72/72 complete; CAPABILITY_ONLY 42; SEARCHABLE_CANONICAL_RECORD 4; EXCLUDED_WITH_REASON 26; eighth_primary_nav=false.
+9|Searchable Boundary
+Tylko candidate-owned committed visible allowlisted fields; nigdy quarantine/staging/raw CV/tokens/consents/invites/pilot/telemetry/audits/MS calendar/other candidates/deleted; archived tylko z filtrem.
+10|Retrieval Contract
+POST /me/workspace-search; Cache-Control private,no-store; query never in URL/logs/response field; deep links internal only; deterministic stable order; match_reasons enums; truth never upgraded; mutations=0; first_value_satisfied=false.
+11|Security Isolation
+Unauth 401; candidate_scoped; cross-candidate unit 0 overlap; parameterized/contains lexical; XSS escaped excerpts; rate via existing auth surface.
+12|Import Lifecycle Continuity
+Import batches indexed only when COMMITTED; staging/quarantine never; Epic 2.12 pipeline intact.
+13|Privacy Pause Export Deletion
+Privacy pause blocks record search (capabilities remain); export/deletion paths untouched; no browser storage of query/results.
+14|UX EN PL A11y
+Palette Cmd/Ctrl+K + floating entry; /dashboard/workspace-search page; EN/PL; dialog a11y; Escape close; clear on logout.
+15|PP1 Regression
+pp1 guard ok; /preview 200; palette absent from preview; kill switch intact.
+16|Backend Unit
+6/6 PASS test_epic_213_unified_workspace_search.py
+17|Frontend Guard
+epic-213-workspace-search-guard ok
+18|Code Stance E2E
+25/25 scripts/epic-2-13-unified-workspace-search-e2e.py
+19|Auth Product E2E
+20/20 scripts/epic-2-13-workspace-search-authenticated-e2e.py
+20|Auth Stance E2E
+6/6 (public_health, launch_nogo, enrollment_off, preview_on, fe_api_worker_aligned, pp1_preview_200)
+21|Terminal Posture
+PUBLIC_LAUNCH=NO_GO · PUBLIC_SIGNUP=OFF · PUBLIC_ENROLLMENT=OFF · PILOT_ACCESS=OPERATIONALLY_READY_INACTIVE · EFFECTIVE_CAPS=0 · REAL_INVITES=0 · REAL_PILOT_USERS=0 · PHASE_3B=BLOCKED · PHASE_3_AGENT=NOT_STARTED · MS_WRITE=OFF · APPLICATION_SUBMISSION=OFF · EMPLOYER_CONTACT=OFF · EXTERNAL_PURCHASE_OR_ENROLLMENT=OFF · PUBLIC_PREVIEW=ON_READ_ONLY_SYNTHETIC · stop after report — no auto pilot/enrollment/launch/Phase 3.
+22|CI Deploy Alignment
+CI tip SUCCESS https://github.com/CzechowskiT/twin/actions/runs/31163411049; FE=API=worker 4d7833f0; Alembic 128; P0/P1=0/0.
+23|Evidence
+reports/epic-2-13-unified-workspace-search-2026-08-07/
+24|Hard Bans Observed
+No public enrollment; no private pilot; no Epic 3.0; no 8th nav; no ES/vector/LLM; no query in URL/telemetry content; no mutations from search.
+25|Remaining Blockers
+REAL_CANDIDATE_USABILITY/VALUE/ADOPTION/RETENTION=NOT_EVALUATED (by design).
+26|Technical Product Debt
+Lifecycle legacy /dashboard/search retained as CAPABILITY_ONLY; opportunity/application deep corpus not fully expanded beyond allowlisted adapters.
+27|Founder Next
+Founder-defined next candidate-first scope OR secure one-candidate canary — do NOT auto-activate signup/enrollment/pilot; do NOT start Epic 3.0.
+28|Final Verdict
+UNIFIED CAREER WORKSPACE SEARCH AND SOURCE-LINKED KNOWLEDGE CONTINUITY CUSTOMER-USABLE — CANDIDATE-SCOPED RETRIEVAL, PROVENANCE-PRESERVING RESULTS AND PRIVACY-SAFE INDEX LIFECYCLE PRODUCTION-READY
+
+Final Answers
+- exact_verdict: UNIFIED CAREER WORKSPACE SEARCH AND SOURCE-LINKED KNOWLEDGE CONTINUITY CUSTOMER-USABLE — CANDIDATE-SCOPED RETRIEVAL, PROVENANCE-PRESERVING RESULTS AND PRIVACY-SAFE INDEX LIFECYCLE PRODUCTION-READY
+- epic_213_status: COMPLETE
+- repo_head: 4d7833f091fa7aea47e87464c7c440f51be49724
+- product_SHA: d5cb7918576a80e62fd42ee18649b26486232e3c
+- tip_SHA: 4d7833f091fa7aea47e87464c7c440f51be49724
+- FE_SHA: 4d7833f091fa7aea47e87464c7c440f51be49724
+- API_SHA: 4d7833f091fa7aea47e87464c7c440f51be49724
+- worker_SHA: 4d7833f091fa7aea47e87464c7c440f51be49724
+- alignment_status: ALIGNED
+- docs_only_drift: false
+- alembic: 128_candidate_owned_import (is_at_head=true; 129_not_required)
+- CI_tip: SUCCESS 31163411049
+- unit_tests: 6/6
+- auth_E2E_product: 20/20
+- auth_E2E_stance: 6/6
+- code_stance_E2E: 25/25
+- auth_E2E_total: 26/26
+- route_inventory: 72/72
+- fe_guard: ok
+- pp1_guard: ok
+- pp1_preview: ON_READ_ONLY_SYNTHETIC HTTP 200
+- public_signup: OFF
+- public_enrollment: OFF
+- pilot_access: OPERATIONALLY_READY_INACTIVE
+- effective_caps: 0
+- active_real_invites: 0
+- real_pilot_users: 0
+- Launch: NO-GO
+- Phase_3B: BLOCKED
+- Phase_3_Agent: NOT_STARTED
+- MS_write: OFF
+- application_submission: OFF
+- employer_contact: OFF
+- external_purchase_or_enrollment: OFF
+- unresolved_P0: 0
+- unresolved_P1: 0
+- safety_incidents: 0
+- REAL_CANDIDATE_USABILITY: NOT_EVALUATED
+- REAL_CANDIDATE_VALUE: NOT_EVALUATED
+- ADOPTION: NOT_EVALUATED
+- RETENTION: NOT_EVALUATED
+- PUBLIC_PRODUCT_LAUNCH: NO_GO
+- next: Founder-defined next candidate-first scope OR secure one-candidate canary — do NOT auto-activate; do NOT start Epic 3.0

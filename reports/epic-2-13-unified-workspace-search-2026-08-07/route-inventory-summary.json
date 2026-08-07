@@ -1,0 +1,10 @@
+{
+  "total": 72,
+  "complete": "72/72",
+  "by_disposition": {
+    "CAPABILITY_ONLY": 42,
+    "SEARCHABLE_CANONICAL_RECORD": 4,
+    "EXCLUDED_WITH_REASON": 26
+  },
+  "eighth_primary_nav": false
+}
