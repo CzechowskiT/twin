@@ -3,7 +3,7 @@ Epic 2.12 COMPLETE (Verdict A). Authenticated Import Center: upload→quarantine
 2|Canonical Baseline
 Tip start 264b0bef / PP1 enable 034ae28 / FE=API=worker ALIGNED / Alembic 127 / CI 31155107318+31156354460 / preview ON / PP1 E2E 23/23 / signup+enrollment OFF / pilot INACTIVE / caps 0 / invites 0 / Launch NO-GO / Phase 3 Agent NOT_STARTED — zweryfikowane przed startem.
 3|Canonical Final State
-tip ff2ba434aea112bd82aa5e131374081f79becc45; FE=API=worker ALIGNED; Alembic 128_candidate_owned_import head; PP1 ENABLED; PILOT_ACCESS=OPERATIONALLY_READY_INACTIVE; schema twin.candidate_owned_import/v1.
+tip 0f2a25163d63afc63cd124c2c513eeabc1f63db7 (evidence); product feature close ff2ba434aea112bd82aa5e131374081f79becc45; FE=API=worker ALIGNED tip; Alembic 128_candidate_owned_import head; PP1 ENABLED; PILOT_ACCESS=OPERATIONALLY_READY_INACTIVE; schema twin.candidate_owned_import/v1.
 4|Verdict
 CANDIDATE-OWNED DATA IMPORT AND SAFE MIGRATION CUSTOMER-USABLE — PROVENANCE-PRESERVING STAGING, APPROVAL-GATED CANONICAL COMMIT AND CONFLICT-SAFE ROLLBACK PRODUCTION-READY
 5|Product Value Delivered
@@ -111,17 +111,17 @@ Document/Tracker/Restore/Reject/Conflict/FV pokryte.
 56|CI Product Close
 SUCCESS https://github.com/CzechowskiT/twin/actions/runs/31158707115 (b7f2e489)
 57|CI Tip
-SUCCESS https://github.com/CzechowskiT/twin/actions/runs/31159585464 (ff2ba434)
+SUCCESS https://github.com/CzechowskiT/twin/actions/runs/31160057030 (0f2a2516)
 58|FE Deployment
-frontend_commit=ff2ba434aea112bd82aa5e131374081f79becc45
+frontend_commit=0f2a25163d63afc63cd124c2c513eeabc1f63db7
 59|API Deployment
-api_commit=ff2ba434aea112bd82aa5e131374081f79becc45
+api_commit=0f2a25163d63afc63cd124c2c513eeabc1f63db7
 60|Worker Deployment
-worker_commit=ff2ba434aea112bd82aa5e131374081f79becc45
+worker_commit=0f2a25163d63afc63cd124c2c513eeabc1f63db7
 61|Production DB
 128_candidate_owned_import head
 62|Four-Way Alignment
-ALIGNED fe=api=worker=ff2ba434aea112bd82aa5e131374081f79becc45
+ALIGNED fe=api=worker=0f2a25163d63afc63cd124c2c513eeabc1f63db7
 63|Closed P0
 Brak approval-gated import; immediate mutation risk — CLOSED (mutations=0 until commit).
 64|Closed P1
@@ -137,11 +137,11 @@ Brak XLSX/ZIP allowlisted manifests poza banem; LinkedIn tylko file-supply; brak
 69|Documentation
 reports/epic-2-12-candidate-owned-import-2026-08-07/
 70|Git History
-b7f2e489 feat import core · e7693e33 GFV+auth E2E · ff2ba434 first-value E2E fix
+b7f2e489 feat import core · e7693e33 GFV+auth E2E · ff2ba434 first-value E2E fix · 0f2a2516 evidence seal
 71|Product SHA
 ff2ba434aea112bd82aa5e131374081f79becc45
 72|Proof Tip
-ff2ba434aea112bd82aa5e131374081f79becc45
+0f2a25163d63afc63cd124c2c513eeabc1f63db7
 73|Frozen Safety State
 PUBLIC_LAUNCH=NO_GO · PUBLIC_SIGNUP=OFF · PUBLIC_ENROLLMENT=OFF · PILOT_ACCESS=OPERATIONALLY_READY_INACTIVE · EFFECTIVE_REAL_PILOT_CAP=0 · REAL_INVITE_GENERATION=OFF · REAL_INVITE_SEND=OFF · REAL_INVITE_REDEMPTION=OFF · ACTIVE_REAL_INVITES=0 · REAL_PILOT_USERS=0 · PHASE_3B=BLOCKED · PHASE_3_AGENT=NOT_STARTED · MS_CALENDAR_WRITE=OFF · APPLICATION_SUBMISSION=OFF · EMPLOYER_CONTACT=OFF · EXTERNAL_PURCHASE_OR_ENROLLMENT=OFF · PUBLIC_PREVIEW=ON_READ_ONLY_SYNTHETIC
 74|Founder Action
@@ -157,9 +157,9 @@ Founder defines next candidate-first MVP slice (np. richer opportunity-watch com
 | FE guard | ok |
 | PP1 guard | ok |
 | /preview | 200 ON |
-| CI tip | SUCCESS 31159585464 |
+| CI tip | SUCCESS 31160057030 |
 | Alembic | 128 head |
-| Alignment | FE=API=worker ff2ba434 |
+| Alignment | FE=API=worker 0f2a2516 |
 | Launch | NO-GO |
 | Invites/users/caps | 0/0/0 |
 77|Hard Bans Observed
@@ -181,14 +181,14 @@ Final Answers
 - exact_verdict: CANDIDATE-OWNED DATA IMPORT AND SAFE MIGRATION CUSTOMER-USABLE — PROVENANCE-PRESERVING STAGING, APPROVAL-GATED CANONICAL COMMIT AND CONFLICT-SAFE ROLLBACK PRODUCTION-READY
 - epic_212_status: COMPLETE
 - product_SHA: ff2ba434aea112bd82aa5e131374081f79becc45
-- tip_SHA: ff2ba434aea112bd82aa5e131374081f79becc45
-- FE_SHA: ff2ba434aea112bd82aa5e131374081f79becc45
-- API_SHA: ff2ba434aea112bd82aa5e131374081f79becc45
-- worker_SHA: ff2ba434aea112bd82aa5e131374081f79becc45
+- tip_SHA: 0f2a25163d63afc63cd124c2c513eeabc1f63db7
+- FE_SHA: 0f2a25163d63afc63cd124c2c513eeabc1f63db7
+- API_SHA: 0f2a25163d63afc63cd124c2c513eeabc1f63db7
+- worker_SHA: 0f2a25163d63afc63cd124c2c513eeabc1f63db7
 - alignment: ALIGNED
 - alembic: 128_candidate_owned_import (is_at_head=true)
 - CI_close: SUCCESS 31158707115
-- CI_tip: SUCCESS 31159585464
+- CI_tip: SUCCESS 31160057030
 - unit_tests: 7/7
 - auth_E2E_product: 26/26
 - auth_E2E_stance: 6/6
