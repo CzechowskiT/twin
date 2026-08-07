@@ -81,12 +81,19 @@ def advance_ladder(
     current = getattr(row, "fv_ladder", None) or "READY"
     if current not in LADDER_RANK:
         current = "READY"
-    # Only advance forward (idempotent if same/lower)
-    if LADDER_RANK[tgt] < LADDER_RANK[current]:
+    # Explicit READY is a Founder/ops/synth reset — allow backwards
+    if tgt != "READY" and LADDER_RANK[tgt] < LADDER_RANK[current]:
         return ladder_status(db, candidate_id=candidate_id, user_id=user_id)
 
     now = _utcnow()
-    if tgt == "VIEWED" and LADDER_RANK[current] < LADDER_RANK["VIEWED"]:
+    if tgt == "READY":
+        row.fv_ladder = "READY"
+        row.fv_viewed_at = None
+        row.fv_acknowledged_at = None
+        row.fv_actioned_at = None
+        # Reset must not leave a synthetic session claiming real first value
+        row.real_first_value_reached = False
+    elif tgt == "VIEWED" and LADDER_RANK[current] < LADDER_RANK["VIEWED"]:
         row.fv_ladder = "VIEWED"
         row.fv_viewed_at = now
     elif tgt == "ACKNOWLEDGED" and LADDER_RANK[current] < LADDER_RANK["ACKNOWLEDGED"]:
@@ -109,8 +116,6 @@ def advance_ladder(
         if row.state not in {"COMPLETED", "SKIPPED", "DELETED"}:
             row.state = "COMPLETED"
             row.completed_at = now
-    elif tgt == "READY":
-        row.fv_ladder = "READY"
 
     row.updated_at = now
     db.commit()

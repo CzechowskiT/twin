@@ -158,6 +158,23 @@ def main() -> int:
         "",
     )
 
+    # Shared synth candidate may carry prior ladder state — reset without claiming REAL
+    code, reset = _req(
+        "POST",
+        "/api/v1/candidates/me/first-value-ladder",
+        token=token,
+        body={"target": "READY", "lane": "SYNTHETIC"},
+    )
+    check(
+        "product",
+        "ladder_reset_ready",
+        code == 200
+        and isinstance(reset, dict)
+        and reset.get("ladder") == "READY"
+        and reset.get("real_first_value_reached") is False,
+        str(reset)[:120] if isinstance(reset, dict) else str(code),
+    )
+
     code, fv2 = _req(
         "POST",
         "/api/v1/candidates/me/first-value-ladder",
@@ -182,7 +199,7 @@ def main() -> int:
         "product",
         "synth_not_real_fv",
         isinstance(fv3, dict) and fv3.get("real_first_value_reached") is False,
-        "",
+        str((fv3 or {}).get("real_first_value_reached") if isinstance(fv3, dict) else ""),
     )
 
     code, fr = _req(

@@ -135,3 +135,25 @@ def test_abort_clears_gate():
         assert out["active_one_candidate"] is False
     finally:
         db.close()
+
+
+def test_ladder_ready_reset_clears_real_flag():
+    db, user, cand = _db()
+    try:
+        ladder.advance_ladder(
+            db, candidate_id=cand.id, user_id=user.id, target="ACTIONED", lane="REAL"
+        )
+        st = ladder.ladder_status(db, candidate_id=cand.id, user_id=user.id)
+        assert st["real_first_value_reached"] is True
+        reset = ladder.advance_ladder(
+            db, candidate_id=cand.id, user_id=user.id, target="READY", lane="SYNTHETIC"
+        )
+        assert reset["ladder"] == "READY"
+        assert reset["real_first_value_reached"] is False
+        again = ladder.advance_ladder(
+            db, candidate_id=cand.id, user_id=user.id, target="ACTIONED", lane="SYNTHETIC"
+        )
+        assert again["ladder"] == "ACTIONED"
+        assert again["real_first_value_reached"] is False
+    finally:
+        db.close()
