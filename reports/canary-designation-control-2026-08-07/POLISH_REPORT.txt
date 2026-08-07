@@ -1,0 +1,161 @@
+1|Executive Summary
+Canary Blocker Closure COMPLETE (Verdict A). Founder-controlled real canary candidate designation production-ready: encrypted delivery identity, masked admin API, singleton DESIGNATED_READY, separate gate REAL_CANARY_CANDIDATE_DESIGNATED_READY, /admin/canary UX. Tip/product 020301095e19 FE=API=worker ALIGNED; Alembic 130; unit 5/5; FE guard ok; auth E2E 26/26 with teardown count=0; CI SUCCESS 31182456339. Final prod: designation_count=0, caps/invites/users=0, READY_INACTIVE, PREPARED_NOT_EXECUTED, Launch NO-GO. Nie aktywowano canary; nie wysłano invite; nie desygnowano realnej osoby w tym runie.
+2|Baseline Verified
+Epic 2.14 COMPLETE; Canary Run 1 blocked NOT_DESIGNATED; product was 2393311b; tip docs 7e1f5547; Alembic 129; gate READY; ACTIVE=false; caps 0 — closed by this designation control without activating.
+3|Root Cause Closed
+Control plane mógł evaluate/dry-run/fail-closed, ale brakowało Founder persistence dla explicit real candidate designation + delivery identity + roster ref + lifecycle. Domknięto wyłącznie tę lukę.
+4|Verdict
+REAL CANARY DESIGNATION CONTROL READY - FOUNDER-CONTROLLED SINGLE-CANDIDATE IDENTITY BINDING PRODUCTION-READY
+5|Architecture
+Tabela real_canary_candidate_designations (Alembic 130); service canary_designation.py; reuse token_crypto Fernet + hash_email/mask_email; admin API + ops BFF; health_ops flags; private_canary.snapshot embeds designation.
+6|Statuses
+NOT_DESIGNATED (count=0) · DESIGNATED_READY (count=1) · REVOKED/INVALID/DELETED · AMBIGUOUS if >1 active (fail-closed).
+7|PII Security
+Encrypt at rest; SHA-256 hash uniqueness; masked API only; no plaintext in logs/metrics/audit text/URL/localStorage/report; decrypt only at future delivery boundary helper.
+8|Admin UX
+/admin/canary — Real canary candidate designation section; save/revoke/replace; ladder Product ready → Candidate designated → Activation not executed → Invite not created → Canary inactive. Save does NOT raise cap/enable gen/send/redeem/mint/send/create user/activate.
+9|Admin API
+GET/POST /api/v1/admin/canary/designation; POST .../revoke; GET .../activation-preflight (read-only). Ops Bearer. BFF /api/ops-admin/canary/designation(+revoke).
+10|Validation
+Exactly one active; email channel; syntax; fixture domains blocked; synthetic markers rejected; blank rejected; replace_existing default true.
+11|Gates Separated
+ONE_CANDIDATE_CANARY_READY (technical) ≠ REAL_CANARY_CANDIDATE_DESIGNATED_READY (designation). Both independent.
+12|Activation Preflight
+Consumes secure designation_id; activates=false; raises_caps=false; never executed in this run.
+13|Alembic
+130_real_canary_candidate_designation revises 129; is_at_head on prod (API serving designation endpoints).
+14|Deploy Alignment
+FE=API=worker 020301095e196d0b69994ae20f5d82626493f593; ALIGNED; GIT_COMMIT_SHA updated; Vercel prod + Railway twin/worker.
+15|CI
+SUCCESS 31182456339 https://github.com/CzechowskiT/twin/actions/runs/31182456339
+16|Unit Tests
+5/5 test_canary_designation.py (+ Epic 2.14 canary 8/8 still green in same session).
+17|FE Guard
+epic-214-canary-readiness-guard ok (designation panel + BFF + i18n).
+18|Platform Guards
+Launch NO-GO; signup/enrollment OFF; pilot INACTIVE; PP1 ON; Phase 3B BLOCKED; Phase 3 Agent NOT_STARTED; MS write OFF; caps 0; canary ACTIVE false.
+19|Auth E2E Prod
+scripts/canary-designation-authenticated-e2e.py 26/26 — designate probe@.invalid → preflight → revoke teardown count=0.
+20|Final Production State
+designation_count=0 · status=NOT_DESIGNATED · designation_gate_ready=false · canary READY_INACTIVE · PREPARED_NOT_EXECUTED · cap=0 · invites=0 · candidates=0 · ACTIVE=false.
+21|Hard Bans Observed
+No Epic 2.15/3.0; no activation; no invite send; no real person designated this run; no Gmail/CRM/CV search; no plaintext PII in report.
+22|Founder Action After A
+Open /admin/canary, enter exactly one real candidate delivery identity in Real canary candidate designation, and save the designation. (still does NOT send invite). Next: rerun Canary Run 1.
+23|Evidence
+reports/canary-designation-control-2026-08-07/
+24|SHAs
+repo_head/tip/product/FE/API/worker=020301095e196d0b69994ae20f5d82626493f593 · docs_only_drift=false · alembic=130
+25|REAL Metrics
+REAL_CANDIDATE_USABILITY/VALUE/ADOPTION/RETENTION=NOT_EVALUATED
+26|Never Raises Caps On Save
+Proven by E2E invites_still_zero + caps_zero + still_not_active after designate.
+27|Never Auto Activate
+active_one_candidate=false throughout; activation_command PREPARED_NOT_EXECUTED.
+28|Singleton Enforce
+Service revoke-on-replace + post-commit AMBIGUOUS invalidate.
+29|Content-Free Audits
+audit events designated/revoked/replaced without identity plaintext.
+30|Delivery Channels
+email only (v1).
+31|BFF
+ops-admin canary designation + revoke routes.
+32|i18n
+canaryJourney des* EN/PL.
+33|PP1
+preview 200; designation not on public preview.
+34|Stop Net-New
+Only designation control — no search/evidence/calendar/agent modules.
+35|Candidate First
+Unchanged PRIMARY; org SECONDARY.
+36|Branch
+cursor/phase1-monorepo-scaffold; no PR main; no force push.
+37|Teardown
+E2E revoke left active_count=0 on production.
+38|Preflight Separate From Execute
+activation-preflight ready_for_founder_activation may be true when designated, but this run left NOT_DESIGNATED after teardown.
+39|Health Flags
+rc1_real_canary_candidate_designated_ready / status / count.
+40|Control Snapshot Embed
+private_canary.snapshot includes designation object.
+41|Fixture Rejection
+example.com → 400 fixture_or_blocked_domain.
+42|Synthetic Rejection
+synth.* markers rejected.
+43|Decrypt Boundary
+decrypt_for_delivery_boundary exists for future invite path only — not exposed on GET.
+44|No Account Create
+Designate does not create User/Candidate rows.
+45|No Kill Switch Flip
+invite gen/send/redeem remain OFF.
+46|P0 P1
+0/0 designation blockers open.
+47|Next Run
+Canary Run 1 after Founder saves real designation.
+48|No Epic 2.15
+NOT_STARTED.
+49|No Epic 3.0
+NOT_STARTED.
+50|Phase 3 Agent
+NOT_STARTED.
+51|Launch Stance
+NO-GO frozen.
+52|Evidence Integrity
+unit, fe-guard, auth-e2e, public-health, designation-status, alembic-note, ci-tip, SUMMARY.
+53|Masked UI
+Admin shows delivery_identity_masked only.
+54|Roster Ref
+Optional secure_roster_reference non-PII string.
+55|Final Verdict
+REAL CANARY DESIGNATION CONTROL READY - FOUNDER-CONTROLLED SINGLE-CANDIDATE IDENTITY BINDING PRODUCTION-READY
+56|Stop
+STOP po raporcie. Product freeze poza designation control. Founder desygnuje później w /admin/canary.
+
+Final Answers
+1|exact_verdict: REAL CANARY DESIGNATION CONTROL READY - FOUNDER-CONTROLLED SINGLE-CANDIDATE IDENTITY BINDING PRODUCTION-READY
+2|blocker_closed: REAL_CANARY_CANDIDATE_NOT_DESIGNATED (control ready; count still 0 until Founder saves)
+3|repo_head: 020301095e196d0b69994ae20f5d82626493f593
+4|product_SHA: 020301095e196d0b69994ae20f5d82626493f593
+5|tip_SHA: 020301095e196d0b69994ae20f5d82626493f593
+6|FE_SHA: 020301095e196d0b69994ae20f5d82626493f593
+7|API_SHA: 020301095e196d0b69994ae20f5d82626493f593
+8|worker_SHA: 020301095e196d0b69994ae20f5d82626493f593
+9|alignment_status: ALIGNED
+10|docs_only_drift: false
+11|alembic: 130_real_canary_candidate_designation
+12|CI_tip: SUCCESS 31182456339
+13|unit_tests: 5/5
+14|fe_guard: ok
+15|auth_E2E: 26/26
+16|designation_count_final: 0
+17|designation_status_final: NOT_DESIGNATED
+18|designation_gate_ready_final: false
+19|technical_gate_ONE_CANDIDATE_CANARY_READY: true
+20|canary_state: READY_INACTIVE
+21|canary_active: false
+22|activation_command: PREPARED_NOT_EXECUTED
+23|effective_canary_cap: 0
+24|real_invites_created: 0
+25|real_candidates_bound: 0
+26|public_signup: OFF
+27|public_enrollment: OFF
+28|launch: NO-GO
+29|pp1: ON_READ_ONLY_SYNTHETIC
+30|phase_3b: BLOCKED
+31|phase_3_agent: NOT_STARTED
+32|epic_215: NOT_STARTED
+33|epic_30: NOT_STARTED
+34|real_person_designated_this_run: false
+35|invite_sent: false
+36|activation_executed: false
+37|founder_action: Open /admin/canary, enter exactly one real candidate delivery identity in Real canary candidate designation, and save the designation.
+38|next: rerun Canary Run 1
+39|evidence_dir: reports/canary-designation-control-2026-08-07/
+40|pii_in_report: false
+41|branch: cursor/phase1-monorepo-scaffold
+42|pr_to_main: none
+43|force_push: false
+44|schema: twin.real_canary_candidate_designation/v1
+45|gate_name: REAL_CANARY_CANDIDATE_DESIGNATED_READY
+46|admin_path: /admin/canary
+47|report_complete: true
