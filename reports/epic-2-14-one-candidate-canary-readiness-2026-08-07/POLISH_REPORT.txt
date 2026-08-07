@@ -3,7 +3,7 @@ Epic 2.14 COMPLETE (Verdict A). Private one-candidate canary readiness: control 
 2|Canonical Baseline
 Epic 2.13 tip 6835aafc / product d5cb7918 / FE=API=worker ALIGNED / Alembic 128 / CI 31163739456 / auth 20/20+6/6 / inventory 72/72 / PP1 ON / signup+enrollment OFF / pilot INACTIVE / caps 0 / Launch NO-GO / Phase 3B BLOCKED / Phase 3 Agent NOT_STARTED — zweryfikowane niezależnie na starcie.
 3|Canonical Final State
-tip 2d91bc8592b866e89abf569fae76d0e1d0753d85 (docs evidence); product close 2393311bbfa60d2e6b13007995363449f295b6f7; FE=API=worker ALIGNED at product; Alembic 129 head; schema twin.private_one_candidate_canary/v1 + twin.first_value_ladder/v1; PP1 ON_READ_ONLY_SYNTHETIC; PILOT_ACCESS=OPERATIONALLY_READY_INACTIVE; canary state READY_INACTIVE; gate_ready true; activation PREPARED_NOT_EXECUTED.
+tip 4614dcf1b6025c0f3061d62757470695f59007b2 (docs evidence); product close 2393311bbfa60d2e6b13007995363449f295b6f7; FE=API=worker ALIGNED at product; Alembic 129 head; schema twin.private_one_candidate_canary/v1 + twin.first_value_ladder/v1; PP1 ON_READ_ONLY_SYNTHETIC; PILOT_ACCESS=OPERATIONALLY_READY_INACTIVE; canary state READY_INACTIVE; gate_ready true; activation PREPARED_NOT_EXECUTED.
 4|Verdict
 ONE-CANDIDATE CANARY READY - GUIDED FIRST-VALUE JOURNEY, REAL-USE EVIDENCE INSTRUMENTATION AND PRIVATE ACTIVATION CONTROLS PRODUCTION-READY
 5|Product Value Delivered
@@ -169,7 +169,7 @@ Guided resume + recovery_opened friction + pause/resume canary control.
 85|Nav Inventory No Regress
 Primary IA 7; Epic 2.13 search secondary retained.
 86|Docs Only Drift
-true (tip 2d91bc85 docs evidence; prod ALIGNED at product 2393311b).
+true (tip 4614dcf1 docs evidence; prod ALIGNED at product 2393311b).
 87|Worker Service
 enthusiastic-encouragement ALIGNED at tip.
 88|API Service
@@ -207,9 +207,9 @@ Final Answers
 1|exact_verdict: ONE-CANDIDATE CANARY READY - GUIDED FIRST-VALUE JOURNEY, REAL-USE EVIDENCE INSTRUMENTATION AND PRIVATE ACTIVATION CONTROLS PRODUCTION-READY
 2|epic_214_status: COMPLETE
 3|verdict_letter: A
-4|repo_head: 2d91bc8592b866e89abf569fae76d0e1d0753d85
+4|repo_head: 4614dcf1b6025c0f3061d62757470695f59007b2
 5|product_SHA: 2393311bbfa60d2e6b13007995363449f295b6f7
-6|tip_SHA: 2d91bc8592b866e89abf569fae76d0e1d0753d85
+6|tip_SHA: 4614dcf1b6025c0f3061d62757470695f59007b2
 7|FE_SHA: 2393311bbfa60d2e6b13007995363449f295b6f7
 8|API_SHA: 2393311bbfa60d2e6b13007995363449f295b6f7
 9|worker_SHA: 2393311bbfa60d2e6b13007995363449f295b6f7
