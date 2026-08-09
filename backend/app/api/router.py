@@ -15,6 +15,7 @@ from app.api import (
     candidate_career_pack,
     career_pack_share_public,
     candidate_journey_continuity,
+    candidate_access_inventory,
     unified_workspace_search,
     career_evidence,
     application_studio,
@@ -268,6 +269,11 @@ api_router.include_router(
     candidate_journey_continuity.router,
     prefix="/candidates",
     tags=["Candidate Journey Continuity"],
+)
+api_router.include_router(
+    candidate_access_inventory.router,
+    prefix="/candidates",
+    tags=["Candidate Access Inventory"],
 )
 api_router.include_router(
     unified_workspace_search.router,

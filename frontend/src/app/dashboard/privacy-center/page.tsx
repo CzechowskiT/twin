@@ -79,6 +79,9 @@ export default function PrivacyCenterPage() {
         ) : null}
         <Card>
           <div className="mb-4 flex flex-wrap gap-3 text-sm">
+            <a href="/dashboard/settings/access" className="underline" data-access-center-link>
+              {t("accessCenter.nav")}
+            </a>
             <a href="/dashboard/data-trust" className="underline">
               {t("dataTrust.nav")}
             </a>
