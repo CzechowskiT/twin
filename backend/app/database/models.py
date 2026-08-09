@@ -7715,3 +7715,58 @@ class CandidateCareerPackShareGrant(Base):
     claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
     kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
     first_value_satisfied: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
+class CandidateAuthSession(Base):
+    """Epic 2.22 — server-validated revocable account session (no IP/UA/fingerprint)."""
+
+    __tablename__ = "candidate_auth_sessions"
+    __table_args__ = (
+        UniqueConstraint("session_key", name="uq_candidate_auth_session_key"),
+        UniqueConstraint("user_id", "family_key", name="uq_candidate_auth_user_family"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    session_key: Mapped[str] = mapped_column(String(64))
+    family_key: Mapped[str] = mapped_column(String(64), index=True)
+    epoch: Mapped[int] = mapped_column(Integer, default=1)
+    state: Mapped[str] = mapped_column(String(32), default="ACTIVE", index=True)
+    schema_version: Mapped[str] = mapped_column(
+        String(64), default="twin.candidate_auth_session/v1"
+    )
+    label: Mapped[str] = mapped_column(String(64), default="session")
+    expires_at: Mapped[datetime] = mapped_column(DateTime)
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    revoke_reason: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    first_value_satisfied: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
+class CandidateRefreshTokenFamily(Base):
+    """Epic 2.22 — one-time refresh rotation; family-scoped reuse containment."""
+
+    __tablename__ = "candidate_refresh_token_families"
+    __table_args__ = (UniqueConstraint("family_key", name="uq_candidate_refresh_family_key"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    session_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_auth_sessions.id", ondelete="CASCADE"), index=True
+    )
+    family_key: Mapped[str] = mapped_column(String(64))
+    generation: Mapped[int] = mapped_column(Integer, default=1)
+    current_digest: Mapped[str] = mapped_column(String(128))
+    previous_digest: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    state: Mapped[str] = mapped_column(String(32), default="ACTIVE", index=True)
+    schema_version: Mapped[str] = mapped_column(
+        String(64), default="twin.candidate_refresh_token_family/v1"
+    )
+    expires_at: Mapped[datetime] = mapped_column(DateTime)
+    rotated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    reuse_detected_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)

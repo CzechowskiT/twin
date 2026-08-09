@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
@@ -40,13 +40,17 @@ def access_catalog(response: Response, user: User = Depends(get_current_user)) -
 
 @router.get("/me/access-inventory")
 def get_access_inventory(
+    request: Request,
     response: Response,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> dict:
     _no_store(response)
     cand = _candidate(db, user)
-    return cai.build_inventory(db, user=user, candidate_id=cand.id)
+    sid = getattr(request.state, "session_key", None)
+    return cai.build_inventory(
+        db, user=user, candidate_id=cand.id, current_session_key=sid
+    )
 
 
 @router.post("/me/access-inventory/revoke")

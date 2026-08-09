@@ -58,6 +58,13 @@ class Settings(BaseSettings):
         return value
     secret_key: str = _DEV_SECRET_KEY
     access_token_expire_minutes: int = 60 * 24 * 7
+    # Epic 2.22 — managed session flags (dual-verify; legacy accepted until original exp)
+    auth_managed_session_mint: bool = True
+    auth_managed_session_verify: bool = True
+    auth_managed_session_enforce: bool = True
+    auth_refresh_rotation: bool = True
+    auth_refresh_reuse_detection: bool = True
+    auth_legacy_token_acceptance: bool = True
     # 0 = disabled (local only). Production should keep a positive cap to slow credential stuffing.
     auth_login_rate_limit_per_minute: int = 30
     # Separate bucket for POST /auth/forgot-password (abuse / enumeration). 0 = disabled.

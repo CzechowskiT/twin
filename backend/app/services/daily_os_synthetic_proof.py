@@ -9,8 +9,9 @@ from datetime import datetime, timezone
 
 from sqlalchemy.orm import Session
 
-from app.core.security import create_access_token, hash_password
+from app.core.security import hash_password
 from app.database.models import Candidate, CandidateCareerCompass, User
+from app.services import candidate_auth_session as cas
 
 SYNTH_EMAIL = "daily-os-synth+kpi@twin.internal"
 SYNTH_NAME = "Daily OS Synthetic Proof"
@@ -88,13 +89,23 @@ def mint_synthetic_daily_os_session(db: Session, *, expires_minutes: int = 45) -
         life.get_or_create_context(db, candidate_id=cand.id, is_synthetic=True)
     except Exception:
         pass
-    token = create_access_token(user.email, expires_minutes=expires_minutes)
+
+    issued = cas.issue_session(
+        db,
+        user=user,
+        expires_minutes=expires_minutes,
+        kpi_excluded=True,
+        label="synthetic",
+    )
     return {
         "ok": True,
         "email": user.email,
         "candidate_id": cand.id,
         "user_id": user.id,
-        "access_token": token,
+        "access_token": issued["access_token"],
+        "refresh_token": issued.get("refresh_token"),
+        "session_key": issued.get("session_key"),
+        "managed": bool(issued.get("managed")),
         "expires_minutes": expires_minutes,
         "kpi_excluded": True,
         "synthetic": True,

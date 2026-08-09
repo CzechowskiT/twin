@@ -103,6 +103,12 @@ def test_inventory_auth_and_share_revoke():
     assert inv["schema_id"] == SCHEMA_ID
     assert inv["new_access_grant_store"] == NEW_ACCESS_GRANT_STORE
     assert inv["derived_only"] is True
+    from app.database.models import CandidateAuthSession, CandidateRefreshTokenFamily
+
+    bind = db.get_bind()
+    CandidateAuthSession.__table__.create(bind=bind, checkfirst=True)
+    CandidateRefreshTokenFamily.__table__.create(bind=bind, checkfirst=True)
+    inv = cai.build_inventory(db, user=u, candidate_id=c.id)
     kinds = {i["kind"] for i in inv["items"]}
     assert "AUTH_SESSION" in kinds
     assert "CAREER_PACK_SHARE" in kinds
@@ -132,10 +138,18 @@ def test_inventory_auth_and_share_revoke():
     )
 
 
-def test_auth_session_not_server_revocable():
+def test_auth_session_legacy_meta_not_server_revocable():
+    """Without managed rows, inventory shows legacy meta (revocable=False)."""
     db, u, c = _db()
+    # Ensure session tables exist for adapter
+    from app.database.models import CandidateAuthSession, CandidateRefreshTokenFamily
+
+    bind = db.get_bind()
+    CandidateAuthSession.__table__.create(bind=bind, checkfirst=True)
+    CandidateRefreshTokenFamily.__table__.create(bind=bind, checkfirst=True)
     inv = cai.build_inventory(db, user=u, candidate_id=c.id)
     auth = next(i for i in inv["items"] if i["kind"] == "AUTH_SESSION")
+    assert auth["revocable"] is False
     with pytest.raises(ValueError, match="not_revocable"):
         cai.revoke_access(
             db,

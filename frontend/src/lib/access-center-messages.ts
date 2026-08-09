@@ -24,6 +24,10 @@ export const ACCESS_CENTER_MESSAGES_EN = {
   revoked: "Revoked.",
   revisionStale: "This item changed — reload and try again.",
   notRevocable: "This item cannot be revoked from here (sign out on this device).",
+  recoveryLead: "Account recovery uses existing password reset / IdP flows — TWIN does not add a new identity provider.",
+  recoveryLink: "Reset password",
+  signOutEverywhere: "Sign out everywhere",
+  sessionsNote: "Sessions show Current vs Other only — no device, IP, location, or activity scores.",
 };
 
 export const ACCESS_CENTER_MESSAGES_PL = {
@@ -50,4 +54,10 @@ export const ACCESS_CENTER_MESSAGES_PL = {
   revoked: "Cofnięto.",
   revisionStale: "Element się zmienił — odśwież i spróbuj ponownie.",
   notRevocable: "Tego elementu nie cofniesz stąd (wyloguj się na tym urządzeniu).",
+  recoveryLead:
+    "Odzyskiwanie konta korzysta z istniejącego resetu hasła / IdP — TWIN nie dodaje nowego dostawcy tożsamości.",
+  recoveryLink: "Zresetuj hasło",
+  signOutEverywhere: "Wyloguj wszędzie",
+  sessionsNote:
+    "Sesje pokazują tylko Bieżąca vs Inna — bez urządzenia, IP, lokalizacji ani scorów aktywności.",
 };

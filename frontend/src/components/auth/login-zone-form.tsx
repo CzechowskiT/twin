@@ -24,7 +24,7 @@ import { postLoginPath, REGISTER_PATH } from "@/lib/persona-auth";
 import { hasConfiguredOAuthProvider } from "@/lib/oauth-auth";
 import { useOAuthProviderStatus } from "@/lib/use-oauth-provider-status";
 
-type TokenResponse = { access_token: string };
+type TokenResponse = { access_token: string; refresh_token?: string | null };
 
 const ZONE_TITLE: Record<LoginZone, TranslationKey> = {
   candidate: "login.zoneCandidateTitle",
@@ -125,7 +125,7 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
         setError(t("login.malformedResponse"));
         return;
       }
-      setToken(accessToken);
+      setToken(accessToken, payload.refresh_token || null);
       setSessionPersona(zone);
       setPersona(zone);
       router.push(nextPath);

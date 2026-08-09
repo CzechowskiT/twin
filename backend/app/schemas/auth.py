@@ -67,6 +67,17 @@ class VerifyEmailRequest(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
+    refresh_token: str | None = None
+    session_key: str | None = None
+    managed: bool = False
+
+
+class RefreshIn(BaseModel):
+    refresh_token: str = Field(min_length=16, max_length=512)
+
+
+class LogoutIn(BaseModel):
+    everywhere: bool = False
 
 
 class GdprConsentIn(BaseModel):
@@ -182,4 +193,7 @@ class UserRegisteredOut(UserOut):
     """Password registration response: profile plus bearer token (avoids a second login request)."""
 
     access_token: str
+    refresh_token: str | None = None
+    session_key: str | None = None
+    managed: bool = False
     token_type: str = "bearer"

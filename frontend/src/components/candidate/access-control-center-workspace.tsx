@@ -7,7 +7,7 @@ import { useTranslation } from "@/components/language-provider";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
-import { getToken } from "@/lib/auth";
+import { getToken, logoutSession } from "@/lib/auth";
 import { WorkspaceHandoffBanner } from "@/components/candidate/workspace-handoff-banner";
 
 type AccessItem = {
@@ -126,6 +126,24 @@ export function AccessControlCenterWorkspace() {
           <p className="mt-1 text-xs text-[var(--twin-muted)]">{t("accessCenter.noTracking")}</p>
           <p className="text-xs text-[var(--twin-muted)]">{t("accessCenter.noSecrets")}</p>
           <p className="text-xs text-[var(--twin-muted)]">{t("accessCenter.notFirstValue")}</p>
+          <p className="mt-2 text-xs text-[var(--twin-muted)]">{t("accessCenter.sessionsNote")}</p>
+          <p className="mt-2 text-sm text-[var(--twin-muted)]">{t("accessCenter.recoveryLead")}</p>
+          <Link href="/forgot-password" className="text-sm underline">
+            {t("accessCenter.recoveryLink")}
+          </Link>
+          <div className="mt-3">
+            <Button
+              type="button"
+              data-auth-sign-out-everywhere
+              onClick={() => {
+                void logoutSession({ everywhere: true }).then(() => {
+                  router.replace("/login");
+                });
+              }}
+            >
+              {t("accessCenter.signOutEverywhere")}
+            </Button>
+          </div>
         </div>
         <WorkspaceHandoffBanner expectedDestRouteKey="access_center" />
         {err ? (

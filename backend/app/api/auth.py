@@ -19,7 +19,8 @@ from app.core.scrape_ops import (
     user_can_trigger_scrape,
     user_has_scrape_ops,
 )
-from app.core.security import create_access_token, hash_password, verify_password
+from app.core.security import hash_password, verify_password
+from app.services import candidate_auth_session as cas
 from app.database.models import User
 from app.database.session import get_db
 from app.limiter import limiter
@@ -28,8 +29,10 @@ from app.schemas.auth import (
     ChangePasswordRequest,
     ForgotPasswordRequest,
     GdprConsentIn,
+    LogoutIn,
     NotificationPreferencesIn,
     OnboardingProgressIn,
+    RefreshIn,
     ResetPasswordRequest,
     VerifyEmailRequest,
     Token,
@@ -335,9 +338,15 @@ def register(request: Request, body: UserRegister, db: Session = Depends(get_db)
         issue_verification_email(db, get_settings(), user)
     except Exception:
         pass
-    token = create_access_token(user.email)
+    issued = cas.issue_session(db, user=user, kpi_excluded=bool(getattr(user, "exclude_from_product_metrics", False)))
     out = UserOut.from_user(user)
-    return UserRegisteredOut(**out.model_dump(), access_token=token)
+    return UserRegisteredOut(
+        **out.model_dump(),
+        access_token=issued["access_token"],
+        refresh_token=issued.get("refresh_token"),
+        session_key=issued.get("session_key"),
+        managed=bool(issued.get("managed")),
+    )
 
 
 @router.post("/login", response_model=Token)
@@ -354,6 +363,61 @@ def login(
 @limiter.limit("5/minute")
 def login_json(request: Request, body: UserLogin, db: Session = Depends(get_db)) -> Token:
     return _authenticate(body.email, body.password, db)
+
+
+@router.get("/session/catalog")
+def session_catalog() -> dict:
+    return cas.catalog()
+
+
+@router.post("/refresh", response_model=Token)
+@limiter.limit("30/minute")
+def refresh_token(request: Request, body: RefreshIn, db: Session = Depends(get_db)) -> Token:
+    try:
+        issued = cas.rotate_refresh(db, refresh_token=body.refresh_token.strip())
+    except LookupError:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="invalid_refresh") from None
+    except ValueError as exc:
+        detail = str(exc)
+        code = (
+            status.HTTP_401_UNAUTHORIZED
+            if detail in {"family_reuse_suspected", "family_revoked", "session_revoked", "refresh_expired"}
+            else status.HTTP_400_BAD_REQUEST
+        )
+        raise HTTPException(code, detail=detail) from None
+    return Token(
+        access_token=issued["access_token"],
+        refresh_token=issued.get("refresh_token"),
+        session_key=issued.get("session_key"),
+        managed=bool(issued.get("managed")),
+    )
+
+
+@router.post("/logout")
+def logout(
+    body: LogoutIn,
+    request: Request,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    sid = getattr(request.state, "session_key", None)
+    if body.everywhere:
+        return cas.revoke_everywhere(db, user_id=user.id)
+    if sid:
+        return cas.revoke_session(db, user_id=user.id, session_key=sid, reason="logout")
+    return {"revoked": False, "legacy_local_only": True}
+
+
+@router.post("/sessions/revoke-others")
+def revoke_other_sessions(
+    request: Request,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    sid = getattr(request.state, "session_key", None)
+    if not sid:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="managed_session_required")
+    return cas.revoke_all_other(db, user_id=user.id, keep_session_key=sid)
 
 
 @router.post("/forgot-password")
@@ -445,8 +509,17 @@ def _authenticate(email: str, password: str, db: Session) -> Token:
             pass
     except Exception:
         pass
-    token = create_access_token(user.email)
-    return Token(access_token=token)
+    issued = cas.issue_session(
+        db,
+        user=user,
+        kpi_excluded=bool(getattr(user, "exclude_from_product_metrics", False)),
+    )
+    return Token(
+        access_token=issued["access_token"],
+        refresh_token=issued.get("refresh_token"),
+        session_key=issued.get("session_key"),
+        managed=bool(issued.get("managed")),
+    )
 
 
 @router.get("/me", response_model=UserOut)
@@ -709,8 +782,14 @@ def linkedin_callback(
     if not user.is_active:
         return RedirectResponse(_frontend_callback_url(error="inactive"))
 
-    token = create_access_token(user.email)
-    params: dict[str, str] = {"token": token}
+    issued = cas.issue_session(
+        db,
+        user=user,
+        kpi_excluded=bool(getattr(user, "exclude_from_product_metrics", False)),
+    )
+    params: dict[str, str] = {"token": issued["access_token"]}
+    if issued.get("refresh_token"):
+        params["rt"] = str(issued["refresh_token"])
     if profile_created:
         params["next"] = "/profile"
         params["linkedin"] = "1"
@@ -756,8 +835,14 @@ async def web_oauth_callback(
     if not user.is_active:
         return RedirectResponse(_frontend_callback_url(error="inactive"), status_code=302)
 
-    token = create_access_token(user.email)
-    params: dict[str, str] = {"token": token}
+    issued = cas.issue_session(
+        db,
+        user=user,
+        kpi_excluded=bool(getattr(user, "exclude_from_product_metrics", False)),
+    )
+    params: dict[str, str] = {"token": issued["access_token"]}
+    if issued.get("refresh_token"):
+        params["rt"] = str(issued["refresh_token"])
     if profile_created:
         params["next"] = "/profile"
         params["oauth"] = "1"

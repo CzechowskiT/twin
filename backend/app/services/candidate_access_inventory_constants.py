@@ -12,7 +12,9 @@ FIRST_VALUE_CONTRACT = "pilot_first_value_v1"
 
 NEW_ACCESS_GRANT_STORE = "NONE"
 PARALLEL_TOKEN_STORE = "NONE"
+# Epic 2.22 — canonical authority is twin.candidate_auth_session (not a parallel store)
 PARALLEL_AUTH_SESSION_STORE = "NONE"
+CANONICAL_SESSION_AUTHORITY = "twin.candidate_auth_session"
 PARALLEL_CONSENT_STORE = "NONE"
 PARALLEL_SHARE_STORE = "NONE"
 PARALLEL_AUDIT_TIMELINE_STORE = "NONE"

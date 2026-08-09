@@ -1,6 +1,7 @@
 import { clearSessionPersona } from "@/lib/session-persona";
 
 const TOKEN_KEY = "twin_access_token";
+const REFRESH_KEY = "twin_refresh_token";
 
 /** Browser-agnostic token storage with localStorage → sessionStorage fallback. */
 function getStorage(): Storage | null {
@@ -28,11 +29,22 @@ export function getToken(): string | null {
   }
 }
 
-export function setToken(token: string): void {
+export function getRefreshToken(): string | null {
+  const store = getStorage();
+  if (!store) return null;
+  try {
+    return store.getItem(REFRESH_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function setToken(token: string, refreshToken?: string | null): void {
   const store = getStorage();
   if (!store) return;
   try {
     store.setItem(TOKEN_KEY, token);
+    if (refreshToken) store.setItem(REFRESH_KEY, refreshToken);
   } catch {
     /* private mode / blocked storage */
   }
@@ -43,10 +55,32 @@ export function clearToken(): void {
   if (!store) return;
   try {
     store.removeItem(TOKEN_KEY);
+    store.removeItem(REFRESH_KEY);
   } catch {
     /* ignore */
   }
   clearSessionPersona();
+}
+
+/** Server logout (current or everywhere) then clear local tokens. */
+export async function logoutSession(opts?: { everywhere?: boolean }): Promise<void> {
+  const token = getToken();
+  if (token) {
+    try {
+      const { apiFetch } = await import("@/lib/api");
+      await apiFetch(
+        "/api/v1/auth/logout",
+        {
+          method: "POST",
+          body: JSON.stringify({ everywhere: Boolean(opts?.everywhere) }),
+        },
+        token,
+      );
+    } catch {
+      /* still clear local */
+    }
+  }
+  clearToken();
 }
 
 export function isStorageAvailable(): boolean {

@@ -18,7 +18,10 @@ import { useOAuthProviderStatus } from "@/lib/use-oauth-provider-status";
 import type { LoginZone } from "@/lib/persona-auth";
 import { LOGIN_PATH, postRegisterPath } from "@/lib/persona-auth";
 
-type RegisterSuccessResponse = { access_token: string };
+type RegisterSuccessResponse = {
+  access_token: string;
+  refresh_token?: string | null;
+};
 
 type SessionPhase = "boot" | "anon" | "gone";
 
@@ -188,7 +191,7 @@ export function RegisterZoneForm({ zone }: { zone: LoginZone }) {
         },
         null,
       );
-      setToken(registered.access_token);
+      setToken(registered.access_token, registered.refresh_token || null);
       setSessionPersona(zone);
       setPersona(zone);
       router.push(safeNext);

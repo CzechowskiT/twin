@@ -29,6 +29,7 @@ from app.services.calendar_oauth_credentials import get_best_google_row
 from app.services.candidate_access_inventory_constants import (
     ACCESS_ANALYTICS,
     ACCESS_KINDS,
+    CANONICAL_SESSION_AUTHORITY,
     CONTRACT_ID,
     EIGHTH_PRIMARY_NAV,
     EXCLUDED_DOMAINS,
@@ -65,6 +66,7 @@ def catalog() -> dict[str, Any]:
         "new_access_grant_store": NEW_ACCESS_GRANT_STORE,
         "parallel_token_store": PARALLEL_TOKEN_STORE,
         "parallel_auth_session_store": PARALLEL_AUTH_SESSION_STORE,
+        "canonical_session_authority": CANONICAL_SESSION_AUTHORITY,
         "parallel_consent_store": PARALLEL_CONSENT_STORE,
         "parallel_share_store": PARALLEL_SHARE_STORE,
         "parallel_audit_timeline_store": PARALLEL_AUDIT_TIMELINE_STORE,
@@ -114,27 +116,45 @@ def _item(
     }
 
 
-def _auth_session_items(user: User) -> list[dict[str, Any]]:
-    # Stateless JWT — inventory shows current session meta only; no server revoke-all.
-    rev = f"user:{user.id}:auth:v1"
-    return [
-        _item(
-            kind="AUTH_SESSION",
-            access_key=f"auth_session:current:{user.id}",
-            title="Current signed-in session",
-            scope="JWT access to your TWIN account on this device",
-            state="ACTIVE",
-            owner_module="auth.jwt",
-            revocable=False,
-            revision=rev,
-            consequence=(
-                "Sign out on this device clears the local token. "
-                "TWIN has no server-side session list to revoke other devices."
-            ),
-            provider="twin",
-            source_ref={"user_id": user.id, "server_session_store": False},
+def _auth_session_items(
+    db: Session, user: User, *, current_session_key: str | None
+) -> list[dict[str, Any]]:
+    """Epic 2.22 — derived from canonical managed sessions (Current / Other)."""
+    from app.services import candidate_auth_session as cas
+
+    sessions = cas.list_sessions_for_inventory(
+        db, user=user, current_session_key=current_session_key
+    )
+    out: list[dict[str, Any]] = []
+    for s in sessions:
+        key = f"auth_session:{s['session_key']}"
+        revocable = bool(s.get("revocable"))
+        out.append(
+            _item(
+                kind="AUTH_SESSION",
+                access_key=key,
+                title=str(s.get("label") or "Session"),
+                scope="Account session (no device/IP/location shown)",
+                state=str(s.get("state") or "ACTIVE"),
+                owner_module="auth.managed_session",
+                revocable=revocable,
+                revision=str(s.get("revision") or key),
+                expires_at=s.get("expires_at"),
+                consequence=(
+                    "Revoke ends this session server-side. "
+                    "Current logout clears this device; Other sessions can be revoked here."
+                    if revocable
+                    else "Legacy JWT — sign out locally; server list unavailable for this token."
+                ),
+                provider="twin",
+                source_ref={
+                    "session_key": s.get("session_key"),
+                    "is_current": bool(s.get("is_current")),
+                    "canonical_session_authority": "twin.candidate_auth_session",
+                },
+            )
         )
-    ]
+    return out
 
 
 def _oauth_items(db: Session, *, user: User) -> list[dict[str, Any]]:
@@ -364,12 +384,21 @@ def _privacy_export_items(db: Session, *, candidate_id: int) -> list[dict[str, A
     return out
 
 
-def build_inventory(db: Session, *, user: User, candidate_id: int) -> dict[str, Any]:
+def build_inventory(
+    db: Session,
+    *,
+    user: User,
+    candidate_id: int,
+    current_session_key: str | None = None,
+) -> dict[str, Any]:
     """Request-time derived inventory — never writes a grant aggregate."""
     items: list[dict[str, Any]] = []
     unavailable: list[str] = []
     adapters = [
-        ("AUTH_SESSION", lambda: _auth_session_items(user)),
+        (
+            "AUTH_SESSION",
+            lambda: _auth_session_items(db, user, current_session_key=current_session_key),
+        ),
         ("OAUTH_CONNECTION", lambda: _oauth_items(db, user=user)),
         ("CALENDAR_READ_CONSENT", lambda: _consent_items(db, candidate_id=candidate_id)),
         ("PRIVATE_CALENDAR_FEED", lambda: _feed_items(db, candidate_id=candidate_id)),
@@ -465,6 +494,13 @@ def revoke_access(
         cprs.cancel_privacy_request(
             db, candidate_id=candidate_id, request_id=int(rid), user_id=user.id
         )
+    elif kind == "AUTH_SESSION":
+        from app.services import candidate_auth_session as cas
+
+        sk = str((match.get("source_ref") or {}).get("session_key") or "")
+        if not sk or sk.startswith("legacy:"):
+            raise ValueError("not_revocable")
+        cas.revoke_session(db, user_id=user.id, session_key=sk, reason="access_center")
     else:
         raise ValueError("unsupported_kind")
 
