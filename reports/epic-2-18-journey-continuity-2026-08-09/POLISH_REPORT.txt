@@ -77,14 +77,14 @@ Final Answers
 1|exact_verdict: CANDIDATE JOURNEY CONTINUITY AND SAFE RESUME CUSTOMER-USABLE — REUSED CANONICAL PATH SESSIONS, MINIMAL SOURCE REFERENCES, REVISION-BOUND RESUME AND APPROVAL-SAFE NON-MUTATING ROUTING PRODUCTION-READY; NO BEHAVIORAL SURVEILLANCE OR CANARY MUTATION
 2|epic_218_status: COMPLETE
 3|verdict_letter: A
-4|repo_head: SEE_TIP_AFTER_DOCS
+4|repo_head: 005d51567b506e3a870bc11dff894052b5189657
 5|product_SHA: 30c21f654e29621ba28025fbfa950b207af90f42
-6|tip_SHA: SEE_TIP_AFTER_DOCS
+6|tip_SHA: 005d51567b506e3a870bc11dff894052b5189657
 7|FE_SHA: 30c21f654e29621ba28025fbfa950b207af90f42
 8|API_SHA: 30c21f654e29621ba28025fbfa950b207af90f42
 9|worker_SHA: 30c21f654e29621ba28025fbfa950b207af90f42
-10|alignment_status: ALIGNED
-11|docs_only_drift: false_at_product__true_after_docs_tip
+10|alignment_status: docs_only_drift
+11|docs_only_drift: true
 12|alembic: 134_candidate_journey_continuity (is_at_head=true)
 13|CI_tip: SUCCESS 31306483529
 14|CI_url: https://github.com/CzechowskiT/twin/actions/runs/31306483529
