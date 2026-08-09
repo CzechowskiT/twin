@@ -13,6 +13,7 @@ from app.api import (
     candidate_data_trust,
     candidate_path_readiness,
     candidate_career_pack,
+    career_pack_share_public,
     candidate_journey_continuity,
     unified_workspace_search,
     career_evidence,
@@ -258,6 +259,10 @@ api_router.include_router(
     candidate_career_pack.router,
     prefix="/candidates",
     tags=["Candidate Career Pack"],
+)
+api_router.include_router(
+    career_pack_share_public.router,
+    tags=["Career Pack Share Public"],
 )
 api_router.include_router(
     candidate_journey_continuity.router,

@@ -109,6 +109,16 @@ export function middleware(request: NextRequest) {
     return applyPreviewSecurityHeaders(response, privateCache);
   }
 
+  if (pathname.startsWith("/share/career-pack")) {
+    const response = NextResponse.next();
+    response.headers.set("Cache-Control", "private, no-store, max-age=0, must-revalidate");
+    response.headers.set("X-Robots-Tag", PREVIEW_ROBOTS);
+    response.headers.set("Referrer-Policy", "no-referrer");
+    response.headers.set("X-Content-Type-Options", "nosniff");
+    response.headers.set("X-Frame-Options", "DENY");
+    return response;
+  }
+
   // Private app surfaces must never be publicly cached.
   if (
     pathname.startsWith("/dashboard") ||

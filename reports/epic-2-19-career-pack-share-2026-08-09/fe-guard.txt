@@ -1,0 +1,5 @@
+
+> frontend@0.1.0 test:epic-219-career-pack-share-guard
+> npx --yes tsx scripts/epic-219-career-pack-share-guard.test.ts
+
+epic-219-career-pack-share-guard: ok

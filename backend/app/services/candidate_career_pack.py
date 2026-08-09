@@ -743,6 +743,25 @@ def download(
     return data, filename, media
 
 
+def _mark_pack_grants_unavailable(db: Session, *, pack_id: int) -> None:
+    """Fail-closed: revoke/delete pack immediately closes active share grants."""
+    from app.database.models import CandidateCareerPackShareGrant
+
+    now = _utcnow()
+    rows = (
+        db.query(CandidateCareerPackShareGrant)
+        .filter(
+            CandidateCareerPackShareGrant.pack_id == pack_id,
+            CandidateCareerPackShareGrant.deleted_at.is_(None),
+            CandidateCareerPackShareGrant.state == "ACTIVE",
+        )
+        .all()
+    )
+    for g in rows:
+        g.state = "PACK_UNAVAILABLE"
+        g.updated_at = now
+
+
 def revoke(db: Session, *, candidate_id: int, pack_key: str) -> dict[str, Any]:
     row = _get_pack(db, candidate_id=candidate_id, pack_key=pack_key)
     if row.state in {"DELETED", "REVOKED"}:
@@ -752,6 +771,7 @@ def revoke(db: Session, *, candidate_id: int, pack_key: str) -> dict[str, Any]:
     row.pdf_bytes = None
     row.zip_bytes = None
     row.updated_at = _utcnow()
+    _mark_pack_grants_unavailable(db, pack_id=row.id)
     _audit(
         db,
         candidate_id=candidate_id,
@@ -770,6 +790,7 @@ def delete_pack(db: Session, *, candidate_id: int, pack_key: str) -> dict[str, A
     row.pdf_bytes = None
     row.zip_bytes = None
     row.updated_at = _utcnow()
+    _mark_pack_grants_unavailable(db, pack_id=row.id)
     _audit(
         db,
         candidate_id=candidate_id,

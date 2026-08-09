@@ -30,6 +30,7 @@ type Pack = {
   state: string;
   title: string;
   preview_hash?: string | null;
+  snapshot_hash?: string | null;
   disclosure?: Record<string, boolean>;
   artifact_refs?: { artifact_kind: string; artifact_ref: string }[];
   preview?: { sections?: unknown[]; warnings?: string[] };
@@ -38,6 +39,14 @@ type Pack = {
   has_pdf?: boolean;
   has_zip?: boolean;
   first_value_satisfied?: boolean;
+};
+
+type ShareGrant = {
+  grant_key: string;
+  public_id: string;
+  permission: string;
+  state: string;
+  expires_at?: string | null;
 };
 
 export function CareerPackWorkspace() {
@@ -52,6 +61,11 @@ export function CareerPackWorkspace() {
   const [packType, setPackType] = useState("GENERAL_EVIDENCE_PORTFOLIO_PACK");
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [shares, setShares] = useState<ShareGrant[]>([]);
+  const [shareOnceUrl, setShareOnceUrl] = useState<string | null>(null);
+  const [shareConfirm, setShareConfirm] = useState(false);
+  const [sharePerm, setSharePerm] = useState("INLINE_VIEW");
+  const [shareTtl, setShareTtl] = useState(24);
 
   const load = useCallback(async () => {
     const token = getToken();
@@ -266,6 +280,87 @@ export function CareerPackWorkspace() {
     }
   }
 
+  async function loadShares() {
+    if (!active || active.state !== "READY") return;
+    const token = getToken();
+    if (!token) return;
+    try {
+      const data = await apiFetch<{ grants?: ShareGrant[] }>(
+        `/api/v1/candidates/me/career-packs/${encodeURIComponent(active.pack_key)}/shares`,
+        {},
+        token,
+      );
+      setShares(data.grants || []);
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : t("careerPack.error"));
+    }
+  }
+
+  async function createShare() {
+    if (!active || active.state !== "READY") return;
+    const token = getToken();
+    if (!token) return;
+    const hash = active.snapshot_hash || active.preview_hash;
+    if (!hash || !shareConfirm) return;
+    setBusy(true);
+    try {
+      const data = await apiFetch<{
+        share_url_once?: string;
+        grants?: ShareGrant[];
+        grant_key?: string;
+      }>(
+        `/api/v1/candidates/me/career-packs/${encodeURIComponent(active.pack_key)}/shares`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            permission: sharePerm,
+            ttl_hours: shareTtl,
+            disclosure_hash: hash,
+            confirm_disclosure: true,
+          }),
+        },
+        token,
+      );
+      setShareOnceUrl(data.share_url_once || null);
+      setShareConfirm(false);
+      await loadShares();
+      setErr(null);
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : t("careerPack.error"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function revokeShare(grantKey: string) {
+    if (!active) return;
+    const token = getToken();
+    if (!token) return;
+    setBusy(true);
+    try {
+      await apiFetch(
+        `/api/v1/candidates/me/career-packs/${encodeURIComponent(active.pack_key)}/shares/${encodeURIComponent(grantKey)}/revoke`,
+        { method: "POST", body: "{}" },
+        token,
+      );
+      setShareOnceUrl(null);
+      await loadShares();
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : t("careerPack.error"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  useEffect(() => {
+    if (active?.state === "READY") {
+      void loadShares();
+    } else {
+      setShares([]);
+      setShareOnceUrl(null);
+    }
+  }, [active?.pack_key, active?.state]);
+
   return (
     <Shell>
       <CandidateWorkspaceSubnav ariaLabel={t("careerPack.nav")} />
@@ -453,6 +548,92 @@ export function CareerPackWorkspace() {
                 {t("careerPack.delete")}
               </Button>
             </div>
+            {active.state === "READY" ? (
+              <div className="mt-6 border-t border-[var(--twin-border)] pt-4" data-career-pack-share>
+                <h3 className="font-medium">{t("careerPack.shareTitle")}</h3>
+                <p className="mt-1 text-sm text-[var(--twin-muted)]">{t("careerPack.shareLead")}</p>
+                <p className="mt-1 text-xs text-[var(--twin-muted)]">{t("careerPack.shareWarning")}</p>
+                <p className="mt-1 text-xs">{t("careerPack.shareNotFirstValue")}</p>
+                <div className="mt-3 flex flex-wrap items-end gap-2">
+                  <label className="text-sm">
+                    <span className="block text-xs">{t("careerPack.sharePermissionView")}</span>
+                    <select
+                      className="mt-1 rounded border border-[var(--twin-border)] bg-transparent px-2 py-1"
+                      value={sharePerm}
+                      onChange={(e) => setSharePerm(e.target.value)}
+                    >
+                      <option value="INLINE_VIEW">{t("careerPack.sharePermissionView")}</option>
+                      <option value="INLINE_VIEW_AND_DOWNLOAD">
+                        {t("careerPack.sharePermissionDownload")}
+                      </option>
+                    </select>
+                  </label>
+                  <label className="text-sm">
+                    <span className="block text-xs">{t("careerPack.shareTtl")}</span>
+                    <input
+                      type="number"
+                      min={1}
+                      max={72}
+                      className="mt-1 w-20 rounded border border-[var(--twin-border)] bg-transparent px-2 py-1"
+                      value={shareTtl}
+                      onChange={(e) => setShareTtl(Number(e.target.value) || 24)}
+                    />
+                  </label>
+                  <label className="inline-flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={shareConfirm}
+                      onChange={(e) => setShareConfirm(e.target.checked)}
+                    />
+                    {t("careerPack.shareConfirm")}
+                  </label>
+                  <Button
+                    type="button"
+                    disabled={busy || !shareConfirm}
+                    onClick={() => void createShare()}
+                  >
+                    {t("careerPack.shareCreate")}
+                  </Button>
+                  <Button
+                    type="button"
+                    className="border border-[var(--twin-border)] bg-transparent"
+                    disabled={busy}
+                    onClick={() => void loadShares()}
+                  >
+                    {t("careerPack.loading")}
+                  </Button>
+                </div>
+                {shareOnceUrl ? (
+                  <div className="mt-3 rounded border border-[var(--twin-border)] p-2 text-xs">
+                    <p className="font-medium">{t("careerPack.shareCopyOnce")}</p>
+                    <code className="mt-1 block break-all">{shareOnceUrl}</code>
+                  </div>
+                ) : null}
+                {(shares || []).length === 0 ? (
+                  <p className="mt-2 text-sm text-[var(--twin-muted)]">{t("careerPack.shareEmpty")}</p>
+                ) : (
+                  <ul className="mt-2 space-y-2 text-sm">
+                    {shares.map((g) => (
+                      <li key={g.grant_key} className="flex flex-wrap items-center justify-between gap-2">
+                        <span>
+                          {g.state} · {g.permission} · {g.public_id.slice(0, 8)}…
+                        </span>
+                        {g.state === "ACTIVE" ? (
+                          <Button
+                            type="button"
+                            className="border border-[var(--twin-border)] bg-transparent"
+                            disabled={busy}
+                            onClick={() => void revokeShare(g.grant_key)}
+                          >
+                            {t("careerPack.shareRevoke")}
+                          </Button>
+                        ) : null}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ) : null}
             {busy ? <p className="mt-2 text-sm">{t("careerPack.loading")}</p> : null}
           </Card>
         ) : null}

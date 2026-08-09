@@ -177,6 +177,7 @@
     "test:epic-216-path-readiness-guard": "npx --yes tsx scripts/epic-216-path-readiness-guard.test.ts",
     "test:epic-217-career-pack-guard": "npx --yes tsx scripts/epic-217-career-pack-guard.test.ts",
     "test:epic-218-journey-continuity-guard": "npx --yes tsx scripts/epic-218-journey-continuity-guard.test.ts",
+    "test:epic-219-career-pack-share-guard": "npx --yes tsx scripts/epic-219-career-pack-share-guard.test.ts",
     "test:hard-live-evidence-guard": "npx --yes tsx --test scripts/hard-live-evidence-guard.test.ts",
     "test:product-inclusion-taxonomy-guard": "npx --yes tsx --test scripts/product-inclusion-taxonomy-guard.test.ts",
     "test:production-topology-rc1-guard": "npx --yes tsx --test scripts/production-topology-rc1-guard.test.ts",

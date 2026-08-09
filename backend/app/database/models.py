@@ -7679,3 +7679,39 @@ class CandidateCareerPackAudit(Base):
     claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
     kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidateCareerPackShareGrant(Base):
+    """Epic 2.19 — private bearer share grant (no content copy, no recipient PII)."""
+
+    __tablename__ = "candidate_career_pack_share_grants"
+    __table_args__ = (
+        UniqueConstraint("public_id", name="uq_career_pack_share_public_id"),
+        UniqueConstraint("candidate_id", "grant_key", name="uq_career_pack_share_grant_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    pack_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_career_packs.id", ondelete="CASCADE"), index=True
+    )
+    grant_key: Mapped[str] = mapped_column(String(64))
+    public_id: Mapped[str] = mapped_column(String(64), index=True)
+    secret_digest: Mapped[str] = mapped_column(String(128))
+    permission: Mapped[str] = mapped_column(String(32), default="INLINE_VIEW")
+    state: Mapped[str] = mapped_column(String(32), default="ACTIVE", index=True)
+    pack_snapshot_hash: Mapped[str] = mapped_column(String(64))
+    disclosure_hash: Mapped[str] = mapped_column(String(64))
+    schema_version: Mapped[str] = mapped_column(
+        String(64), default="twin.candidate_career_pack_share_grant/v1"
+    )
+    expires_at: Mapped[datetime] = mapped_column(DateTime)
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    first_value_satisfied: Mapped[bool] = mapped_column(Boolean, default=False)

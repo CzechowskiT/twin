@@ -238,4 +238,103 @@ def delete_pack(
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="pack_not_found") from None
 
 
-# Explicitly no send/share/publish routes — fail closed if ever mounted elsewhere.
+# Epic 2.19 — private share grants (owner). TWIN never sends the link.
+from app.services import candidate_career_pack_share as cps  # noqa: E402
+from app.config import get_settings  # noqa: E402
+
+
+class ShareCreateIn(BaseModel):
+    permission: str = Field(default="INLINE_VIEW", max_length=32)
+    ttl_hours: int = Field(default=24, ge=1, le=72)
+    disclosure_hash: str = Field(min_length=16, max_length=64)
+    confirm_disclosure: bool = False
+
+
+@router.get("/me/career-packs/share/catalog")
+def share_catalog(response: Response, user: User = Depends(get_current_user)) -> dict:
+    _ = user
+    _no_store(response)
+    return cps.catalog()
+
+
+@router.get("/me/career-packs/{pack_key}/shares")
+def list_shares(
+    pack_key: str,
+    response: Response,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    _no_store(response)
+    cand = _candidate(db, user)
+    try:
+        return cps.list_grants(db, candidate_id=cand.id, pack_key=pack_key)
+    except LookupError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="pack_not_found") from None
+
+
+@router.post("/me/career-packs/{pack_key}/shares")
+def create_share(
+    pack_key: str,
+    body: ShareCreateIn,
+    response: Response,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    _no_store(response)
+    cand = _candidate(db, user)
+    settings = get_settings()
+    base = (settings.frontend_url or "https://twin-sooty.vercel.app").rstrip("/")
+    try:
+        return cps.create_grant(
+            db,
+            candidate_id=cand.id,
+            pack_key=pack_key,
+            permission=body.permission.strip().upper(),
+            ttl_hours=body.ttl_hours,
+            disclosure_hash=body.disclosure_hash.strip(),
+            confirm_disclosure=body.confirm_disclosure,
+            public_base_url=base,
+        )
+    except LookupError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="pack_not_found") from None
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from None
+
+
+@router.post("/me/career-packs/{pack_key}/shares/{grant_key}/revoke")
+def revoke_share(
+    pack_key: str,
+    grant_key: str,
+    response: Response,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    _no_store(response)
+    cand = _candidate(db, user)
+    try:
+        return cps.revoke_grant(
+            db, candidate_id=cand.id, pack_key=pack_key, grant_key=grant_key
+        )
+    except LookupError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="grant_not_found") from None
+
+
+@router.delete("/me/career-packs/{pack_key}/shares/{grant_key}")
+def delete_share(
+    pack_key: str,
+    grant_key: str,
+    response: Response,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    _no_store(response)
+    cand = _candidate(db, user)
+    try:
+        return cps.delete_grant(
+            db, candidate_id=cand.id, pack_key=pack_key, grant_key=grant_key
+        )
+    except LookupError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="grant_not_found") from None
+
+
+# Explicitly no outbound send/email routes — fail closed.
