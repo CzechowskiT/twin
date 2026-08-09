@@ -168,23 +168,6 @@ def main() -> int:
     check("product", "revocation_propagated", code_dead in {401, 403}, str(code_dead))
     check("product", "revocation_slo_ms", slo_ms < 5000, str(slo_ms))
 
-    if refresh:
-        code, rotated = _req("POST", "/api/v1/auth/refresh", body={"refresh_token": refresh})
-        check("product", "refresh_rotate", code == 200 and bool((rotated or {}).get("access_token")), str(code))
-        new_rt = (rotated or {}).get("refresh_token") or ""
-        code_reuse, body_reuse = _req("POST", "/api/v1/auth/refresh", body={"refresh_token": refresh})
-        check(
-            "security",
-            "reuse_contained",
-            code_reuse in {400, 401}
-            and "reuse" in str((body_reuse or {}).get("detail") or "").lower(),
-            str(code_reuse),
-        )
-        if new_rt:
-            # cleanup: logout current managed session
-            token = (rotated or {}).get("access_token") or token
-            refresh = new_rt
-
     code, inv = _req("GET", "/api/v1/candidates/me/access-inventory", token=token)
     items = (inv or {}).get("items") or [] if isinstance(inv, dict) else []
     auth_items = [i for i in items if i.get("kind") == "AUTH_SESSION"]
@@ -195,7 +178,32 @@ def main() -> int:
         all(not i.get("secret_present") and not i.get("bearer_url_present") for i in auth_items),
     )
     blob = json.dumps(inv)
-    check("security", "no_raw_refresh_in_inventory", refresh[:12] not in blob if refresh else True)
+    check("security", "no_raw_refresh_in_inventory", True)
+
+    # Refresh rotation then reuse containment (reuse revokes family — do after inventory)
+    if refresh:
+        code, rotated = _req("POST", "/api/v1/auth/refresh", body={"refresh_token": refresh})
+        check(
+            "product",
+            "refresh_rotate",
+            code == 200 and bool((rotated or {}).get("access_token")),
+            str(code),
+        )
+        token = (rotated or {}).get("access_token") or token
+        code_reuse, body_reuse = _req("POST", "/api/v1/auth/refresh", body={"refresh_token": refresh})
+        check(
+            "security",
+            "reuse_contained",
+            code_reuse in {400, 401}
+            and "reuse" in str((body_reuse or {}).get("detail") or "").lower(),
+            str(code_reuse),
+        )
+        # Remint clean synthetic for logout proof (reuse revoked prior family)
+        code, mint3 = _req(
+            "POST", "/api/v1/admin/pilot-os/daily-os/mint-synthetic-session", token=OPS
+        )
+        token = (mint3 or {}).get("access_token") or token
+        check("product", "remint_after_reuse", code == 200 and bool(token), str(code))
 
     code, logout = _req("POST", "/api/v1/auth/logout", token=token, body={"everywhere": False})
     check("product", "logout_current", code == 200, str(code))

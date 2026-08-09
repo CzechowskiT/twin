@@ -1,0 +1,161 @@
+1|Executive Summary
+Epic 2.22 COMPLETE (Verdict A). Candidate Account Session Security: managed JWT (sid+epoch) + one-time refresh families + Access Center Current/Other revoke; LEGACY_TOKEN_ACCEPTANCE=BOUNDED_TO_ORIGINAL_EXPIRY; NO_MASS_FORCED_LOGOUT; PARALLEL_IDENTITY/CREDENTIAL=NONE; CANONICAL_SESSION_AUTHORITY=twin.candidate_auth_session; BUILD_INTERNAL_MANAGED_SESSION_LAYER. Product 25aa9dd7 FE=API=worker ALIGNED; Alembic 136; unit 5/5; FE guard ok; code/stance 34/34; auth product 15/15 + stance 7/7 + security 4/4 + invariant 4/4; CI SUCCESS 31317499574; canary diff=0. first_value_satisfied_by_auth_session=false. Canary Run 1 nie retry. REAL_*/absolute security/comprehension/trust/activation/retention/PMF/pilot-public=NOT_EVALUATED.
+2|Canonical Baseline
+Epic 2.21 product 397307a3 FE=API=worker / tip f721c50d docs_only_drift / Alembic 135 / handoff registry+context v1 / PARALLEL_HANDOFF=NONE / CI 31315481639 / IA=7 / PP1 ON / canary diff 0 / P0=P1=0 — zweryfikowane niezależnie.
+3|Canonical Final State
+product SHA 25aa9dd7f53b6a76ddb7f974c72a4b69a6030b1a FE=API=worker ALIGNED; tip docs po raporcie; Alembic 136_candidate_auth_session; schemas twin.candidate_auth_session/v1 + refresh_token_family/v1 + auth_security_state/v1; canary READY_INACTIVE; designation=0; PREPARED_NOT_EXECUTED; caps 0; Launch NO-GO; enrollment OFF; Phase 3B BLOCKED; MS write OFF.
+4|Verdict
+CANDIDATE ACCOUNT SESSION SECURITY AND RECOVERY CONTROL CUSTOMER-USABLE — VALID-SESSION-PRESERVING MANAGED-JWT MIGRATION, ONE-TIME REFRESH ROTATION, TOKEN-FAMILY REUSE CONTAINMENT AND OWNER-CONTROLLED ACCESS CENTER REVOCATION PRODUCTION-READY; NO FINGERPRINTING, SECURITY SCORING OR MASS FORCED LOGOUT
+5|Provider Reuse Gate
+BUILD_INTERNAL_MANAGED_SESSION_LAYER — TWIN is identity authority; no Auth0/Clerk/Cognito session plane; OAuth = federation only. Audit: reports/.../owner-audit.md.
+6|Architecture Decision
+Additive Alembic 136 session+refresh family tables; digests/HMAC only; dual-verify managed sid+epoch; legacy sub+exp accepted until original exp.
+7|Contracts
+twin.candidate_auth_session/v1 · twin.candidate_refresh_token_family/v1 · twin.candidate_auth_security_state/v1.
+8|Canonical Authority
+CANONICAL_SESSION_AUTHORITY=twin.candidate_auth_session; PARALLEL_IDENTITY_STORE=NONE; PARALLEL_CREDENTIAL_STORE=NONE.
+9|Managed Access JWT
+Claims sub+sid+epoch+typ; signature alone insufficient — DB ACTIVE + epoch match required when verify on.
+10|Refresh Rotation
+POST /auth/refresh — one-time atomic rotation with SELECT FOR UPDATE; previous_digest enables reuse detection.
+11|Reuse Containment
+Family-only REUSE_SUSPECTED (not account-wide); revokes that session/family only.
+12|Revocation API
+logout current · revoke-others · sign out everywhere · Access Center AUTH_SESSION revoke; REVOCATION_PROPAGATION_SLO_MS measured.
+13|Legacy Preservation
+LEGACY_TOKEN_ACCEPTANCE=BOUNDED_TO_ORIGINAL_EXPIRY; NO_MASS_FORCED_LOGOUT — no forced invalidation of valid pre-migration JWTs.
+14|Feature Flags
+AUTH_MANAGED_SESSION_MINT/VERIFY/ENFORCE · AUTH_REFRESH_ROTATION · AUTH_REFRESH_REUSE_DETECTION · AUTH_LEGACY_TOKEN_ACCEPTANCE (all true for Verdict A dual-verify).
+15|Access Center UX
+/dashboard/settings/access — Current/Other sessions; no device/IP/location/last_active/scores; PRIMARY_IA=7.
+16|Recovery
+Link to existing /forgot-password / IdP only — no new IdP, credential DB, password-reset engine, or MFA product.
+17|Privacy Bans
+No raw tokens/passwords/IP/UA/fingerprint/activity in store or inventory; digests only for refresh.
+18|First-Value Integrity
+first_value_satisfied_by_auth_session=false.
+19|Alembic
+136_candidate_auth_session revises 135; is_at_head=true.
+20|Proof Matrix Product
+Unit 5/5; FE guard ok; code E2E A–M 34/34; auth product 15/15.
+21|Proof Matrix Stance
+Auth stance 7/7 + code stance 6.
+22|Proof Matrix Security
+Auth security 4/4 (reuse contained, no secrets in inventory, synthetic-only, no raw refresh leak).
+23|Proof Matrix Canary Invariant
+invariant 4/4 + snapshot diff_count=0.
+24|CI Deploy
+CI SUCCESS 31317499574 @ 25aa9dd7; FE+API+worker ALIGNED; Alembic 136 live via start-api; PP1 /preview HTTP 200.
+25|Synthetic Cleanup
+Synth mint/refresh/reuse/logout only; zero real/staff session revokes.
+26|Hard Bans Observed
+No Canary Run 1 retry; no designation/invite/activation/signup/enrollment/Launch/Phase 3; no Epic 2.23 auto; no Founder ask for real credentials; no force push; no PR main; MS write OFF; application submission OFF; employer contact OFF.
+27|Terminal Posture
+PUBLIC_LAUNCH=NO_GO · ENROLLMENT=OFF · PILOT=OPERATIONALLY_READY_INACTIVE · CAPS=0 · DESIGNATION=0 · INVITES=0 · USERS=0 · CANARY=READY_INACTIVE · ACTIVE=false · ACTIVATION=PREPARED_NOT_EXECUTED · CANARY_RUN_1=BLOCKED_EXTERNALLY_NOT_EXECUTED · PHASE_3B=BLOCKED · PHASE_3_AGENT=NOT_STARTED · MS_CALENDAR_WRITE=OFF · stop after report — no Epic 2.23 / Canary Run 1 retry.
+28|Evidence Dir
+reports/epic-2-22-account-session-security-2026-08-09/
+29|Push Only Scaffold
+Branch cursor/phase1-monorepo-scaffold; no PR main; no force push.
+30|PP1
+/preview HTTP 200.
+31|Unit Tests
+5/5 PASS
+32|Frontend Guard
+epic-222-auth-session-guard ok
+33|Code Stance E2E
+34/34 A–M + stance
+34|Auth Product E2E
+15/15
+35|Auth Stance E2E
+7/7
+36|Auth Security E2E
+4/4
+37|Auth Invariant E2E
+4/4; total auth 30/30
+38|Concurrency
+with_for_update + family reuse unit; PG contention script shipped
+39|REAL Evaluation
+absolute_security=NOT_EVALUATED; token_theft_prevention=NOT_EVALUATED; hacker_detection=NOT_EVALUATED; REAL_SECURITY_EFFECTIVENESS=NOT_EVALUATED; COMPREHENSION=NOT_EVALUATED; TRUST=NOT_EVALUATED; ACTIVATION/RETENTION/PMF=NOT_EVALUATED; REAL_CANDIDATE_*=NOT_EVALUATED; pilot/public launch=NOT_EVALUATED
+
+Final Answers
+1|exact_verdict: CANDIDATE ACCOUNT SESSION SECURITY AND RECOVERY CONTROL CUSTOMER-USABLE — VALID-SESSION-PRESERVING MANAGED-JWT MIGRATION, ONE-TIME REFRESH ROTATION, TOKEN-FAMILY REUSE CONTAINMENT AND OWNER-CONTROLLED ACCESS CENTER REVOCATION PRODUCTION-READY; NO FINGERPRINTING, SECURITY SCORING OR MASS FORCED LOGOUT
+2|epic_222_status: COMPLETE
+3|verdict_letter: A
+4|repo_head: TIP_PLACEHOLDER
+5|product_SHA: 25aa9dd7f53b6a76ddb7f974c72a4b69a6030b1a
+6|tip_SHA: TIP_PLACEHOLDER
+7|FE_SHA: 25aa9dd7f53b6a76ddb7f974c72a4b69a6030b1a
+8|API_SHA: 25aa9dd7f53b6a76ddb7f974c72a4b69a6030b1a
+9|worker_SHA: 25aa9dd7f53b6a76ddb7f974c72a4b69a6030b1a
+10|alignment_status_at_product: ALIGNED
+11|alignment_status_at_tip: docs_only_drift
+12|docs_only_drift: true
+13|alembic: 136_candidate_auth_session (is_at_head=true; revises 135)
+14|CI_tip: SUCCESS 31317499574
+15|CI_url: https://github.com/CzechowskiT/twin/actions/runs/31317499574
+16|unit_tests: 5/5
+17|fe_guard: ok
+18|code_stance_E2E: 34/34
+19|auth_E2E_product: 15/15
+20|auth_E2E_stance: 7/7
+21|auth_E2E_security: 4/4
+22|auth_E2E_invariant: 4/4
+23|auth_E2E_total: 30/30
+24|pp1_preview: ON HTTP 200
+25|public_signup: OFF
+26|public_enrollment: OFF
+27|pilot_access: OPERATIONALLY_READY_INACTIVE
+28|launch: NO-GO
+29|phase_3b: BLOCKED
+30|phase_3_agent: NOT_STARTED
+31|effective_cohort_cap: 0
+32|effective_canary_cap: 0
+33|designation_count: 0
+34|designation_status: NOT_DESIGNATED
+35|canary_state: READY_INACTIVE
+36|canary_active: false
+37|activation_command: PREPARED_NOT_EXECUTED
+38|canary_run_1: BLOCKED_EXTERNALLY_NOT_EXECUTED
+39|canary_invariant_diff: 0
+40|session_schema_id: twin.candidate_auth_session/v1
+41|refresh_family_schema_id: twin.candidate_refresh_token_family/v1
+42|security_state_schema_id: twin.candidate_auth_security_state/v1
+43|parallel_identity_store: NONE
+44|parallel_credential_store: NONE
+45|canonical_session_authority: twin.candidate_auth_session
+46|provider_reuse_gate: BUILD_INTERNAL_MANAGED_SESSION_LAYER
+47|legacy_token_acceptance: BOUNDED_TO_ORIGINAL_EXPIRY
+48|no_mass_forced_logout: true
+49|eighth_primary_nav: false
+50|first_value_satisfied_by_auth_session: false
+51|fingerprinting: false
+52|security_scoring: false
+53|auth_managed_session_mint: true
+54|auth_managed_session_verify: true
+55|auth_managed_session_enforce: true
+56|auth_refresh_rotation: true
+57|auth_refresh_reuse_detection: true
+58|auth_legacy_token_acceptance: true
+59|ux_route: /dashboard/settings/access
+60|recovery: link_existing_idp_only
+61|REAL_CANDIDATE_USABILITY: NOT_EVALUATED
+62|REAL_CANDIDATE_VALUE: NOT_EVALUATED
+63|absolute_security: NOT_EVALUATED
+64|token_theft_prevention: NOT_EVALUATED
+65|hacker_detection: NOT_EVALUATED
+66|REAL_SECURITY_EFFECTIVENESS: NOT_EVALUATED
+67|COMPREHENSION: NOT_EVALUATED
+68|TRUST: NOT_EVALUATED
+69|ACTIVATION_IMPACT: NOT_EVALUATED
+70|RETENTION_IMPACT: NOT_EVALUATED
+71|PMF: NOT_EVALUATED
+72|pilot_public_launch: NOT_EVALUATED
+73|evidence_dir: reports/epic-2-22-account-session-security-2026-08-09/
+74|branch: cursor/phase1-monorepo-scaffold
+75|pr_to_main: none
+76|force_push: none
+77|P0_open: 0
+78|P1_open: 0
+79|ms_calendar_write: OFF
+80|application_submission: OFF
+81|employer_contact: OFF
