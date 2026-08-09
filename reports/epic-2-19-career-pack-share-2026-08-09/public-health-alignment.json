@@ -1,0 +1,18 @@
+{
+  "frontend_commit": "bea2bdbef0fcf3dae82d19a3e7c1b0000ecfcbc3",
+  "api_commit": "bea2bdbef0fcf3dae82d19a3e7c1b0000ecfcbc3",
+  "worker_commit": "bea2bdbef0fcf3dae82d19a3e7c1b0000ecfcbc3",
+  "alignment_status": "ALIGNED",
+  "rc1_launch": "NO-GO",
+  "rc1_external_pilot_enrollment_enabled": false,
+  "rc1_pilot_access_status": "OPERATIONALLY_READY_INACTIVE",
+  "rc1_one_candidate_canary_state": "READY_INACTIVE",
+  "rc1_one_candidate_canary_active": false,
+  "rc1_canary_activation_command": "PREPARED_NOT_EXECUTED",
+  "rc1_effective_canary_cap": 0,
+  "rc1_effective_cohort_cap": 0,
+  "rc1_real_canary_designation_count": 0,
+  "rc1_phase_3b": "BLOCKED",
+  "rc1_phase_3_agent": null,
+  "pp1_preview": null
+}

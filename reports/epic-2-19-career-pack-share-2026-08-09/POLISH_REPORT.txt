@@ -1,0 +1,142 @@
+1|Executive Summary
+Epic 2.19 COMPLETE (Verdict A). Candidate-Controlled Private Career Pack Sharing: approved immutable pack → exact disclosure confirmation → expiring private bearer link (#key= fragment) → POST exchange → recipient read-only → immediate revoke. TWIN NEVER sends the link. Schema twin.candidate_career_pack_share_grant/v1; PARALLEL_CAREER_PACK_STORE=NONE; no recipient PII/access analytics/outbound. Product bea2bdbe FE=API=worker ALIGNED; Alembic 135; unit 5/5; FE guard ok; code/stance 50/50; auth product 20/20 + stance 7/7 + security 5/5 + invariant 4/4; CI SUCCESS 31309164194; canary invariant diff=0; active grants cleaned to 0. Canary Run 1 nie retry. REAL_CANDIDATE_USABILITY/VALUE=NOT_EVALUATED; RECIPIENT_INTEREST/EMPLOYER_ENGAGEMENT/ACTIVATION/RETENTION/PMF/public-launch=NOT_EVALUATED.
+2|Canonical Baseline
+Epic 2.18 product 30c21f65 FE=API=worker / tip 796fb31c docs_only_drift / Alembic 134 / twin.candidate_journey_session/v1 / PARALLEL_CHECKPOINT_STORE=NONE / CI 31306483529 / PP1 ON / IA=7 / canary diff 0 / P0=P1=0 — zweryfikowane niezależnie; repo truth wins.
+3|Canonical Final State
+product SHA bea2bdbef0fcf3dae82d19a3e7c1b0000ecfcbc3 FE=API=worker ALIGNED; tip docs_only_drift po raporcie PL; Alembic 135_candidate_career_pack_share (head live); schema twin.candidate_career_pack_share_grant/v1; PARALLEL_CAREER_PACK_STORE=NONE; canary READY_INACTIVE; designation=0; PREPARED_NOT_EXECUTED; caps 0; Launch NO-GO; enrollment OFF; invites/users 0; Phase 3B BLOCKED; Phase 3 Agent NOT_STARTED; MS Calendar write OFF.
+4|Verdict
+CANDIDATE-CONTROLLED PRIVATE CAREER PACK SHARING CUSTOMER-USABLE — EXPIRING REVOCABLE BEARER ACCESS, IMMUTABLE DISCLOSURE SCOPE AND PRIVACY-MINIMAL RECIPIENT EXPERIENCE PRODUCTION-READY; NO OUTBOUND SEND, RECIPIENT TRACKING OR CANARY MUTATION
+5|Contract Fields
+Grant: public_id, secret_digest, permission, state, pack_snapshot_hash, disclosure_hash, expires_at, grant_key, timestamps — bez content copy, bez recipient PII, bez access analytics.
+6|Grant States
+ACTIVE | EXPIRED | REVOKED | PACK_UNAVAILABLE | DELETED. Create atomic; bind immutable pack revision + disclosure hash; confirm_disclosure required.
+7|TTL And Caps
+Default TTL 24h; max 72h; never beyond pack expiry; max 5 ACTIVE grants / candidate.
+8|Permissions Language
+INLINE_VIEW (default) | INLINE_VIEW_AND_DOWNLOAD. Honest language — not DRM. Bearer-link warning + no open tracking.
+9|Secret Model
+Prefer /share/career-pack/{public_id}#key={secret}; fragment not on first GET; POST /exchange; SHA-256 digest only; ≥256-bit; compare_digest; short HttpOnly Secure cookie + session_token body + X-Twin-Share-Session; generic unavailable; rate limit; history.replaceState fragment cleanup; full link once to owner.
+10|Recipient Experience
+Read-only view; noindex meta + X-Robots-Tag; robots disallow /share/; Referrer-Policy no-referrer; strict CSP on API JSON; private/no-store; no analytics/replay; no signup CTA; no /me.
+11|Owner UX Placement
+Share create/list/revoke inside Career Pack detail (data-career-pack-share); PRIMARY_IA=7; no 8th nav.
+12|Ownership Boundaries
+2.17 owns pack content — no edit/regenerate/LLM/refresh share from newer sources. 2.18 owns continuity — no parallel checkpoint/resume store. PARALLEL_CAREER_PACK_STORE=NONE.
+13|Fail-Closed
+Revoke/expiry/privacy pause/pack delete|revoke → PACK_UNAVAILABLE or REVOKED; exchange/view fail closed; send endpoint absent (405).
+14|First-Value Integrity
+first_value_satisfied_by_share_grant=false; share ≠ pilot_first_value_v1.
+15|Telemetry Privacy
+Content-free only; kpi_excluded; OUTBOUND_SEND=false; RECIPIENT_TRACKING=false; ACCESS_ANALYTICS=false; EMAIL_SEND=false.
+16|Alembic
+135_candidate_career_pack_share revises 134_candidate_journey_continuity; table candidate_career_pack_share_grants; live head via railway ssh alembic current.
+17|Proof Matrix Product
+Unit 5/5; FE guard ok; code E2E A–L 50/50; auth product 20/20.
+18|Proof Matrix Stance
+Auth stance 7/7 (NO-GO, enrollment OFF, canary inactive, PREPARED, designation 0, caps 0).
+19|Proof Matrix Security
+Auth security 5/5 (meta no leak, bad secret generic, view without session, exchange after revoke, send absent).
+20|Proof Matrix Canary Invariant
+invariant 4/4 + snapshot before/after diff_count=0.
+21|CI Deploy
+CI SUCCESS 31309164194 @ bea2bdbe; FE+API+worker ALIGNED; Alembic 135 live; PP1 /preview HTTP 200.
+22|Synthetic Cleanup
+Synthetic grant create→revoke→delete; active grants 0; no real designation/invite/pilot user/real share grant left in final posture.
+23|Hard Bans Observed
+No Canary Run 1 retry; no designation/invite/activation/signup/enrollment/Launch/Phase 3; no Epic 2.20 auto; no outbound send; no Founder ask for real candidate/recipient/email/employer/credentials/MS/screenshots/QA; no force push; no PR main.
+24|Terminal Posture
+PUBLIC_LAUNCH=NO_GO · ENROLLMENT=OFF · PILOT=OPERATIONALLY_READY_INACTIVE · CAPS=0 · DESIGNATION=0 · INVITES=0 · USERS=0 · CANARY=READY_INACTIVE · ACTIVE=false · ACTIVATION=PREPARED_NOT_EXECUTED · CANARY_RUN_1=BLOCKED_EXTERNALLY_NOT_EXECUTED · PHASE_3B=BLOCKED · PHASE_3_AGENT=NOT_STARTED · MS_CALENDAR_WRITE=OFF · stop after report — no Epic 2.20 / Canary Run 1 retry.
+25|Evidence Dir
+reports/epic-2-19-career-pack-share-2026-08-09/
+26|Push Only Scaffold
+Branch cursor/phase1-monorepo-scaffold; no PR main; no force push.
+27|PP1
+/preview HTTP 200; share UX not on preview primary IA.
+28|Unit Tests
+5/5 PASS (create/exchange/view/revoke, disclosure confirm, max active+wipe, download gate)
+29|Frontend Guard
+epic-219-career-pack-share-guard ok
+30|Code Stance E2E
+50/50 A–L + stance
+31|Auth Product E2E
+20/20
+32|Auth Stance E2E
+7/7
+33|Auth Security E2E
+5/5
+34|Auth Invariant E2E
+4/4; total auth 36/36
+35|Regression
+Import/search/continuity/pack: 16/16 (217+218) + unit 219 green
+36|REAL Evaluation
+REAL_CANDIDATE_USABILITY/VALUE=NOT_EVALUATED; RECIPIENT_INTEREST=NOT_EVALUATED; EMPLOYER_ENGAGEMENT=NOT_EVALUATED; ACTIVATION/RETENTION_IMPACT=NOT_EVALUATED; PMF=NOT_EVALUATED; public-launch readiness=NOT_EVALUATED
+37|Secrets Hygiene
+Report never prints secrets, share URLs with keys, recipient PII, or pack content.
+
+Final Answers
+1|exact_verdict: CANDIDATE-CONTROLLED PRIVATE CAREER PACK SHARING CUSTOMER-USABLE — EXPIRING REVOCABLE BEARER ACCESS, IMMUTABLE DISCLOSURE SCOPE AND PRIVACY-MINIMAL RECIPIENT EXPERIENCE PRODUCTION-READY; NO OUTBOUND SEND, RECIPIENT TRACKING OR CANARY MUTATION
+2|epic_219_status: COMPLETE
+3|verdict_letter: A
+4|repo_head: TIP_AFTER_DOCS
+5|product_SHA: bea2bdbef0fcf3dae82d19a3e7c1b0000ecfcbc3
+6|tip_SHA: TIP_AFTER_DOCS
+7|FE_SHA: bea2bdbef0fcf3dae82d19a3e7c1b0000ecfcbc3
+8|API_SHA: bea2bdbef0fcf3dae82d19a3e7c1b0000ecfcbc3
+9|worker_SHA: bea2bdbef0fcf3dae82d19a3e7c1b0000ecfcbc3
+10|alignment_status: docs_only_drift
+11|docs_only_drift: true
+12|alembic: 135_candidate_career_pack_share (is_at_head=true)
+13|CI_tip: SUCCESS 31309164194
+14|CI_url: https://github.com/CzechowskiT/twin/actions/runs/31309164194
+15|unit_tests: 5/5
+16|fe_guard: ok
+17|code_stance_E2E: 50/50
+18|auth_E2E_product: 20/20
+19|auth_E2E_stance: 7/7
+20|auth_E2E_security: 5/5
+21|auth_E2E_invariant: 4/4
+22|auth_E2E_total: 36/36
+23|pp1_preview: ON HTTP 200
+24|public_signup: OFF
+25|public_enrollment: OFF
+26|pilot_access: OPERATIONALLY_READY_INACTIVE
+27|launch: NO-GO
+28|phase_3b: BLOCKED
+29|phase_3_agent: NOT_STARTED
+30|effective_cohort_cap: 0
+31|effective_canary_cap: 0
+32|designation_count: 0
+33|designation_status: NOT_DESIGNATED
+34|canary_state: READY_INACTIVE
+35|canary_active: false
+36|activation_command: PREPARED_NOT_EXECUTED
+37|canary_run_1: BLOCKED_EXTERNALLY_NOT_EXECUTED
+38|canary_invariant_diff: 0
+39|schema_id: twin.candidate_career_pack_share_grant/v1
+40|parallel_career_pack_store: NONE
+41|outbound_send: false
+42|recipient_tracking: false
+43|access_analytics: false
+44|email_send: false
+45|eighth_primary_nav: false
+46|first_value_by_share_grant: false
+47|max_active_grants: 5
+48|ttl_default_h: 24
+49|ttl_max_h: 72
+50|permissions: INLINE_VIEW|INLINE_VIEW_AND_DOWNLOAD
+51|active_grants_final: 0
+52|REAL_CANDIDATE_USABILITY: NOT_EVALUATED
+53|REAL_CANDIDATE_VALUE: NOT_EVALUATED
+54|RECIPIENT_INTEREST: NOT_EVALUATED
+55|EMPLOYER_ENGAGEMENT: NOT_EVALUATED
+56|ACTIVATION_IMPACT: NOT_EVALUATED
+57|RETENTION_IMPACT: NOT_EVALUATED
+58|PMF: NOT_EVALUATED
+59|public_launch_readiness: NOT_EVALUATED
+60|evidence_dir: reports/epic-2-19-career-pack-share-2026-08-09/
+61|branch: cursor/phase1-monorepo-scaffold
+62|pr_to_main: none
+63|force_push: none
+64|P0_open: 0
+65|P1_open: 0
+66|ms_calendar_write: OFF
