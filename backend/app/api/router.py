@@ -10,6 +10,7 @@ from app.api import (
     ats_completion,
     candidate_intelligence,
     candidate_owned_import,
+    candidate_data_trust,
     unified_workspace_search,
     career_evidence,
     application_studio,
@@ -239,6 +240,11 @@ api_router.include_router(
     candidate_owned_import.router,
     prefix="/candidates",
     tags=["Candidate Owned Import"],
+)
+api_router.include_router(
+    candidate_data_trust.router,
+    prefix="/candidates",
+    tags=["Candidate Data Trust"],
 )
 api_router.include_router(
     unified_workspace_search.router,

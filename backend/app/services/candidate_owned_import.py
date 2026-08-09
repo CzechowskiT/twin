@@ -467,6 +467,20 @@ def commit_approved(
     row.ciphertext_b64 = None
     db.commit()
     db.refresh(row)
+    # Epic 2.15 — post-commit reconciliation only (never staging/preview)
+    try:
+        from app.services import candidate_data_trust as cdt
+
+        cdt.spawn_post_commit_review(
+            db,
+            candidate_id=candidate_id,
+            import_batch_key=row.batch_key,
+            created=created,
+        )
+    except Exception:
+        # Import commit must remain durable even if review spawn fails
+        pass
+    db.refresh(row)
     return _public(row)
 
 

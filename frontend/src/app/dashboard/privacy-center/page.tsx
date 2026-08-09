@@ -78,6 +78,14 @@ export default function PrivacyCenterPage() {
           </p>
         ) : null}
         <Card>
+          <div className="mb-4 flex flex-wrap gap-3 text-sm">
+            <a href="/dashboard/data-trust" className="underline">
+              {t("dataTrust.nav")}
+            </a>
+            <a href="/dashboard/import" className="underline">
+              {t("importCenter.nav")}
+            </a>
+          </div>
           <dl className="grid gap-2 text-sm">
             <div>
               <dt>{t("careerLifecycle.paused")}</dt>

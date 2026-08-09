@@ -7462,3 +7462,110 @@ class CandidateImportBatch(Base):
     created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateDataTrustReview(Base):
+    """Epic 2.15 — post-commit reconciliation review (not staging)."""
+
+    __tablename__ = "candidate_data_trust_reviews"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "review_key", name="uq_data_trust_review_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    review_key: Mapped[str] = mapped_column(String(64))
+    trigger_kind: Mapped[str] = mapped_column(String(32), default="import_commit")
+    import_batch_key: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="OPEN", index=True)
+    schema_version: Mapped[str] = mapped_column(String(48), default="twin.candidate_data_trust/v1")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    commit_snapshot_json: Mapped[str] = mapped_column(Text, default="{}")
+    coverage_json: Mapped[str] = mapped_column(Text, default="{}")
+    impact_preview_json: Mapped[str] = mapped_column(Text, default="{}")
+    impact_preview_version: Mapped[int] = mapped_column(Integer, default=0)
+    lifecycle_approval_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    change_set_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    first_value_satisfied: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateDataTrustQuestion(Base):
+    __tablename__ = "candidate_data_trust_questions"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "question_key", name="uq_data_trust_question_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    review_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_data_trust_reviews.id", ondelete="CASCADE"), index=True
+    )
+    question_key: Mapped[str] = mapped_column(String(64))
+    rule_family: Mapped[str] = mapped_column(String(64))
+    domain: Mapped[str] = mapped_column(String(32))
+    status: Mapped[str] = mapped_column(String(32), default="OPEN", index=True)
+    comparison_json: Mapped[str] = mapped_column(Text, default="{}")
+    resolution_action: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    resolution_json: Mapped[str] = mapped_column(Text, default="{}")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateDataTrustChangeSet(Base):
+    __tablename__ = "candidate_data_trust_change_sets"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "change_set_key", name="uq_data_trust_cs_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    review_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_data_trust_reviews.id", ondelete="CASCADE"), index=True
+    )
+    change_set_key: Mapped[str] = mapped_column(String(64))
+    status: Mapped[str] = mapped_column(String(32), default="pending", index=True)
+    bound_review_version: Mapped[int] = mapped_column(Integer, default=1)
+    bound_preview_version: Mapped[int] = mapped_column(Integer, default=0)
+    before_json: Mapped[str] = mapped_column(Text, default="{}")
+    after_json: Mapped[str] = mapped_column(Text, default="{}")
+    impact_preview_json: Mapped[str] = mapped_column(Text, default="{}")
+    execution_json: Mapped[str] = mapped_column(Text, default="{}")
+    stale_applied_json: Mapped[str] = mapped_column(Text, default="[]")
+    lifecycle_approval_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    execution_idempotency_key: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    reverted_from_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateDataTrustAudit(Base):
+    __tablename__ = "candidate_data_trust_audits"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    entity_type: Mapped[str] = mapped_column(String(32))
+    entity_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    action: Mapped[str] = mapped_column(String(64))
+    payload_json: Mapped[str] = mapped_column(Text, default="{}")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)

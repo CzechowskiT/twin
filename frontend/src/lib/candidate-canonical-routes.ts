@@ -26,6 +26,7 @@ export const CANDIDATE_CANONICAL_ROUTES = {
   trustControls: "/dashboard/trust/controls",
   trustExportPreview: "/dashboard/trust/export-preview",
   trustCorrections: "/dashboard/trust/corrections",
+  dataTrust: "/dashboard/data-trust",
   trustIdentityVerification: "/dashboard/trust/identity-verification",
   trustPortability: "/dashboard/trust/portability",
   trustRevokeDelete: "/dashboard/trust/revoke-delete",

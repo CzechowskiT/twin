@@ -70,6 +70,10 @@ import {
   CANARY_JOURNEY_MESSAGES_PL,
 } from "./canary-journey-messages";
 import {
+  DATA_TRUST_MESSAGES_EN,
+  DATA_TRUST_MESSAGES_PL,
+} from "./data-trust-messages";
+import {
   PUBLIC_PREVIEW_MESSAGES_EN,
   PUBLIC_PREVIEW_MESSAGES_PL,
 } from "./public-preview-messages";
@@ -135,6 +139,7 @@ export type TranslationKey =
   | `importCenter.${keyof typeof IMPORT_CENTER_MESSAGES_EN}`
   | `workspaceSearch.${keyof typeof WORKSPACE_SEARCH_MESSAGES_EN}`
   | `canaryJourney.${keyof typeof CANARY_JOURNEY_MESSAGES_EN}`
+  | `dataTrust.${keyof typeof DATA_TRUST_MESSAGES_EN}`
   | `publicPreview.${keyof typeof PUBLIC_PREVIEW_MESSAGES_EN}`
   | `faq.${keyof typeof FAQ_MESSAGES_EN}`
   | `site.${keyof typeof SITE_MESSAGES_EN}`
@@ -633,6 +638,7 @@ const en = {
   importCenter: IMPORT_CENTER_MESSAGES_EN,
   workspaceSearch: WORKSPACE_SEARCH_MESSAGES_EN,
   canaryJourney: CANARY_JOURNEY_MESSAGES_EN,
+  dataTrust: DATA_TRUST_MESSAGES_EN,
   publicPreview: PUBLIC_PREVIEW_MESSAGES_EN,
   faq: FAQ_MESSAGES_EN,
   site: SITE_MESSAGES_EN,
@@ -9944,6 +9950,7 @@ const pl: MessageTree = {
   importCenter: IMPORT_CENTER_MESSAGES_PL,
   workspaceSearch: WORKSPACE_SEARCH_MESSAGES_PL,
   canaryJourney: CANARY_JOURNEY_MESSAGES_PL,
+  dataTrust: DATA_TRUST_MESSAGES_PL,
   publicPreview: PUBLIC_PREVIEW_MESSAGES_PL,
   faq: FAQ_MESSAGES_PL,
   site: SITE_MESSAGES_PL,
