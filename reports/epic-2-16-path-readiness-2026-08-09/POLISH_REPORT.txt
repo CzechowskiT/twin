@@ -1,0 +1,122 @@
+1|Executive Summary
+Epic 2.16 COMPLETE (Verdict A). Candidate-selected path readiness: pięć ścieżek, dwuosiowa gotowość (path_state + requirement status), healthy empty=STARTABLE, allowlisted non-mutating deep links do kanonicznych edytorów, Data Trust handoff=recalc bez auto-continue. Panel Home (nie 8th nav). Tip/product 1f94f2dd FE=API=worker ALIGNED; Alembic 132; unit 8/8; code/stance 41/41; auth product 21/21 + stance 7/7 + invariant 4/4; CI SUCCESS 31302628681; canary invariant diff=0. Canary Run 1 nie retry. REAL_CANDIDATE_*=NOT_EVALUATED.
+2|Canonical Baseline
+Epic 2.15 product d21ba766 / tip 771331c9 docs_only_drift / FE tip vs API product / Alembic 131 / CI 31300519946 / canary READY_INACTIVE / designation 0 / PREPARED_NOT_EXECUTED / Launch NO-GO — zweryfikowane niezależnie.
+3|Canonical Final State
+product SHA 1f94f2dd451abb47d927132675fa2e2c7150b046 FE=API=worker ALIGNED; tip evidence 96ffa16cb3eeed72c39953a1720abe20ebe7c2c6 (docs_only_drift); Alembic 132_candidate_path_readiness; schema twin.candidate_path_readiness/v1; canary READY_INACTIVE; designation_count=0; activation PREPARED_NOT_EXECUTED; caps 0; Launch NO-GO; enrollment OFF; Phase 3B BLOCKED; Phase 3 Agent NOT_STARTED.
+4|Verdict
+CANDIDATE-SELECTED PATH READINESS AND GUIDED RESOLUTION ROUTING CUSTOMER-USABLE — DETERMINISTIC REQUIRED-VERSUS-OPTIONAL PRODUCT BLOCKERS, SOURCE-LINKED EXPLANATIONS AND NON-MUTATING ROUTES TO CANONICAL EDITORS PRODUCTION-READY; CANARY CONTROL PLANE UNCHANGED
+5|Repository Reconciliation
+Brak wcześniejszej implementacji path readiness. Reuse: GFV/Daily OS/Execution Calendar surfaces, Lifecycle deep links, 2.15 Data Trust handoff, 2.13 search mutations=0, Home mount slot.
+6|Five Paths Only
+EVALUATE_ONE_OPPORTUNITY, PREPARE_ONE_APPLICATION, PREPARE_ONE_INTERVIEW, REVIEW_ONE_CAREER_DECISION, MOVE_ONE_APPROVED_DECISION_TO_EXECUTION. recommends_best_path=false.
+7|Two-Axis Readiness
+path_state STARTABLE|IN_PROGRESS|BLOCKED|COMPLETE|UNAVAILABLE; requirement status MISSING|PRESENT|STALE|OPTIONAL|SATISFIED|BLOCKING. Healthy empty=STARTABLE (nie false BLOCKED).
+8|Guided Resolution Routing
+Allowlisted deep links do matches/application-studio/interview-decision/approvals/execution-calendar/portfolio/career/data-trust/privacy-center/import (+strategy/review-center). mutates_on_click=false; clicks≠first value.
+9|Data Trust Handoff
+POST …/recalculate po powrocie z Data Trust; auto_continue=false; 2.15 sole repair ownership.
+10|Copy Safety
+Banned: ready to apply/interview, career-ready, employability, best/recommended path. assert_copy_safe + FE guard na wartościach i18n.
+11|Home GFV Panel
+PathReadinessPanel na /dashboard obok GFV/Canary; PRIMARY_IA=7; preview bez panelu.
+12|First-Value Integrity
+pilot_first_value_v1 only; first_value_satisfied_by_path_readiness=false; route-click satisfies_first_value=false.
+13|Boundaries Observed
+2.11 GFV/demo; 2.12 import; 2.13 search lexical mutations=0; 2.15 Data Trust; Daily OS/Execution Calendar ownership; canary untouched.
+14|Persistence
+Alembic 132 candidate_path_readiness_sessions (minimal metadata); no canary/invite DML.
+15|Privacy Telemetry Security
+Auth + no-store; content-free route-click; kpi_excluded; unauth 401.
+16|Canary Isolation
+before/after invariant diff_count=0; designation=0; READY_INACTIVE; PREPARED_NOT_EXECUTED; caps 0.
+17|Proof Matrix Product
+Unit 8/8; FE guard ok; code E2E A–J 41/41; auth product 21/21.
+18|Proof Matrix Stance
+Auth stance 7/7.
+19|Proof Matrix Canary Invariant
+invariant 4/4 + snapshot diff 0.
+20|CI Deploy
+CI SUCCESS 31302628681 @ 1f94f2dd; FE+API+worker ALIGNED; Alembic 132 live.
+21|Hard Bans Observed
+No Canary Run 1 retry; no designation/invite/activation/signup/enrollment/Launch/Phase 3; no Epic 2.17 auto; no best-path recommender; no scores; no 8th nav; no MS write; no Founder ask for real data.
+22|Evidence Dir
+reports/epic-2-16-path-readiness-2026-08-09/
+23|Terminal Posture
+PUBLIC_LAUNCH=NO_GO · ENROLLMENT=OFF · PILOT=OPERATIONALLY_READY_INACTIVE · CAPS=0 · DESIGNATION=0 · CANARY=READY_INACTIVE · ACTIVE=false · ACTIVATION=PREPARED_NOT_EXECUTED · CANARY_RUN_1=BLOCKED_EXTERNALLY_NOT_EXECUTED · PHASE_3B=BLOCKED · PHASE_3_AGENT=NOT_STARTED · stop after report — no Epic 2.17 / Canary Run 1 retry.
+24|Push Only Scaffold
+Branch cursor/phase1-monorepo-scaffold; no PR main; no force push.
+25|PP1
+/preview HTTP 200; PathReadinessPanel absent.
+26|Unit Tests
+8/8 PASS
+27|Frontend Guard
+epic-216-path-readiness-guard ok
+28|Code Stance E2E
+41/41
+29|Auth Product E2E
+21/21
+30|Auth Stance E2E
+7/7
+31|Auth Invariant E2E
+4/4; total auth 32/32
+32|Import Search DataTrust Regression
+19/19 (216+215+213)
+33|REAL Evaluation
+REAL_CANDIDATE_COMPREHENSION/USABILITY/VALUE/ADOPTION/RETENTION=NOT_EVALUATED
+
+Final Answers
+1|exact_verdict: CANDIDATE-SELECTED PATH READINESS AND GUIDED RESOLUTION ROUTING CUSTOMER-USABLE — DETERMINISTIC REQUIRED-VERSUS-OPTIONAL PRODUCT BLOCKERS, SOURCE-LINKED EXPLANATIONS AND NON-MUTATING ROUTES TO CANONICAL EDITORS PRODUCTION-READY; CANARY CONTROL PLANE UNCHANGED
+2|epic_216_status: COMPLETE
+3|verdict_letter: A
+4|repo_head: 96ffa16cb3eeed72c39953a1720abe20ebe7c2c6
+5|product_SHA: 1f94f2dd451abb47d927132675fa2e2c7150b046
+6|tip_SHA: 96ffa16cb3eeed72c39953a1720abe20ebe7c2c6
+7|FE_SHA: 1f94f2dd451abb47d927132675fa2e2c7150b046
+8|API_SHA: 1f94f2dd451abb47d927132675fa2e2c7150b046
+9|worker_SHA: 1f94f2dd451abb47d927132675fa2e2c7150b046
+10|alignment_status: ALIGNED
+11|docs_only_drift: true
+12|alembic: 132_candidate_path_readiness (is_at_head=true)
+13|CI_tip: SUCCESS 31302628681
+14|CI_url: https://github.com/CzechowskiT/twin/actions/runs/31302628681
+15|unit_tests: 8/8
+16|fe_guard: ok
+17|code_stance_E2E: 41/41
+18|auth_E2E_product: 21/21
+19|auth_E2E_stance: 7/7
+20|auth_E2E_invariant: 4/4
+21|auth_E2E_total: 32/32
+22|import_search_datatrust_regression: 19/19
+23|pp1_preview: ON_READ_ONLY_SYNTHETIC HTTP 200
+24|public_signup: OFF
+25|public_enrollment: OFF
+26|pilot_access: OPERATIONALLY_READY_INACTIVE
+27|launch: NO-GO
+28|phase_3b: BLOCKED
+29|phase_3_agent: NOT_STARTED
+30|effective_cohort_cap: 0
+31|effective_canary_cap: 0
+32|designation_count: 0
+33|designation_status: NOT_DESIGNATED
+34|canary_state: READY_INACTIVE
+35|canary_active: false
+36|activation_command: PREPARED_NOT_EXECUTED
+37|canary_run_1: BLOCKED_EXTERNALLY_NOT_EXECUTED
+38|canary_invariant_diff: 0
+39|schema_id: twin.candidate_path_readiness/v1
+40|path_kinds: 5
+41|recommends_best_path: false
+42|person_employability_scores: false
+43|eighth_primary_nav: false
+44|first_value_by_path_readiness: false
+45|REAL_CANDIDATE_COMPREHENSION: NOT_EVALUATED
+46|REAL_CANDIDATE_USABILITY: NOT_EVALUATED
+47|REAL_CANDIDATE_VALUE: NOT_EVALUATED
+48|REAL_CANDIDATE_ADOPTION: NOT_EVALUATED
+49|REAL_CANDIDATE_RETENTION: NOT_EVALUATED
+50|evidence_dir: reports/epic-2-16-path-readiness-2026-08-09/
+51|branch: cursor/phase1-monorepo-scaffold
+52|pr_to_main: none
+53|force_push: none
+54|next_epic_auto_start: none
