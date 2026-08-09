@@ -1,0 +1,34 @@
+PASS  stance/public_health
+PASS  stance/launch_nogo
+PASS  stance/enrollment_off
+PASS  stance/canary_inactive
+PASS  stance/activation_prepared
+PASS  stance/designation_0
+PASS  stance/caps_zero
+PASS  product/mint_synthetic — 200
+PASS  product/unauth_blocked — 401
+PASS  product/catalog_200 — 200
+PASS  product/schema
+PASS  product/five_paths
+PASS  product/no_best_path
+PASS  product/no_scores
+PASS  product/not_first_value
+PASS  product/no_eighth_nav
+PASS  product/options_200 — 200
+PASS  product/options_five — 5
+PASS  product/healthy_empty_startable
+PASS  product/options_mutations_0
+PASS  product/select_startable — 200
+PASS  product/select_not_fv
+PASS  product/evaluate_200 — 200
+PASS  product/evaluate_mutations_0
+PASS  product/click_not_fv — 200
+PASS  product/data_trust_recalc_no_auto — 200
+PASS  product/search_mutations_0 — 0
+PASS  product/clear_ok
+PASS  invariant/business_state_diff_0 — {}
+PASS  invariant/canary_ready_inactive
+PASS  invariant/designation_still_0
+PASS  invariant/activation_still_prepared
+
+product 21/21 stance 7/7 invariant 4/4

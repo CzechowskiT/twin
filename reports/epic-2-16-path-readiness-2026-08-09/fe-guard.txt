@@ -1,0 +1,5 @@
+
+> frontend@0.1.0 test:epic-216-path-readiness-guard
+> npx --yes tsx scripts/epic-216-path-readiness-guard.test.ts
+
+epic-216-path-readiness-guard: ok

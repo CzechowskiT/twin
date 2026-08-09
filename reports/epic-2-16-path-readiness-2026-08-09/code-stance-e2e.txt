@@ -1,0 +1,43 @@
+PASS  A service
+PASS  A constants
+PASS  A api
+PASS  A alembic 132
+PASS  A fe panel
+PASS  B path EVALUATE_ONE_OPPORTUNITY
+PASS  B path PREPARE_ONE_APPLICATION
+PASS  B path PREPARE_ONE_INTERVIEW
+PASS  B path REVIEW_ONE_CAREER_DECISION
+PASS  B path MOVE_ONE_APPROVED_DECISION_TO_EXECUTION
+PASS  B no best path
+PASS  C STARTABLE
+PASS  C requirement statuses
+PASS  D no employability scores
+PASS  D banned ready to apply
+PASS  D assert_copy_safe
+PASS  E mutates_on_evaluate false
+PASS  E mutations 0 in evaluate
+PASS  F data-trust link
+PASS  F approvals link
+PASS  G recalculate_after_data_trust
+PASS  G auto_continue false
+PASS  H clicks != satisfaction
+PASS  H not first value
+PASS  I primary still 7 markers
+PASS  I no path-readiness primary
+PASS  I home panel mounted
+PASS  I preview without panel
+PASS  J revises 131
+PASS  J no canary ddl
+PASS  J no invite ddl
+PASS  J schema id
+PASS  J owns data trust boundary
+PASS  J unit tests
+PASS  J fe guard
+PASS  stance launch NO-GO
+PASS  stance enrollment OFF
+PASS  stance canary inactive
+PASS  stance activation prepared
+PASS  stance designation 0
+PASS  stance canary cap 0
+
+41 passed, 0 failed
