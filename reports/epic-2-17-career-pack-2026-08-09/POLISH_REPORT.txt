@@ -1,9 +1,9 @@
 1|Executive Summary
-Epic 2.17 COMPLETE (Verdict A). Candidate-controlled Career Pack: wybór zatwierdzonych artefaktów Application Studio + Career Evidence, disclosure allowlist (sensitive default OFF, internal blocked), exact recipient-facing preview, confirm → immutable snapshot PDF+ZIP, authenticated owner-only download, expire/revoke/delete. TWIN nigdy nie wysyła/publikuje/dostarcza zewnętrznie; zero LLM rewrite. Secondary page (nie 8th primary nav). Product 42d8d724 FE=API=worker ALIGNED; tip 89de3f71 docs_only_drift; Alembic 133; unit 6/6; code/stance 46/46; auth product 25/25 + stance 7/7 + invariant 4/4; regression 19/19; CI SUCCESS 31305298325; canary invariant diff=0. Canary Run 1 nie retry. REAL_CANDIDATE_*=NOT_EVALUATED; RECIPIENT_DELIVERY=NOT_PERFORMED; RECIPIENT_OPEN_OR_VIEW=NOT_TRACKED.
+Epic 2.17 COMPLETE (Verdict A). Candidate-controlled Career Pack: wybór zatwierdzonych artefaktów Application Studio + Career Evidence, disclosure allowlist (sensitive default OFF, internal blocked), exact recipient-facing preview, confirm → immutable snapshot PDF+ZIP, authenticated owner-only download, expire/revoke/delete. TWIN nigdy nie wysyła/publikuje/dostarcza zewnętrznie; zero LLM rewrite. Secondary page (nie 8th primary nav). Product 42d8d724 FE=API=worker ALIGNED; tip docs_only_drift (see Final Answers); Alembic 133; unit 6/6; code/stance 46/46; auth product 25/25 + stance 7/7 + invariant 4/4; regression 19/19; CI SUCCESS 31305298325; canary invariant diff=0. Canary Run 1 nie retry. REAL_CANDIDATE_*=NOT_EVALUATED; RECIPIENT_DELIVERY=NOT_PERFORMED; RECIPIENT_OPEN_OR_VIEW=NOT_TRACKED.
 2|Canonical Baseline
 Epic 2.16 product 1f94f2dd / tip ~92c6b1a3 docs_only_drift / FE tip vs API=worker product / Alembic 132 / CI 31302628681 / unit 8/8 / E2E 41/41+21/21+7/7+4/4 / regression 19/19 / PP1 ON / signup+enrollment OFF / pilot INACTIVE / caps 0 / designation 0 / READY_INACTIVE / PREPARED_NOT_EXECUTED / Launch NO-GO / Phase 3 Agent NOT_STARTED — zweryfikowane niezależnie na starcie 2.17.
 3|Canonical Final State
-product SHA 42d8d7249a6080243d909526422fa5445a79fa65 FE=API=worker ALIGNED; tip c141f4d39d3c11a127f553b861008c1daf6a72c2 docs_only_drift vs product 42d8d7249a6080243d909526422fa5445a79fa65; Alembic 133_candidate_career_pack; schema twin.candidate_career_pack/v1; canary READY_INACTIVE; designation_count=0; activation PREPARED_NOT_EXECUTED; caps 0; Launch NO-GO; enrollment OFF; Phase 3B BLOCKED; Phase 3 Agent NOT_STARTED.
+product SHA 42d8d7249a6080243d909526422fa5445a79fa65 FE=API=worker ALIGNED; tip docs_only_drift (Final Answers); Alembic 133_candidate_career_pack; schema twin.candidate_career_pack/v1; canary READY_INACTIVE; designation_count=0; activation PREPARED_NOT_EXECUTED; caps 0; Launch NO-GO; enrollment OFF; Phase 3B BLOCKED; Phase 3 Agent NOT_STARTED.
 4|Verdict
 CANDIDATE-CONTROLLED PORTABILITY AND SELECTIVE DISCLOSURE PACK CUSTOMER-USABLE — FIELD-LEVEL CONSENT, EXACT RECIPIENT-FACING PREVIEW, PROVENANCE-PRESERVING GENERATION AND PRIVATE OWNER-ONLY DOWNLOAD PRODUCTION-READY; NO EXTERNAL DELIVERY OR CANARY MUTATION
 5|Repository Reconciliation
@@ -73,9 +73,9 @@ Final Answers
 1|exact_verdict: CANDIDATE-CONTROLLED PORTABILITY AND SELECTIVE DISCLOSURE PACK CUSTOMER-USABLE — FIELD-LEVEL CONSENT, EXACT RECIPIENT-FACING PREVIEW, PROVENANCE-PRESERVING GENERATION AND PRIVATE OWNER-ONLY DOWNLOAD PRODUCTION-READY; NO EXTERNAL DELIVERY OR CANARY MUTATION
 2|epic_217_status: COMPLETE
 3|verdict_letter: A
-4|repo_head: c141f4d39d3c11a127f553b861008c1daf6a72c2
+4|repo_head: 3a1c37e4a48acfb1eb05c98d55267c6a50dbde08
 5|product_SHA: 42d8d7249a6080243d909526422fa5445a79fa65
-6|tip_SHA: c141f4d39d3c11a127f553b861008c1daf6a72c2
+6|tip_SHA: 3a1c37e4a48acfb1eb05c98d55267c6a50dbde08
 7|FE_SHA: 42d8d7249a6080243d909526422fa5445a79fa65
 8|API_SHA: 42d8d7249a6080243d909526422fa5445a79fa65
 9|worker_SHA: 42d8d7249a6080243d909526422fa5445a79fa65
