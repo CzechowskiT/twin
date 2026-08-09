@@ -12,6 +12,7 @@ import { DailyCareerOsPanel } from "@/components/career/daily-career-os-panel";
 import { PilotHomeNextAction } from "@/components/dashboard/pilot-home-next-action";
 import { GuidedFirstValueEntry } from "@/components/dashboard/guided-first-value-entry";
 import { CanaryFirstValuePanel } from "@/components/dashboard/canary-first-value-panel";
+import { PathReadinessPanel } from "@/components/dashboard/path-readiness-panel";
 import { IaActionableEmpty } from "@/components/dashboard/ia-actionable-empty";
 import { LifecycleCommandPanel } from "@/components/lifecycle/lifecycle-command-panel";
 import { ProfileCompletenessHint } from "@/components/ux/profile-completeness-hint";
@@ -358,6 +359,7 @@ export default function DashboardPage() {
               />
               <GuidedFirstValueEntry />
               <CanaryFirstValuePanel />
+              <PathReadinessPanel />
               <IaActionableEmpty areaId="home" show />
               <PilotHomeNextAction />
               <DailyCareerOsPanel compact />
@@ -378,6 +380,7 @@ export default function DashboardPage() {
             />
             <GuidedFirstValueEntry />
             <CanaryFirstValuePanel />
+            <PathReadinessPanel />
             <IaActionableEmpty areaId="home" show />
             <PilotHomeNextAction />
             <DailyCareerOsPanel compact />

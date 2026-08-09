@@ -7569,3 +7569,35 @@ class CandidateDataTrustAudit(Base):
     claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
     kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class CandidatePathReadinessSession(Base):
+    """Epic 2.16 — explicit path + object selection metadata only."""
+
+    __tablename__ = "candidate_path_readiness_sessions"
+    __table_args__ = (
+        UniqueConstraint(
+            "candidate_id", "session_key", name="uq_path_readiness_session_key"
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    session_key: Mapped[str] = mapped_column(String(64))
+    path_kind: Mapped[str] = mapped_column(String(64))
+    object_kind: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    object_ref: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="ACTIVE", index=True)
+    readiness_json: Mapped[str] = mapped_column(Text, default="{}")
+    schema_version: Mapped[str] = mapped_column(
+        String(48), default="twin.candidate_path_readiness/v1"
+    )
+    claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    first_value_satisfied: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    cleared_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)

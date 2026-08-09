@@ -11,6 +11,7 @@ from app.api import (
     candidate_intelligence,
     candidate_owned_import,
     candidate_data_trust,
+    candidate_path_readiness,
     unified_workspace_search,
     career_evidence,
     application_studio,
@@ -245,6 +246,11 @@ api_router.include_router(
     candidate_data_trust.router,
     prefix="/candidates",
     tags=["Candidate Data Trust"],
+)
+api_router.include_router(
+    candidate_path_readiness.router,
+    prefix="/candidates",
+    tags=["Candidate Path Readiness"],
 )
 api_router.include_router(
     unified_workspace_search.router,
