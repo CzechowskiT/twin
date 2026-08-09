@@ -1,0 +1,32 @@
+{
+  "epic": "2.21",
+  "title": "Candidate Workspace Cohesion and Context-Preserving Handoffs",
+  "status": "COMPLETE",
+  "verdict_letter": "A",
+  "exact_verdict": "CANDIDATE WORKSPACE COHESION AND CONTEXT-PRESERVING HANDOFFS CUSTOMER-USABLE — REUSED CANONICAL SESSIONS, CANDIDATE-BOUND REVISION-SAFE CONTEXT ENVELOPES AND NON-MUTATING ALLOWLISTED ROUTING PRODUCTION-READY; NO PARALLEL STATE, BEHAVIORAL SURVEILLANCE OR EXTERNAL ACTION",
+  "product_SHA": "397307a3ee28a2e8dbe9fcd52aff2b81ac4c038a",
+  "alignment_status_at_product": "ALIGNED",
+  "alembic": "135_candidate_career_pack_share",
+  "registry_schema_id": "twin.candidate_handoff_registry/v1",
+  "context_schema_id": "twin.candidate_handoff_context/v1",
+  "parallel_handoff_or_checkpoint_store": "NONE",
+  "CI": "https://github.com/CzechowskiT/twin/actions/runs/31315481639",
+  "CI_conclusion": "success",
+  "unit_tests": "5/5",
+  "fe_guard": "ok",
+  "code_stance_E2E": "36/36",
+  "auth_E2E": {
+    "product": "19/19",
+    "stance": "7/7",
+    "security": "4/4",
+    "invariant": "4/4",
+    "total": "34/34"
+  },
+  "canary_invariant_diff": 0,
+  "first_value_satisfied_by_handoff": false,
+  "eighth_primary_nav": false,
+  "continuity_sole_continue_owner": true,
+  "launch": "NO-GO",
+  "canary_run_1": "BLOCKED_EXTERNALLY_NOT_EXECUTED",
+  "evidence_dir": "reports/epic-2-21-workspace-handoffs-2026-08-09/"
+}

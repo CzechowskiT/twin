@@ -1,0 +1,154 @@
+1|Executive Summary
+Epic 2.21 COMPLETE (Verdict A). Candidate Workspace Cohesion: allowlisted context-preserving handoffs (twin.candidate_handoff_registry/v1 + twin.candidate_handoff_context/v1), Fernet candidate-bound envelopes TTL≤30m depth≤3, contextual Return/Dismiss banners; PARALLEL_HANDOFF_OR_CHECKPOINT_STORE=NONE; Continuity sole Continue; PRIMARY_IA=7. Product 397307a3 FE=API=worker ALIGNED; Alembic 135 (bez 136); unit 5/5; FE guard ok; code/stance 36/36; auth product 19/19 + stance 7/7 + security 4/4 + invariant 4/4; CI SUCCESS 31315481639; canary invariant diff=0. Canary Run 1 nie retry. first_value_satisfied_by_handoff=false. REAL_* / friction / comprehension / activation / retention / PMF / absolute completeness / next-best-action / pilot-public = NOT_EVALUATED.
+2|Canonical Baseline
+Epic 2.20 product 5c549855 FE=API=worker / tip 212bdaf7 docs_only_drift / Alembic 135 / twin.candidate_access_inventory/v1 + revocation/v1 / NEW_ACCESS_GRANT_STORE=NONE / CI 31314496471 / PP1 ON / IA=7 / shares 0 / canary diff 0 / P0=P1=0 — zweryfikowane niezależnie.
+3|Canonical Final State
+product SHA 397307a3ee28a2e8dbe9fcd52aff2b81ac4c038a FE=API=worker ALIGNED; tip docs po raporcie PL; Alembic 135_candidate_career_pack_share; schemas twin.candidate_handoff_registry/v1 + twin.candidate_handoff_context/v1; PARALLEL_HANDOFF_OR_CHECKPOINT_STORE=NONE; canary READY_INACTIVE; designation=0; PREPARED_NOT_EXECUTED; caps 0; Launch NO-GO; enrollment OFF; Phase 3B BLOCKED; MS write OFF.
+4|Verdict
+CANDIDATE WORKSPACE COHESION AND CONTEXT-PRESERVING HANDOFFS CUSTOMER-USABLE — REUSED CANONICAL SESSIONS, CANDIDATE-BOUND REVISION-SAFE CONTEXT ENVELOPES AND NON-MUTATING ALLOWLISTED ROUTING PRODUCTION-READY; NO PARALLEL STATE, BEHAVIORAL SURVEILLANCE OR EXTERNAL ACTION
+5|Owner Route Audit
+Mandatory audit reports/epic-2-21-workspace-handoffs-2026-08-09/owner-audit.md — 5 ALLOWLIST transitions (journeys A/B); DEFER_TO_CONTINUITY; EXCLUDE any-to-any; opportunity_intelligence.handoff_to_studio pozostaje owner mutating API poza warstwą 2.21.
+6|Architecture Decision
+Prefer Continuity gdy persistent flow; else short-lived opaque Fernet envelope (TTL≤30m, max depth 3); no Alembic; no parallel checkpoint/timeline/journey graph.
+7|Registry Contract
+twin.candidate_handoff_registry/v1 — import_to_data_trust, data_trust_to_path_home, opportunity_to_app_studio, app_studio_to_career_pack, career_pack_to_access_center.
+8|Context Contract
+twin.candidate_handoff_context/v1 — candidate_id/user_id bound; object_ref+revision; dest/return route keys; depth; exp; safe_mode EXACT|SAFE_REVIEW.
+9|Not Authorization
+Handoff = context hint only; destination rechecks auth/ownership/object/relation/revision/privacy/approval/route; authorization=false always.
+10|Zero Mutations At Layer
+mutations_at_handoff_layer=false — zero domain/approval/Data Trust/Path/Search/draft/pack/share/Access revoke/task/calendar/email/employer/submission mutations.
+11|UX Banner
+Contextual banner on registered destinations; Return/Dismiss; strip ?h= via replaceState; no next-best-action/scores/urgency/journey history.
+12|Primary IA
+PRIMARY_IA remains exactly 7; eighth_primary_nav=false; Continuity (2.18) sole Continue owner.
+13|Journey A Proof
+Import→Data Trust→Path: auth create/resolve ok; path hop when review exists; unit covers data_trust_to_path_home.
+14|Journey B Proof
+App Studio→Career Pack→Access Center: create/resolve ok; return_href=/dashboard/career-pack; synthetics cleaned.
+15|Security
+Opaque handle; not_allowlisted→400; unauth→401; dest_mismatch→400; wrong-candidate unavailable (unit); Referrer-Policy no-referrer; private no-store.
+16|Privacy Bans
+No raw context in durable URLs/history after strip; no behavioral surveillance; PARALLEL_ACTIVITY_TIMELINE=NONE; PARALLEL_JOURNEY_GRAPH=NONE.
+17|First-Value Integrity
+first_value_satisfied_by_handoff=false.
+18|Alembic
+Head remains 135_candidate_career_pack_share; no 136 aggregate handoff table.
+19|Proof Matrix Product
+Unit 5/5; FE guard ok; code E2E A–K 36/36; auth product 19/19.
+20|Proof Matrix Stance
+Auth stance 7/7 + code stance 6.
+21|Proof Matrix Security
+Auth security 4/4.
+22|Proof Matrix Canary Invariant
+invariant 4/4 + snapshot diff_count=0.
+23|CI Deploy
+CI SUCCESS 31315481639 @ 397307a3; FE+API+worker ALIGNED; Alembic 135; PP1 /preview HTTP 200.
+24|Synthetic Cleanup
+Synth batch/workspace/pack handoffs; pack delete + workspace delete; no real candidate/connection/share/session/invite/pilot mutation.
+25|Hard Bans Observed
+No Canary Run 1 retry; no designation/invite/activation/signup/enrollment/Launch/Phase 3; no Epic 2.22 auto; no Founder ask for real data; no force push; no PR main; MS write OFF; application submission OFF; employer contact OFF; external purchase/enrollment OFF.
+26|Terminal Posture
+PUBLIC_LAUNCH=NO_GO · ENROLLMENT=OFF · PILOT=OPERATIONALLY_READY_INACTIVE · CAPS=0 · DESIGNATION=0 · INVITES=0 · USERS=0 · CANARY=READY_INACTIVE · ACTIVE=false · ACTIVATION=PREPARED_NOT_EXECUTED · CANARY_RUN_1=BLOCKED_EXTERNALLY_NOT_EXECUTED · PHASE_3B=BLOCKED · PHASE_3_AGENT=NOT_STARTED · MS_CALENDAR_WRITE=OFF · stop after report — no Epic 2.22 / Canary Run 1 retry.
+27|Evidence Dir
+reports/epic-2-21-workspace-handoffs-2026-08-09/
+28|Push Only Scaffold
+Branch cursor/phase1-monorepo-scaffold; no PR main; no force push.
+29|PP1
+/preview HTTP 200.
+30|Unit Tests
+5/5 PASS
+31|Frontend Guard
+epic-221-workspace-handoff-guard ok
+32|Code Stance E2E
+36/36 A–K + stance
+33|Auth Product E2E
+19/19
+34|Auth Stance E2E
+7/7
+35|Auth Security E2E
+4/4
+36|Auth Invariant E2E
+4/4; total auth 34/34
+37|Canary Diff
+0
+38|Schemas
+registry twin.candidate_handoff_registry/v1 · context twin.candidate_handoff_context/v1 · PARALLEL_HANDOFF_OR_CHECKPOINT_STORE=NONE
+39|REAL Evaluation
+REAL_CANDIDATE_USABILITY/VALUE=NOT_EVALUATED; REAL_FRICTION_REDUCTION=NOT_EVALUATED; COMPREHENSION=NOT_EVALUATED; ACTIVATION/RETENTION/PMF=NOT_EVALUATED; absolute context completeness=NOT_EVALUATED; next best action=NOT_EVALUATED; pilot/public launch=NOT_EVALUATED
+
+Final Answers
+1|exact_verdict: CANDIDATE WORKSPACE COHESION AND CONTEXT-PRESERVING HANDOFFS CUSTOMER-USABLE — REUSED CANONICAL SESSIONS, CANDIDATE-BOUND REVISION-SAFE CONTEXT ENVELOPES AND NON-MUTATING ALLOWLISTED ROUTING PRODUCTION-READY; NO PARALLEL STATE, BEHAVIORAL SURVEILLANCE OR EXTERNAL ACTION
+2|epic_221_status: COMPLETE
+3|verdict_letter: A
+4|repo_head: 397307a3ee28a2e8dbe9fcd52aff2b81ac4c038a
+5|product_SHA: 397307a3ee28a2e8dbe9fcd52aff2b81ac4c038a
+6|tip_SHA: TIP_AFTER_DOCS
+7|FE_SHA: 397307a3ee28a2e8dbe9fcd52aff2b81ac4c038a
+8|API_SHA: 397307a3ee28a2e8dbe9fcd52aff2b81ac4c038a
+9|worker_SHA: 397307a3ee28a2e8dbe9fcd52aff2b81ac4c038a
+10|alignment_status_at_product: ALIGNED
+11|alignment_status_at_tip: docs_only_drift
+12|docs_only_drift: true
+13|alembic: 135_candidate_career_pack_share (is_at_head=true; no 136)
+14|CI_tip: SUCCESS 31315481639
+15|CI_url: https://github.com/CzechowskiT/twin/actions/runs/31315481639
+16|unit_tests: 5/5
+17|fe_guard: ok
+18|code_stance_E2E: 36/36
+19|auth_E2E_product: 19/19
+20|auth_E2E_stance: 7/7
+21|auth_E2E_security: 4/4
+22|auth_E2E_invariant: 4/4
+23|auth_E2E_total: 34/34
+24|pp1_preview: ON HTTP 200
+25|public_signup: OFF
+26|public_enrollment: OFF
+27|pilot_access: OPERATIONALLY_READY_INACTIVE
+28|launch: NO-GO
+29|phase_3b: BLOCKED
+30|phase_3_agent: NOT_STARTED
+31|effective_cohort_cap: 0
+32|effective_canary_cap: 0
+33|designation_count: 0
+34|designation_status: NOT_DESIGNATED
+35|canary_state: READY_INACTIVE
+36|canary_active: false
+37|activation_command: PREPARED_NOT_EXECUTED
+38|canary_run_1: BLOCKED_EXTERNALLY_NOT_EXECUTED
+39|canary_invariant_diff: 0
+40|registry_schema_id: twin.candidate_handoff_registry/v1
+41|context_schema_id: twin.candidate_handoff_context/v1
+42|parallel_handoff_or_checkpoint_store: NONE
+43|parallel_activity_timeline: NONE
+44|parallel_journey_graph: NONE
+45|eighth_primary_nav: false
+46|first_value_satisfied_by_handoff: false
+47|mutations_at_handoff_layer: false
+48|continuity_sole_continue_owner: true
+49|max_depth: 3
+50|ttl_seconds: 1800
+51|journey_a: PASS
+52|journey_b: PASS
+53|behavioral_surveillance: false
+54|next_best_action: false
+55|urgency_scores: false
+56|REAL_CANDIDATE_USABILITY: NOT_EVALUATED
+57|REAL_CANDIDATE_VALUE: NOT_EVALUATED
+58|REAL_FRICTION_REDUCTION: NOT_EVALUATED
+59|COMPREHENSION: NOT_EVALUATED
+60|ACTIVATION_IMPACT: NOT_EVALUATED
+61|RETENTION_IMPACT: NOT_EVALUATED
+62|PMF: NOT_EVALUATED
+63|absolute_context_completeness: NOT_EVALUATED
+64|next_best_action_eval: NOT_EVALUATED
+65|pilot_public_launch: NOT_EVALUATED
+66|evidence_dir: reports/epic-2-21-workspace-handoffs-2026-08-09/
+67|branch: cursor/phase1-monorepo-scaffold
+68|pr_to_main: none
+69|force_push: none
+70|P0_open: 0
+71|P1_open: 0
+72|ms_calendar_write: OFF
+73|application_submission: OFF
+74|employer_contact: OFF

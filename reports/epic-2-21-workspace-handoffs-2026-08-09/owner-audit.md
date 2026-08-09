@@ -1,25 +1,27 @@
-# Epic 2.21 — Route / CTA / Owner Handoff Audit
+# Epic 2.21 — Extended Route / CTA / Owner Classification (2.12–2.20 + Opp/App)
 
-PARALLEL_HANDOFF_OR_CHECKPOINT_STORE=NONE. Continuity (2.18) is sole Continue owner.
+PARALLEL_HANDOFF_OR_CHECKPOINT_STORE=NONE · PARALLEL_ACTIVITY_TIMELINE=NONE · PARALLEL_JOURNEY_GRAPH=NONE
+Continuity (Epic 2.18) = sole Continue owner. Handoff ≠ authorization.
 
-## Journey A (ALLOWLIST)
-| ID | Source → Dest | Object | Notes |
-|----|---------------|--------|-------|
-| import_to_data_trust | /dashboard/import → /dashboard/data-trust | import_batch | Explicit CTA |
-| data_trust_to_path_home | /dashboard/data-trust → /dashboard | data_trust_review | Path panel on Home |
+## ALLOWLIST (registered in twin.candidate_handoff_registry/v1)
 
-## Journey B (ALLOWLIST)
-| ID | Source → Dest | Object | Notes |
-|----|---------------|--------|-------|
-| opportunity_to_app_studio | /dashboard/matches → /dashboard/application-studio | opportunity | Context only — no studio.create |
-| app_studio_to_career_pack | /dashboard/application-studio → /dashboard/career-pack | app_studio_workspace | |
-| career_pack_to_access_center | /dashboard/career-pack → /dashboard/settings/access | career_pack | After private share |
+| handoff_id | Source | Dest | Object | Class |
+|------------|--------|------|--------|-------|
+| import_to_data_trust | Import Center 2.12 | Data Trust 2.15 | import_batch | ALLOW_HANDOFF |
+| data_trust_to_path_home | Data Trust 2.15 | Path Home 2.16 | data_trust_review | ALLOW_HANDOFF |
+| opportunity_to_app_studio | Matches / Opp Intel | Application Studio | opportunity | ALLOW_HANDOFF (context only) |
+| app_studio_to_career_pack | Application Studio | Career Pack 2.17 | app_studio_workspace | ALLOW_HANDOFF |
+| career_pack_to_access_center | Career Pack 2.17/19 | Access Center 2.20 | career_pack | ALLOW_HANDOFF |
 
 ## DEFER_TO_CONTINUITY
-Long-lived draft/resume flows (CAREER_PACK_DRAFT, APPLICATION_STUDIO_DRAFT, IMPORT_REVIEW, DATA_TRUST_REVIEW) — Home Continue via 2.18 only.
+IMPORT_REVIEW · DATA_TRUST_REVIEW · APPLICATION_STUDIO_DRAFT · CAREER_PACK_DRAFT — Home Continue panel only.
 
-## EXCLUDE
-Any-to-any router; Daily OS; Search; Approvals mutation; Access revoke as handoff; recruiter/agent; query-param domain dumps; Next-best-action.
+## OWNER_MUTATING (not 2.21 layer)
+`opportunity_intelligence.handoff_to_studio` creates workspace — remains owner API; envelope never calls it.
+Access Center revoke, Share grant/revoke, Import commit, Data Trust resolve, Pack confirm — owner surfaces only.
 
-## Existing mutable owner handoff (NOT 2.21 layer)
-opportunity_intelligence.handoff_to_studio creates workspace — stays owner API; 2.21 envelope never calls it.
+## EXCLUDE / NOT_HANDOFF
+Any-to-any router · Search 2.13 · Canary readiness 2.14 · Daily OS · Approvals bypass · Agent/recruiter/support escalation · Query-param domain dumps · Next-best-action · Navigation history graph · Recruiter packs · External delivery
+
+## Privacy
+Opaque Fernet handle via `?h=` then `history.replaceState` strip · sessionStorage · Referrer-Policy no-referrer · Cache-Control private,no-store · no raw context in URLs after strip

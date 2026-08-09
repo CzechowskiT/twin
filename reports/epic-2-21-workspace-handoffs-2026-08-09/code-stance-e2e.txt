@@ -26,11 +26,11 @@ PASS  I primary 7
 PASS  I continuity panel
 PASS  J strip handle
 PASS  J referrer no-store
-PASS  K unit —  Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
-    gdpr_consent_at=datetime.utcnow(),
+PASS  K unit — sion. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    created_at=datetime.utcnow(),
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-4 passed, 122 warnings in 6.24s
+5 passed, 126 warnings in 3.03s
 
 PASS  K fe guard — 
 > frontend@0.1.0 test:epic-221-workspace-handoff-guard
