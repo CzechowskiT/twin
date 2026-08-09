@@ -9,6 +9,8 @@ import {
   IMPORT_CENTER_MESSAGES_PL,
 } from "@/lib/import-center-messages";
 import { useTranslation } from "@/components/language-provider";
+import { WorkspaceHandoffBanner, startWorkspaceHandoff } from "@/components/candidate/workspace-handoff-banner";
+import { useRouter } from "next/navigation";
 
 type Family = "document" | "tracker" | "twin_export" | "linkedin_export";
 
@@ -37,7 +39,8 @@ function copy(locale: string) {
 }
 
 export function ImportCenterWorkspace() {
-  const { locale } = useTranslation();
+  const { locale, t } = useTranslation();
+  const router = useRouter();
   const m = copy(locale);
   const [family, setFamily] = useState<Family>("document");
   const [batch, setBatch] = useState<Batch | null>(null);
@@ -198,6 +201,7 @@ export function ImportCenterWorkspace() {
             {m.backEvidence}
           </Link>
         </div>
+        <WorkspaceHandoffBanner expectedDestRouteKey="import_center" />
       </header>
 
       <section className="flex flex-col gap-3 rounded border border-[var(--twin-border)] p-4">
@@ -256,6 +260,24 @@ export function ImportCenterWorkspace() {
             </button>
             <button type="button" className="rounded border px-3 py-2 text-sm" onClick={() => void rollback()} disabled={busy} data-testid="import-rollback">
               {m.rollback}
+            </button>
+            <button
+              type="button"
+              className="rounded border px-3 py-2 text-sm"
+              data-workspace-handoff-cta="import_to_data_trust"
+              disabled={busy}
+              onClick={() => {
+                void (async () => {
+                  const url = await startWorkspaceHandoff({
+                    handoffId: "import_to_data_trust",
+                    objectRef: batch.batch_key,
+                    objectRevision: String(batch.preview_version ?? batch.state),
+                  });
+                  if (url) router.push(url);
+                })();
+              }}
+            >
+              {t("handoff.startHandoff")}
             </button>
           </div>
 

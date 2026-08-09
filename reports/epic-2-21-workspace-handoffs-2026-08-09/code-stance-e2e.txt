@@ -1,0 +1,48 @@
+PASS  A constants
+PASS  A service
+PASS  A api
+PASS  A banner
+PASS  A audit
+PASS  B parallel handoff NONE
+PASS  B no alembic 136
+PASS  B registry schema
+PASS  B context schema
+PASS  C handoff import_to_data_trust
+PASS  C handoff data_trust_to_path_home
+PASS  C handoff opportunity_to_app_studio
+PASS  C handoff app_studio_to_career_pack
+PASS  C handoff career_pack_to_access_center
+PASS  D max depth 3
+PASS  D ttl 30m
+PASS  E encrypt envelope
+PASS  E no mutations flag
+PASS  F resolve route
+PASS  F create route
+PASS  G ownership recheck
+PASS  G continuity prefer
+PASS  H no next best
+PASS  H not first value
+PASS  I primary 7
+PASS  I continuity panel
+PASS  J strip handle
+PASS  J referrer no-store
+PASS  K unit —  Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    gdpr_consent_at=datetime.utcnow(),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+4 passed, 122 warnings in 6.24s
+
+PASS  K fe guard — 
+> frontend@0.1.0 test:epic-221-workspace-handoff-guard
+> npx --yes tsx scripts/epic-221-workspace-handoff-guard.test.ts
+
+epic-221-workspace-handoff-guard: ok
+
+PASS  stance launch NO-GO
+PASS  stance enrollment OFF
+PASS  stance canary inactive
+PASS  stance activation prepared
+PASS  stance designation 0
+PASS  stance canary cap 0
+
+36 passed, 0 failed

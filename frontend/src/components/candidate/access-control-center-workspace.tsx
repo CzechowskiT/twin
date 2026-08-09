@@ -8,6 +8,7 @@ import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subna
 import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
+import { WorkspaceHandoffBanner } from "@/components/candidate/workspace-handoff-banner";
 
 type AccessItem = {
   access_key: string;
@@ -126,6 +127,7 @@ export function AccessControlCenterWorkspace() {
           <p className="text-xs text-[var(--twin-muted)]">{t("accessCenter.noSecrets")}</p>
           <p className="text-xs text-[var(--twin-muted)]">{t("accessCenter.notFirstValue")}</p>
         </div>
+        <WorkspaceHandoffBanner expectedDestRouteKey="access_center" />
         {err ? (
           <p className="text-sm text-red-700" role="alert">
             {err}

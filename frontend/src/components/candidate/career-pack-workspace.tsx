@@ -8,6 +8,7 @@ import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subna
 import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch, apiFetchBlob } from "@/lib/api";
 import { getToken } from "@/lib/auth";
+import { WorkspaceHandoffBanner, startWorkspaceHandoff } from "@/components/candidate/workspace-handoff-banner";
 
 type Artifact = {
   artifact_kind: string;
@@ -377,7 +378,27 @@ export function CareerPackWorkspace() {
           <Link href="/dashboard/privacy-center">{t("careerPack.backSettings")}</Link>
           <Link href="/dashboard/application-studio">{t("careerPack.openStudio")}</Link>
           <Link href="/dashboard/portfolio">{t("careerPack.openEvidence")}</Link>
+          {active?.pack_key ? (
+            <button
+              type="button"
+              className="underline"
+              data-workspace-handoff-cta="career_pack_to_access_center"
+              onClick={() => {
+                void (async () => {
+                  const url = await startWorkspaceHandoff({
+                    handoffId: "career_pack_to_access_center",
+                    objectRef: active.pack_key,
+                    objectRevision: active.snapshot_hash || undefined,
+                  });
+                  if (url) router.push(url);
+                })();
+              }}
+            >
+              {t("handoff.startHandoff")}
+            </button>
+          ) : null}
         </div>
+        <WorkspaceHandoffBanner expectedDestRouteKey="career_pack" />
         {err ? (
           <p className="text-sm text-red-700" role="alert">
             {err}

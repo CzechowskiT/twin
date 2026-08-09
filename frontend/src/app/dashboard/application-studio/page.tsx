@@ -7,6 +7,7 @@ import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subna
 import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
+import { WorkspaceHandoffBanner, startWorkspaceHandoff } from "@/components/candidate/workspace-handoff-banner";
 
 type Workspace = {
   id: number;
@@ -176,6 +177,9 @@ export default function ApplicationStudioPage() {
       </div>
 
       {err ? <p className="mb-3 text-sm text-red-700">{err}</p> : null}
+      <div className="mb-4">
+        <WorkspaceHandoffBanner expectedDestRouteKey="application_studio" />
+      </div>
 
       <Card className="mb-4">
         <p className="text-xs text-neutral-500">{t("applicationStudio.safetyBanner")}</p>
@@ -197,6 +201,23 @@ export default function ApplicationStudioPage() {
         <div className="mt-2 flex flex-wrap gap-2">
           <Button type="button" disabled={busy} onClick={() => void createWorkspace()}>
             {t("applicationStudio.create")}
+          </Button>
+          <Button
+            type="button"
+            disabled={busy || !active}
+            data-workspace-handoff-cta="app_studio_to_career_pack"
+            onClick={() => {
+              if (!active) return;
+              void (async () => {
+                const url = await startWorkspaceHandoff({
+                  handoffId: "app_studio_to_career_pack",
+                  objectRef: String(active.id),
+                });
+                if (url) router.push(url);
+              })();
+            }}
+          >
+            {t("handoff.startHandoff")}
           </Button>
           <Button
             type="button"

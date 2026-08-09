@@ -86,6 +86,10 @@ import {
   ACCESS_CENTER_MESSAGES_PL,
 } from "./access-center-messages";
 import {
+  HANDOFF_MESSAGES_EN,
+  HANDOFF_MESSAGES_PL,
+} from "./handoff-messages";
+import {
   JOURNEY_CONTINUITY_MESSAGES_EN,
   JOURNEY_CONTINUITY_MESSAGES_PL,
 } from "./journey-continuity-messages";
@@ -159,6 +163,7 @@ export type TranslationKey =
   | `pathReadiness.${keyof typeof PATH_READINESS_MESSAGES_EN}`
   | `careerPack.${keyof typeof CAREER_PACK_MESSAGES_EN}`
   | `accessCenter.${keyof typeof ACCESS_CENTER_MESSAGES_EN}`
+  | `handoff.${keyof typeof HANDOFF_MESSAGES_EN}`
   | `journeyContinuity.${keyof typeof JOURNEY_CONTINUITY_MESSAGES_EN}`
   | `publicPreview.${keyof typeof PUBLIC_PREVIEW_MESSAGES_EN}`
   | `faq.${keyof typeof FAQ_MESSAGES_EN}`
@@ -662,6 +667,7 @@ const en = {
   pathReadiness: PATH_READINESS_MESSAGES_EN,
   careerPack: CAREER_PACK_MESSAGES_EN,
   accessCenter: ACCESS_CENTER_MESSAGES_EN,
+  handoff: HANDOFF_MESSAGES_EN,
   journeyContinuity: JOURNEY_CONTINUITY_MESSAGES_EN,
   publicPreview: PUBLIC_PREVIEW_MESSAGES_EN,
   faq: FAQ_MESSAGES_EN,
@@ -9978,6 +9984,7 @@ const pl: MessageTree = {
   pathReadiness: PATH_READINESS_MESSAGES_PL,
   careerPack: CAREER_PACK_MESSAGES_PL,
   accessCenter: ACCESS_CENTER_MESSAGES_PL,
+  handoff: HANDOFF_MESSAGES_PL,
   journeyContinuity: JOURNEY_CONTINUITY_MESSAGES_PL,
   publicPreview: PUBLIC_PREVIEW_MESSAGES_PL,
   faq: FAQ_MESSAGES_PL,

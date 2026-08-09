@@ -16,6 +16,8 @@ import type { DashboardMatchList } from "@/components/dashboard/dashboard-helper
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 import { CANDIDATE_CANONICAL_ROUTES } from "@/lib/candidate-canonical-routes";
+import { WorkspaceHandoffBanner, startWorkspaceHandoff } from "@/components/candidate/workspace-handoff-banner";
+import { useRouter } from "next/navigation";
 import {
   CANDIDATE_MATCHES_PAGE_MARKER,
   CANDIDATE_MATCHES_PILOT_ITEMS,
@@ -25,6 +27,7 @@ import { dashboardMatchesQuery } from "@/lib/matching-quality";
 
 export function CandidateMatchesWorkspace() {
   const { t } = useTranslation();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const activated = searchParams.get("activated") === "1";
   const [matches, setMatches] = useState<DashboardMatchList | null>(null);
@@ -80,9 +83,30 @@ export function CandidateMatchesWorkspace() {
           <Link href={CANDIDATE_CANONICAL_ROUTES.panel} className="twin-muted mt-2 inline-block text-xs underline">
             {t("candidateMatchesPage.backToPanel")}
           </Link>
+          <WorkspaceHandoffBanner expectedDestRouteKey="matches" />
         </header>
 
         <CandidateWorkspaceSubnav ariaLabel={pageTitle} />
+        {liveItems[0] && "id" in (liveItems[0] as object) ? (
+          <button
+            type="button"
+            className="twin-link text-sm underline"
+            data-workspace-handoff-cta="opportunity_to_app_studio"
+            onClick={() => {
+              const id = String((liveItems[0] as { id?: number | string }).id || "");
+              if (!id) return;
+              void (async () => {
+                const url = await startWorkspaceHandoff({
+                  handoffId: "opportunity_to_app_studio",
+                  objectRef: id,
+                });
+                if (url) router.push(url);
+              })();
+            }}
+          >
+            {t("handoff.startHandoff")}
+          </button>
+        ) : null}
         <WorkspaceFlowSteps current="matches" className="mb-2" />
 
         <ActivationMatchingStatus

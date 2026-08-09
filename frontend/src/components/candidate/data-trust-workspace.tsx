@@ -8,6 +8,7 @@ import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subna
 import { Button, Card, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { getToken } from "@/lib/auth";
+import { WorkspaceHandoffBanner, startWorkspaceHandoff } from "@/components/candidate/workspace-handoff-banner";
 
 type Question = {
   question_key: string;
@@ -166,6 +167,7 @@ export function DataTrustWorkspace() {
           <Link href="/dashboard/privacy-center">{t("dataTrust.backSettings")}</Link>
           <Link href="/dashboard/import">{t("dataTrust.backImport")}</Link>
         </div>
+        <WorkspaceHandoffBanner expectedDestRouteKey="data_trust" />
         {err ? (
           <p className="text-sm text-red-700" role="alert">
             {err}
@@ -184,6 +186,22 @@ export function DataTrustWorkspace() {
                   </span>
                   <Button type="button" disabled={busy} onClick={() => void openReview(r.review_key)}>
                     {t("dataTrust.openReview")}
+                  </Button>
+                  <Button
+                    type="button"
+                    disabled={busy}
+                    data-workspace-handoff-cta="data_trust_to_path_home"
+                    onClick={() => {
+                      void (async () => {
+                        const url = await startWorkspaceHandoff({
+                          handoffId: "data_trust_to_path_home",
+                          objectRef: r.review_key,
+                        });
+                        if (url) router.push(url);
+                      })();
+                    }}
+                  >
+                    {t("handoff.startHandoff")}
                   </Button>
                 </li>
               ))}
