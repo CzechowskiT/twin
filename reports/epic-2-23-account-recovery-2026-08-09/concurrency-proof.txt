@@ -1,0 +1,1 @@
+complete_recovery uses with_for_update + revoke_everywhere: True

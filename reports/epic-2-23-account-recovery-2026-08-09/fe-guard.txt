@@ -1,0 +1,5 @@
+
+> frontend@0.1.0 test:epic-223-account-recovery-guard
+> npx --yes tsx scripts/epic-223-account-recovery-guard.test.ts
+
+epic-223-account-recovery-guard: ok

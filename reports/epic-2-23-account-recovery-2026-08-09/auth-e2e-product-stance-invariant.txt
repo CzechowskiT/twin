@@ -1,0 +1,35 @@
+PASS  stance/public_health
+PASS  stance/launch_nogo
+PASS  stance/enrollment_off
+PASS  stance/canary_inactive
+PASS  stance/activation_prepared
+PASS  stance/designation_0
+PASS  stance/caps_zero
+PASS  product/recovery_catalog — 200
+PASS  product/recovery_schema
+PASS  product/parallel_none
+PASS  product/step_up_catalog — 200
+PASS  product/step_up_ttl
+PASS  product/mint_synthetic — 200
+PASS  product/everywhere_requires_step_up — 403
+PASS  product/step_up_issue — 200
+PASS  product/everywhere_with_step_up — 200
+PASS  product/remint — 200
+PASS  product/mint_recovery — 200
+PASS  security/recovery_sink_no_mail
+PASS  product/inventory_pending_recovery — 200
+PASS  security/no_secrets_in_pending
+PASS  security/no_raw_recovery_token_in_inventory
+PASS  product/recovery_complete — 200
+PASS  product/post_recovery_session_dead — 401
+PASS  product/recovery_single_use — 400
+PASS  product/remint_after_recovery — 200
+PASS  product/step_up_change_pw — 200
+PASS  product/restore_synth_password — 200
+PASS  security/synthetic_only
+PASS  invariant/business_state_diff_0 — {}
+PASS  invariant/canary_ready_inactive
+PASS  invariant/designation_still_0
+PASS  invariant/activation_still_prepared
+
+product 18/18 stance 7/7 security 4/4 invariant 4/4

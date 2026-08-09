@@ -1,0 +1,19 @@
+{
+  "epic": "2.23",
+  "status": "COMPLETE",
+  "verdict_letter": "A",
+  "exact_verdict": "CANDIDATE ACCOUNT RECOVERY AND STEP-UP REAUTHENTICATION CUSTOMER-USABLE — SINGLE-USE RECOVERY, ATOMIC CREDENTIAL ROTATION WITH SESSION-FAMILY REVOCATION, ENUMERATION RESISTANCE AND ACTION-BOUND HIGH-RISK STEP-UP PRODUCTION-READY; NO NEW IDENTITY PROOFING, BEHAVIORAL SCORING OR CANARY MUTATION",
+  "product_SHA": "605413a5d04ba3f7f54653ff5fa2fd4981a9e1d8",
+  "alignment_status_at_product": "ALIGNED",
+  "alembic": "137_candidate_account_recovery",
+  "CI": "SUCCESS 31321724314",
+  "unit_tests": "12/12",
+  "fe_guard": "ok",
+  "code_stance_E2E": "37/37",
+  "auth_E2E_total": "33/33",
+  "canary_invariant_diff": 0,
+  "mfa_passkeys": "DEFERRED_PENDING_RECOVERY_PROOF",
+  "launch": "NO-GO",
+  "phase_3b": "BLOCKED",
+  "canary_run_1": "BLOCKED_EXTERNALLY_NOT_EXECUTED"
+}

@@ -1,0 +1,160 @@
+1|Executive Summary
+Epic 2.23 COMPLETE (Verdict A). Candidate Account Recovery + Step-Up: enumeration-resistant forgot → single-use challenge → atomic credential rotation + revoke-all managed sessions/families → fresh login (no auto-mint); purpose-bound step-up (TTL≤5m) for SIGN_OUT_EVERYWHERE / CANCEL_RECOVERY / CHANGE_PASSWORD / ACCOUNT_DELETION / FULL_PRIVACY_EXPORT. MFA/passkeys=DEFERRED_PENDING_RECOVERY_PROOF. Product 605413a5 FE=API=worker ALIGNED; Alembic 137; unit 12/12; FE guard ok; code/stance 37/37; auth product 18/18 + stance 7/7 + security 4/4 + invariant 4/4; CI SUCCESS 31321724314; canary diff=0. first_value_satisfied_by_recovery/step_up=false. Canary Run 1 nie retry. REAL_*/absolute email security/MFA readiness/comprehension/trust/activation/retention/PMF/pilot-public=NOT_EVALUATED.
+2|Canonical Baseline
+Epic 2.22 product 25aa9dd7 FE=API=worker / tip 8d5d87f0→36c6e88d docs_only_drift / Alembic 136 / twin.candidate_auth_session + refresh + security_state / CANONICAL_SESSION_AUTHORITY=twin.candidate_auth_session / BUILD_INTERNAL_MANAGED_SESSION_LAYER / CI 31317499574 / IA=7 / PP1 ON / canary diff 0 / P0=P1=0 — zweryfikowane niezależnie.
+3|Canonical Final State
+product SHA 605413a5d04ba3f7f54653ff5fa2fd4981a9e1d8 FE=API=worker ALIGNED; tip docs po raporcie; Alembic 137_candidate_account_recovery; schemas twin.candidate_account_recovery/v1 + twin.candidate_recovery_completion/v1 + twin.candidate_step_up_reauthentication/v1; canary READY_INACTIVE; designation=0; PREPARED_NOT_EXECUTED; caps 0; Launch NO-GO; enrollment OFF; Phase 3B BLOCKED; MS write OFF.
+4|Verdict
+CANDIDATE ACCOUNT RECOVERY AND STEP-UP REAUTHENTICATION CUSTOMER-USABLE — SINGLE-USE RECOVERY, ATOMIC CREDENTIAL ROTATION WITH SESSION-FAMILY REVOCATION, ENUMERATION RESISTANCE AND ACTION-BOUND HIGH-RISK STEP-UP PRODUCTION-READY; NO NEW IDENTITY PROOFING, BEHAVIORAL SCORING OR CANARY MUTATION
+5|Provider Reuse Gate
+Extend password_reset_tokens (004) — PARALLEL_PASSWORD_RESET_STORE=NONE; no second IdP; MFA deferred.
+6|Architecture Decision
+Additive Alembic 137 on password_reset_tokens + step_up_challenges + recovery receipts; hash-fragment links; atomic FOR UPDATE completion with revoke_everywhere; step-up header X-Twin-Step-Up.
+7|Contracts
+twin.candidate_account_recovery/v1 · twin.candidate_recovery_completion/v1 · twin.candidate_step_up_reauthentication/v1.
+8|Canonical Authority
+CANONICAL_SESSION_AUTHORITY=twin.candidate_auth_session; PARALLEL_IDENTITY/CREDENTIAL/MANAGED_SESSION/PASSWORD_RESET/RECOVERY_CHANNEL=NONE.
+9|Recovery Request
+Generic forgot ack; cancel prior ACTIVE challenges; synthetic/KPI mail sink (zero real recovery email in E2E).
+10|Recovery Completion
+Lock challenge → hash password → revoke_everywhere → invalidate other challenges → security receipt → commit; auto_mint=false; require_fresh_login=true.
+11|Link Format
+Canonical /reset-password#token= with FE replaceState strip; AUTH_LEGACY_RESET_TOKEN_ACCEPTANCE bounds query tokens.
+12|Step-Up
+TTL≤5m; purpose allowlist; session/epoch bound when managed; consume once via X-Twin-Step-Up.
+13|Access Center
+PENDING_RECOVERY inventory + cancel with CANCEL_RECOVERY step-up; sign-out-everywhere requires SIGN_OUT_EVERYWHERE step-up.
+14|Feature Flags
+AUTH_RECOVERY_V2_ENABLED/SESSION_REVOKE/HASH_LINKS · AUTH_STEP_UP_ENFORCE · AUTH_LEGACY_RESET_TOKEN_ACCEPTANCE (all true for Verdict A).
+15|Access Center UX
+/dashboard/settings/access — sessions + pending recovery; PRIMARY_IA=7; no IP/UA/fingerprint/scores.
+16|Recovery UX
+forgot-password + reset-password hash strip + fresh login copy; profile change-password issues step-up first.
+17|Privacy Bans
+No raw tokens/passwords/IP/UA/fingerprint/open-tracking/security scores in inventory or receipts (fingerprints of digests only).
+18|First-Value Integrity
+first_value_satisfied_by_recovery=false; first_value_satisfied_by_step_up=false.
+19|Alembic
+137_candidate_account_recovery revises 136; is_at_head=true (catalog live).
+20|Proof Matrix Product
+Unit 12/12; FE guard ok; code E2E A–M 37/37; auth product 18/18.
+21|Proof Matrix Stance
+Auth stance 7/7 + code stance checks.
+22|Proof Matrix Security
+Auth security 4/4 (sink no mail, no secrets in pending, no raw token in inventory, synthetic-only).
+23|Proof Matrix Canary Invariant
+invariant 4/4 + snapshot diff_count=0.
+24|CI Deploy
+CI SUCCESS 31321724314 @ 605413a5; FE+API+worker ALIGNED; Alembic 137 live via start-api; PP1 /preview HTTP 200.
+25|Synthetic Cleanup
+Synth mint/recovery/step-up/password restore only; zero real/staff credential or session mutations; zero real recovery emails.
+26|Hard Bans Observed
+No Canary Run 1 retry; no designation/invite/activation/signup/enrollment/Launch/Phase 3; no Epic 2.24 auto; no Founder ask for real credentials/SMTP; no force push; no PR main; MS write OFF; application submission OFF; employer contact OFF.
+27|Terminal Posture
+PUBLIC_LAUNCH=NO_GO · ENROLLMENT=OFF · PILOT=OPERATIONALLY_READY_INACTIVE · CAPS=0 · DESIGNATION=0 · INVITES=0 · USERS=0 · CANARY=READY_INACTIVE · ACTIVE=false · ACTIVATION=PREPARED_NOT_EXECUTED · CANARY_RUN_1=BLOCKED_EXTERNALLY_NOT_EXECUTED · PHASE_3B=BLOCKED · PHASE_3_AGENT=NOT_STARTED · MS_CALENDAR_WRITE=OFF · stop after report — no Epic 2.24 / Canary Run 1 retry.
+28|Evidence Dir
+reports/epic-2-23-account-recovery-2026-08-09/
+29|Push Only Scaffold
+Branch cursor/phase1-monorepo-scaffold; no PR main; no force push.
+30|PP1
+/preview HTTP 200.
+31|Unit Tests
+12/12 PASS
+32|Frontend Guard
+epic-223-account-recovery-guard ok
+33|Code Stance E2E
+37/37 A–M + stance
+34|Auth Product E2E
+18/18
+35|Auth Stance E2E
+7/7
+36|Auth Security E2E
+4/4
+37|Auth Invariant E2E
+4/4; total auth 33/33
+38|Concurrency
+with_for_update + revoke_everywhere; concurrency proof script shipped
+39|REAL Evaluation
+REAL_ACCOUNT_TAKEOVER_RESISTANCE=NOT_EVALUATED; REAL_LOCKOUT_RISK=NOT_EVALUATED; REAL_CANDIDATE_*=NOT_EVALUATED; COMPREHENSION=NOT_EVALUATED; TRUST=NOT_EVALUATED; ACTIVATION/RETENTION/PMF=NOT_EVALUATED; absolute_email_security=NOT_EVALUATED; MFA_readiness=NOT_EVALUATED; pilot/public launch=NOT_EVALUATED
+
+Final Answers
+1|exact_verdict: CANDIDATE ACCOUNT RECOVERY AND STEP-UP REAUTHENTICATION CUSTOMER-USABLE — SINGLE-USE RECOVERY, ATOMIC CREDENTIAL ROTATION WITH SESSION-FAMILY REVOCATION, ENUMERATION RESISTANCE AND ACTION-BOUND HIGH-RISK STEP-UP PRODUCTION-READY; NO NEW IDENTITY PROOFING, BEHAVIORAL SCORING OR CANARY MUTATION
+2|epic_223_status: COMPLETE
+3|verdict_letter: A
+4|repo_head: TIP_PLACEHOLDER
+5|product_SHA: 605413a5d04ba3f7f54653ff5fa2fd4981a9e1d8
+6|tip_SHA: TIP_PLACEHOLDER
+7|FE_SHA: 605413a5d04ba3f7f54653ff5fa2fd4981a9e1d8
+8|API_SHA: 605413a5d04ba3f7f54653ff5fa2fd4981a9e1d8
+9|worker_SHA: 605413a5d04ba3f7f54653ff5fa2fd4981a9e1d8
+10|alignment_status_at_product: ALIGNED
+11|alignment_status_at_tip: docs_only_drift
+12|docs_only_drift: true
+13|alembic: 137_candidate_account_recovery (is_at_head=true; revises 136)
+14|CI_tip: SUCCESS 31321724314
+15|CI_url: https://github.com/CzechowskiT/twin/actions/runs/31321724314
+16|unit_tests: 12/12
+17|fe_guard: ok
+18|code_stance_E2E: 37/37
+19|auth_E2E_product: 18/18
+20|auth_E2E_stance: 7/7
+21|auth_E2E_security: 4/4
+22|auth_E2E_invariant: 4/4
+23|auth_E2E_total: 33/33
+24|pp1_preview: ON HTTP 200
+25|public_signup: OFF
+26|public_enrollment: OFF
+27|pilot_access: OPERATIONALLY_READY_INACTIVE
+28|launch: NO-GO
+29|phase_3b: BLOCKED
+30|phase_3_agent: NOT_STARTED
+31|effective_cohort_cap: 0
+32|effective_canary_cap: 0
+33|designation_count: 0
+34|designation_status: NOT_DESIGNATED
+35|canary_state: READY_INACTIVE
+36|canary_active: false
+37|activation_command: PREPARED_NOT_EXECUTED
+38|canary_run_1: BLOCKED_EXTERNALLY_NOT_EXECUTED
+39|canary_invariant_diff: 0
+40|recovery_schema_id: twin.candidate_account_recovery/v1
+41|completion_schema_id: twin.candidate_recovery_completion/v1
+42|step_up_schema_id: twin.candidate_step_up_reauthentication/v1
+43|parallel_identity_store: NONE
+44|parallel_credential_store: NONE
+45|parallel_managed_session_store: NONE
+46|parallel_password_reset_store: NONE
+47|parallel_recovery_channel: NONE
+48|canonical_session_authority: twin.candidate_auth_session
+49|mfa_passkeys: DEFERRED_PENDING_RECOVERY_PROOF
+50|no_auto_mint_from_recovery: true
+51|eighth_primary_nav: false
+52|first_value_satisfied_by_recovery: false
+53|first_value_satisfied_by_step_up: false
+54|fingerprinting: false
+55|behavioral_scoring: false
+56|auth_recovery_v2_enabled: true
+57|auth_recovery_v2_session_revoke: true
+58|auth_recovery_v2_hash_links: true
+59|auth_step_up_enforce: true
+60|auth_legacy_reset_token_acceptance: true
+61|ux_route: /dashboard/settings/access
+62|recovery_link_format: hash_fragment
+63|step_up_header: X-Twin-Step-Up
+64|step_up_ttl_seconds: 300
+65|REAL_ACCOUNT_TAKEOVER_RESISTANCE: NOT_EVALUATED
+66|REAL_LOCKOUT_RISK: NOT_EVALUATED
+67|REAL_CANDIDATE_USABILITY: NOT_EVALUATED
+68|REAL_CANDIDATE_VALUE: NOT_EVALUATED
+69|absolute_email_security: NOT_EVALUATED
+70|MFA_readiness: NOT_EVALUATED
+71|COMPREHENSION: NOT_EVALUATED
+72|TRUST: NOT_EVALUATED
+73|ACTIVATION_IMPACT: NOT_EVALUATED
+74|RETENTION_IMPACT: NOT_EVALUATED
+75|PMF: NOT_EVALUATED
+76|pilot_public_launch: NOT_EVALUATED
+77|P0_OPEN: 0
+78|P1_OPEN: 0
+79|hard_bans: NO-GO; Phase 3B BLOCKED; Canary Run 1 BLOCKED_EXTERNALLY_NOT_EXECUTED; no Epic 2.24 auto
+80|stop: true

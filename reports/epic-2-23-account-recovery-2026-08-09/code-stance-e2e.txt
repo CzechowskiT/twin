@@ -1,0 +1,49 @@
+PASS  A alembic 137
+PASS  A recovery const
+PASS  A step_up svc
+PASS  A audit dir
+PASS  B parallel identity NONE
+PASS  B parallel password_reset NONE
+PASS  B parallel recovery channel NONE
+PASS  C recovery schema
+PASS  C completion schema
+PASS  C step-up schema
+PASS  D for update
+PASS  D revoke everywhere
+PASS  D no auto mint
+PASS  E mfa deferred
+PASS  E hash fragment links
+PASS  F step-up routes
+PASS  F step-up header
+PASS  G no fingerprint
+PASS  G no ua/ip scoring
+PASS  H not first value recovery
+PASS  H not first value step-up
+PASS  I primary 7
+PASS  J fe replaceState
+PASS  J access step-up
+PASS  K alembic revises 136
+PASS  L unit —  version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return datetime.utcnow()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+12 passed, 125 warnings in 4.79s
+
+PASS  L fe guard — 
+> frontend@0.1.0 test:epic-223-account-recovery-guard
+> npx --yes tsx scripts/epic-223-account-recovery-guard.test.ts
+
+epic-223-account-recovery-guard: ok
+
+PASS  stance launch nogo preserved
+PASS  stance no mfa product
+PASS  stance no canary mutation code
+PASS  stance mint synthetic recovery ops
+PASS  stance pending recovery inventory
+PASS  M public health
+PASS  M launch NO-GO
+PASS  M canary inactive
+PASS  M activation prepared
+PASS  M designation 0
+
+37/37
