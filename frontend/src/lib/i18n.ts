@@ -78,6 +78,10 @@ import {
   PATH_READINESS_MESSAGES_PL,
 } from "./path-readiness-messages";
 import {
+  CAREER_PACK_MESSAGES_EN,
+  CAREER_PACK_MESSAGES_PL,
+} from "./career-pack-messages";
+import {
   PUBLIC_PREVIEW_MESSAGES_EN,
   PUBLIC_PREVIEW_MESSAGES_PL,
 } from "./public-preview-messages";
@@ -145,6 +149,7 @@ export type TranslationKey =
   | `canaryJourney.${keyof typeof CANARY_JOURNEY_MESSAGES_EN}`
   | `dataTrust.${keyof typeof DATA_TRUST_MESSAGES_EN}`
   | `pathReadiness.${keyof typeof PATH_READINESS_MESSAGES_EN}`
+  | `careerPack.${keyof typeof CAREER_PACK_MESSAGES_EN}`
   | `publicPreview.${keyof typeof PUBLIC_PREVIEW_MESSAGES_EN}`
   | `faq.${keyof typeof FAQ_MESSAGES_EN}`
   | `site.${keyof typeof SITE_MESSAGES_EN}`
@@ -645,6 +650,7 @@ const en = {
   canaryJourney: CANARY_JOURNEY_MESSAGES_EN,
   dataTrust: DATA_TRUST_MESSAGES_EN,
   pathReadiness: PATH_READINESS_MESSAGES_EN,
+  careerPack: CAREER_PACK_MESSAGES_EN,
   publicPreview: PUBLIC_PREVIEW_MESSAGES_EN,
   faq: FAQ_MESSAGES_EN,
   site: SITE_MESSAGES_EN,
@@ -9958,6 +9964,7 @@ const pl: MessageTree = {
   canaryJourney: CANARY_JOURNEY_MESSAGES_PL,
   dataTrust: DATA_TRUST_MESSAGES_PL,
   pathReadiness: PATH_READINESS_MESSAGES_PL,
+  careerPack: CAREER_PACK_MESSAGES_PL,
   publicPreview: PUBLIC_PREVIEW_MESSAGES_PL,
   faq: FAQ_MESSAGES_PL,
   site: SITE_MESSAGES_PL,

@@ -225,6 +225,9 @@ export function PathReadinessPanel() {
             <Button type="button" disabled={busy || !evalOut} onClick={() => void clearSel()}>
               {t("pathReadiness.clear")}
             </Button>
+            <Link className="twin-link inline-flex items-center text-sm" href="/dashboard/career-pack">
+              {t("careerPack.nav")}
+            </Link>
           </div>
         </div>
       ) : null}

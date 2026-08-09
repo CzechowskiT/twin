@@ -360,9 +360,14 @@ export default function PortfolioPage() {
       </div>
 
       <p className="twin-muted mt-4 text-[11px]">{t("careerEvidence.disclaimer")}</p>
-      <Link href="/dashboard/evidence" className="twin-link mt-3 inline-block text-sm">
-        {t("careerEvidence.openVault")} →
-      </Link>
+      <div className="mt-3 flex flex-wrap gap-3 text-sm">
+        <Link href="/dashboard/evidence" className="twin-link">
+          {t("careerEvidence.openVault")} →
+        </Link>
+        <Link href="/dashboard/career-pack" className="twin-link">
+          {t("careerPack.nav")} →
+        </Link>
+      </div>
     </Shell>
   );
 }

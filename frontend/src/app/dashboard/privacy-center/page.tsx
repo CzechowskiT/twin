@@ -82,6 +82,9 @@ export default function PrivacyCenterPage() {
             <a href="/dashboard/data-trust" className="underline">
               {t("dataTrust.nav")}
             </a>
+            <a href="/dashboard/career-pack" className="underline">
+              {t("careerPack.nav")}
+            </a>
             <a href="/dashboard/import" className="underline">
               {t("importCenter.nav")}
             </a>

@@ -189,6 +189,11 @@ export default function ApplicationStudioPage() {
           onChange={(e) => setDesc(e.target.value)}
           aria-label={t("applicationStudio.opportunityLabel")}
         />
+        <p className="mb-2 text-sm">
+          <a href="/dashboard/career-pack" className="underline">
+            {t("careerPack.nav")}
+          </a>
+        </p>
         <div className="mt-2 flex flex-wrap gap-2">
           <Button type="button" disabled={busy} onClick={() => void createWorkspace()}>
             {t("applicationStudio.create")}

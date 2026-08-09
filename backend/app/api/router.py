@@ -12,6 +12,7 @@ from app.api import (
     candidate_owned_import,
     candidate_data_trust,
     candidate_path_readiness,
+    candidate_career_pack,
     unified_workspace_search,
     career_evidence,
     application_studio,
@@ -251,6 +252,11 @@ api_router.include_router(
     candidate_path_readiness.router,
     prefix="/candidates",
     tags=["Candidate Path Readiness"],
+)
+api_router.include_router(
+    candidate_career_pack.router,
+    prefix="/candidates",
+    tags=["Candidate Career Pack"],
 )
 api_router.include_router(
     unified_workspace_search.router,

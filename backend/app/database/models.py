@@ -7601,3 +7601,62 @@ class CandidatePathReadinessSession(Base):
     updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     cleared_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateCareerPack(Base):
+    """Epic 2.17 — private owner-only career pack (never externally delivered)."""
+
+    __tablename__ = "candidate_career_packs"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "pack_key", name="uq_career_pack_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    pack_key: Mapped[str] = mapped_column(String(64))
+    pack_type: Mapped[str] = mapped_column(String(64))
+    state: Mapped[str] = mapped_column(String(32), default="DRAFT", index=True)
+    schema_version: Mapped[str] = mapped_column(
+        String(48), default="twin.candidate_career_pack/v1"
+    )
+    title: Mapped[str] = mapped_column(String(300), default="Career Pack")
+    artifact_refs_json: Mapped[str] = mapped_column(Text, default="[]")
+    disclosure_json: Mapped[str] = mapped_column(Text, default="{}")
+    preview_json: Mapped[str] = mapped_column(Text, default="{}")
+    preview_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    snapshot_json: Mapped[str] = mapped_column(Text, default="{}")
+    snapshot_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    immutable: Mapped[bool] = mapped_column(Boolean, default=False)
+    pdf_bytes: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True)
+    zip_bytes: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True)
+    byte_size: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    download_count: Mapped[int] = mapped_column(Integer, default=0)
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    confirmed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    generated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    stale_confirmed: Mapped[bool] = mapped_column(Boolean, default=False)
+    external_delivery: Mapped[bool] = mapped_column(Boolean, default=False)
+    claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    first_value_satisfied: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateCareerPackAudit(Base):
+    __tablename__ = "candidate_career_pack_audits"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    pack_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    action: Mapped[str] = mapped_column(String(64))
+    payload_json: Mapped[str] = mapped_column(Text, default="{}")
+    claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
