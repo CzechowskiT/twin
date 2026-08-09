@@ -1,0 +1,23 @@
+{
+  "epic": "2.15",
+  "schema_id": "twin.candidate_data_trust/v1",
+  "contract_id": "candidate_data_trust_v1",
+  "verdict_letter": "A",
+  "exact_verdict": "CANDIDATE DATA TRUST CONTROLS, RECONCILIATION AND CHANGE CONTROL CUSTOMER-USABLE — PROVENANCE-PRESERVING POST-COMMIT CONFLICT REVIEW, CANDIDATE-APPROVED IMPACT-PREVIEWED REPAIR AND CONFLICT-SAFE UNDO PRODUCTION-READY; CANARY CONTROL PLANE UNCHANGED",
+  "product_sha": "d21ba7661b8cb3a1dc08e1b91975a3743158e639",
+  "alignment_status": "ALIGNED",
+  "alembic": "131_candidate_data_trust",
+  "ci_tip": "31300519946",
+  "canary_run_1": "BLOCKED_EXTERNALLY_NOT_EXECUTED",
+  "canary_invariant_diff": 0,
+  "REAL_CANDIDATE_COMPREHENSION": "NOT_EVALUATED",
+  "REAL_CANDIDATE_USABILITY": "NOT_EVALUATED",
+  "REAL_CANDIDATE_VALUE": "NOT_EVALUATED",
+  "REAL_CANDIDATE_ADOPTION": "NOT_EVALUATED",
+  "REAL_CANDIDATE_RETENTION": "NOT_EVALUATED",
+  "auto_repair": false,
+  "fuzzy_or_llm_conflict": false,
+  "trust_quality_scores": false,
+  "eighth_primary_nav": false,
+  "first_value_satisfied_by_data_trust": false
+}

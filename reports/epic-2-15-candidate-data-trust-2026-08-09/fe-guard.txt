@@ -1,0 +1,5 @@
+
+> frontend@0.1.0 test:epic-215-data-trust-guard
+> npx --yes tsx scripts/epic-215-data-trust-guard.test.ts
+
+epic-215-data-trust-guard: ok

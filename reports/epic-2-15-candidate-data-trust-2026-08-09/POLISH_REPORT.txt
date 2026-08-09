@@ -1,0 +1,128 @@
+1|Executive Summary
+Epic 2.15 COMPLETE (Verdict A). Post-commit Candidate Data Trust: deterministyczne pytania po COMMITTED import, porównanie proweniencji, rozstrzygnięcia, version-bound impact preview (mutates_on_preview=false), approval Lifecycle, atomowy change set, STALE tylko gdy previewowane, conflict-safe undo. Surface Settings/Data (/dashboard/data-trust, secondary). Tip/product d21ba766 FE=API=worker ALIGNED; Alembic 131; unit 5/5; code/stance 39/39; auth product 18/18 + stance 7/7 + invariant 4/4; CI SUCCESS 31300519946; canary invariant diff=0. Canary Run 1 nie retry. REAL_CANDIDATE_*=NOT_EVALUATED.
+2|Canonical Baseline
+Start: tip 3a7ac0dc (docs) / product API=worker 02030109 / FE 3a7ac0dc docs_only_drift / Alembic 130 designation / canary READY_INACTIVE / DESIGNATED=0 / activation PREPARED_NOT_EXECUTED / caps 0 / Launch NO-GO — zweryfikowane niezależnie; Canary Run 1 pozostaje BLOCKED_EXTERNALLY_NOT_EXECUTED.
+3|Canonical Final State
+product SHA d21ba7661b8cb3a1dc08e1b91975a3743158e639 FE=API=worker ALIGNED; Alembic 131_candidate_data_trust head; schema twin.candidate_data_trust/v1; canary READY_INACTIVE; designation_count=0; activation PREPARED_NOT_EXECUTED; caps 0; Launch NO-GO; enrollment OFF; Phase 3B BLOCKED; Phase 3 Agent NOT_STARTED.
+4|Verdict
+CANDIDATE DATA TRUST CONTROLS, RECONCILIATION AND CHANGE CONTROL CUSTOMER-USABLE — PROVENANCE-PRESERVING POST-COMMIT CONFLICT REVIEW, CANDIDATE-APPROVED IMPACT-PREVIEWED REPAIR AND CONFLICT-SAFE UNDO PRODUCTION-READY; CANARY CONTROL PLANE UNCHANGED
+5|Repository Reconciliation
+Brak wcześniejszej implementacji data-trust/reconciliation field-level. Reuse: Lifecycle Approvals, Strategy change-set/STALE/undo pattern, Epic 2.12 import commit hook, Epic 2.13 search mutations=0, Settings/privacy-center. Trust Center privacy ≠ Data Trust reconciliation.
+6|Core Flow Proven
+committed import → spawn_post_commit_review → deterministic questions → resolve → impact-preview → propose (CandidateLifecycleApproval approval_kind=data_trust_change_set) → approve atomic CAS → dependents STALE if previewed → undo conflict-safe. Staging/preview nie spawnują review.
+7|Coverage Matrix
+Included: profile/direction/roles/skills/evidence/opportunities/lifecycle/provenance/deps. Excluded: staging/raw_ms/employer/enrichment/canary_control/invite/designation/activation_manifest.
+8|Question Registry
+Rule families: PROFILE_FIELD_CONFLICT, DIRECTION_CONFLICT, ROLE_CONFLICT, SKILL_CONFLICT, EVIDENCE_DUPLICATE_OR_CONFLICT, OPPORTUNITY_NOTE_CONFLICT, LIFECYCLE_PHASE_HINT, PROVENANCE_MISMATCH, DEPENDENT_STALE_RISK. States OPEN…CONFLICT_BLOCKED. Actions KEEP_EXISTING/REPLACE_WITH_INCOMING/MERGE_DECLARED/DEFER/DISMISS. No fuzzy/LLM; no trust/quality scores; AUTO_REPAIR=false.
+9|Persistence
+Alembic 131 tables: candidate_data_trust_reviews/questions/change_sets/audits. kpi_excluded=true. Content-free audit allowlist. Zero DDL/DML against canary/invite/designation.
+10|Frontend Surface
+/dashboard/data-trust secondary; link z privacy-center (Settings); CANDIDATE_PRIMARY_IA=7; eighth_primary_nav=false; preview bez DataTrustWorkspace; i18n EN/PL dataTrust.*.
+11|First-Value Integrity
+first_value_satisfied_by_data_trust=false; review/approve/undo nie flipują first value; import alone nadal nie jest first value.
+12|Search Import Continuity
+Epic 2.12 commit hook tylko post-COMMITTED; Epic 2.13 search mutations=0 w auth E2E; regresja unit 215+213 = 11/11.
+13|Privacy Telemetry Security
+Auth required; Cache-Control no-store; audit bez free-text wartości pól; exclude_from_product_metrics synth; brak email/invite/canary write.
+14|Canary Isolation
+svc/api/migration nie mutują canary/designation/invite; before/after invariant diff_count=0; designation_count=0; READY_INACTIVE; PREPARED_NOT_EXECUTED; caps 0.
+15|Proof Matrix Product
+Unit 5/5; FE guard ok; code E2E 39/39; auth product 18/18 (catalog, spawn, preview, propose, approve, undo, search=0, unauth 401).
+16|Proof Matrix Stance
+Auth stance 7/7: launch NO-GO, enrollment OFF, canary inactive, activation prepared, designation 0, caps 0, public_health.
+17|Proof Matrix Canary Invariant
+invariant 4/4 + snapshot diff 0; osobny bucket od product/stance.
+18|CI Deploy
+CI smoke SUCCESS 31300519946 @ d21ba766; FE Vercel twin-sooty + API Railway twin + worker enthusiastic-encouragement ALIGNED @ d21ba766; Alembic 131 live (E2E spawn OK).
+19|Hard Bans Observed
+No Canary Run 1 retry; no designation; no invite gen/send/redeem; no activation; no signup/enrollment/Launch/Phase 3; no Epic 2.16 auto-start; no 8th nav; no auto repair; no fuzzy/LLM; no Founder ask for real data.
+20|Terminal Posture
+PUBLIC_LAUNCH=NO_GO · PUBLIC_SIGNUP=OFF · PUBLIC_ENROLLMENT=OFF · PILOT_ACCESS=OPERATIONALLY_READY_INACTIVE · EFFECTIVE_CAPS=0 · REAL_INVITES=0 · DESIGNATION_COUNT=0 · CANARY_STATE=READY_INACTIVE · CANARY_ACTIVE=false · ACTIVATION=PREPARED_NOT_EXECUTED · CANARY_RUN_1=BLOCKED_EXTERNALLY_NOT_EXECUTED · PHASE_3B=BLOCKED · PHASE_3_AGENT=NOT_STARTED · MS_WRITE=OFF · stop after report.
+21|Evidence Dir
+reports/epic-2-15-candidate-data-trust-2026-08-09/
+22|Push Only Scaffold
+Branch cursor/phase1-monorepo-scaffold; no PR to main; no force push.
+23|Docs Only Drift
+false at product close (FE=API=worker=d21ba766); subsequent docs tip may advance after evidence commit.
+24|REAL Evaluation
+REAL_CANDIDATE_COMPREHENSION/USABILITY/VALUE/ADOPTION/RETENTION=NOT_EVALUATED
+25|Stop Condition
+Report complete; no Canary Run 1 retry; no Epic 2.16 auto-start; canary control plane unchanged.
+26|Architecture Boundaries
+2.12 owns import; 2.13 owns search read-only; reuse Lifecycle Approvals + Decision Governance patterns; no second stores/approval/truth/graph/autonomous repair agent.
+27|Impact Preview Contract
+mutates_on_preview=false; version-bound to review+preview versions; reject/postpone leave canonical unchanged; STALE fan-out only for previewed dependents.
+28|Undo Contract
+conflict-safe: blocks if skills edited after execute (undo_conflict_skills_edited); creates undo change set; marks review UNDONE.
+29|Admin Canary Unchanged
+No admin canary/designation API changes in this epic; health flags unchanged business-wise.
+30|PP1
+/preview HTTP 200; DataTrustWorkspace absent from preview.
+31|Unit Tests
+5/5 PASS test_epic_215_candidate_data_trust.py
+32|Frontend Guard
+epic-215-data-trust-guard ok
+33|Code Stance E2E
+39/39 scripts/epic-2-15-data-trust-e2e.py
+34|Auth Product E2E
+18/18
+35|Auth Stance E2E
+7/7
+36|Auth Invariant E2E
+4/4; total auth checks 29/29
+
+Final Answers
+1|exact_verdict: CANDIDATE DATA TRUST CONTROLS, RECONCILIATION AND CHANGE CONTROL CUSTOMER-USABLE — PROVENANCE-PRESERVING POST-COMMIT CONFLICT REVIEW, CANDIDATE-APPROVED IMPACT-PREVIEWED REPAIR AND CONFLICT-SAFE UNDO PRODUCTION-READY; CANARY CONTROL PLANE UNCHANGED
+2|epic_215_status: COMPLETE
+3|verdict_letter: A
+4|repo_head: d21ba7661b8cb3a1dc08e1b91975a3743158e639
+5|product_SHA: d21ba7661b8cb3a1dc08e1b91975a3743158e639
+6|tip_SHA: d21ba7661b8cb3a1dc08e1b91975a3743158e639
+7|FE_SHA: d21ba7661b8cb3a1dc08e1b91975a3743158e639
+8|API_SHA: d21ba7661b8cb3a1dc08e1b91975a3743158e639
+9|worker_SHA: d21ba7661b8cb3a1dc08e1b91975a3743158e639
+10|alignment_status: ALIGNED
+11|docs_only_drift: false
+12|alembic: 131_candidate_data_trust (is_at_head=true)
+13|CI_tip: SUCCESS 31300519946
+14|CI_url: https://github.com/CzechowskiT/twin/actions/runs/31300519946
+15|unit_tests: 5/5
+16|fe_guard: ok
+17|code_stance_E2E: 39/39
+18|auth_E2E_product: 18/18
+19|auth_E2E_stance: 7/7
+20|auth_E2E_invariant: 4/4
+21|auth_E2E_total: 29/29
+22|import_search_regression: 11/11
+23|pp1_preview: ON_READ_ONLY_SYNTHETIC HTTP 200
+24|public_signup: OFF
+25|public_enrollment: OFF
+26|pilot_access: OPERATIONALLY_READY_INACTIVE
+27|launch: NO-GO
+28|phase_3b: BLOCKED
+29|phase_3_agent: NOT_STARTED
+30|effective_cohort_cap: 0
+31|effective_canary_cap: 0
+32|designation_count: 0
+33|designation_status: NOT_DESIGNATED
+34|canary_state: READY_INACTIVE
+35|canary_active: false
+36|activation_command: PREPARED_NOT_EXECUTED
+37|canary_run_1: BLOCKED_EXTERNALLY_NOT_EXECUTED
+38|canary_invariant_diff: 0
+39|schema_id: twin.candidate_data_trust/v1
+40|eighth_primary_nav: false
+41|auto_repair: false
+42|fuzzy_or_llm_conflict: false
+43|trust_quality_scores: false
+44|first_value_by_data_trust: false
+45|REAL_CANDIDATE_COMPREHENSION: NOT_EVALUATED
+46|REAL_CANDIDATE_USABILITY: NOT_EVALUATED
+47|REAL_CANDIDATE_VALUE: NOT_EVALUATED
+48|REAL_CANDIDATE_ADOPTION: NOT_EVALUATED
+49|REAL_CANDIDATE_RETENTION: NOT_EVALUATED
+50|evidence_dir: reports/epic-2-15-candidate-data-trust-2026-08-09/
+51|branch: cursor/phase1-monorepo-scaffold
+52|pr_to_main: none
+53|force_push: none
+54|next_epic_auto_start: none
