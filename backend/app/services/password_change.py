@@ -1,7 +1,8 @@
-"""Authenticated password change (bcrypt verify + invalidate reset tokens)."""
+"""Authenticated password change (bcrypt verify + invalidate reset + optional revoke)."""
 
 from sqlalchemy.orm import Session
 
+from app.config import get_settings
 from app.core.security import hash_password, verify_password
 from app.database.models import PasswordResetToken, User
 
@@ -20,6 +21,7 @@ def change_user_password(
     *,
     current_password: str,
     new_password: str,
+    keep_session_key: str | None = None,
 ) -> None:
     if not user.hashed_password:
         raise PasswordChangeError("no_password_login")
@@ -32,3 +34,12 @@ def change_user_password(
     db.query(PasswordResetToken).filter(PasswordResetToken.user_id == user.id).delete()
     db.add(user)
     db.commit()
+
+    settings = get_settings()
+    if bool(getattr(settings, "auth_recovery_v2_session_revoke", True)):
+        from app.services import candidate_auth_session as cas
+
+        if keep_session_key:
+            cas.revoke_all_other(db, user_id=user.id, keep_session_key=keep_session_key)
+        else:
+            cas.revoke_everywhere(db, user_id=user.id)

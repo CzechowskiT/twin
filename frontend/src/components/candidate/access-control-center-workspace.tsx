@@ -5,9 +5,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/components/language-provider";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
-import { Button, Card, Shell } from "@/components/ui";
+import { Button, Card, Input, Label, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 import { getToken, logoutSession } from "@/lib/auth";
+import { issueStepUpToken, stepUpHeaders, type StepUpPurpose } from "@/lib/step-up";
 import { WorkspaceHandoffBanner } from "@/components/candidate/workspace-handoff-banner";
 
 type AccessItem = {
@@ -35,6 +36,11 @@ const GROUP_ORDER = [
   "temporary_files",
 ] as const;
 
+type StepUpPrompt = {
+  purpose: StepUpPurpose;
+  onToken: (token: string) => Promise<void>;
+};
+
 export function AccessControlCenterWorkspace() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -42,6 +48,9 @@ export function AccessControlCenterWorkspace() {
   const [err, setErr] = useState<string | null>(null);
   const [busyKey, setBusyKey] = useState<string | null>(null);
   const [confirmKey, setConfirmKey] = useState<string | null>(null);
+  const [stepUp, setStepUp] = useState<StepUpPrompt | null>(null);
+  const [stepPassword, setStepPassword] = useState("");
+  const [stepBusy, setStepBusy] = useState(false);
 
   const load = useCallback(async () => {
     const token = getToken();
@@ -68,6 +77,27 @@ export function AccessControlCenterWorkspace() {
     });
   }, [load]);
 
+  async function runWithStepUp(purpose: StepUpPurpose, onToken: (tok: string) => Promise<void>) {
+    setStepUp({ purpose, onToken });
+    setStepPassword("");
+  }
+
+  async function submitStepUp() {
+    if (!stepUp) return;
+    setStepBusy(true);
+    setErr(null);
+    try {
+      const once = await issueStepUpToken(stepUp.purpose, stepPassword);
+      await stepUp.onToken(once);
+      setStepUp(null);
+      setStepPassword("");
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : t("accessCenter.error"));
+    } finally {
+      setStepBusy(false);
+    }
+  }
+
   async function revoke(item: AccessItem) {
     const token = getToken();
     if (!token) return;
@@ -79,29 +109,39 @@ export function AccessControlCenterWorkspace() {
       setConfirmKey(item.access_key);
       return;
     }
-    setBusyKey(item.access_key);
-    try {
-      await apiFetch(
-        "/api/v1/candidates/me/access-inventory/revoke",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            access_key: item.access_key,
-            kind: item.kind,
-            client_revision: item.revision,
-            confirm: true,
-          }),
-        },
-        token,
-      );
-      setConfirmKey(null);
-      await load();
-    } catch (ex) {
-      const msg = ex instanceof Error ? ex.message : t("accessCenter.error");
-      setErr(msg.includes("revision") ? t("accessCenter.revisionStale") : msg);
-    } finally {
-      setBusyKey(null);
+
+    const doRevoke = async (stepTok?: string) => {
+      setBusyKey(item.access_key);
+      try {
+        await apiFetch(
+          "/api/v1/candidates/me/access-inventory/revoke",
+          {
+            method: "POST",
+            headers: stepTok ? stepUpHeaders(stepTok) : {},
+            body: JSON.stringify({
+              access_key: item.access_key,
+              kind: item.kind,
+              client_revision: item.revision,
+              confirm: true,
+            }),
+          },
+          token,
+        );
+        setConfirmKey(null);
+        await load();
+      } catch (ex) {
+        const msg = ex instanceof Error ? ex.message : t("accessCenter.error");
+        setErr(msg.includes("revision") ? t("accessCenter.revisionStale") : msg);
+      } finally {
+        setBusyKey(null);
+      }
+    };
+
+    if (item.kind === "PENDING_RECOVERY") {
+      await runWithStepUp("CANCEL_RECOVERY", doRevoke);
+      return;
     }
+    await doRevoke();
   }
 
   function groupLabel(g: string): string {
@@ -110,12 +150,20 @@ export function AccessControlCenterWorkspace() {
     return t("accessCenter.groupTemp");
   }
 
+  function revokeLabel(item: AccessItem): string {
+    if (item.kind === "PENDING_RECOVERY") return t("accessCenter.cancelRecovery");
+    return confirmKey === item.access_key
+      ? t("accessCenter.confirmRevoke")
+      : t("accessCenter.revoke");
+  }
+
   return (
     <Shell>
       <CandidateWorkspaceSubnav ariaLabel={t("accessCenter.nav")} />
       <main
         className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8"
         data-access-control-center
+        data-auth-recovery-center
       >
         <div>
           <Link href="/dashboard/privacy-center" className="text-sm underline">
@@ -128,6 +176,7 @@ export function AccessControlCenterWorkspace() {
           <p className="text-xs text-[var(--twin-muted)]">{t("accessCenter.notFirstValue")}</p>
           <p className="mt-2 text-xs text-[var(--twin-muted)]">{t("accessCenter.sessionsNote")}</p>
           <p className="mt-2 text-sm text-[var(--twin-muted)]">{t("accessCenter.recoveryLead")}</p>
+          <p className="mt-1 text-xs text-[var(--twin-muted)]">{t("accessCenter.pendingRecoveryNote")}</p>
           <Link href="/forgot-password" className="text-sm underline">
             {t("accessCenter.recoveryLink")}
           </Link>
@@ -136,7 +185,8 @@ export function AccessControlCenterWorkspace() {
               type="button"
               data-auth-sign-out-everywhere
               onClick={() => {
-                void logoutSession({ everywhere: true }).then(() => {
+                void runWithStepUp("SIGN_OUT_EVERYWHERE", async (stepTok) => {
+                  await logoutSession({ everywhere: true, stepUpToken: stepTok });
                   router.replace("/login");
                 });
               }}
@@ -146,6 +196,34 @@ export function AccessControlCenterWorkspace() {
           </div>
         </div>
         <WorkspaceHandoffBanner expectedDestRouteKey="access_center" />
+        {stepUp ? (
+          <Card data-step-up-prompt>
+            <h2 className="text-lg font-medium">{t("accessCenter.stepUpTitle")}</h2>
+            <p className="mt-1 text-sm text-[var(--twin-muted)]">{t("accessCenter.stepUpLead")}</p>
+            <Label>{t("accessCenter.stepUpPassword")}</Label>
+            <Input
+              type="password"
+              autoComplete="current-password"
+              value={stepPassword}
+              onChange={(e) => setStepPassword(e.target.value)}
+            />
+            <div className="mt-3 flex gap-2">
+              <Button type="button" disabled={stepBusy || !stepPassword} onClick={() => void submitStepUp()}>
+                {t("accessCenter.stepUpConfirm")}
+              </Button>
+              <Button
+                type="button"
+                disabled={stepBusy}
+                onClick={() => {
+                  setStepUp(null);
+                  setStepPassword("");
+                }}
+              >
+                {t("accessCenter.stepUpCancel")}
+              </Button>
+            </div>
+          </Card>
+        ) : null}
         {err ? (
           <p className="text-sm text-red-700" role="alert">
             {err}
@@ -173,6 +251,7 @@ export function AccessControlCenterWorkspace() {
                       key={item.access_key}
                       className="border-t border-[var(--twin-border)] pt-3 first:border-0 first:pt-0"
                       data-access-key={item.access_key}
+                      data-access-kind={item.kind}
                     >
                       <div className="font-medium">{item.title}</div>
                       <dl className="mt-1 grid gap-1 text-sm text-[var(--twin-muted)]">
@@ -202,9 +281,7 @@ export function AccessControlCenterWorkspace() {
                           disabled={busyKey === item.access_key}
                           onClick={() => void revoke(item)}
                         >
-                          {confirmKey === item.access_key
-                            ? t("accessCenter.confirmRevoke")
-                            : t("accessCenter.revoke")}
+                          {revokeLabel(item)}
                         </Button>
                       ) : null}
                     </li>

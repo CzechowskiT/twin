@@ -33,6 +33,7 @@ ACCESS_KINDS = (
     "CAREER_PACK_SHARE",
     "TEMPORARY_CAREER_PACK_ARTIFACT",
     "TEMPORARY_PRIVACY_EXPORT",
+    "PENDING_RECOVERY",
     "OTHER_EXPLICITLY_ALLOWLISTED",
 )
 
@@ -62,5 +63,6 @@ KIND_TO_GROUP = {
     "CAREER_PACK_SHARE": "private_links_and_feeds",
     "TEMPORARY_CAREER_PACK_ARTIFACT": "temporary_files",
     "TEMPORARY_PRIVACY_EXPORT": "temporary_files",
+    "PENDING_RECOVERY": "temporary_files",
     "OTHER_EXPLICITLY_ALLOWLISTED": "connected_services",
 }

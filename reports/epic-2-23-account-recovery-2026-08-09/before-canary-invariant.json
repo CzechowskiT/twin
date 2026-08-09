@@ -1,0 +1,18 @@
+{
+  "rc1_launch": "NO-GO",
+  "rc1_external_pilot_enrollment_enabled": false,
+  "rc1_one_candidate_canary_ready": true,
+  "rc1_one_candidate_canary_state": "READY_INACTIVE",
+  "rc1_one_candidate_canary_active": false,
+  "rc1_canary_activation_command": "PREPARED_NOT_EXECUTED",
+  "rc1_effective_canary_cap": 0,
+  "rc1_effective_cohort_cap": 0,
+  "rc1_real_canary_designation_count": 0,
+  "rc1_real_canary_designation_status": "NOT_DESIGNATED",
+  "rc1_real_canary_candidate_designated_ready": false,
+  "rc1_pilot_runtime_state": "OPERATIONALLY_READY_INACTIVE",
+  "rc1_invite_send_enabled": false,
+  "frontend_commit": "8d5d87f0976e4d7bc4aa5a659faa983f3a53c9d8",
+  "api_commit": "25aa9dd7f53b6a76ddb7f974c72a4b69a6030b1a",
+  "worker_commit": "25aa9dd7f53b6a76ddb7f974c72a4b69a6030b1a"
+}

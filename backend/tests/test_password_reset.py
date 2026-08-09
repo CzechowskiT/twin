@@ -59,10 +59,11 @@ def test_request_reset_creates_token_and_sends_mail(mock_send: MagicMock, _mc: M
     user.email = "u@example.com"
     user.hashed_password = "bcrypt-here"
     user.is_active = True
+    user.exclude_from_product_metrics = False
 
     token_q = MagicMock()
     token_q.filter.return_value = token_q
-    token_q.delete.return_value = None
+    token_q.update.return_value = 0
 
     user_q = MagicMock()
     user_q.filter.return_value = user_q
@@ -86,11 +87,21 @@ def test_request_reset_creates_token_and_sends_mail(mock_send: MagicMock, _mc: M
     settings.environment = "development"
     settings.debug = False
 
-    msg = request_password_reset(db, settings, "U@Example.com")
+    with patch("app.services.password_reset.get_settings") as gs:
+        gs.return_value = MagicMock(
+            auth_recovery_v2_enabled=True,
+            auth_recovery_v2_session_revoke=True,
+            auth_recovery_v2_hash_links=True,
+            auth_legacy_reset_token_acceptance=True,
+        )
+        msg = request_password_reset(db, settings, "U@Example.com")
     assert msg == FORGOT_PASSWORD_ACK
-    db.add.assert_called_once()
+    assert db.add.call_count >= 1
     assert db.commit.call_count >= 1
     mock_send.assert_called_once()
+    args, kwargs = mock_send.call_args
+    reset_url = kwargs.get("reset_url") or (args[2] if len(args) > 2 else "")
+    assert "#token=" in str(reset_url)
 
 
 def test_forgot_password_route_does_not_require_real_db() -> None:

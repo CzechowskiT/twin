@@ -56,19 +56,43 @@ def get_access_inventory(
 @router.post("/me/access-inventory/revoke")
 def post_access_revoke(
     body: RevokeIn,
+    request: Request,
     response: Response,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> dict:
     _no_store(response)
     cand = _candidate(db, user)
+    kind = body.kind.strip().upper()
+    if kind == "PENDING_RECOVERY":
+        from app.services import candidate_step_up as step_up
+        from app.services.candidate_account_recovery_constants import (
+            PURPOSE_CANCEL_RECOVERY,
+        )
+        from app.services.step_up_request import (
+            session_binding_from_request,
+            step_up_token_from_request,
+        )
+
+        sid, epoch = session_binding_from_request(request)
+        try:
+            step_up.require_step_up_or_raise(
+                db,
+                user=user,
+                purpose=PURPOSE_CANCEL_RECOVERY,
+                step_up_token=step_up_token_from_request(request),
+                session_key=sid,
+                session_epoch=epoch,
+            )
+        except ValueError as exc:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
     try:
         return cai.revoke_access(
             db,
             user=user,
             candidate_id=cand.id,
             access_key=body.access_key.strip(),
-            kind=body.kind.strip().upper(),
+            kind=kind,
             client_revision=body.client_revision.strip(),
             confirm=body.confirm,
         )

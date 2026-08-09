@@ -823,10 +823,31 @@ def export_my_matches_xlsx(
 
 @router.get("/me/export.json")
 def export_my_data_json(
+    request: Request,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> JSONResponse:
     """Machine-readable export of account and profile data owned by the signed-in user (GDPR-style portability)."""
+    from app.services import candidate_step_up as step_up
+    from app.services.candidate_account_recovery_constants import PURPOSE_FULL_PRIVACY_EXPORT
+    from app.services.step_up_request import (
+        session_binding_from_request,
+        step_up_token_from_request,
+    )
+
+    sid, epoch = session_binding_from_request(request)
+    try:
+        step_up.require_step_up_or_raise(
+            db,
+            user=user,
+            purpose=PURPOSE_FULL_PRIVACY_EXPORT,
+            step_up_token=step_up_token_from_request(request),
+            session_key=sid,
+            session_epoch=epoch,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
+
     settings = get_settings()
     dashboard_url = f"{settings.frontend_url.rstrip('/')}/dashboard"
     row = db.query(User).filter(User.id == user.id).first()
@@ -1037,6 +1058,26 @@ def delete_my_account(
     user: User = Depends(get_current_user),
 ) -> AccountDeleteOut:
     """Self-service account deletion — anonymizes PII and deactivates sign-in (R-019)."""
+    from app.services import candidate_step_up as step_up
+    from app.services.candidate_account_recovery_constants import PURPOSE_ACCOUNT_DELETION
+    from app.services.step_up_request import (
+        session_binding_from_request,
+        step_up_token_from_request,
+    )
+
+    sid, epoch = session_binding_from_request(request)
+    try:
+        step_up.require_step_up_or_raise(
+            db,
+            user=user,
+            purpose=PURPOSE_ACCOUNT_DELETION,
+            step_up_token=step_up_token_from_request(request),
+            session_key=sid,
+            session_epoch=epoch,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
+
     candidate = _get_candidate_or_404(db, user.id)
     try:
         data = execute_candidate_account_deletion(

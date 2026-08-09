@@ -28,6 +28,13 @@ export const ACCESS_CENTER_MESSAGES_EN = {
   recoveryLink: "Reset password",
   signOutEverywhere: "Sign out everywhere",
   sessionsNote: "Sessions show Current vs Other only — no device, IP, location, or activity scores.",
+  stepUpTitle: "Confirm with password",
+  stepUpLead: "This action needs a short reauthentication (≤5 minutes, purpose-bound).",
+  stepUpPassword: "Current password",
+  stepUpConfirm: "Confirm",
+  stepUpCancel: "Cancel",
+  cancelRecovery: "Cancel recovery",
+  pendingRecoveryNote: "Pending recovery challenges appear below — cancel requires step-up.",
 };
 
 export const ACCESS_CENTER_MESSAGES_PL = {
@@ -60,4 +67,11 @@ export const ACCESS_CENTER_MESSAGES_PL = {
   signOutEverywhere: "Wyloguj wszędzie",
   sessionsNote:
     "Sesje pokazują tylko Bieżąca vs Inna — bez urządzenia, IP, lokalizacji ani scorów aktywności.",
+  stepUpTitle: "Potwierdź hasłem",
+  stepUpLead: "Ta czynność wymaga krótkiego ponownego uwierzytelnienia (≤5 min, związanego z celem).",
+  stepUpPassword: "Aktualne hasło",
+  stepUpConfirm: "Potwierdź",
+  stepUpCancel: "Anuluj",
+  cancelRecovery: "Anuluj odzyskiwanie",
+  pendingRecoveryNote: "Oczekujące wyzwania odzyskiwania są poniżej — anulowanie wymaga step-up.",
 };

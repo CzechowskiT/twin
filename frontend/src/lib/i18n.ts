@@ -1654,6 +1654,7 @@ const en = {
     submit: "Update password",
     updating: "Saving…",
     success: "Your password was updated. You can log in now.",
+    freshLogin: "For security, sign in again with your new password — recovery does not keep you signed in.",
     backToLogin: "Log in",
     failed: "Could not reset password",
   },
@@ -10983,6 +10984,8 @@ const pl: MessageTree = {
     submit: "Zapisz hasło",
     updating: "Zapisywanie…",
     success: "Hasło zostało zmienione. Możesz się zalogować.",
+    freshLogin:
+      "Ze względów bezpieczeństwa zaloguj się ponownie nowym hasłem — odzyskiwanie nie pozostawia Cię zalogowanym.",
     backToLogin: "Zaloguj się",
     failed: "Nie udało się zresetować hasła",
   },

@@ -157,6 +157,36 @@ def _auth_session_items(
     return out
 
 
+def _pending_recovery_items(db: Session, *, user: User) -> list[dict[str, Any]]:
+    """Epic 2.23 — pending password recovery challenges (no secrets)."""
+    from app.services.password_reset import list_pending_recovery
+
+    out: list[dict[str, Any]] = []
+    for row in list_pending_recovery(db, user_id=user.id):
+        out.append(
+            _item(
+                kind="PENDING_RECOVERY",
+                access_key=str(row["access_key"]),
+                title="Pending account recovery",
+                scope="Password reset challenge (fingerprint only)",
+                state=str(row.get("state") or "ACTIVE"),
+                owner_module="auth.password_reset",
+                revocable=True,
+                revision=str(row["revision"]),
+                expires_at=row.get("expires_at"),
+                consequence=(
+                    "Cancel invalidates this recovery link. Requires step-up reauthentication."
+                ),
+                provider="twin",
+                source_ref={
+                    "challenge_id": row.get("challenge_id"),
+                    "token_fingerprint": row.get("token_fingerprint"),
+                },
+            )
+        )
+    return out
+
+
 def _oauth_items(db: Session, *, user: User) -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
     g = get_best_google_row(db, user.id)
@@ -405,6 +435,7 @@ def build_inventory(
         ("CAREER_PACK_SHARE", lambda: _share_items(db, candidate_id=candidate_id)),
         ("TEMPORARY_CAREER_PACK_ARTIFACT", lambda: _pack_artifact_items(db, candidate_id=candidate_id)),
         ("TEMPORARY_PRIVACY_EXPORT", lambda: _privacy_export_items(db, candidate_id=candidate_id)),
+        ("PENDING_RECOVERY", lambda: _pending_recovery_items(db, user=user)),
     ]
     for kind, fn in adapters:
         try:
@@ -501,6 +532,13 @@ def revoke_access(
         if not sk or sk.startswith("legacy:"):
             raise ValueError("not_revocable")
         cas.revoke_session(db, user_id=user.id, session_key=sk, reason="access_center")
+    elif kind == "PENDING_RECOVERY":
+        from app.services.password_reset import cancel_pending_recovery
+
+        cid = (match.get("source_ref") or {}).get("challenge_id")
+        if cid is None:
+            raise ValueError("not_revocable")
+        cancel_pending_recovery(db, user_id=user.id, challenge_id=int(cid))
     else:
         raise ValueError("unsupported_kind")
 

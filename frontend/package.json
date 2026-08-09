@@ -181,6 +181,7 @@
     "test:epic-220-access-control-guard": "npx --yes tsx scripts/epic-220-access-control-guard.test.ts",
     "test:epic-221-workspace-handoff-guard": "npx --yes tsx scripts/epic-221-workspace-handoff-guard.test.ts",
     "test:epic-222-auth-session-guard": "npx --yes tsx scripts/epic-222-auth-session-guard.test.ts",
+    "test:epic-223-account-recovery-guard": "npx --yes tsx scripts/epic-223-account-recovery-guard.test.ts",
     "test:hard-live-evidence-guard": "npx --yes tsx --test scripts/hard-live-evidence-guard.test.ts",
     "test:product-inclusion-taxonomy-guard": "npx --yes tsx --test scripts/product-inclusion-taxonomy-guard.test.ts",
     "test:production-topology-rc1-guard": "npx --yes tsx --test scripts/production-topology-rc1-guard.test.ts",

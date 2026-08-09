@@ -38,9 +38,15 @@ def get_current_user(
     try:
         request.state.access_token = token
         request.state.session_key = None
+        request.state.session_epoch = None
         from app.services.candidate_auth_session import session_key_from_token
+        from app.core.security import decode_access_token_claims
+        from app.services.candidate_auth_session_constants import MANAGED_CLAIM_EPOCH
 
         request.state.session_key = session_key_from_token(token)
+        claims = decode_access_token_claims(token) or {}
+        if MANAGED_CLAIM_EPOCH in claims:
+            request.state.session_epoch = int(claims[MANAGED_CLAIM_EPOCH])
     except Exception:
         pass
     user = db.query(User).filter(User.email == email).first()

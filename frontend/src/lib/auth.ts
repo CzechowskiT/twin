@@ -63,15 +63,21 @@ export function clearToken(): void {
 }
 
 /** Server logout (current or everywhere) then clear local tokens. */
-export async function logoutSession(opts?: { everywhere?: boolean }): Promise<void> {
+export async function logoutSession(opts?: {
+  everywhere?: boolean;
+  stepUpToken?: string;
+}): Promise<void> {
   const token = getToken();
   if (token) {
     try {
       const { apiFetch } = await import("@/lib/api");
+      const headers: Record<string, string> = {};
+      if (opts?.stepUpToken) headers["X-Twin-Step-Up"] = opts.stepUpToken;
       await apiFetch(
         "/api/v1/auth/logout",
         {
           method: "POST",
+          headers,
           body: JSON.stringify({ everywhere: Boolean(opts?.everywhere) }),
         },
         token,

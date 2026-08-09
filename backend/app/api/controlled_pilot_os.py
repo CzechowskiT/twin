@@ -593,6 +593,24 @@ def daily_os_mint_synthetic_session(
     return mint_synthetic_daily_os_session(db, expires_minutes=45)
 
 
+@router.post("/pilot-os/auth/mint-synthetic-recovery")
+def mint_synthetic_recovery(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    """Ops-only: mint recovery challenge for KPI-excluded synthetic user (mail sink; raw once)."""
+    _require_ops_admin(settings, authorization)
+    from app.services.daily_os_synthetic_proof import ensure_synthetic_daily_os_candidate
+    from app.services.password_reset import mint_synthetic_recovery_challenge
+
+    user, _cand = ensure_synthetic_daily_os_candidate(db)
+    try:
+        return mint_synthetic_recovery_challenge(db, user=user)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
 class DailyOsReminderSweepBody(BaseModel):
     dry_run: bool = True
     limit: int = Field(default=50, ge=1, le=200)

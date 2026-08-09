@@ -34,6 +34,7 @@ from app.schemas.auth import (
     OnboardingProgressIn,
     RefreshIn,
     ResetPasswordRequest,
+    StepUpIssueIn,
     VerifyEmailRequest,
     Token,
     UserLogin,
@@ -91,7 +92,20 @@ from app.services.email_verification import (
     verify_email_with_token,
 )
 from app.services.password_change import PasswordChangeError, change_user_password
-from app.services.password_reset import request_password_reset, reset_password_with_token
+from app.services.password_reset import (
+    catalog as recovery_catalog,
+    request_password_reset,
+    reset_password_with_token,
+)
+from app.services import candidate_step_up as step_up
+from app.services.candidate_account_recovery_constants import (
+    PURPOSE_CHANGE_PASSWORD,
+    PURPOSE_SIGN_OUT_EVERYWHERE,
+)
+from app.services.step_up_request import (
+    session_binding_from_request,
+    step_up_token_from_request,
+)
 from app.services.referral_public_token import ensure_user_referral_public_token
 from app.services.recruiter_company_auth import resolve_recruiter_access
 from app.services.signup_referrer import (
@@ -370,6 +384,44 @@ def session_catalog() -> dict:
     return cas.catalog()
 
 
+@router.get("/recovery/catalog")
+def auth_recovery_catalog() -> dict:
+    return recovery_catalog()
+
+
+@router.get("/step-up/catalog")
+def auth_step_up_catalog() -> dict:
+    return step_up.catalog()
+
+
+@router.post("/step-up/issue")
+@limiter.limit("10/minute")
+def auth_step_up_issue(
+    request: Request,
+    body: StepUpIssueIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    sid, epoch = session_binding_from_request(request)
+    try:
+        return step_up.issue_step_up(
+            db,
+            user=user,
+            purpose=body.purpose,
+            password=body.password,
+            session_key=sid,
+            session_epoch=epoch,
+        )
+    except ValueError as exc:
+        code = str(exc)
+        status_code = (
+            status.HTTP_401_UNAUTHORIZED
+            if code == "invalid_password"
+            else status.HTTP_400_BAD_REQUEST
+        )
+        raise HTTPException(status_code, detail=code) from exc
+
+
 @router.post("/refresh", response_model=Token)
 @limiter.limit("30/minute")
 def refresh_token(request: Request, body: RefreshIn, db: Session = Depends(get_db)) -> Token:
@@ -402,6 +454,17 @@ def logout(
 ) -> dict:
     sid = getattr(request.state, "session_key", None)
     if body.everywhere:
+        try:
+            step_up.require_step_up_or_raise(
+                db,
+                user=user,
+                purpose=PURPOSE_SIGN_OUT_EVERYWHERE,
+                step_up_token=step_up_token_from_request(request),
+                session_key=sid,
+                session_epoch=getattr(request.state, "session_epoch", None),
+            )
+        except ValueError as exc:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
         return cas.revoke_everywhere(db, user_id=user.id)
     if sid:
         return cas.revoke_session(db, user_id=user.id, session_key=sid, reason="logout")
@@ -624,12 +687,25 @@ def change_password(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> dict[str, str]:
+    sid, epoch = session_binding_from_request(request)
+    try:
+        step_up.require_step_up_or_raise(
+            db,
+            user=user,
+            purpose=PURPOSE_CHANGE_PASSWORD,
+            step_up_token=step_up_token_from_request(request),
+            session_key=sid,
+            session_epoch=epoch,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
     try:
         change_user_password(
             db,
             user,
             current_password=body.current_password,
             new_password=body.new_password,
+            keep_session_key=sid,
         )
     except PasswordChangeError as exc:
         detail = {

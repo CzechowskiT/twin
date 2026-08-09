@@ -65,6 +65,12 @@ class Settings(BaseSettings):
     auth_refresh_rotation: bool = True
     auth_refresh_reuse_detection: bool = True
     auth_legacy_token_acceptance: bool = True
+    # Epic 2.23 — recovery v2 + step-up
+    auth_recovery_v2_enabled: bool = True
+    auth_recovery_v2_session_revoke: bool = True
+    auth_recovery_v2_hash_links: bool = True
+    auth_step_up_enforce: bool = True
+    auth_legacy_reset_token_acceptance: bool = True
     # 0 = disabled (local only). Production should keep a positive cap to slow credential stuffing.
     auth_login_rate_limit_per_minute: int = 30
     # Separate bucket for POST /auth/forgot-password (abuse / enumeration). 0 = disabled.

@@ -270,8 +270,60 @@ class PasswordResetToken(Base):
     token_hash: Mapped[str] = mapped_column(String(64), index=True)
     expires_at: Mapped[datetime] = mapped_column(DateTime, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    # Epic 2.23 additive
+    schema_version: Mapped[str] = mapped_column(
+        String(64), default="twin.candidate_account_recovery/v1"
+    )
+    state: Mapped[str] = mapped_column(String(32), default="ACTIVE", index=True)
+    used_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    cancelled_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=False)
 
     user: Mapped["User"] = relationship(back_populates="password_reset_tokens")
+
+
+class CandidateStepUpChallenge(Base):
+    """Epic 2.23 — purpose-bound step-up (TTL≤5m); no MFA/passkeys."""
+
+    __tablename__ = "candidate_step_up_challenges"
+    __table_args__ = (
+        UniqueConstraint("challenge_key", name="uq_step_up_challenge_key"),
+        UniqueConstraint("token_digest", name="uq_step_up_token_digest"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    challenge_key: Mapped[str] = mapped_column(String(64))
+    token_digest: Mapped[str] = mapped_column(String(128))
+    purpose: Mapped[str] = mapped_column(String(64), index=True)
+    session_key: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    session_epoch: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    state: Mapped[str] = mapped_column(String(32), default="ACTIVE", index=True)
+    schema_version: Mapped[str] = mapped_column(
+        String(64), default="twin.candidate_step_up_reauthentication/v1"
+    )
+    expires_at: Mapped[datetime] = mapped_column(DateTime)
+    used_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+
+
+class CandidateRecoverySecurityReceipt(Base):
+    """Epic 2.23 — append-only recovery/step-up security receipts (no secrets)."""
+
+    __tablename__ = "candidate_recovery_security_receipts"
+    __table_args__ = (UniqueConstraint("receipt_key", name="uq_recovery_receipt_key"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    receipt_key: Mapped[str] = mapped_column(String(64))
+    event_kind: Mapped[str] = mapped_column(String(64))
+    payload_json: Mapped[str] = mapped_column(Text, default="{}")
+    schema_version: Mapped[str] = mapped_column(
+        String(64), default="twin.candidate_recovery_completion/v1"
+    )
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
 
 
 class EmailVerificationToken(Base):
