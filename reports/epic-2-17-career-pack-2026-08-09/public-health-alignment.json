@@ -1,10 +1,10 @@
 {
-  "repo_head": "42d8d7249a6080243d909526422fa5445a79fa65",
-  "frontend_commit": "42d8d7249a6080243d909526422fa5445a79fa65",
+  "repo_head": "46db6670da65b3e22056ab6e7fc23057564612a1",
+  "frontend_commit": "46db6670da65b3e22056ab6e7fc23057564612a1",
   "api_commit": "42d8d7249a6080243d909526422fa5445a79fa65",
   "worker_commit": "42d8d7249a6080243d909526422fa5445a79fa65",
-  "alignment_status": "ALIGNED",
-  "docs_only_drift": false,
-  "phase": "aligned",
-  "reason": "strict_four_way"
+  "alignment_status": "docs_only_drift",
+  "docs_only_drift": true,
+  "product_sha": "42d8d7249a6080243d909526422fa5445a79fa65",
+  "product_was_aligned": true
 }
