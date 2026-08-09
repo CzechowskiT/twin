@@ -1,0 +1,150 @@
+1|Executive Summary
+Epic 2.20 COMPLETE (Verdict A). Candidate Access and Sharing Control Center: derived inventory twin.candidate_access_inventory/v1 + delegated revocation twin.candidate_access_revocation/v1 w Settings/Privacy (/dashboard/settings/access). NEW_ACCESS_GRANT_STORE=NONE; brak równoległych store token/session/consent/share/audit. Product 5c549855 FE=API=worker ALIGNED; Alembic 135 (bez 136); unit 3/3; FE guard ok; code/stance 48/48; auth product 14/14 + stance 7/7 + security 4/4 + invariant 4/4; CI SUCCESS 31314496471; canary invariant diff=0. Canary Run 1 nie retry. REAL_CANDIDATE_USABILITY/VALUE=NOT_EVALUATED; absolute security/comprehension/trust/file retraction/activation/retention/PMF/pilot-public launch=NOT_EVALUATED.
+2|Canonical Baseline
+Epic 2.19 product bea2bdbe FE=API=worker / tip d657930d docs_only_drift / Alembic 135 / twin.candidate_career_pack_share_grant/v1 / CI 31309164194 / PP1 ON / IA=7 / grants 0 / outbound send false / recipient tracking false / canary diff 0 / P0=P1=0 — zweryfikowane niezależnie.
+3|Canonical Final State
+product SHA 5c5498552d247f33a6ad7199282f65b8f88794c4 FE=API=worker ALIGNED; tip docs_only_drift po raporcie PL; Alembic 135_candidate_career_pack_share (head; no aggregate migration); schema twin.candidate_access_inventory/v1; NEW_ACCESS_GRANT_STORE=NONE; canary READY_INACTIVE; designation=0; PREPARED_NOT_EXECUTED; caps 0; Launch NO-GO; enrollment OFF; Phase 3B BLOCKED; MS write OFF.
+4|Verdict
+CANDIDATE ACCESS AND SHARING CONTROL CENTER CUSTOMER-USABLE — CANONICAL ACTIVE-GRANT INVENTORY, SOURCE-OWNED EXPLICIT REVOCATION AND PRIVACY-PRESERVING ACCESS TRANSPARENCY PRODUCTION-READY; NO PARALLEL TOKEN STORE, BEHAVIORAL TRACKING OR CANARY MUTATION
+5|Duplication Owner Audit
+Mandatory audit: reports/epic-2-20-access-control-2026-08-09/owner-audit.md — adapters only over existing owners; no NEW_ACCESS_GRANT_STORE.
+6|Architecture Decision
+Request-time derived inventory; PARALLEL_TOKEN/AUTH_SESSION/CONSENT/SHARE/AUDIT_TIMELINE=NONE; migration not needed.
+7|Access Kinds
+AUTH_SESSION | OAUTH_CONNECTION | CALENDAR_READ_CONSENT | PRIVATE_CALENDAR_FEED | CAREER_PACK_SHARE | TEMPORARY_CAREER_PACK_ARTIFACT | TEMPORARY_PRIVACY_EXPORT | OTHER_EXPLICITLY_ALLOWLISTED.
+8|Exclusions
+Continuity, Path, Data Trust, Daily OS, drafts, page views, search, demo/preview — not access grants.
+9|AUTH_SESSION Honesty
+Stateless JWT — inventory shows current session meta; server revoke-all unavailable; client sign-out only.
+10|OAuth Calendar
+Google/Microsoft connections via status/token-presence (no secrets); disconnect delegates to calendar DELETE / calendar-sync disconnect.
+11|Calendar Consent Feeds
+Busy-read consent + private ICS feeds from calendar-sync owners; revoke/consent-off/feed revoke.
+12|Career Pack Share
+ACTIVE grants from 2.19; revoke via Access Center delegates to share owner; post-condition verified.
+13|Temporary Artifacts Export
+READY pack PDF/ZIP metadata; live export.json capability + open privacy export/portability requests (no download tokens).
+14|Revocation Contract
+twin.candidate_access_revocation/v1 — confirm required; revision-bound; post_condition_verified; never success-on-accept.
+15|UX Placement
+/dashboard/settings/access linked from Privacy Center; PRIMARY_IA=7; secondary only; groups Connected / Private links / Temporary files.
+16|No Scores Tracking
+No urgency/scores/recipient activity; RECIPIENT_TRACKING=false; ACCESS_ANALYTICS=false.
+17|Secrets Ban
+No secrets/tokens/bearer URLs in inventory responses or UI.
+18|First-Value Integrity
+first_value_satisfied_by_access_center=false.
+19|Fail Closed
+Unavailable source adapters → unavailable_sources list; sections omit failed kinds.
+20|Alembic
+Head remains 135_candidate_career_pack_share; no 136 aggregate table.
+21|Proof Matrix Product
+Unit 3/3; FE guard ok; code E2E A–M 48/48; auth product 14/14.
+22|Proof Matrix Stance
+Auth stance 7/7.
+23|Proof Matrix Security
+Auth security 4/4 (no secrets, no recipient activity, confirm required, auth required).
+24|Proof Matrix Canary Invariant
+invariant 4/4 + snapshot diff_count=0.
+25|CI Deploy
+CI SUCCESS 31314496471 @ 5c549855; FE+API+worker ALIGNED; Alembic 135 live; PP1 /preview HTTP 200.
+26|Synthetic Cleanup
+Synthetic share create→revoke via Access Center→delete; ACTIVE shares 0; no real OAuth/session/invite revoke.
+27|Hard Bans Observed
+No Canary Run 1 retry; no designation/invite/activation/signup/enrollment/Launch/Phase 3; no Epic 2.21 auto; no Founder ask for real data; no force push; no PR main; MS write OFF; application submission OFF; employer contact OFF.
+28|Terminal Posture
+PUBLIC_LAUNCH=NO_GO · ENROLLMENT=OFF · PILOT=OPERATIONALLY_READY_INACTIVE · CAPS=0 · DESIGNATION=0 · INVITES=0 · USERS=0 · CANARY=READY_INACTIVE · ACTIVE=false · ACTIVATION=PREPARED_NOT_EXECUTED · CANARY_RUN_1=BLOCKED_EXTERNALLY_NOT_EXECUTED · PHASE_3B=BLOCKED · PHASE_3_AGENT=NOT_STARTED · MS_CALENDAR_WRITE=OFF · stop after report — no Epic 2.21 / Canary Run 1 retry.
+29|Evidence Dir
+reports/epic-2-20-access-control-2026-08-09/
+30|Push Only Scaffold
+Branch cursor/phase1-monorepo-scaffold; no PR main; no force push.
+31|PP1
+/preview HTTP 200.
+32|Unit Tests
+3/3 PASS
+33|Frontend Guard
+epic-220-access-control-guard ok
+34|Code Stance E2E
+48/48 A–M + stance
+35|Auth Product E2E
+14/14
+36|Auth Stance E2E
+7/7
+37|Auth Security E2E
+4/4
+38|Auth Invariant E2E
+4/4; total auth 29/29
+39|Regression
+219+218: 15/15
+40|REAL Evaluation
+REAL_CANDIDATE_USABILITY/VALUE=NOT_EVALUATED; absolute security=NOT_EVALUATED; comprehension/trust/file retraction=NOT_EVALUATED; activation/retention/PMF=NOT_EVALUATED; pilot/public launch=NOT_EVALUATED
+
+Final Answers
+1|exact_verdict: CANDIDATE ACCESS AND SHARING CONTROL CENTER CUSTOMER-USABLE — CANONICAL ACTIVE-GRANT INVENTORY, SOURCE-OWNED EXPLICIT REVOCATION AND PRIVACY-PRESERVING ACCESS TRANSPARENCY PRODUCTION-READY; NO PARALLEL TOKEN STORE, BEHAVIORAL TRACKING OR CANARY MUTATION
+2|epic_220_status: COMPLETE
+3|verdict_letter: A
+4|repo_head: TIP_AFTER_DOCS
+5|product_SHA: 5c5498552d247f33a6ad7199282f65b8f88794c4
+6|tip_SHA: TIP_AFTER_DOCS
+7|FE_SHA: 5c5498552d247f33a6ad7199282f65b8f88794c4
+8|API_SHA: 5c5498552d247f33a6ad7199282f65b8f88794c4
+9|worker_SHA: 5c5498552d247f33a6ad7199282f65b8f88794c4
+10|alignment_status: docs_only_drift
+11|docs_only_drift: true
+12|alembic: 135_candidate_career_pack_share (is_at_head=true; no 136)
+13|CI_tip: SUCCESS 31314496471
+14|CI_url: https://github.com/CzechowskiT/twin/actions/runs/31314496471
+15|unit_tests: 3/3
+16|fe_guard: ok
+17|code_stance_E2E: 48/48
+18|auth_E2E_product: 14/14
+19|auth_E2E_stance: 7/7
+20|auth_E2E_security: 4/4
+21|auth_E2E_invariant: 4/4
+22|auth_E2E_total: 29/29
+23|pp1_preview: ON HTTP 200
+24|public_signup: OFF
+25|public_enrollment: OFF
+26|pilot_access: OPERATIONALLY_READY_INACTIVE
+27|launch: NO-GO
+28|phase_3b: BLOCKED
+29|phase_3_agent: NOT_STARTED
+30|effective_cohort_cap: 0
+31|effective_canary_cap: 0
+32|designation_count: 0
+33|designation_status: NOT_DESIGNATED
+34|canary_state: READY_INACTIVE
+35|canary_active: false
+36|activation_command: PREPARED_NOT_EXECUTED
+37|canary_run_1: BLOCKED_EXTERNALLY_NOT_EXECUTED
+38|canary_invariant_diff: 0
+39|schema_id: twin.candidate_access_inventory/v1
+40|revocation_schema_id: twin.candidate_access_revocation/v1
+41|new_access_grant_store: NONE
+42|parallel_token_store: NONE
+43|parallel_auth_session_store: NONE
+44|parallel_consent_store: NONE
+45|parallel_share_store: NONE
+46|parallel_audit_timeline_store: NONE
+47|recipient_tracking: false
+48|access_analytics: false
+49|eighth_primary_nav: false
+50|first_value_by_access_center: false
+51|ux_route: /dashboard/settings/access
+52|REAL_CANDIDATE_USABILITY: NOT_EVALUATED
+53|REAL_CANDIDATE_VALUE: NOT_EVALUATED
+54|absolute_security: NOT_EVALUATED
+55|comprehension: NOT_EVALUATED
+56|trust_impact: NOT_EVALUATED
+57|file_retraction: NOT_EVALUATED
+58|ACTIVATION_IMPACT: NOT_EVALUATED
+59|RETENTION_IMPACT: NOT_EVALUATED
+60|PMF: NOT_EVALUATED
+61|pilot_public_launch: NOT_EVALUATED
+62|evidence_dir: reports/epic-2-20-access-control-2026-08-09/
+63|branch: cursor/phase1-monorepo-scaffold
+64|pr_to_main: none
+65|force_push: none
+66|P0_open: 0
+67|P1_open: 0
+68|ms_calendar_write: OFF
