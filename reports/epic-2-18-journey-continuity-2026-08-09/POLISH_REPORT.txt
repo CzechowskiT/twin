@@ -1,0 +1,134 @@
+1|Executive Summary
+Epic 2.18 COMPLETE (Verdict A). Candidate Journey Continuity / Safe Resume: reuse candidate_path_readiness_sessions as sole store (PARALLEL_CHECKPOINT_STORE=NONE), additive flow_kind/revision/route/pin/pause/expiry; six adapters; Home Continue; server revalidate → EXACT_CHECKPOINT or SAFE_REVIEW; never obsolete overwrite; no reminders/surveillance/8th nav. Product 30c21f65 FE=API=worker ALIGNED; Alembic 134; unit 10/10; code/stance 51/51; auth 20/20+7/7+4/4; adapter matrix 48/48; regression 19/19; CI SUCCESS 31306483529; canary invariant diff=0. Canary Run 1 nie retry. REAL_CANDIDATE_USABILITY/VALUE=NOT_EVALUATED; ACTIVATION/RETENTION/ABANDONMENT_IMPACT=NOT_EVALUATED.
+2|Canonical Baseline
+Epic 2.17 product 42d8d724 / tip 4c8b4798 / FE docs 46db6670 / runtime product identity ALIGNED at 42d8d724 / Alembic 133 / CI 31305298325 — zweryfikowane niezależnie.
+3|Canonical Final State
+product SHA 30c21f654e29621ba28025fbfa950b207af90f42 FE=API=worker ALIGNED; tip docs_only_drift po raporcie PL; Alembic 134_candidate_journey_continuity; schema twin.candidate_journey_session/v1; PARALLEL_CHECKPOINT_STORE=NONE; canary READY_INACTIVE; designation=0; PREPARED_NOT_EXECUTED; caps 0; Launch NO-GO; enrollment OFF; Phase 3B BLOCKED; Phase 3 Agent NOT_STARTED.
+4|Verdict
+CANDIDATE JOURNEY CONTINUITY AND SAFE RESUME CUSTOMER-USABLE — REUSED CANONICAL PATH SESSIONS, MINIMAL SOURCE REFERENCES, REVISION-BOUND RESUME AND APPROVAL-SAFE NON-MUTATING ROUTING PRODUCTION-READY; NO BEHAVIORAL SURVEILLANCE OR CANARY MUTATION
+5|Store Audit Field-by-Field
+Reuse table candidate_path_readiness_sessions: id, candidate_id, session_key, path_kind, object_kind, object_ref, status, readiness_json, schema_version, claim_kind, kpi_excluded, first_value_satisfied, created_at, updated_at, cleared_at, deleted_at — plus additive Continuity: flow_kind, owner_ref, step_key, revision, route_key, pinned, paused, expires_at, continuity_schema, source_revision.
+6|Sole Store Decision
+PARALLEL_CHECKPOINT_STORE=NONE. Forbidden parallel journey_checkpoints/resume_sessions; no dual-write; no copy of owner draft content — tylko minimal source refs.
+7|Generalized Contract
+twin.candidate_journey_session/v1 + candidate_journey_flow_adapter/v1 + candidate_safe_resume/v1. Path rows = flow_kind=CANDIDATE_PATH_READINESS.
+8|Six Adapters
+CANDIDATE_PATH_READINESS, CANDIDATE_IMPORT_REVIEW, DATA_TRUST_REVIEW, CAREER_PACK_DRAFT, APPLICATION_STUDIO_DRAFT, LIFECYCLE_APPROVAL_REVIEW.
+9|Adapter Matrix 48/48
+6 flows × 8 capabilities (checkpoint/resume/revision_check/pin/pause/clear/invalidate_on_complete/non_mutating_route) = 48/48 PASS.
+10|Data Trust Boundary
+Continuity: explicit start/defer/pause only; can_resolve=false — nie rozwiązuje konfliktów 2.15.
+11|Lifecycle Approval Boundary
+Open-only routing do /dashboard/approvals; approval_mutation=false — zero mutacji approve/reject.
+12|Path Readiness Boundary
+2.16 owns readiness semantics; 2.18 only resumable refs + cross-device nav + revision validation. select_path supersedes tylko flow_kind=CANDIDATE_PATH_READINESS.
+13|Checkpoint Rules
+Tylko explicit=true (save/meaningful transition); nigdy page view/inactivity/telemetry. Allowlisted route_key tylko.
+14|Resume Modes
+EXACT_CHECKPOINT | SAFE_REVIEW | INVALID. Stale client_revision / source_revision_changed → SAFE_REVIEW (nigdy overwrite).
+15|Multi-tab Protection
+bump_revision + client_revision check; sessionStorage hint only — server authoritative; cross-device bez localStorage drafts.
+16|Pin Pause Clear Invalidate
+Owner pin/pause/clear; completion/deletion → COMPLETED/INVALIDATED; TTL default 168h → EXPIRED.
+17|Home Continue
+JourneyContinuityPanel na /dashboard; PRIMARY_IA=7; preview bez panelu; no urgency/inbox/reminders.
+18|First-Value Integrity
+first_value_satisfied_by_continuity=false; Continuity ≠ pilot_first_value_v1.
+19|Privacy Telemetry Security
+Auth + no-store; content-free; kpi_excluded; privacy_pause blocks; unauth 401.
+20|Canary Isolation
+before/after invariant diff_count=0; designation=0; READY_INACTIVE; PREPARED_NOT_EXECUTED; caps 0.
+21|Proof Matrix Product
+Unit 10/10; FE guard ok; code E2E A–K 51/51; auth product 20/20; adapter 48/48.
+22|Proof Matrix Stance
+Auth stance 7/7.
+23|Proof Matrix Canary Invariant
+invariant 4/4 + snapshot diff 0.
+24|CI Deploy
+CI SUCCESS 31306483529 @ 30c21f65; FE+API+worker ALIGNED; Alembic 134 live.
+25|Hard Bans Observed
+No Canary Run 1 retry; no designation/invite/activation/signup/enrollment/Launch/Phase 3; no Epic 2.19 auto; no email/push reminders; no MS write; no parallel store; no Founder ask for real data.
+26|Terminal Posture
+PUBLIC_LAUNCH=NO_GO · ENROLLMENT=OFF · PILOT=OPERATIONALLY_READY_INACTIVE · CAPS=0 · DESIGNATION=0 · CANARY=READY_INACTIVE · ACTIVE=false · ACTIVATION=PREPARED_NOT_EXECUTED · CANARY_RUN_1=BLOCKED_EXTERNALLY_NOT_EXECUTED · PHASE_3B=BLOCKED · PHASE_3_AGENT=NOT_STARTED · stop after report — no Epic 2.19 / Canary Run 1 retry.
+27|Evidence Dir
+reports/epic-2-18-journey-continuity-2026-08-09/
+28|Push Only Scaffold
+Branch cursor/phase1-monorepo-scaffold; no PR main; no force push.
+29|PP1
+/preview HTTP 200; JourneyContinuityPanel absent on preview.
+30|Unit Tests
+10/10 PASS
+31|Frontend Guard
+epic-218-journey-continuity-guard ok
+32|Code Stance E2E
+51/51
+33|Auth Product E2E
+20/20
+34|Auth Stance E2E
+7/7
+35|Auth Invariant E2E
+4/4; total auth 31/31
+36|Regression
+19/19 (216+217+215)
+37|REAL Evaluation
+REAL_CANDIDATE_USABILITY/VALUE=NOT_EVALUATED; ACTIVATION_IMPACT/RETENTION_IMPACT/ABANDONMENT_REDUCTION=NOT_EVALUATED
+
+Final Answers
+1|exact_verdict: CANDIDATE JOURNEY CONTINUITY AND SAFE RESUME CUSTOMER-USABLE — REUSED CANONICAL PATH SESSIONS, MINIMAL SOURCE REFERENCES, REVISION-BOUND RESUME AND APPROVAL-SAFE NON-MUTATING ROUTING PRODUCTION-READY; NO BEHAVIORAL SURVEILLANCE OR CANARY MUTATION
+2|epic_218_status: COMPLETE
+3|verdict_letter: A
+4|repo_head: SEE_TIP_AFTER_DOCS
+5|product_SHA: 30c21f654e29621ba28025fbfa950b207af90f42
+6|tip_SHA: SEE_TIP_AFTER_DOCS
+7|FE_SHA: 30c21f654e29621ba28025fbfa950b207af90f42
+8|API_SHA: 30c21f654e29621ba28025fbfa950b207af90f42
+9|worker_SHA: 30c21f654e29621ba28025fbfa950b207af90f42
+10|alignment_status: ALIGNED
+11|docs_only_drift: false_at_product__true_after_docs_tip
+12|alembic: 134_candidate_journey_continuity (is_at_head=true)
+13|CI_tip: SUCCESS 31306483529
+14|CI_url: https://github.com/CzechowskiT/twin/actions/runs/31306483529
+15|unit_tests: 10/10
+16|fe_guard: ok
+17|code_stance_E2E: 51/51
+18|auth_E2E_product: 20/20
+19|auth_E2E_stance: 7/7
+20|auth_E2E_invariant: 4/4
+21|auth_E2E_total: 31/31
+22|adapter_matrix: 48/48
+23|regression: 19/19
+24|pp1_preview: ON HTTP 200
+25|public_signup: OFF
+26|public_enrollment: OFF
+27|pilot_access: OPERATIONALLY_READY_INACTIVE
+28|launch: NO-GO
+29|phase_3b: BLOCKED
+30|phase_3_agent: NOT_STARTED
+31|effective_cohort_cap: 0
+32|effective_canary_cap: 0
+33|designation_count: 0
+34|designation_status: NOT_DESIGNATED
+35|canary_state: READY_INACTIVE
+36|canary_active: false
+37|activation_command: PREPARED_NOT_EXECUTED
+38|canary_run_1: BLOCKED_EXTERNALLY_NOT_EXECUTED
+39|canary_invariant_diff: 0
+40|schema_id: twin.candidate_journey_session/v1
+41|parallel_checkpoint_store: NONE
+42|flow_kinds: 6
+43|eighth_primary_nav: false
+44|first_value_by_continuity: false
+45|email_push_reminders: false
+46|behavioral_surveillance: false
+47|mutates_on_resume: false
+48|REAL_CANDIDATE_USABILITY: NOT_EVALUATED
+49|REAL_CANDIDATE_VALUE: NOT_EVALUATED
+50|ACTIVATION_IMPACT: NOT_EVALUATED
+51|RETENTION_IMPACT: NOT_EVALUATED
+52|ABANDONMENT_REDUCTION: NOT_EVALUATED
+53|evidence_dir: reports/epic-2-18-journey-continuity-2026-08-09/
+54|branch: cursor/phase1-monorepo-scaffold
+55|pr_to_main: none
+56|force_push: none
+57|P0_open: 0
+58|P1_open: 0
