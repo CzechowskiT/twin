@@ -87,8 +87,10 @@ def _req(method: str, path: str, *, token: str | None = None, body: dict | None 
             return exc.code, {"_raw_len": len(raw)}
 
 
-def _req_bytes(method: str, path: str, *, token: str) -> tuple[int, int]:
-    headers = {"Authorization": f"Bearer {token}", "Accept": "*/*"}
+def _req_bytes(method: str, path: str, *, token: str | None = None) -> tuple[int, int]:
+    headers = {"Accept": "*/*"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
     req = urllib.request.Request(f"{API}{path}", method=method, headers=headers)
     try:
         with urllib.request.urlopen(req, timeout=90, context=_CTX) as resp:

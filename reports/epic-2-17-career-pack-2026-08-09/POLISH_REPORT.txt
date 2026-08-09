@@ -1,0 +1,128 @@
+1|Executive Summary
+Epic 2.17 COMPLETE (Verdict A). Candidate-controlled Career Pack: wybór zatwierdzonych artefaktów Application Studio + Career Evidence, disclosure allowlist (sensitive default OFF, internal blocked), exact recipient-facing preview, confirm → immutable snapshot PDF+ZIP, authenticated owner-only download, expire/revoke/delete. TWIN nigdy nie wysyła/publikuje/dostarcza zewnętrznie; zero LLM rewrite. Secondary page (nie 8th primary nav). Product tip 42d8d724 FE=API=worker ALIGNED; Alembic 133; unit 6/6; code/stance 46/46; auth product 25/25 + stance 7/7 + invariant 4/4; regression 19/19; CI SUCCESS 31305298325; canary invariant diff=0. Canary Run 1 nie retry. REAL_CANDIDATE_*=NOT_EVALUATED; RECIPIENT_DELIVERY=NOT_PERFORMED; RECIPIENT_OPEN_OR_VIEW=NOT_TRACKED.
+2|Canonical Baseline
+Epic 2.16 product 1f94f2dd / tip ~92c6b1a3 docs_only_drift / FE tip vs API=worker product / Alembic 132 / CI 31302628681 / unit 8/8 / E2E 41/41+21/21+7/7+4/4 / regression 19/19 / PP1 ON / signup+enrollment OFF / pilot INACTIVE / caps 0 / designation 0 / READY_INACTIVE / PREPARED_NOT_EXECUTED / Launch NO-GO / Phase 3 Agent NOT_STARTED — zweryfikowane niezależnie na starcie 2.17.
+3|Canonical Final State
+product SHA 42d8d7249a6080243d909526422fa5445a79fa65 FE=API=worker ALIGNED; tip = product (przed docs evidence) lub tip docs_only_drift po raporcie PL; Alembic 133_candidate_career_pack; schema twin.candidate_career_pack/v1; canary READY_INACTIVE; designation_count=0; activation PREPARED_NOT_EXECUTED; caps 0; Launch NO-GO; enrollment OFF; Phase 3B BLOCKED; Phase 3 Agent NOT_STARTED.
+4|Verdict
+CANDIDATE-CONTROLLED PORTABILITY AND SELECTIVE DISCLOSURE PACK CUSTOMER-USABLE — FIELD-LEVEL CONSENT, EXACT RECIPIENT-FACING PREVIEW, PROVENANCE-PRESERVING GENERATION AND PRIVATE OWNER-ONLY DOWNLOAD PRODUCTION-READY; NO EXTERNAL DELIVERY OR CANARY MUTATION
+5|Repository Reconciliation
+Brak wcześniejszego Career Pack. Reuse: Application Studio approved CV/cover, Career Evidence confirmed, Lifecycle privacy pause, Data Trust/privacy-center secondary IA scaffold, fpdf2+zipfile (zero external fetches). Full privacy export pozostaje osobny.
+6|Core Flow
+select approved artifacts → choose disclosed fields → exact preview → confirm → immutable snapshot → authenticated owner-only download → expire/revoke/delete. Brak send/share/publish/cloud upload.
+7|Pack Types
+Tylko OPPORTUNITY_APPLICATION_PACK oraz GENERAL_EVIDENCE_PORTFOLIO_PACK.
+8|Lifecycle States
+DRAFT, PREVIEW_READY, AWAITING_CONFIRMATION, GENERATING, READY, EXPIRED, REVOKED, DELETED.
+9|Schema Contract
+twin.candidate_career_pack/v1; CONTRACT candidate_career_pack_v1; first_value_contract=pilot_first_value_v1 (pack ops ≠ first value).
+10|Disclosure Allowlist
+Sensitive (contact_email/phone/location/salary) default OFF; internal_notes/twin_scores/raw_cv_full blocked (nie selectable). Explicit opt-in tylko dla sensitive non-internal.
+11|Preview Parity
+preview_hash=SHA256(canonical payload); confirm wymaga hash match; snapshot immutable; PDF+ZIP z tego samego payloadu; renderer bez HTTP.
+12|Private Download
+GET …/download?format=zip|pdf; auth required; Cache-Control:no-store; X-Twin-External-Delivery:false; unauth 401; po revoke 409.
+13|Retention Revoke Delete
+TTL default 72h → EXPIRED; revoke czyści pdf/zip bytes; delete soft-delete + clear bytes.
+14|Privacy Pause
+CandidateLifecyclePrivacy.paused blokuje create/selection/preview/confirm/download (privacy_pause).
+15|IA Placement
+Secondary /dashboard/career-pack; PRIMARY_IA nadal 7; linki kontekstowe: privacy-center, application-studio, portfolio, path-readiness panel. Brak 8th primary nav.
+16|Zero Content Generation
+LLM_REWRITE=false; EMAIL_SEND=false; EXTERNAL_DELIVERY=false; PUBLIC_PROFILE=false; CLOUD_UPLOAD=false; brak rewrite/summarize/tailor.
+17|First-Value Integrity
+first_value_satisfied_by_career_pack=false; create/preview/confirm/download nie satysfakcjonują pilot_first_value_v1; kpi_excluded=true.
+18|Telemetry
+Audit content-free (state/counts/sizes only); never log pack body/PII.
+19|Security Isolation
+Owner-only by candidate_id; no cross-candidate; no canary/invite DML w migracji 133.
+20|Canary Isolation
+before/after invariant diff_count=0; designation=0; READY_INACTIVE; PREPARED_NOT_EXECUTED; caps 0; Canary Run 1 nie retry.
+21|Proof Matrix Product
+Unit 6/6; FE guard ok; code E2E A–J 46/46; auth product 25/25.
+22|Proof Matrix Stance
+Auth stance 7/7 (Launch NO-GO, enrollment OFF, canary inactive, prepared, designation 0, caps 0).
+23|Proof Matrix Canary Invariant
+invariant 4/4 + snapshot diff 0.
+24|CI Deploy
+CI SUCCESS 31305298325 @ 42d8d724; FE+API+worker ALIGNED; Alembic 133 live (railway ssh current=head).
+25|Hard Bans Observed
+No Canary Run 1 retry; no designation/invite/activation/signup/enrollment/Launch/Phase 3; no Epic 2.18 auto; no send/public profile; no LLM; no 8th nav; no MS write; no Founder ask for real candidate/recipient/credentials.
+26|Evidence Dir
+reports/epic-2-17-career-pack-2026-08-09/
+27|Terminal Posture
+PUBLIC_LAUNCH=NO_GO · ENROLLMENT=OFF · PILOT=OPERATIONALLY_READY_INACTIVE · CAPS=0 · DESIGNATION=0 · CANARY=READY_INACTIVE · ACTIVE=false · ACTIVATION=PREPARED_NOT_EXECUTED · CANARY_RUN_1=BLOCKED_EXTERNALLY_NOT_EXECUTED · PHASE_3B=BLOCKED · PHASE_3_AGENT=NOT_STARTED · stop after report — no Epic 2.18 / Canary Run 1 retry.
+28|Push Only Scaffold
+Branch cursor/phase1-monorepo-scaffold; no PR main; no force push.
+29|PP1
+rc1_public_preview_enabled=true; preview surface bez Career Pack primary nav.
+30|Unit Tests
+6/6 PASS (catalog, sensitive OFF, lifecycle, hash mismatch, privacy pause, delete).
+31|Frontend Guard
+epic-217-career-pack-guard ok
+32|Code Stance E2E
+46/46
+33|Auth Product E2E
+25/25
+34|Auth Stance E2E
+7/7
+35|Auth Invariant E2E
+4/4; total auth 36/36; regression import/search/path 19/19; REAL_CANDIDATE_USABILITY/VALUE/ADOPTION/RETENTION=NOT_EVALUATED; RECIPIENT_DELIVERY=NOT_PERFORMED; RECIPIENT_OPEN_OR_VIEW=NOT_TRACKED.
+
+Final Answers
+1|exact_verdict: CANDIDATE-CONTROLLED PORTABILITY AND SELECTIVE DISCLOSURE PACK CUSTOMER-USABLE — FIELD-LEVEL CONSENT, EXACT RECIPIENT-FACING PREVIEW, PROVENANCE-PRESERVING GENERATION AND PRIVATE OWNER-ONLY DOWNLOAD PRODUCTION-READY; NO EXTERNAL DELIVERY OR CANARY MUTATION
+2|epic_217_status: COMPLETE
+3|verdict_letter: A
+4|repo_head: SEE_TIP_AFTER_EVIDENCE_COMMIT
+5|product_SHA: 42d8d7249a6080243d909526422fa5445a79fa65
+6|tip_SHA: SEE_TIP_AFTER_EVIDENCE_COMMIT
+7|FE_SHA: 42d8d7249a6080243d909526422fa5445a79fa65
+8|API_SHA: 42d8d7249a6080243d909526422fa5445a79fa65
+9|worker_SHA: 42d8d7249a6080243d909526422fa5445a79fa65
+10|alignment_status: ALIGNED
+11|docs_only_drift: false_at_product_align__true_if_tip_docs_after
+12|alembic: 133_candidate_career_pack (is_at_head=true)
+13|CI_tip: SUCCESS 31305298325
+14|CI_url: https://github.com/CzechowskiT/twin/actions/runs/31305298325
+15|unit_tests: 6/6
+16|fe_guard: ok
+17|code_stance_E2E: 46/46
+18|auth_E2E_product: 25/25
+19|auth_E2E_stance: 7/7
+20|auth_E2E_invariant: 4/4
+21|auth_E2E_total: 36/36
+22|import_search_path_regression: 19/19
+23|pp1_preview: ON
+24|public_signup: OFF
+25|public_enrollment: OFF
+26|pilot_access: OPERATIONALLY_READY_INACTIVE
+27|launch: NO-GO
+28|phase_3b: BLOCKED
+29|phase_3_agent: NOT_STARTED
+30|effective_cohort_cap: 0
+31|effective_canary_cap: 0
+32|designation_count: 0
+33|designation_status: NOT_DESIGNATED
+34|canary_state: READY_INACTIVE
+35|canary_active: false
+36|activation_command: PREPARED_NOT_EXECUTED
+37|canary_run_1: BLOCKED_EXTERNALLY_NOT_EXECUTED
+38|canary_invariant_diff: 0
+39|schema_id: twin.candidate_career_pack/v1
+40|pack_types: 2
+41|external_delivery: false
+42|llm_rewrite: false
+43|eighth_primary_nav: false
+44|first_value_by_career_pack: false
+45|recipient_delivery: NOT_PERFORMED
+46|recipient_open_or_view: NOT_TRACKED
+47|REAL_CANDIDATE_USABILITY: NOT_EVALUATED
+48|REAL_CANDIDATE_VALUE: NOT_EVALUATED
+49|REAL_CANDIDATE_ADOPTION: NOT_EVALUATED
+50|REAL_CANDIDATE_RETENTION: NOT_EVALUATED
+51|evidence_dir: reports/epic-2-17-career-pack-2026-08-09/
+52|branch: cursor/phase1-monorepo-scaffold
+53|pr_to_main: none
+54|force_push: none
+55|P0_open: 0
+56|P1_open: 0
