@@ -31,11 +31,11 @@ const SCATTER_CVS = [
 
 export function InboxChaosScene() {
   const frame = useCurrentFrame();
-  const scrollY = interpolate(frame, [0, 210], [0, -60], { extrapolateRight: "clamp" });
+  const scrollY = interpolate(frame, [0, 150], [0, -60], { extrapolateRight: "clamp" });
   const cursor = useCursorPath([
-    { frame: 30, x: 400, y: 300 },
-    { frame: 60, x: 600, y: 400 },
-    { frame: 90, x: 500, y: 500 },
+    { frame: 15, x: 400, y: 300 },
+    { frame: 40, x: 600, y: 400 },
+    { frame: 65, x: 500, y: 500 },
   ]);
 
   return (
@@ -48,7 +48,7 @@ export function InboxChaosScene() {
       <div style={{ position: "relative", transform: `translateY(${scrollY}px)` }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
           <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: FILM.textLight }}>
-            Inbox — <AnimatedCounter from={847} to={2847} startFrame={0} durationFrames={90} /> unread
+            Inbox — <AnimatedCounter from={847} to={2847} startFrame={0} durationFrames={45} /> unread
           </h2>
           <span
             style={{
@@ -63,7 +63,7 @@ export function InboxChaosScene() {
               boxShadow: `0 0 12px ${FILM.red}44`,
             }}
           >
-            +{Math.round(interpolate(frame, [0, 90], [12, 47], { extrapolateRight: "clamp" }))}/min
+            +{Math.round(interpolate(frame, [0, 45], [12, 47], { extrapolateRight: "clamp" }))}/min
           </span>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>

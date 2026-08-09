@@ -1,5 +1,5 @@
 /**
- * Step-based interactive sales demo flows — UI beat ~1.5s during playback.
+ * Step-based interactive sales demo flows — UI beat ~1s during playback.
  */
 import type { SalesDemoRole } from "@/lib/demo/sales-demo-config";
 import type { TranslationKey } from "@/lib/i18n";
@@ -25,11 +25,11 @@ export type InteractiveFlowStep = {
   uiChanges: readonly string[];
 };
 
-/** Canonical beat cadence — founder target ~1.5s. */
-export const INTERACTIVE_FLOW_TARGET_BEAT_MS = 1_500;
-export const INTERACTIVE_FLOW_BEAT_MIN_MS = 1_300;
-export const INTERACTIVE_FLOW_BEAT_MAX_MS = 1_700;
-export const INTERACTIVE_FLOW_ABSOLUTE_MAX_MS = 1_800;
+/** Canonical beat cadence — founder target ~1s between successive UI elements. */
+export const INTERACTIVE_FLOW_TARGET_BEAT_MS = 1_000;
+export const INTERACTIVE_FLOW_BEAT_MIN_MS = 900;
+export const INTERACTIVE_FLOW_BEAT_MAX_MS = 1_100;
+export const INTERACTIVE_FLOW_ABSOLUTE_MAX_MS = 1_200;
 export const INTERACTIVE_FLOW_MAX_STEP_MS = INTERACTIVE_FLOW_ABSOLUTE_MAX_MS;
 export const INTERACTIVE_FLOW_MIN_STEP_MS = INTERACTIVE_FLOW_BEAT_MIN_MS;
 

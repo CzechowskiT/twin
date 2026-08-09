@@ -22,8 +22,8 @@ const SHORTLIST = [
 export function CompanyCockpitScene() {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const blockerRemoved = frame >= 80;
-  const slotApproved = frame >= 120;
+  const blockerRemoved = frame >= 50;
+  const slotApproved = frame >= 80;
 
   return (
     <ProductShell
@@ -100,7 +100,7 @@ export function CompanyCockpitScene() {
                         Slot approved ✓
                       </span>
                     ) : null}
-                    {approved ? <SuccessFlash startFrame={120} /> : null}
+                    {approved ? <SuccessFlash startFrame={80} /> : null}
                   </div>
                 </FlyInItem>
               );

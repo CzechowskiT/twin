@@ -15,9 +15,9 @@ const CALENDARS = [
 export function CalendarScene() {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const overlayProgress = interpolate(frame, [20, 50], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const confirmed = frame >= 120;
-  const highlightWed = frame >= 60;
+  const overlayProgress = interpolate(frame, [8, 30], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const confirmed = frame >= 75;
+  const highlightWed = frame >= 35;
 
   return (
     <ProductShell
@@ -85,7 +85,7 @@ export function CalendarScene() {
                           position: "absolute",
                           bottom: 8,
                           left: "50%",
-                          transform: `translateX(-50%) scale(${spring({ frame: frame - 60, fps, config: { damping: 10 } })})`,
+                          transform: `translateX(-50%) scale(${spring({ frame: frame - 35, fps, config: { damping: 10 } })})`,
                         }}
                       >
                         <PulseBadge color={FILM.neon}>Wed 14:00</PulseBadge>
@@ -97,7 +97,7 @@ export function CalendarScene() {
             })}
           </div>
         </div>
-        <FlyInItem delay={100} fromX={60} fromY={0}>
+        <FlyInItem delay={45} fromX={60} fromY={0}>
           <div
             style={{
               width: 300,
@@ -130,7 +130,7 @@ export function CalendarScene() {
                 Syncing calendars…
               </div>
             )}
-            <SuccessFlash startFrame={120} />
+            <SuccessFlash startFrame={75} />
           </div>
         </FlyInItem>
       </div>
