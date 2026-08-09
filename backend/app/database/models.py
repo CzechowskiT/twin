@@ -7572,7 +7572,11 @@ class CandidateDataTrustAudit(Base):
 
 
 class CandidatePathReadinessSession(Base):
-    """Epic 2.16 — explicit path + object selection metadata only."""
+    """Epic 2.16 path selection + Epic 2.18 journey Continuity sole store.
+
+    PARALLEL_CHECKPOINT_STORE=NONE — no parallel resume/checkpoint tables.
+    Path rows use flow_kind=CANDIDATE_PATH_READINESS.
+    """
 
     __tablename__ = "candidate_path_readiness_sessions"
     __table_args__ = (
@@ -7594,6 +7598,21 @@ class CandidatePathReadinessSession(Base):
     schema_version: Mapped[str] = mapped_column(
         String(48), default="twin.candidate_path_readiness/v1"
     )
+    # Epic 2.18 Continuity (additive)
+    flow_kind: Mapped[str] = mapped_column(
+        String(64), default="CANDIDATE_PATH_READINESS", index=True
+    )
+    owner_ref: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    step_key: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    revision: Mapped[int] = mapped_column(Integer, default=1)
+    route_key: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    pinned: Mapped[bool] = mapped_column(Boolean, default=False)
+    paused: Mapped[bool] = mapped_column(Boolean, default=False)
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    continuity_schema: Mapped[str] = mapped_column(
+        String(64), default="twin.candidate_journey_session/v1"
+    )
+    source_revision: Mapped[str | None] = mapped_column(String(64), nullable=True)
     claim_kind: Mapped[str] = mapped_column(String(32), default="FACT")
     kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
     first_value_satisfied: Mapped[bool] = mapped_column(Boolean, default=False)

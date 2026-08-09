@@ -284,13 +284,14 @@ def select_path(
     if _privacy_paused(db, candidate_id=candidate_id):
         raise ValueError("privacy_pause")
     meta = _path_meta(path_kind)
-    # Clear prior active sessions (single explicit selection)
+    # Clear prior active PATH READINESS sessions only (not other Continuity flows)
     for old in (
         db.query(CandidatePathReadinessSession)
         .filter(
             CandidatePathReadinessSession.candidate_id == candidate_id,
             CandidatePathReadinessSession.status == "ACTIVE",
             CandidatePathReadinessSession.deleted_at.is_(None),
+            CandidatePathReadinessSession.flow_kind == "CANDIDATE_PATH_READINESS",
         )
         .all()
     ):
@@ -303,6 +304,12 @@ def select_path(
         path_kind=path_kind,
         object_kind=meta["object_kind"] if object_ref else None,
         object_ref=(object_ref or None) and str(object_ref)[:64],
+        flow_kind="CANDIDATE_PATH_READINESS",
+        owner_ref=(object_ref or None) and str(object_ref)[:128],
+        step_key="selected",
+        revision=1,
+        route_key="path_readiness_home",
+        continuity_schema="twin.candidate_journey_session/v1",
         status="ACTIVE",
         readiness_json="{}",
         schema_version=SCHEMA_ID,

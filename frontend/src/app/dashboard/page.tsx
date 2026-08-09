@@ -13,6 +13,7 @@ import { PilotHomeNextAction } from "@/components/dashboard/pilot-home-next-acti
 import { GuidedFirstValueEntry } from "@/components/dashboard/guided-first-value-entry";
 import { CanaryFirstValuePanel } from "@/components/dashboard/canary-first-value-panel";
 import { PathReadinessPanel } from "@/components/dashboard/path-readiness-panel";
+import { JourneyContinuityPanel } from "@/components/dashboard/journey-continuity-panel";
 import { IaActionableEmpty } from "@/components/dashboard/ia-actionable-empty";
 import { LifecycleCommandPanel } from "@/components/lifecycle/lifecycle-command-panel";
 import { ProfileCompletenessHint } from "@/components/ux/profile-completeness-hint";
@@ -359,6 +360,7 @@ export default function DashboardPage() {
               />
               <GuidedFirstValueEntry />
               <CanaryFirstValuePanel />
+              <JourneyContinuityPanel />
               <PathReadinessPanel />
               <IaActionableEmpty areaId="home" show />
               <PilotHomeNextAction />
@@ -380,6 +382,7 @@ export default function DashboardPage() {
             />
             <GuidedFirstValueEntry />
             <CanaryFirstValuePanel />
+            <JourneyContinuityPanel />
             <PathReadinessPanel />
             <IaActionableEmpty areaId="home" show />
             <PilotHomeNextAction />
