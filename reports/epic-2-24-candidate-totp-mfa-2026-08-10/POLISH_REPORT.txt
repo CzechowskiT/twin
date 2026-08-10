@@ -1,0 +1,167 @@
+1|Executive Summary
+Epic 2.24 COMPLETE (Verdict A). Candidate-controlled opt-in TOTP MFA + one-time hashed recovery codes: verified enrollment state machine; versioned AEAD secrets on dedicated MFA keyring (not JWT/SECRET_KEY); restricted pre-auth challenges TTL≤5m; atomic last_accepted_counter replay prevention; recovery-code login; safe disable; anti-lockout MFA_RECOVERY_RESET via Epic 2.23 password recovery; managed-session assurance AAL1/AAL2. MFA_DEFAULT=OFF; OPT_IN_ONLY; MANDATORY=OFF; PASSKEYS_WEBAUTHN=DEFERRED_NOT_STARTED. Product 2e94b290 FE=API=worker ALIGNED; Alembic 138; unit 4/4; FE guard ok; code/stance 36/36; auth product 11/11 + stance 7/7 + security 5/5 + invariant 4/4; CI SUCCESS 31358448839; canary diff=0; keyring_available=true. first_value_satisfied_by_mfa=false. Canary Run 1 nie retry. REAL_*/phishing/absolute security/passkey availability/comprehension/trust/activation/retention/PMF/pilot-public=NOT_EVALUATED.
+2|Canonical Baseline
+Epic 2.23 product 605413a5 FE=API=worker / tip 3c4e0d59 docs_only_drift / Alembic 137 / recovery+step-up / CANONICAL_SESSION_AUTHORITY=twin.candidate_auth_session / MFA was DEFERRED_PENDING_RECOVERY_PROOF / CI 31321724314 / IA=7 / PP1 ON / canary diff 0 / P0=P1=0 — zweryfikowane niezależnie.
+3|Canonical Final State
+product SHA 2e94b29073307f29b188f242cbac8d41e8674a7f FE=API=worker ALIGNED; tip docs po raporcie; Alembic 138_candidate_totp_mfa; schemas factor/enrollment/challenge/recovery_code_set/session_assurance v1; canary READY_INACTIVE; designation=0; PREPARED_NOT_EXECUTED; caps 0; Launch NO-GO; enrollment OFF; Phase 3B BLOCKED; MS write OFF.
+4|Verdict
+CANDIDATE-CONTROLLED TOTP MFA AND RECOVERY CODES CUSTOMER-USABLE — OPT-IN VERIFIED ENROLLMENT, VERSIONED ENCRYPTED FACTOR SECRETS, ATOMIC REPLAY-RESISTANT CHALLENGES AND ONE-TIME HASHED RECOVERY PRODUCTION-READY; NO SMS/EMAIL OTP, PASSKEYS, TRUSTED DEVICES, FINGERPRINTING OR FORCED MIGRATION
+5|Provider Reuse Gate
+USE_MATURE_RFC6238_LIBRARY_PYOTP — no custom TOTP crypto; no Auth0/Clerk MFA plane; WebAuthn DEFERRED_NOT_STARTED. Audit: reports/.../provider-gate.md.
+6|Architecture Decision
+Additive Alembic 138 MFA tables + assurance_level on sessions; pyotp; dedicated MFA_AEAD_KEY Fernet; Epic 2.22 owns sessions; 2.23 owns recovery/step-up; 2.24 owns factor/challenge/codes/assurance only.
+7|Contracts
+twin.candidate_mfa_factor/v1 · enrollment/v1 · challenge/v1 · recovery_code_set/v1 · session_assurance/v1.
+8|Canonical Authority
+CANONICAL_SESSION_AUTHORITY=twin.candidate_auth_session; PARALLEL_MFA_STORE=NONE; PARALLEL_SESSION_STORE=NONE.
+9|Enrollment State Machine
+DISABLED→PENDING_FACTOR→FACTOR_VERIFIED→RECOVERY_CODES_PRESENTED→ENABLED; requires step-up MFA_ENROLL + recovery channel (password capable).
+10|TOTP Parameters
+160-bit+ secret; 6 digits; 30s; ±1 window; AEAD ciphertext versioned.
+11|Keyring
+Dedicated MFA_AEAD_KEY; production fail-closed; uses_secret_key=false; Verdict A requires keyring_available=true (proven live).
+12|Pre-auth Challenge
+LOGIN challenge TTL≤5m; no candidate API access until complete; methods totp|recovery_code.
+13|Replay Prevention
+SELECT FOR UPDATE + last_accepted_counter; totp_replay if counter ≤ last accepted.
+14|Recovery Codes
+10 one-time digests; shown once; usable for login/assurance AAL2_RECOVERY_CODE.
+15|Anti-lockout
+Password recovery completion calls MFA_RECOVERY_RESET (disable factors + revoke codes).
+16|Session Assurance
+AAL1_PRIMARY / AAL2_TOTP / AAL2_RECOVERY_CODE on managed session + JWT aal claim.
+17|Access Center UX
+/dashboard/settings/access opt-in panel; PRIMARY_IA=7; inventory MFA_TOTP; no SMS/passkeys UI.
+18|Login UX
+Password → optional MFA code step → challenge complete → session.
+19|Feature Flags
+AUTH_MFA_TOTP_ENABLED · DEFAULT_OFF · OPT_IN_ONLY · MANDATORY=false · MFA_AEAD_KEY set.
+20|Privacy Bans
+No raw secrets/codes/IP/UA/fingerprint/trusted devices/behavioral scores in inventory.
+21|First-Value Integrity
+first_value_satisfied_by_mfa=false.
+22|Alembic
+138_candidate_totp_mfa revises 137; is_at_head=true.
+23|Proof Matrix Product
+Unit 4/4; FE guard ok; code E2E A–O 36/36; auth product 11/11.
+24|Proof Matrix Stance
+Auth stance 7/7 + code stance.
+25|Proof Matrix Security
+Auth security 5/5 (keyring dedicated, secrets not in inventory, synthetic-only).
+26|Proof Matrix Canary Invariant
+invariant 4/4 + snapshot diff_count=0.
+27|CI Deploy
+CI SUCCESS 31358448839 @ 2e94b290; FE+API+worker ALIGNED; Alembic 138 live; PP1 /preview HTTP 200; keyring_available=true.
+28|Synthetic Cleanup
+Enroll/verify/codes/disable on synth only; MFA left disabled after E2E; zero real/staff factor mutations; zero SMS/email OTP.
+29|Hard Bans Observed
+No Canary Run 1 retry; no designation/invite/activation/signup/enrollment/Launch/Phase 3; no Epic 2.25 auto; no Founder ask for authenticator/QR; no force push; no PR main; MS write OFF; application submission OFF; employer contact OFF.
+30|Terminal Posture
+PUBLIC_LAUNCH=NO_GO · ENROLLMENT=OFF · PILOT=OPERATIONALLY_READY_INACTIVE · CAPS=0 · DESIGNATION=0 · INVITES=0 · USERS=0 · CANARY=READY_INACTIVE · ACTIVE=false · ACTIVATION=PREPARED_NOT_EXECUTED · CANARY_RUN_1=BLOCKED_EXTERNALLY_NOT_EXECUTED · PHASE_3B=BLOCKED · PHASE_3_AGENT=NOT_STARTED · MS_CALENDAR_WRITE=OFF · stop after report — no Epic 2.25 / Canary Run 1 retry.
+31|Evidence Dir
+reports/epic-2-24-candidate-totp-mfa-2026-08-10/
+32|Push Only Scaffold
+Branch cursor/phase1-monorepo-scaffold; no PR main; no force push.
+33|PP1
+/preview HTTP 200.
+34|Unit Tests
+4/4 PASS
+35|Frontend Guard
+epic-224-totp-mfa-guard ok
+36|Code Stance E2E
+36/36 A–O + stance
+37|Auth Product E2E
+11/11
+38|Auth Stance E2E
+7/7
+39|Auth Security E2E
+5/5
+40|Auth Invariant E2E
+4/4; total auth 27/27
+41|Concurrency
+with_for_update + last_accepted_counter; note shipped
+42|REAL Evaluation
+REAL_CANDIDATE_*=NOT_EVALUATED; REAL_ACCOUNT_TAKEOVER_RESISTANCE=NOT_EVALUATED; REAL_LOCKOUT_RISK=NOT_EVALUATED; COMPREHENSION=NOT_EVALUATED; TRUST=NOT_EVALUATED; ACTIVATION/RETENTION/PMF=NOT_EVALUATED; phishing_resistance=NOT_EVALUATED; absolute_security=NOT_EVALUATED; passkey_availability=NOT_EVALUATED; pilot/public launch=NOT_EVALUATED
+
+Final Answers
+1|exact_verdict: CANDIDATE-CONTROLLED TOTP MFA AND RECOVERY CODES CUSTOMER-USABLE — OPT-IN VERIFIED ENROLLMENT, VERSIONED ENCRYPTED FACTOR SECRETS, ATOMIC REPLAY-RESISTANT CHALLENGES AND ONE-TIME HASHED RECOVERY PRODUCTION-READY; NO SMS/EMAIL OTP, PASSKEYS, TRUSTED DEVICES, FINGERPRINTING OR FORCED MIGRATION
+2|epic_224_status: COMPLETE
+3|verdict_letter: A
+4|repo_head: TIP_PLACEHOLDER
+5|product_SHA: 2e94b29073307f29b188f242cbac8d41e8674a7f
+6|tip_SHA: TIP_PLACEHOLDER
+7|FE_SHA: 2e94b29073307f29b188f242cbac8d41e8674a7f
+8|API_SHA: 2e94b29073307f29b188f242cbac8d41e8674a7f
+9|worker_SHA: 2e94b29073307f29b188f242cbac8d41e8674a7f
+10|alignment_status_at_product: ALIGNED
+11|alignment_status_at_tip: docs_only_drift
+12|docs_only_drift: true
+13|alembic: 138_candidate_totp_mfa (is_at_head=true; revises 137)
+14|CI_tip: SUCCESS 31358448839
+15|CI_url: https://github.com/CzechowskiT/twin/actions/runs/31358448839
+16|unit_tests: 4/4
+17|fe_guard: ok
+18|code_stance_E2E: 36/36
+19|auth_E2E_product: 11/11
+20|auth_E2E_stance: 7/7
+21|auth_E2E_security: 5/5
+22|auth_E2E_invariant: 4/4
+23|auth_E2E_total: 27/27
+24|pp1_preview: ON HTTP 200
+25|public_signup: OFF
+26|public_enrollment: OFF
+27|pilot_access: OPERATIONALLY_READY_INACTIVE
+28|launch: NO-GO
+29|phase_3b: BLOCKED
+30|phase_3_agent: NOT_STARTED
+31|effective_cohort_cap: 0
+32|effective_canary_cap: 0
+33|designation_count: 0
+34|designation_status: NOT_DESIGNATED
+35|canary_state: READY_INACTIVE
+36|canary_active: false
+37|activation_command: PREPARED_NOT_EXECUTED
+38|canary_run_1: BLOCKED_EXTERNALLY_NOT_EXECUTED
+39|canary_invariant_diff: 0
+40|factor_schema_id: twin.candidate_mfa_factor/v1
+41|enrollment_schema_id: twin.candidate_mfa_enrollment/v1
+42|challenge_schema_id: twin.candidate_mfa_challenge/v1
+43|recovery_code_set_schema_id: twin.candidate_mfa_recovery_code_set/v1
+44|session_assurance_schema_id: twin.candidate_mfa_session_assurance/v1
+45|mfa_default: OFF
+46|mfa_enrollment: OPT_IN_ONLY
+47|mandatory_mfa: OFF
+48|passkeys_webauthn: DEFERRED_NOT_STARTED
+49|parallel_mfa_store: NONE
+50|canonical_session_authority: twin.candidate_auth_session
+51|provider_reuse_gate: USE_MATURE_RFC6238_LIBRARY_PYOTP
+52|totp_library: pyotp
+53|keyring_available: true
+54|uses_secret_key: false
+55|sms_otp: false
+56|email_otp: false
+57|trusted_devices: false
+58|fingerprinting: false
+59|behavioral_scoring: false
+60|eighth_primary_nav: false
+61|first_value_satisfied_by_mfa: false
+62|challenge_ttl_seconds: 300
+63|ux_route: /dashboard/settings/access
+64|anti_lockout: MFA_RECOVERY_RESET_on_password_recovery
+65|REAL_CANDIDATE_USABILITY: NOT_EVALUATED
+66|REAL_CANDIDATE_VALUE: NOT_EVALUATED
+67|REAL_ACCOUNT_TAKEOVER_RESISTANCE: NOT_EVALUATED
+68|REAL_LOCKOUT_RISK: NOT_EVALUATED
+69|COMPREHENSION: NOT_EVALUATED
+70|TRUST: NOT_EVALUATED
+71|ACTIVATION_IMPACT: NOT_EVALUATED
+72|RETENTION_IMPACT: NOT_EVALUATED
+73|PMF: NOT_EVALUATED
+74|phishing_resistance: NOT_EVALUATED
+75|absolute_security: NOT_EVALUATED
+76|passkey_availability: NOT_EVALUATED
+77|pilot_public_launch: NOT_EVALUATED
+78|P0_OPEN: 0
+79|P1_OPEN: 0
+80|hard_bans: NO-GO; Phase 3B BLOCKED; Canary Run 1 BLOCKED_EXTERNALLY_NOT_EXECUTED; no Epic 2.25 auto
+81|stop: true

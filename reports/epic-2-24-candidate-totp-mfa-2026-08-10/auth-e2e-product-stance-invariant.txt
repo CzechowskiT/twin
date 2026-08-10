@@ -1,0 +1,29 @@
+PASS  stance/public_health
+PASS  stance/launch_nogo
+PASS  stance/enrollment_off
+PASS  stance/canary_inactive
+PASS  stance/activation_prepared
+PASS  stance/designation_0
+PASS  stance/caps_zero
+PASS  product/mfa_catalog — 200
+PASS  product/stance_flags
+PASS  security/keyring_not_secret_key
+PASS  product/keyring_available — {'keyring_available': True, 'uses_secret_key': False, 'uses_jwt_signing_key': False, 'dedicated_mfa_keyring': True, 'production_fail_closed': True}
+PASS  product/mint_synthetic — 200
+PASS  product/mfa_status — 200
+PASS  product/step_up_enroll — 200
+PASS  product/enroll_start — 200
+PASS  security/secret_not_empty
+PASS  product/enroll_verify — 200
+PASS  product/recovery_codes — 200
+PASS  product/inventory_mfa — 200
+PASS  security/no_secrets_in_inventory
+PASS  security/no_raw_secret_in_inventory
+PASS  product/disable_cleanup — 200
+PASS  security/synthetic_only
+PASS  invariant/business_state_diff_0 — {}
+PASS  invariant/canary_ready_inactive
+PASS  invariant/designation_still_0
+PASS  invariant/activation_still_prepared
+
+product 11/11 stance 7/7 security 5/5 invariant 4/4
