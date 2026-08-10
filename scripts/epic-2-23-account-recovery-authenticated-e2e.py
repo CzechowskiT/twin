@@ -147,7 +147,7 @@ def main() -> int:
         "parallel_none",
         isinstance(rcat, dict)
         and rcat.get("parallel_password_reset_store") == "NONE"
-        and rcat.get("mfa_passkeys") == "DEFERRED_PENDING_RECOVERY_PROOF",
+        and rcat.get("mfa_passkeys") == "DEFERRED_NOT_STARTED",
     )
 
     code, scat = _req("GET", "/api/v1/auth/step-up/catalog")

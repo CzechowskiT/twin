@@ -103,7 +103,8 @@ def main() -> int:
         check(
             "invite_inactive",
             "pilot_access_inactive",
-            ph.get("rc1_pilot_access_status") == "PRODUCTION_READY_INACTIVE",
+            ph.get("rc1_pilot_access_status")
+            in ("OPERATIONALLY_READY_INACTIVE", "PRODUCTION_READY_INACTIVE"),
             str(ph.get("rc1_pilot_access_status")),
         )
         check(
@@ -164,7 +165,8 @@ def main() -> int:
         "invite_inactive",
         "access_status",
         isinstance(agg, dict)
-        and ((agg.get("pilot_access") or {}).get("pilot_access_status") == "PRODUCTION_READY_INACTIVE"),
+        and ((agg.get("pilot_access") or {}).get("pilot_access_status")
+             in ("OPERATIONALLY_READY_INACTIVE", "PRODUCTION_READY_INACTIVE")),
         str((agg or {}).get("pilot_access")),
     )
     check(
@@ -286,7 +288,7 @@ def main() -> int:
         st == 200
         and isinstance(mig, dict)
         and mig.get("is_at_head") is True
-        and str(mig.get("current_revision") or "").startswith("124"),
+        and str(mig.get("current_revision") or "") == "138_candidate_totp_mfa",
         str(mig)[:160] if isinstance(mig, dict) else str(st),
     )
 

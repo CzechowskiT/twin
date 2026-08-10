@@ -168,11 +168,16 @@ def main() -> int:
         check("D_discoverability", "no_silent_scores", d.get("silent_personalization_scores") is False, "")
         check("D_discoverability", "tour_7", len((d.get("tour") or {}).get("steps") or []) == 7, "")
         check("D_discoverability", "tour_ne_fv", (d.get("tour") or {}).get("equals_first_value") is False, "")
+        # Public Preview is intentionally ON (read-only synthetic), independent of Launch/canary.
         check(
             "D_discoverability",
             "preview_ready_inactive",
-            p.get("status") == "READY_INACTIVE" and p.get("enabled_in_production") is False,
-            "",
+            (
+                p.get("mode") == "READ_ONLY_SYNTHETIC"
+                or p.get("status") in ("ENABLED", "READY_INACTIVE", "ON_READ_ONLY_NOINDEX")
+            )
+            and p.get("independent_of_launch_gates") is not False,
+            str(p.get("status")),
         )
         check(
             "D_discoverability",

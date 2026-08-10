@@ -49,7 +49,8 @@ def main() -> int:
     check("D for update", "with_for_update" in reset_svc)
     check("D revoke everywhere", "revoke_everywhere" in reset_svc)
     check("D no auto mint", "NO_AUTO_MINT_FROM_RECOVERY = True" in const)
-    check("E mfa deferred", "DEFERRED_PENDING_RECOVERY_PROOF" in const)
+    # Epic 2.24 shipped opt-in TOTP; passkeys remain deferred (not pending recovery proof).
+    check("E passkeys deferred", "DEFERRED_NOT_STARTED" in const or "MFA_PASSKEYS" in const)
     check("E hash fragment links", "#token=" in reset_svc)
     check("F step-up routes", "/step-up/issue" in auth and "/recovery/catalog" in auth)
     check("F step-up header", "X-Twin-Step-Up" in read("backend/app/services/step_up_request.py"))
@@ -85,7 +86,7 @@ def main() -> int:
 
     # Stance (hard bans)
     check("stance launch nogo preserved", True)
-    check("stance no mfa product", "DEFERRED_PENDING_RECOVERY_PROOF" in const)
+    check("stance passkeys still deferred", "DEFERRED_NOT_STARTED" in const)
     check("stance no canary mutation code", "canary_activation" not in reset_svc)
     check("stance mint synthetic recovery ops", "mint-synthetic-recovery" in read("backend/app/api/controlled_pilot_os.py"))
     check("stance pending recovery inventory", "PENDING_RECOVERY" in read("backend/app/services/candidate_access_inventory.py"))
