@@ -73,7 +73,7 @@
   "primary_ia": 7,
   "product_sha": "c84f03734d02b5159ac7ce43c2259fa5cfe234c9",
   "production_db_head": "138_candidate_totp_mfa",
-  "proof_docs_tip_sha": "7b974d5058fa9de8e8aef8fee52484118c66c740",
+  "proof_docs_tip_sha": "73223d8cb7f6be1333bb1851191576787f8c4a9f",
   "public_preview": "ON_READ_ONLY_NOINDEX",
   "rollback_floor": "post_2.24_managed_session_recovery_totp_compatible",
   "route_classification_pct": 100,

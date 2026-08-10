@@ -61,7 +61,7 @@ Final Answers
 3|verdict_letter: A
 4|repo_head_at_product: c84f03734d02b5159ac7ce43c2259fa5cfe234c9
 5|product_SHA: c84f03734d02b5159ac7ce43c2259fa5cfe234c9
-6|tip_SHA: 7b974d5058fa9de8e8aef8fee52484118c66c740
+6|tip_SHA: 73223d8cb7f6be1333bb1851191576787f8c4a9f
 7|FE_SHA: c84f03734d02b5159ac7ce43c2259fa5cfe234c9
 8|API_SHA: c84f03734d02b5159ac7ce43c2259fa5cfe234c9
 9|worker_SHA: c84f03734d02b5159ac7ce43c2259fa5cfe234c9
