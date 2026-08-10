@@ -16,7 +16,7 @@
   "ci_run_id": "31360958744",
   "ci_url": "https://github.com/CzechowskiT/twin/actions/runs/31360958744",
   "db_at_expected_head": true,
-  "docs_only_drift": false,
+  "docs_only_drift": true,
   "evidence_generated_at": "2026-08-10T06:18:01.839463+00:00",
   "fe_commit": "c84f03734d02b5159ac7ce43c2259fa5cfe234c9",
   "feature_flags_snapshot": {
@@ -73,7 +73,7 @@
   "primary_ia": 7,
   "product_sha": "c84f03734d02b5159ac7ce43c2259fa5cfe234c9",
   "production_db_head": "138_candidate_totp_mfa",
-  "proof_docs_tip_sha": "c84f03734d02b5159ac7ce43c2259fa5cfe234c9",
+  "proof_docs_tip_sha": "7b974d5058fa9de8e8aef8fee52484118c66c740",
   "public_preview": "ON_READ_ONLY_NOINDEX",
   "rollback_floor": "post_2.24_managed_session_recovery_totp_compatible",
   "route_classification_pct": 100,
