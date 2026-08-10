@@ -1,0 +1,2858 @@
+{
+  "classification_complete_pct": 100.0,
+  "classified_count": 284,
+  "page_route_count": 284,
+  "primary_ia_count": 7,
+  "primary_ia_routes": [
+    "/dashboard",
+    "/dashboard/approvals",
+    "/dashboard/career",
+    "/dashboard/execution-calendar",
+    "/dashboard/matches",
+    "/dashboard/portfolio",
+    "/dashboard/privacy-center"
+  ],
+  "routes": [
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/about",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/admin/beta",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/admin/canary",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/admin/cohorts",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/admin/data-quality",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/admin/founder-command",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/admin/metrics",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/admin/partner-keys",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/admin/pilot-os",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/admin/placements",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/admin/recruiter-tokens",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/auth/callback",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/beta",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/beta/dashboard",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/beta/join",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/board/ai-compliance",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/board/audit-event-foundation",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/board/calendar-readiness",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/board/first-working-persistence-plan",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/board/hiring-journey",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/board/implementation-tracker",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/board/microsoft-busy-read-staging-checklist",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/board/offer-readiness",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/board/persistence-operations-monitor",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/board/placement-verification",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/board/production-persistence-status",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/board/scheduling-proposal",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/board/working-data-readiness",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/board/working-features-readiness",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/calculator",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/calculator/b2b",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/careers",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/case-studies",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/companies/signup",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/audit-log",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/billing",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/candidate-role-status",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/candidates/[candidateId]",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/candidates/[candidateId]/collaboration",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/candidates/[candidateId]/communication",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/candidates/[candidateId]/consent",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/candidates/[candidateId]/contact-history",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/candidates/[candidateId]/decision-memory",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/candidates/[candidateId]/feedback",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/candidates/[candidateId]/team",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/candidates/[candidateId]/trust",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/candidates/[candidateId]/trust-summary",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/dashboard",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/evidence/audit",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/feedback",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/hiring-cockpit",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/hiring-command-center",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/hiring-journey",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/integrations",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/integrations/ats",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/integrations/ats/[...rest]",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/integrations/ats/deduplication",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/integrations/ats/import-readiness",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/integrations/ats/mapping",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/notifications",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/offer-readiness",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/onboarding",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/org-settings",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/permissions",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/pipeline",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/placement-verification",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/roles",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/roles/[roleId]",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/roles/[roleId]/communication",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/roles/[roleId]/consent",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/roles/[roleId]/decision-memory",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/roles/[roleId]/drafts",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/roles/[roleId]/feedback",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/roles/[roleId]/pipeline",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/roles/[roleId]/scorecards",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/roles/[roleId]/tasks",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/roles/[roleId]/team",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/roles/new",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/scheduling-proposal",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/scorecards",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/talent-pool",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/team",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/trust-summary",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/company/work-items",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/compare/agencies",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/compare/dover",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/compare/linkedin",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/compare/moonhub",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/consent/gdpr",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/contact",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_ia_primary",
+      "empty_state": "module_owned",
+      "entry_point": "primary_nav",
+      "intended_audience": "candidate_primary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/acceptance",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/application-studio",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/applications",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_ia_primary",
+      "empty_state": "module_owned",
+      "entry_point": "primary_nav",
+      "intended_audience": "candidate_primary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/approvals",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/billing",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/calendar",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/calendar-sync",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/calendar/readiness",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_ia_primary",
+      "empty_state": "module_owned",
+      "entry_point": "primary_nav",
+      "intended_audience": "candidate_primary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/career",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/career-pack",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/career-transition",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/consent-center",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/cv",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/data-trust",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/decision-journal",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/evidence",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/evidence-investment",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/evidence/ai-runs",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/evidence/claims",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/evidence/disputes",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/evidence/security",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_ia_primary",
+      "empty_state": "module_owned",
+      "entry_point": "primary_nav",
+      "intended_audience": "candidate_primary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/execution-calendar",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/execution-intelligence",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/help",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/help/feedback",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/help/report-problem",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/hiring-journey",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/history",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/identity",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/import",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/interview-decision",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/interview-prep",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/jobs",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/lifecycle",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_ia_primary",
+      "empty_state": "module_owned",
+      "entry_point": "primary_nav",
+      "intended_audience": "candidate_primary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/matches",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/offer-readiness",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/placement-verification",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/plan",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_ia_primary",
+      "empty_state": "module_owned",
+      "entry_point": "primary_nav",
+      "intended_audience": "candidate_primary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/portfolio",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_ia_primary",
+      "empty_state": "module_owned",
+      "entry_point": "primary_nav",
+      "intended_audience": "candidate_primary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/privacy-center",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/profile",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/recovery",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/referrals",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/referrals/cash-out",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/review-center",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/scheduling-proposal",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/search",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/search-outcomes",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/search-strategy",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/settings/access",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/settings/auto-apply",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/strategy",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/timeline",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/trust",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/trust/activity-timeline",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/trust/audit-export",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/trust/consent-receipt",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/trust/controls",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/trust/corrections",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/trust/export-preview",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/trust/export-requests",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/trust/identity-verification",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/trust/overview",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/trust/portability",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/trust/request-intake-preview",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/trust/revoke-delete",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/trust/visibility-preferences",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/dashboard/workspace-search",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/demo",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/developers",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/faq",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/first-1000",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/for-candidates",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/for-companies",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/for-employers/pricing",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/for-investors",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/for-investors/yc",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/for-recruiters",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/forgot-password",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/how-it-works",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/investor",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/investor/calculator",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/investor/data-room",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/investor/metrics",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/investor/placement",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/investor/product-proof",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/investor/roadmap",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/investor/trust-proof",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/login",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/login/candidate",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/login/company",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/login/investor",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/login/recruiter",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/media",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/onboarding",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/onboarding-assistant",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/partners",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/placement/employer",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/placement/employer/[slug]",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/preview",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/pricing",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/privacy",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/profile",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/profile/hiring-journey",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/profile/offer-readiness",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/profile/placement-verification",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/profile/scheduling-proposal",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/profile/trust",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/profile/trust/audit-export",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/profile/trust/consent-receipt",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/profile/trust/controls",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/profile/trust/corrections",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/profile/trust/export-preview",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/profile/trust/identity-verification",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/profile/trust/overview",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/profile/trust/portability",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/profile/trust/revoke-delete",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/profile/trust/visibility-preferences",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/activity-timeline",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/analytics",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/calendar",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/candidate-role-status",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/candidates/[candidateId]",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/candidates/[candidateId]/collaboration",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/candidates/[candidateId]/communication",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/candidates/[candidateId]/consent",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/candidates/[candidateId]/contact-history",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/candidates/[candidateId]/decision-memory",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/candidates/[candidateId]/feedback",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/candidates/[candidateId]/notes",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/candidates/[candidateId]/scorecard",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/candidates/[candidateId]/team",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/candidates/[candidateId]/trust",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/daily-cockpit",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/evidence/claims",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/evidence/disputes",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/evidence/reviews",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/hiring-journey",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/inbox",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/integrations",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/integrations/ats",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/integrations/ats/[...rest]",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/integrations/ats/deduplication",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/integrations/ats/import-readiness",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/integrations/ats/mapping",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/jobs",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/jobs/[jobId]",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/jobs/[jobId]/communication",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/jobs/[jobId]/consent",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/jobs/[jobId]/decision-memory",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/jobs/[jobId]/drafts",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/jobs/[jobId]/feedback",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/jobs/[jobId]/pipeline",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/jobs/[jobId]/scorecards",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/jobs/[jobId]/tasks",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/jobs/[jobId]/team",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/notification-preferences",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/offer-readiness",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/operational-work-queue",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/pipeline",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/placement-verification",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/request-intake",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/review-queue",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/scheduling-proposal",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/search",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/talent-pool",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/talent-pool/import",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/talent-radar",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/talent-radar/digest",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/trust-review-queue",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/recruiter/work-items",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/register",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/register/candidate",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/register/investor",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/register/recruiter",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "candidate_product_module",
+      "empty_state": "module_owned",
+      "entry_point": "secondary_or_handoff",
+      "intended_audience": "candidate_secondary",
+      "return_path": "owner_or_primary_home",
+      "route": "/reset-password",
+      "synthetic_demo_real": "synthetic_ok"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/share/career-pack/[publicId]",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/status",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/terms",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/testimonials",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/verify-email",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": false,
+      "canonical_owner": "public_surface",
+      "empty_state": "n_a",
+      "entry_point": "public",
+      "intended_audience": "public_or_unauth",
+      "return_path": "owner_or_primary_home",
+      "route": "/waitlist",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/workspace",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/workspace/candidate",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/workspace/candidate/jobs",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/workspace/candidate/matches",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/workspace/company",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/workspace/investor",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/workspace/investor/product-proof",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/workspace/recruiter",
+      "synthetic_demo_real": "n_a"
+    },
+    {
+      "authentication_required": true,
+      "canonical_owner": "classified_other",
+      "empty_state": "n_a",
+      "entry_point": "unknown_entry",
+      "intended_audience": "other",
+      "return_path": "owner_or_primary_home",
+      "route": "/workspace/recruiter/integrations",
+      "synthetic_demo_real": "n_a"
+    }
+  ],
+  "schema_id": "twin.candidate_route_inventory/v1"
+}

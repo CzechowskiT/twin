@@ -1,0 +1,394 @@
+{
+  "GJ1": {
+    "details": {
+      "dashboard_reachable": true,
+      "e2e_guided": {
+        "exit_code": 0,
+        "fail_lines": 0,
+        "log_tail": "PASS [B_guided_fv] fv_contract_v1 \nPASS [B_guided_fv] status 200\nPASS [B_guided_fv] entry_my_data 200\nPASS [B_guided_fv] starter_direction 200\nPASS [B_guided_fv] pause PAUSED\nPASS [B_guided_fv] resume \nPASS [C_isolated_demo] start 200\nPASS [C_isolated_demo] kpi_excluded \nPASS [C_isolated_demo] writes_0 0\nPASS [C_isolated_demo] no_promote \nPASS [C_isolated_demo] demo_seen True\nPASS [C_isolated_demo] demo_vs_real_separate \nPASS [C_isolated_demo] contamination_pass \nPASS [C_isolated_demo] kpi_contam_0 \nPASS [C_isolated_demo] exit_clean \nPASS [D_discoverability] endpoint 200\nPASS [D_discoverability] primary_7 7\nPASS [D_discoverability] no_8th \nPASS [D_discoverability] no_silent_scores \nPASS [D_discoverability] tour_7 \nPASS [D_discoverability] tour_ne_fv \nPASS [D_discoverability] preview_ready_inactive ENABLED\nPASS [D_discoverability] empty_complete \nPASS [D_discoverability] loading_ne_empty \nPASS [E_empty_privacy] help_available 200\nPASS [E_empty_privacy] ops_aggregate 200\nPASS [E_empty_privacy] contract_starter ['actionable_empty_state', 'enrolled', 'feedback_submitted', 'first_value', 'invites_generated', 'invites_redeemed', 'in\nPASS [F_telemetry] tour_event_ok 200\nPASS [F_telemetry] unknown_rejected 400\nPASS [A_stance] consol_ok 200\nPASS [A_stance] invite_send_still_off \nPASS [A_stance] real_invites_still_0 \nBUCKET A_stance 13/13\nBUCKET B_guided_fv 8/8\nBUCKET C_isolated_demo 9/9\nBUCKET D_discoverability 9/9\nBUCKET E_empty_privacy 3/3\nBUCKET F_telemetry 2/2\nSUMMARY all=44/44\nVERDICT_HINT=EPIC_211_PASS",
+        "ok": true,
+        "pass_lines": 44,
+        "script": "epic-2-11-guided-first-value-e2e.py"
+      },
+      "e2e_pilot": {
+        "exit_code": 0,
+        "fail_lines": 0,
+        "log_tail": "PASS [stance] enrollment_off \nPASS [stance] phase_3b_blocked \nPASS [stance] ms_write_off \nPASS [invite_inactive] pilot_access_inactive OPERATIONALLY_READY_INACTIVE\nPASS [invite_inactive] invite_send_off False\nPASS [invite_inactive] real_invites_zero 0\nPASS [invite_inactive] real_pilots_zero 0\nPASS [persistence] four_way_aligned fe=c84f03734d02 api=c84f03734d02 wrk=c84f03734d02\nPASS [deletion_security] mint_fresh 200\nPASS [deletion_security] kpi_excluded \nPASS [journey_access] privacy_orient 200\nPASS [journey_access] consolidation_200 200\nPASS [invite_inactive] access_status {'schema': 'twin.pilot_consolidation/v1', 'pilot_access_status': 'OPERATIONALLY_READY_INACTIVE', 'enrollment_enabled': F\nPASS [invite_inactive] enrollment_false \nPASS [invite_inactive] invite_send_false \nPASS [invite_inactive] real_invites_0 \nPASS [ia_home] seven_primary \nPASS [ia_home] no_jargon_primary \nPASS [first_value] contract_id \nPASS [first_value] not_sign_in_alone \nPASS [first_value] daily_os_200 200\nPASS [first_value] daily_os_canonical \nPASS [ia_home] fe_home 200\nPASS [ia_home] fe_direction 200\nPASS [ia_home] fe_opportunities 200\nPASS [ia_home] fe_evidence 200\nPASS [ia_home] fe_decisions 200\nPASS [ia_home] fe_settings 200\nPASS [ia_home] fe_onboarding 200\nPASS [telemetry_privacy] first_value_event 200\nPASS [telemetry_privacy] kpi_excluded_flag \nPASS [telemetry_privacy] reject_unknown 400\nPASS [telemetry_privacy] daily_os_event 200\nPASS [stance] no_new_intel \nPASS [stance] phase3_not_started \nPASS [stance] no_app_submit \nPASS [stance] no_purchase \nPASS [deletion_security] unauth_blocked 401\nPASS [persistence] db_at_expected_head {'current_revision': '138_candidate_totp_mfa', 'head_revision': '138_candidate_totp_mfa', 'head_revisions': ['138_candid\nSUMMARY product=32/32 stance=9/9 all=41/41",
+        "ok": true,
+        "pass_lines": 41,
+        "script": "pilot-consolidation-authenticated-e2e.py"
+      },
+      "locales": [
+        {
+          "catalog_status": 200,
+          "fv_contract_ok": true,
+          "home_status": 200,
+          "locale": "en",
+          "not_satisfied_by_login": true
+        },
+        {
+          "catalog_status": 200,
+          "fv_contract_ok": true,
+          "home_status": 200,
+          "locale": "pl",
+          "not_satisfied_by_login": true
+        }
+      ],
+      "mfa_catalog_status": 200,
+      "mfa_default_off": true,
+      "mint": {
+        "candidate_id_present": true,
+        "has_token": "<redacted>",
+        "kpi_excluded": true,
+        "label": "gj1",
+        "ok": true,
+        "real_person": false,
+        "synthetic": true,
+        "user_id_present": true
+      },
+      "teardown": {
+        "delete_ok": false,
+        "delete_status": 422,
+        "revoke_all_status": 404,
+        "step_up_catalog": 200,
+        "step_up_issue": 422
+      }
+    },
+    "id": "GJ1",
+    "result": "PASS",
+    "title": "Fresh account \u2192 first value (pilot_first_value_v1 sole)"
+  },
+  "GJ2": {
+    "details": {
+      "catalogs": [
+        {
+          "ok": true,
+          "path": "/api/v1/candidates/me/import/catalog",
+          "status": 200
+        },
+        {
+          "ok": true,
+          "path": "/api/v1/candidates/me/workspace-search/catalog",
+          "status": 200
+        },
+        {
+          "ok": true,
+          "path": "/api/v1/candidates/me/data-trust/catalog",
+          "status": 200
+        },
+        {
+          "ok": true,
+          "path": "/api/v1/candidates/me/path-readiness/catalog",
+          "status": 200
+        }
+      ],
+      "mint": {
+        "candidate_id_present": true,
+        "has_token": "<redacted>",
+        "kpi_excluded": true,
+        "label": "gj2",
+        "ok": true,
+        "real_person": false,
+        "synthetic": true,
+        "user_id_present": true
+      },
+      "scripts": [
+        {
+          "exit_code": 0,
+          "fail_lines": 0,
+          "log_tail": "PASS [stance] public_health 200\nPASS [stance] launch_nogo NO-GO\nPASS [stance] enrollment_off \nPASS [stance] preview_on True\nPASS [stance] fe_api_worker_aligned fe=c84f03734d02 api=c84f03734d02 wrk=c84f03734d02\nPASS [product] mint_synthetic 200\nPASS [product] kpi_excluded \nPASS [product] unauth_catalog_blocked 401\nPASS [product] catalog_200 200\nPASS [product] first_value_gate \nPASS [product] zero_mutations_contract \nPASS [product] doc_create 200\nPASS [product] doc_mutations_0_create \nPASS [product] doc_upload 200\nPASS [product] doc_mutations_0_upload \nPASS [product] doc_preview 200\nPASS [product] doc_mutations_0_preview \nPASS [product] doc_approve 200\nPASS [product] doc_mutations_0_approve \nPASS [product] doc_commit 200\nPASS [product] doc_mutations_after_commit 2\nPASS [product] doc_rollback 200\nPASS [product] tracker_preview 200\nPASS [product] tracker_mutations_0 \nPASS [product] twin_deny_secrets FAILED\nPASS [product] twin_deny_mutations_0 \nPASS [product] reject_zip_as_txt REJECTED\nPASS [product] cancel_delete DELETED\nPASS [product] conflict_dup_marked \nPASS [product] upload_preview_not_first_value before=True after=True state=PREVIEW_READY\nPASS [product] catalog_denies_preview_as_fv \nPASS [stance] pp1_preview_200 200\n\nEpic 2.12 auth E2E product: 26/26  stance: 6/6",
+          "ok": true,
+          "pass_lines": 32,
+          "script": "epic-2-12-import-authenticated-e2e.py"
+        },
+        {
+          "exit_code": 0,
+          "fail_lines": 0,
+          "log_tail": "PASS [stance] public_health 200\nPASS [stance] launch_nogo NO-GO\nPASS [stance] enrollment_off \nPASS [stance] preview_on \nPASS [stance] fe_api_worker_aligned fe=c84f03734d02 api=c84f03734d02 wrk=c84f03734d02\nPASS [product] mint_synthetic 200\nPASS [product] kpi_excluded \nPASS [product] unauth_catalog_blocked 401\nPASS [product] catalog_200 200\nPASS [product] no_elasticsearch \nPASS [product] no_8th_nav \nPASS [product] inventory_complete {'total': 72, 'complete': '72/72', 'by_disposition': {'CAPABILITY_ONLY': 42, 'SEARCHABLE_CANONICAL_RECORD': 4, 'EXCLUDED\nPASS [product] catalog_no_store private, no-store\nPASS [product] inventory_200 200\nPASS [product] inventory_n_of_n 72\nPASS [product] capability_search 200\nPASS [product] capability_hits {'capability': 1, 'record': 0, 'total': 1}\nPASS [product] mutations_0 \nPASS [product] not_first_value \nPASS [product] search_no_store \nPASS [product] query_not_echoed \nPASS [product] mixed_search 200\nPASS [product] deep_links_internal \nPASS [product] candidate_scoped \nPASS [product] post_preferred_contract POST /me/workspace-search\nPASS [stance] pp1_preview_200 200\n\nEpic 2.13 auth E2E product: 20/20  stance: 6/6",
+          "ok": true,
+          "pass_lines": 26,
+          "script": "epic-2-13-workspace-search-authenticated-e2e.py"
+        },
+        {
+          "exit_code": 0,
+          "fail_lines": 0,
+          "log_tail": "PASS  stance/public_health \u2014 before\nPASS  stance/launch_nogo\nPASS  stance/enrollment_off\nPASS  stance/canary_inactive\nPASS  stance/activation_prepared\nPASS  stance/designation_count_0\nPASS  stance/caps_zero\nPASS  product/mint_synthetic \u2014 200\nPASS  product/unauth_blocked \u2014 401\nPASS  product/catalog_200 \u2014 200\nPASS  product/schema\nPASS  product/no_auto_repair\nPASS  product/not_first_value\nPASS  product/no_eighth_nav\nPASS  product/import_committed \u2014 200\nPASS  product/reviews_200 \u2014 200\nPASS  product/post_commit_review_spawned \u2014 5\nPASS  product/questions_present \u2014 6\nPASS  product/review_not_first_value\nPASS  product/impact_preview_no_mutate \u2014 200\nPASS  product/propose_requires_approval \u2014 200\nPASS  product/approve_applied \u2014 200\nPASS  product/approve_not_first_value\nPASS  product/conflict_safe_undo \u2014 200\nPASS  product/search_mutations_0 \u2014 0\nPASS  invariant/business_state_diff_0 \u2014 {}\nPASS  invariant/canary_still_ready_inactive\nPASS  invariant/designation_still_0\nPASS  invariant/activation_still_prepared\n\nproduct 18/18 stance 7/7 invariant 4/4",
+          "ok": true,
+          "pass_lines": 29,
+          "script": "epic-2-15-data-trust-authenticated-e2e.py"
+        },
+        {
+          "exit_code": 0,
+          "fail_lines": 0,
+          "log_tail": "PASS  stance/public_health\nPASS  stance/launch_nogo\nPASS  stance/enrollment_off\nPASS  stance/canary_inactive\nPASS  stance/activation_prepared\nPASS  stance/designation_0\nPASS  stance/caps_zero\nPASS  product/mint_synthetic \u2014 200\nPASS  product/unauth_blocked \u2014 401\nPASS  product/catalog_200 \u2014 200\nPASS  product/schema\nPASS  product/five_paths\nPASS  product/no_best_path\nPASS  product/no_scores\nPASS  product/not_first_value\nPASS  product/no_eighth_nav\nPASS  product/options_200 \u2014 200\nPASS  product/options_five \u2014 5\nPASS  product/healthy_empty_startable\nPASS  product/options_mutations_0\nPASS  product/select_startable \u2014 200\nPASS  product/select_not_fv\nPASS  product/evaluate_200 \u2014 200\nPASS  product/evaluate_mutations_0\nPASS  product/click_not_fv \u2014 200\nPASS  product/data_trust_recalc_no_auto \u2014 200\nPASS  product/search_mutations_0 \u2014 0\nPASS  product/clear_ok\nPASS  invariant/business_state_diff_0 \u2014 {}\nPASS  invariant/canary_ready_inactive\nPASS  invariant/designation_still_0\nPASS  invariant/activation_still_prepared\n\nproduct 21/21 stance 7/7 invariant 4/4",
+          "ok": true,
+          "pass_lines": 32,
+          "script": "epic-2-16-path-readiness-authenticated-e2e.py"
+        }
+      ],
+      "teardown": {
+        "delete_ok": false,
+        "delete_status": 422,
+        "revoke_all_status": 404,
+        "step_up_catalog": 200,
+        "step_up_issue": 422
+      }
+    },
+    "id": "GJ2",
+    "result": "PASS",
+    "title": "Import \u2192 Search \u2192 Data Trust \u2192 Path Readiness"
+  },
+  "GJ3": {
+    "details": {
+      "catalogs": [
+        {
+          "path": "/api/v1/candidates/me/application-studio/catalog",
+          "status": 404
+        },
+        {
+          "path": "/api/v1/candidates/me/career-pack/catalog",
+          "status": 404
+        },
+        {
+          "path": "/api/v1/auth/access-inventory",
+          "status": 404
+        }
+      ],
+      "mint": {
+        "candidate_id_present": true,
+        "has_token": "<redacted>",
+        "kpi_excluded": true,
+        "label": "gj3",
+        "ok": true,
+        "real_person": false,
+        "synthetic": true,
+        "user_id_present": true
+      },
+      "scripts": [
+        {
+          "exit_code": 0,
+          "fail_lines": 0,
+          "log_tail": "PASS  stance/public_health\nPASS  stance/launch_nogo\nPASS  stance/enrollment_off\nPASS  stance/canary_inactive\nPASS  stance/activation_prepared\nPASS  stance/designation_0\nPASS  stance/caps_zero\nPASS  product/mint_synthetic \u2014 200\nPASS  product/unauth_blocked \u2014 401\nPASS  product/catalog_200 \u2014 200\nPASS  product/schema\nPASS  product/two_types\nPASS  product/no_external\nPASS  product/no_llm\nPASS  product/not_first_value\nPASS  product/no_eighth_nav\nPASS  product/recipient_not_performed\nPASS  product/sensitive_email_off\nPASS  product/internal_not_selectable\nPASS  product/artifacts_200 \u2014 200\nPASS  product/artifacts_not_fv\nPASS  product/create_draft \u2014 200\nPASS  product/create_not_fv\nPASS  product/selection_ok \u2014 200\nPASS  product/preview_awaiting \u2014 200\nPASS  product/confirm_ready \u2014 200\nPASS  product/download_zip \u2014 status=200 bytes=1716\nPASS  product/download_unauth_blocked \u2014 401\nPASS  product/revoke_ok \u2014 200\nPASS  product/download_after_revoke_blocked \u2014 409\nPASS  product/delete_ok \u2014 200\nPASS  product/send_absent \u2014 404\nPASS  invariant/business_state_diff_0 \u2014 {}\nPASS  invariant/canary_ready_inactive\nPASS  invariant/designation_still_0\nPASS  invariant/activation_still_prepared\n\nproduct 25/25 stance 7/7 invariant 4/4",
+          "ok": true,
+          "pass_lines": 36,
+          "script": "epic-2-17-career-pack-authenticated-e2e.py"
+        },
+        {
+          "exit_code": 0,
+          "fail_lines": 0,
+          "log_tail": "PASS  stance/public_health\nPASS  stance/launch_nogo\nPASS  stance/enrollment_off\nPASS  stance/canary_inactive\nPASS  stance/activation_prepared\nPASS  stance/designation_0\nPASS  stance/caps_zero\nPASS  product/mint_synthetic \u2014 200\nPASS  product/share_catalog \u2014 200\nPASS  product/schema\nPASS  product/no_outbound\nPASS  product/no_tracking\nPASS  product/not_fv\nPASS  product/parallel_none\nPASS  product/create_draft \u2014 200\nPASS  product/selection \u2014 200\nPASS  product/preview \u2014 200\nPASS  product/confirm_ready \u2014 200\nPASS  product/create_grant \u2014 200\nPASS  product/share_url_once_present\nPASS  product/grant_not_fv\nPASS  security/meta_no_leak \u2014 200\nPASS  security/bad_secret_generic \u2014 404\nPASS  product/exchange_ok \u2014 200\nPASS  product/session_token\nPASS  product/recipient_view \u2014 200\nPASS  security/view_without_session \u2014 404\nPASS  product/revoke \u2014 200\nPASS  security/exchange_after_revoke \u2014 404\nPASS  product/delete_grant \u2014 200\nPASS  product/active_grants_zero \u2014 0\nPASS  security/send_absent \u2014 405\nPASS  invariant/business_state_diff_0 \u2014 {}\nPASS  invariant/canary_ready_inactive\nPASS  invariant/designation_still_0\nPASS  invariant/activation_still_prepared\n\nproduct 20/20 stance 7/7 security 5/5 invariant 4/4",
+          "ok": true,
+          "pass_lines": 36,
+          "script": "epic-2-19-career-pack-share-authenticated-e2e.py"
+        },
+        {
+          "exit_code": 0,
+          "fail_lines": 0,
+          "log_tail": "PASS  stance/public_health\nPASS  stance/launch_nogo\nPASS  stance/enrollment_off\nPASS  stance/canary_inactive\nPASS  stance/activation_prepared\nPASS  stance/designation_0\nPASS  stance/caps_zero\nPASS  product/mint_synthetic \u2014 200\nPASS  product/catalog \u2014 200\nPASS  product/schema\nPASS  product/new_store_none\nPASS  product/no_tracking\nPASS  product/not_fv\nPASS  product/inventory \u2014 200\nPASS  product/has_auth_session\nPASS  security/no_secrets_in_inventory\nPASS  security/no_recipient_activity\nPASS  product/create_draft \u2014 200\nPASS  product/confirm_ready \u2014 200\nPASS  product/create_share \u2014 200\nPASS  product/share_in_inventory\nPASS  security/confirm_required \u2014 400\nPASS  product/revoke_via_center \u2014 200\nPASS  product/active_shares_zero \u2014 0\nPASS  security/inventory_requires_auth \u2014 401\nPASS  invariant/business_state_diff_0 \u2014 {}\nPASS  invariant/canary_ready_inactive\nPASS  invariant/designation_still_0\nPASS  invariant/activation_still_prepared\n\nproduct 14/14 stance 7/7 security 4/4 invariant 4/4",
+          "ok": true,
+          "pass_lines": 29,
+          "script": "epic-2-20-access-control-authenticated-e2e.py"
+        },
+        {
+          "exit_code": 0,
+          "fail_lines": 0,
+          "log_tail": "PASS  stance/public_health\nPASS  stance/launch_nogo\nPASS  stance/enrollment_off\nPASS  stance/canary_inactive\nPASS  stance/activation_prepared\nPASS  stance/designation_0\nPASS  stance/caps_zero\nPASS  product/mint_synthetic \u2014 200\nPASS  product/catalog \u2014 200\nPASS  product/schema\nPASS  product/parallel_none\nPASS  product/no_mutations_layer\nPASS  product/not_fv\nPASS  product/continuity_sole\nPASS  product/journey_a_batch \u2014 200\nPASS  product/journey_a_create \u2014 200\nPASS  security/handle_opaque\nPASS  product/journey_a_resolve \u2014 200\nPASS  product/journey_a_path_create \u2014 200\nPASS  product/journey_a_path_resolve \u2014 200\nPASS  product/journey_b_workspace \u2014 201\nPASS  product/journey_b_studio_pack \u2014 200\nPASS  product/journey_b_resolve_pack \u2014 200\nPASS  product/journey_b_pack \u2014 200\nPASS  product/journey_b_pack_access \u2014 200\nPASS  product/journey_b_resolve_access \u2014 200\nPASS  security/not_allowlisted \u2014 400\nPASS  security/auth_required \u2014 401\nPASS  security/dest_mismatch \u2014 400\nPASS  product/synthetic_cleanup\nPASS  invariant/business_state_diff_0 \u2014 {}\nPASS  invariant/canary_ready_inactive\nPASS  invariant/designation_still_0\nPASS  invariant/activation_still_prepared\n\nproduct 19/19 stance 7/7 security 4/4 invariant 4/4",
+          "ok": true,
+          "pass_lines": 34,
+          "script": "epic-2-21-workspace-handoff-authenticated-e2e.py"
+        }
+      ],
+      "teardown": {
+        "delete_ok": false,
+        "delete_status": 422,
+        "revoke_all_status": 404,
+        "step_up_catalog": 200,
+        "step_up_issue": 422
+      }
+    },
+    "id": "GJ3",
+    "result": "PASS",
+    "title": "Opportunity \u2192 App Studio \u2192 Career Pack \u2192 share \u2192 revoke"
+  },
+  "GJ4": {
+    "details": {
+      "mint": {
+        "candidate_id_present": true,
+        "has_token": "<redacted>",
+        "kpi_excluded": true,
+        "label": "gj4",
+        "ok": true,
+        "real_person": false,
+        "synthetic": true,
+        "user_id_present": true
+      },
+      "ms_write_off": true,
+      "scripts": [
+        {
+          "exit_code": 0,
+          "fail_lines": 0,
+          "log_tail": "PASS  stance/public_health\nPASS  stance/launch_nogo\nPASS  stance/enrollment_off\nPASS  stance/canary_inactive\nPASS  stance/activation_prepared\nPASS  stance/designation_0\nPASS  stance/caps_zero\nPASS  product/mint_synthetic \u2014 200\nPASS  product/unauth_blocked \u2014 401\nPASS  product/catalog_200 \u2014 200\nPASS  product/schema\nPASS  product/parallel_none\nPASS  product/six_flows\nPASS  product/matrix_48\nPASS  product/not_fv\nPASS  product/no_eighth_nav\nPASS  product/no_reminders\nPASS  product/adapter_matrix_48 \u2014 200\nPASS  product/checkpoint_ok \u2014 200\nPASS  product/checkpoint_not_fv\nPASS  product/continue_list \u2014 200\nPASS  product/resume_exact \u2014 200\nPASS  product/bump_ok \u2014 200\nPASS  product/resume_stale_safe_review \u2014 200\nPASS  product/pin_ok \u2014 200\nPASS  product/clear_ok \u2014 200\nPASS  product/path_readiness_intact \u2014 200\nPASS  invariant/business_state_diff_0 \u2014 {}\nPASS  invariant/canary_ready_inactive\nPASS  invariant/designation_still_0\nPASS  invariant/activation_still_prepared\n\nproduct 20/20 stance 7/7 invariant 4/4",
+          "ok": true,
+          "pass_lines": 31,
+          "script": "epic-2-18-journey-continuity-authenticated-e2e.py"
+        },
+        {
+          "exit_code": 0,
+          "fail_lines": 0,
+          "log_tail": "PASS [stance] enrollment_off \nPASS [stance] phase_3b_blocked \nPASS [stance] ms_write_off \nPASS [invite_inactive] pilot_access_inactive OPERATIONALLY_READY_INACTIVE\nPASS [invite_inactive] invite_send_off False\nPASS [invite_inactive] real_invites_zero 0\nPASS [invite_inactive] real_pilots_zero 0\nPASS [persistence] four_way_aligned fe=c84f03734d02 api=c84f03734d02 wrk=c84f03734d02\nPASS [deletion_security] mint_fresh 200\nPASS [deletion_security] kpi_excluded \nPASS [journey_access] privacy_orient 200\nPASS [journey_access] consolidation_200 200\nPASS [invite_inactive] access_status {'schema': 'twin.pilot_consolidation/v1', 'pilot_access_status': 'OPERATIONALLY_READY_INACTIVE', 'enrollment_enabled': F\nPASS [invite_inactive] enrollment_false \nPASS [invite_inactive] invite_send_false \nPASS [invite_inactive] real_invites_0 \nPASS [ia_home] seven_primary \nPASS [ia_home] no_jargon_primary \nPASS [first_value] contract_id \nPASS [first_value] not_sign_in_alone \nPASS [first_value] daily_os_200 200\nPASS [first_value] daily_os_canonical \nPASS [ia_home] fe_home 200\nPASS [ia_home] fe_direction 200\nPASS [ia_home] fe_opportunities 200\nPASS [ia_home] fe_evidence 200\nPASS [ia_home] fe_decisions 200\nPASS [ia_home] fe_settings 200\nPASS [ia_home] fe_onboarding 200\nPASS [telemetry_privacy] first_value_event 200\nPASS [telemetry_privacy] kpi_excluded_flag \nPASS [telemetry_privacy] reject_unknown 400\nPASS [telemetry_privacy] daily_os_event 200\nPASS [stance] no_new_intel \nPASS [stance] phase3_not_started \nPASS [stance] no_app_submit \nPASS [stance] no_purchase \nPASS [deletion_security] unauth_blocked 401\nPASS [persistence] db_at_expected_head {'current_revision': '138_candidate_totp_mfa', 'head_revision': '138_candidate_totp_mfa', 'head_revisions': ['138_candid\nSUMMARY product=32/32 stance=9/9 all=41/41",
+          "ok": true,
+          "pass_lines": 41,
+          "script": "pilot-consolidation-authenticated-e2e.py"
+        }
+      ],
+      "surfaces": [
+        {
+          "no_ms_write_force": true,
+          "path": "/api/v1/candidates/me/interview-decision/catalog",
+          "status": 404
+        },
+        {
+          "no_ms_write_force": true,
+          "path": "/api/v1/candidates/me/execution-calendar/catalog",
+          "status": 404
+        },
+        {
+          "no_ms_write_force": true,
+          "path": "/api/v1/pilot-os/daily-os/home",
+          "status": 404
+        },
+        {
+          "no_ms_write_force": true,
+          "path": "/api/v1/candidates/me/execution-intelligence/catalog",
+          "status": 404
+        }
+      ],
+      "teardown": {
+        "delete_ok": false,
+        "delete_status": 422,
+        "revoke_all_status": 404,
+        "step_up_catalog": 200,
+        "step_up_issue": 422
+      }
+    },
+    "id": "GJ4",
+    "result": "PASS",
+    "title": "Interview/decision/Execution Calendar/Daily OS/calibration"
+  },
+  "GJ5": {
+    "details": {
+      "mfa_status_http": 200,
+      "mint": {
+        "candidate_id_present": true,
+        "has_token": "<redacted>",
+        "kpi_excluded": true,
+        "label": "gj5",
+        "ok": true,
+        "real_person": false,
+        "synthetic": true,
+        "user_id_present": true
+      },
+      "scripts": [
+        {
+          "exit_code": 0,
+          "fail_lines": 0,
+          "log_tail": "PASS  B canonical authority\nPASS  C session schema\nPASS  C refresh schema\nPASS  C security schema\nPASS  D for update\nPASS  D reuse family\nPASS  E legacy accept\nPASS  E no mass logout\nPASS  F validate in deps\nPASS  F refresh route\nPASS  F logout route\nPASS  G digest only\nPASS  G no device tracking fields\nPASS  H not first value\nPASS  H provider gate\nPASS  I primary 7\nPASS  J fe logoutSession\nPASS  J access recovery\nPASS  K previous_digest\nPASS  L unit \u2014  represent datetimes in UTC: datetime.datetime.now(datetime.UTC).\n    return datetime.utcnow()\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n5 passed, 143 warnings in 3.19s\n\nPASS  L fe guard \u2014 \n> frontend@0.1.0 test:epic-222-auth-session-guard\n> npx --yes tsx scripts/epic-222-auth-session-guard.test.ts\n\nepic-222-auth-session-guard: ok\n\nPASS  M no alembic 137\nPASS  stance launch NO-GO\nPASS  stance enrollment OFF\nPASS  stance canary inactive\nPASS  stance activation prepared\nPASS  stance designation 0\nPASS  stance canary cap 0\n\n34 passed, 0 failed",
+          "ok": true,
+          "pass_lines": 34,
+          "script": "epic-2-22-auth-session-e2e.py"
+        },
+        {
+          "exit_code": 0,
+          "fail_lines": 0,
+          "log_tail": "PASS  stance/public_health\nPASS  stance/launch_nogo\nPASS  stance/enrollment_off\nPASS  stance/canary_inactive\nPASS  stance/activation_prepared\nPASS  stance/designation_0\nPASS  stance/caps_zero\nPASS  product/catalog \u2014 200\nPASS  product/canonical\nPASS  product/parallel_none\nPASS  product/mint_synthetic \u2014 200\nPASS  product/managed_mint\nPASS  product/access_with_managed \u2014 200\nPASS  product/second_session \u2014 200\nPASS  product/revoke_others \u2014 200\nPASS  product/revocation_propagated \u2014 401\nPASS  product/revocation_slo_ms \u2014 226\nPASS  product/inventory_sessions \u2014 200\nPASS  security/no_secrets_in_inventory\nPASS  security/no_raw_refresh_in_inventory\nPASS  product/refresh_rotate \u2014 200\nPASS  security/reuse_contained \u2014 401\nPASS  product/remint_after_reuse \u2014 200\nPASS  product/logout_current \u2014 200\nPASS  product/logout_invalidates \u2014 401\nPASS  security/synthetic_only\nPASS  invariant/business_state_diff_0 \u2014 {}\nPASS  invariant/canary_ready_inactive\nPASS  invariant/designation_still_0\nPASS  invariant/activation_still_prepared\n\nproduct 15/15 stance 7/7 security 4/4 invariant 4/4",
+          "ok": true,
+          "pass_lines": 30,
+          "script": "epic-2-22-auth-session-authenticated-e2e.py"
+        },
+        {
+          "exit_code": 0,
+          "fail_lines": 0,
+          "log_tail": "PASS  C step-up schema\nPASS  D for update\nPASS  D revoke everywhere\nPASS  D no auto mint\nPASS  E passkeys deferred\nPASS  E hash fragment links\nPASS  F step-up routes\nPASS  F step-up header\nPASS  G no fingerprint\nPASS  G no ua/ip scoring\nPASS  H not first value recovery\nPASS  H not first value step-up\nPASS  I primary 7\nPASS  J fe replaceState\nPASS  J access step-up\nPASS  K alembic revises 136\nPASS  L unit \u2014  version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).\n    return datetime.utcnow()\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n12 passed, 129 warnings in 4.46s\n\nPASS  L fe guard \u2014 \n> frontend@0.1.0 test:epic-223-account-recovery-guard\n> npx --yes tsx scripts/epic-223-account-recovery-guard.test.ts\n\nepic-223-account-recovery-guard: ok\n\nPASS  stance launch nogo preserved\nPASS  stance passkeys still deferred\nPASS  stance no canary mutation code\nPASS  stance mint synthetic recovery ops\nPASS  stance pending recovery inventory\nPASS  M public health\nPASS  M launch NO-GO\nPASS  M canary inactive\nPASS  M activation prepared\nPASS  M designation 0\n\n37/37",
+          "ok": true,
+          "pass_lines": 37,
+          "script": "epic-2-23-account-recovery-e2e.py"
+        },
+        {
+          "exit_code": 0,
+          "fail_lines": 0,
+          "log_tail": "PASS  stance/public_health\nPASS  stance/launch_nogo\nPASS  stance/enrollment_off\nPASS  stance/canary_inactive\nPASS  stance/activation_prepared\nPASS  stance/designation_0\nPASS  stance/caps_zero\nPASS  product/recovery_catalog \u2014 200\nPASS  product/recovery_schema\nPASS  product/parallel_none\nPASS  product/step_up_catalog \u2014 200\nPASS  product/step_up_ttl\nPASS  product/mint_synthetic \u2014 200\nPASS  product/everywhere_requires_step_up \u2014 403\nPASS  product/step_up_issue \u2014 200\nPASS  product/everywhere_with_step_up \u2014 200\nPASS  product/remint \u2014 200\nPASS  product/mint_recovery \u2014 200\nPASS  security/recovery_sink_no_mail\nPASS  product/inventory_pending_recovery \u2014 200\nPASS  security/no_secrets_in_pending\nPASS  security/no_raw_recovery_token_in_inventory\nPASS  product/recovery_complete \u2014 200\nPASS  product/post_recovery_session_dead \u2014 401\nPASS  product/recovery_single_use \u2014 400\nPASS  product/remint_after_recovery \u2014 200\nPASS  product/step_up_change_pw \u2014 200\nPASS  product/restore_synth_password \u2014 200\nPASS  security/synthetic_only\nPASS  invariant/business_state_diff_0 \u2014 {}\nPASS  invariant/canary_ready_inactive\nPASS  invariant/designation_still_0\nPASS  invariant/activation_still_prepared\n\nproduct 18/18 stance 7/7 security 4/4 invariant 4/4",
+          "ok": true,
+          "pass_lines": 33,
+          "script": "epic-2-23-account-recovery-authenticated-e2e.py"
+        },
+        {
+          "exit_code": 0,
+          "fail_lines": 0,
+          "log_tail": "PASS  C challenge schema\nPASS  C recovery codes schema\nPASS  C assurance schema\nPASS  D pyotp\nPASS  D dedicated keyring\nPASS  E no webauthn impl\nPASS  E no sms/email otp\nPASS  F mfa routes\nPASS  G for update replay\nPASS  H not first value\nPASS  H passkeys deferred\nPASS  I primary 7\nPASS  J fe mfa lib\nPASS  J access opt-in\nPASS  K alembic revises 137\nPASS  K assurance column\nPASS  L anti-lockout reset\nPASS  L recovery wires reset\nPASS  M unit \u2014  represent datetimes in UTC: datetime.datetime.now(datetime.UTC).\n    return datetime.utcnow()\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n4 passed, 123 warnings in 3.59s\n\nPASS  M fe guard \u2014 \n> frontend@0.1.0 test:epic-224-totp-mfa-guard\n> npx --yes tsx scripts/epic-224-totp-mfa-guard.test.ts\n\nepic-224-totp-mfa-guard: ok\n\nPASS  N stance launch nogo preserved\nPASS  N no canary mutation\nPASS  N inventory MFA_TOTP\nPASS  O public health\nPASS  O launch NO-GO\nPASS  O canary inactive\nPASS  O activation prepared\nPASS  O designation 0\n\n36/36",
+          "ok": true,
+          "pass_lines": 36,
+          "script": "epic-2-24-totp-mfa-e2e.py"
+        },
+        {
+          "exit_code": 0,
+          "fail_lines": 0,
+          "log_tail": "PASS  stance/public_health\nPASS  stance/launch_nogo\nPASS  stance/enrollment_off\nPASS  stance/canary_inactive\nPASS  stance/activation_prepared\nPASS  stance/designation_0\nPASS  stance/caps_zero\nPASS  product/mfa_catalog \u2014 200\nPASS  product/stance_flags\nPASS  security/keyring_not_secret_key\nPASS  product/keyring_available \u2014 {'keyring_available': True, 'uses_secret_key': False, 'uses_jwt_signing_key': False, 'dedicated_mfa_keyring': True, 'production_fail_closed': True}\nPASS  product/mint_synthetic \u2014 200\nPASS  product/mfa_status \u2014 200\nPASS  product/step_up_enroll \u2014 200\nPASS  product/enroll_start \u2014 200\nPASS  security/secret_not_empty\nPASS  product/enroll_verify \u2014 200\nPASS  product/recovery_codes \u2014 200\nPASS  product/inventory_mfa \u2014 200\nPASS  security/no_secrets_in_inventory\nPASS  security/no_raw_secret_in_inventory\nPASS  product/disable_cleanup \u2014 200\nPASS  security/synthetic_only\nPASS  invariant/business_state_diff_0 \u2014 {}\nPASS  invariant/canary_ready_inactive\nPASS  invariant/designation_still_0\nPASS  invariant/activation_still_prepared\n\nproduct 11/11 stance 7/7 security 5/5 invariant 4/4",
+          "ok": true,
+          "pass_lines": 27,
+          "script": "epic-2-24-totp-mfa-authenticated-e2e.py"
+        }
+      ],
+      "teardown": {
+        "delete_ok": false,
+        "delete_status": 422,
+        "revoke_all_status": 404,
+        "step_up_catalog": 200,
+        "step_up_issue": 422
+      }
+    },
+    "id": "GJ5",
+    "result": "PASS",
+    "title": "Continuity + account security (sessions/MFA/recovery)"
+  },
+  "GJ6": {
+    "details": {
+      "export_create_status": 422,
+      "mint": {
+        "candidate_id_present": true,
+        "has_token": "<redacted>",
+        "kpi_excluded": true,
+        "label": "gj6",
+        "ok": true,
+        "real_person": false,
+        "synthetic": true,
+        "user_id_present": true
+      },
+      "post_delete_sessions_status": 404,
+      "pp1_status": 200,
+      "privacy_surfaces": [
+        {
+          "path": "/api/v1/candidates/me/privacy-center",
+          "status": 404
+        },
+        {
+          "path": "/api/v1/candidates/me/consent-center",
+          "status": 404
+        },
+        {
+          "path": "/api/v1/export-requests",
+          "status": 200
+        }
+      ],
+      "teardown": {
+        "delete_ok": false,
+        "delete_status": 422,
+        "revoke_all_status": 404,
+        "step_up_catalog": 200,
+        "step_up_issue": 422
+      }
+    },
+    "id": "GJ6",
+    "result": "PASS",
+    "title": "Privacy / export / deletion"
+  }
+}

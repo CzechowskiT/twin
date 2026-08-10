@@ -1,0 +1,133 @@
+1|Executive Summary
+Epic 2.25 COMPLETE (Verdict A). Candidate Product Release Candidate zamrożony: sześć golden journeys z izolowanych kont syntetycznych PASS; route inventory 284/284 sklasyfikowany; PRIMARY_IA=7; P0/P1/candidate-critical P2=0/0/0; FE=API=worker ALIGNED na product SHA c84f0373; Alembic 138; CI SUCCESS 31360958744; canary diff=0; TECHNICALLY_READY_INACTIVE; aktywacja BLOCKED_NO_DESIGNATED_REAL_CANDIDATE. Brak nowych domen/silników/FV/auth factors/passkeys/8. nav. Stop — bez Epic 2.26, bez Canary Run 1, bez Phase 3.
+2|Canonical Baseline
+Epic 2.24 product 2e94b290 FE=API=worker / tip 49b3abc3 docs_only_drift / Alembic 138 / MFA OFF OPT_IN / CI 31358448839 / canary READY_INACTIVE / designation=0 — zweryfikowane niezależnie; RC wymagał P1 fix EXPECTED_ALEMBIC_HEAD (126→138) + stabilizacji asercji post-2.24.
+3|Canonical Final State
+product SHA c84f03734d02b5159ac7ce43c2259fa5cfe234c9 FE=API=worker ALIGNED; Alembic 138_candidate_totp_mfa is_at_head=true; schema twin.candidate_product_release_candidate/v1; golden 6/6; canary READY_INACTIVE; PREPARED_NOT_EXECUTED; caps 0; Launch NO-GO; enrollment OFF; Phase 3B BLOCKED; MS write OFF.
+4|Verdict
+CANDIDATE PRODUCT RELEASE CANDIDATE FROZEN — END-TO-END FRESH-ACCOUNT GOLDEN JOURNEYS, CROSS-FEATURE PRIVACY/SECURITY INVARIANTS AND REVERSIBLE DEPLOYMENT PROVEN SYNTHETICALLY; CANARY REMAINS INACTIVE AND BLOCKED_NO_DESIGNATED_REAL_CANDIDATE
+5|Consolidation Audit
+Route inventory 284 page routes; 100% classified (owner/audience/auth/entry/return/empty/synthetic); PRIMARY_IA=7 unchanged; handoffs 2.12–2.21 zachowane; sole FV=pilot_first_value_v1; brak 8. primary nav.
+6|RC Manifest
+reports/.../release-candidate-manifest.json schema twin.candidate_product_release_candidate/v1 — derived, bez sekretów; nie jest drugą władzą deploy/flag.
+7|Golden Journey 1
+PASS — fresh synth → guided FV catalog + pilot consolidation EN+PL; FV contract sole; login/mint ≠ first value; e2e 2.11 44/44; teardown.
+8|Golden Journey 2
+PASS — Import→Workspace Search→Data Trust→Path Readiness (e2e 2.12/2.13/2.15/2.16); ownership catalogs; teardown.
+9|Golden Journey 3
+PASS — App Studio/Career Pack/share/Access Center revoke + handoffs 2.17/2.19/2.20/2.21; teardown.
+10|Golden Journey 4
+PASS — interview/decision/execution-calendar/Daily OS surfaces; MS write OFF; continuity 2.18; teardown.
+11|Golden Journey 5
+PASS — sessions 2.22 + recovery 2.23 + TOTP MFA 2.24 (27/27 auth MFA); fresh MFA default OFF; passkeys DEFERRED_NOT_STARTED.
+12|Golden Journey 6
+PASS — privacy/export/deletion ścieżki; PP1 HTTP 200 izolowane; brak leak sekretów w export; teardown attempt.
+13|Cross-feature Invariants
+Ownership + synthetic KPI exclusion ENFORCED; false real FV=0; secret leakage=0; canary mutation diff=0; no external submit/outreach/MS write.
+14|Route UX a11y
+284 routes classified; PRIMARY_IA=7; progressive disclosure; PP1 ON_READ_ONLY; critical EN/PL paths covered via locale X-Locale; keyboard/mobile = automated harness PASS (bez manual QA).
+15|Public Pilot Boundary
+/preview 200; signup blocked; enrollment OFF; invite send OFF; caps 0; designation 0; canary READY_INACTIVE; activation PREPARED_NOT_EXECUTED; Canary Run 1 nie retry.
+16|Test Buckets
+product 9/9 · stance 13/13 · auth_security 7/7 · privacy 3/3 · infra 8/8 (certify buckets; plus underlying epic e2e matrices).
+17|CI Deploy Rollback
+CI SUCCESS 31360958744 @ c84f0373; FE+API+worker ALIGNED; DB 138; rollback floor = post-2.24 managed-session/recovery/TOTP (nie pre-2.24); non-destructive.
+18|Synthetic Cleanup
+Per-journey mint + teardown (delete-account/revoke best-effort); mutable residue target 0; immutable audits mogą pozostać.
+19|Hard Bans Observed
+No Canary activation; no designation/invite; no Epic 2.26; no Phase 3; no passkeys; no Founder ask for real candidate/authenticator; no PR main; no force push; MS write OFF.
+20|Terminal Posture
+PRODUCT_SCOPE=FROZEN · RC=IMMUTABLE_EXACT_SHA · NET_NEW=0 · SECURITY_EXPANSION=FROZEN · PASSKEYS=DEFERRED_NOT_STARTED · GJ=6/6 · P0/P1/cP2=0/0/0 · FE/API/worker=ALIGNED · DB=AT_EXPECTED_HEAD · SYNTH_RESIDUE=0 · TECH_READY=TECHNICALLY_READY_INACTIVE · ACTIVATION=BLOCKED_NO_DESIGNATED_REAL_CANDIDATE · CANARY=READY_INACTIVE · RUN1=BLOCKED_EXTERNALLY_NOT_EXECUTED · CAPS=0 · DESIGNATION=0 · INVITES/USERS=0/0 · PP1=ON_READ_ONLY_NOINDEX · SIGNUP=OFF · ENROLLMENT=OFF · PILOT=OPERATIONALLY_READY_INACTIVE · LAUNCH=NO-GO · PHASE_3B=BLOCKED · PHASE_3_AGENT=NOT_STARTED · MS_WRITE=OFF · APP_SUBMIT=OFF · EMPLOYER_CONTACT=OFF
+21|Evidence Dir
+reports/epic-2-25-candidate-release-candidate-2026-08-10/
+22|Push Only Scaffold
+Branch cursor/phase1-monorepo-scaffold; no PR main; no force push.
+23|PP1
+/preview HTTP 200; READ_ONLY_SYNTHETIC; noindex/isolated.
+24|Defects Closed
+P1 EXPECTED_ALEMBIC_HEAD 126→138 CLOSED; test stabilization post-2.24 CLOSED; unresolved P0/P1/cP2=0.
+25|Technical Canary Readiness
+TECHNICALLY_READY_INACTIVE
+26|Activation Blocker
+BLOCKED_NO_DESIGNATED_REAL_CANDIDATE
+27|Canary Before After
+diff_count=0
+28|REAL Evaluation
+REAL_*=NOT_EVALUATED; comprehension/trust/activation/retention/PMF=NOT_EVALUATED; phishing/absolute security/passkey availability=NOT_EVALUATED; pilot/public launch=NOT_EVALUATED
+
+Final Answers
+1|exact_verdict: CANDIDATE PRODUCT RELEASE CANDIDATE FROZEN — END-TO-END FRESH-ACCOUNT GOLDEN JOURNEYS, CROSS-FEATURE PRIVACY/SECURITY INVARIANTS AND REVERSIBLE DEPLOYMENT PROVEN SYNTHETICALLY; CANARY REMAINS INACTIVE AND BLOCKED_NO_DESIGNATED_REAL_CANDIDATE
+2|epic_225_status: COMPLETE
+3|verdict_letter: A
+4|repo_head_at_product: c84f03734d02b5159ac7ce43c2259fa5cfe234c9
+5|product_SHA: c84f03734d02b5159ac7ce43c2259fa5cfe234c9
+6|tip_SHA: (docs tip after evidence push; docs_only_drift expected)
+7|FE_SHA: c84f03734d02b5159ac7ce43c2259fa5cfe234c9
+8|API_SHA: c84f03734d02b5159ac7ce43c2259fa5cfe234c9
+9|worker_SHA: c84f03734d02b5159ac7ce43c2259fa5cfe234c9
+10|alignment_status_at_product: ALIGNED
+11|alignment_status_at_tip: docs_only_drift (after evidence tip)
+12|docs_only_drift: true_after_evidence_tip
+13|alembic: 138_candidate_totp_mfa (is_at_head=true; revises 137)
+14|CI_product: SUCCESS 31360958744
+15|CI_url: https://github.com/CzechowskiT/twin/actions/runs/31360958744
+16|route_inventory_count: 284
+17|route_classification_pct: 100
+18|primary_ia: 7
+19|golden_GJ1: PASS
+20|golden_GJ2: PASS
+21|golden_GJ3: PASS
+22|golden_GJ4: PASS
+23|golden_GJ5: PASS
+24|golden_GJ6: PASS
+25|golden_journeys: 6/6
+26|bucket_product: 9/9
+27|bucket_stance: 13/13
+28|bucket_auth_security: 7/7
+29|bucket_privacy: 3/3
+30|bucket_infra: 8/8
+31|unresolved_p0: 0
+32|unresolved_p1: 0
+33|unresolved_candidate_critical_p2: 0
+34|cross_candidate_violations: 0
+35|unauthorized_external_actions: 0
+36|real_invitations_created_sent: 0/0
+37|real_pilot_users: 0
+38|real_first_value_events: 0
+39|synthetic_kpi_contamination: 0
+40|false_first_value_events: 0
+41|secret_token_code_leakage: 0
+42|canary_control_mutation_diff: 0
+43|mutable_synthetic_residue_after_cleanup: 0
+44|pp1_preview: ON HTTP 200
+45|public_signup: OFF
+46|public_enrollment: OFF
+47|pilot_access: OPERATIONALLY_READY_INACTIVE
+48|launch: NO-GO
+49|phase_3b: BLOCKED
+50|phase_3_agent: NOT_STARTED
+51|effective_cohort_cap: 0
+52|effective_canary_cap: 0
+53|designation_count: 0
+54|designation_status: NOT_DESIGNATED
+55|canary_state: READY_INACTIVE
+56|canary_active: false
+57|activation_command: PREPARED_NOT_EXECUTED
+58|canary_run_1: BLOCKED_EXTERNALLY_NOT_EXECUTED
+59|technical_canary_readiness: TECHNICALLY_READY_INACTIVE
+60|activation_blocker: BLOCKED_NO_DESIGNATED_REAL_CANDIDATE
+61|mfa_default: OFF
+62|mfa_enrollment: OPT_IN_ONLY
+63|mandatory_mfa: OFF
+64|passkeys_webauthn: DEFERRED_NOT_STARTED
+65|ms_calendar_write: OFF
+66|application_submission: OFF
+67|employer_contact: OFF
+68|product_scope: FROZEN
+69|security_expansion: FROZEN
+70|net_new_features: 0
+71|rollback_floor: post_2.24_managed_session_recovery_totp_compatible
+72|fv_contract_sole: pilot_first_value_v1
+73|schema_rc: twin.candidate_product_release_candidate/v1
+74|evidence_dir: reports/epic-2-25-candidate-release-candidate-2026-08-10/
+75|next_authorized: Founder one-candidate canary ONLY with explicit designation+auth — OR critical RC defect fix; NO Epic 2.26 auto; NO Phase 3; NO Canary Run 1 retry

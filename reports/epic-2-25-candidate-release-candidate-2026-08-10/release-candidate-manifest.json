@@ -1,0 +1,121 @@
+{
+  "alembic_code_head": "138_candidate_totp_mfa",
+  "alignment_at_product": "ALIGNED",
+  "api_commit": "c84f03734d02b5159ac7ce43c2259fa5cfe234c9",
+  "auth_posture": {
+    "mandatory_mfa": "OFF",
+    "mfa_default": "OFF",
+    "mfa_enrollment": "OPT_IN_ONLY",
+    "passkeys_webauthn": "DEFERRED_NOT_STARTED",
+    "session_authority": "twin.candidate_auth_session"
+  },
+  "canary_activation_blocker": "BLOCKED_NO_DESIGNATED_REAL_CANDIDATE",
+  "canary_state": "READY_INACTIVE",
+  "canary_technical_readiness": "TECHNICALLY_READY_INACTIVE",
+  "ci_result": "SUCCESS",
+  "ci_run_id": "31360958744",
+  "ci_url": "https://github.com/CzechowskiT/twin/actions/runs/31360958744",
+  "db_at_expected_head": true,
+  "docs_only_drift": false,
+  "evidence_generated_at": "2026-08-10T06:18:01.839463+00:00",
+  "fe_commit": "c84f03734d02b5159ac7ce43c2259fa5cfe234c9",
+  "feature_flags_snapshot": {
+    "google_calendar_configured": true,
+    "microsoft_calendar_configured": true,
+    "microsoft_calendar_write_enabled": false,
+    "rc1_canary_activation_command": "PREPARED_NOT_EXECUTED",
+    "rc1_effective_canary_cap": 0,
+    "rc1_effective_cohort_cap": 0,
+    "rc1_external_pilot_enrollment_enabled": false,
+    "rc1_founder_approved_real_orgs": 0,
+    "rc1_invite_send_enabled": false,
+    "rc1_launch": "NO-GO",
+    "rc1_launch_go_readiness_score": 15,
+    "rc1_on_call_primary_assigned": true,
+    "rc1_on_call_secondary_assigned": true,
+    "rc1_one_candidate_canary_active": false,
+    "rc1_one_candidate_canary_ready": true,
+    "rc1_one_candidate_canary_state": "READY_INACTIVE",
+    "rc1_operational_frontend": "https://twin-sooty.vercel.app",
+    "rc1_os_verdict": "FIRST CUSTOMER READY \u2014 WAITING FOR FIRST APPROVED PILOT ORGANIZATION",
+    "rc1_phase_3b": "BLOCKED",
+    "rc1_pilot_access_status": "OPERATIONALLY_READY_INACTIVE",
+    "rc1_pilot_health_score": 80,
+    "rc1_pilot_registration_invite_only": true,
+    "rc1_pilot_runtime_state": "OPERATIONALLY_READY_INACTIVE",
+    "rc1_pilot_stance": "READY_FOR_CONTROLLED_PILOT",
+    "rc1_preferred_frontend": "https://twin.care",
+    "rc1_public_preview_enabled": true,
+    "rc1_public_preview_status": "ENABLED",
+    "rc1_real_canary_candidate_designated_ready": false,
+    "rc1_real_canary_designation_count": 0,
+    "rc1_real_canary_designation_status": "NOT_DESIGNATED",
+    "rc1_real_invite_generation": "OFF",
+    "rc1_real_invite_redemption": "OFF",
+    "rc1_real_invites_sent": 0,
+    "rc1_real_pilot_users_added": 0
+  },
+  "generated_at": "2026-08-10T06:17:27.878413+00:00",
+  "golden_journeys": {
+    "GJ1": "PASS",
+    "GJ2": "PASS",
+    "GJ3": "PASS",
+    "GJ4": "PASS",
+    "GJ5": "PASS",
+    "GJ6": "PASS"
+  },
+  "known_limitations": [
+    "REAL_* evaluations NOT_EVALUATED",
+    "Canary activation blocked externally: no designated real candidate",
+    "Rollback floor is post-2.24 (managed session + recovery + TOTP); pre-2.24 rollback forbidden"
+  ],
+  "net_new_features": 0,
+  "primary_ia": 7,
+  "product_sha": "c84f03734d02b5159ac7ce43c2259fa5cfe234c9",
+  "production_db_head": "138_candidate_totp_mfa",
+  "proof_docs_tip_sha": "c84f03734d02b5159ac7ce43c2259fa5cfe234c9",
+  "public_preview": "ON_READ_ONLY_NOINDEX",
+  "rollback_floor": "post_2.24_managed_session_recovery_totp_compatible",
+  "route_classification_pct": 100,
+  "route_inventory_count": 284,
+  "schema_id": "twin.candidate_product_release_candidate/v1",
+  "security_expansion": 0,
+  "supported_contracts": [
+    "twin.candidate_auth_session/v1",
+    "twin.candidate_account_recovery/v1",
+    "twin.candidate_step_up_reauthentication/v1",
+    "twin.candidate_mfa_factor/v1",
+    "twin.candidate_mfa_enrollment/v1",
+    "twin.candidate_mfa_challenge/v1",
+    "twin.candidate_mfa_recovery_code_set/v1",
+    "twin.candidate_session_assurance/v1",
+    "pilot_first_value_v1"
+  ],
+  "synthetic_cleanup": "DETERMINISTIC_TEARDOWN_ATTEMPTED",
+  "test_buckets": {
+    "auth_security": {
+      "fail": 0,
+      "pass": 7
+    },
+    "infra": {
+      "fail": 0,
+      "pass": 8
+    },
+    "privacy": {
+      "fail": 0,
+      "pass": 3
+    },
+    "product": {
+      "fail": 0,
+      "pass": 9
+    },
+    "stance": {
+      "fail": 0,
+      "pass": 13
+    }
+  },
+  "unresolved_candidate_critical_p2": 0,
+  "unresolved_p0": 0,
+  "unresolved_p1": 0,
+  "worker_commit": "c84f03734d02b5159ac7ce43c2259fa5cfe234c9"
+}

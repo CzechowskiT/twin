@@ -1,0 +1,11 @@
+{
+  "product_sha": "c84f03734d02b5159ac7ce43c2259fa5cfe234c9",
+  "frontend_commit": "c84f03734d02b5159ac7ce43c2259fa5cfe234c9",
+  "api_commit": "c84f03734d02b5159ac7ce43c2259fa5cfe234c9",
+  "worker_commit": "c84f03734d02b5159ac7ce43c2259fa5cfe234c9",
+  "alignment_status_at_product": "ALIGNED",
+  "tip_sha_at_cert": "c84f03734d02b5159ac7ce43c2259fa5cfe234c9",
+  "docs_only_drift": false,
+  "alembic_db": "138_candidate_totp_mfa",
+  "pp1": "ON HTTP 200"
+}

@@ -1,0 +1,9 @@
+{
+  "frontend_commit": "c84f03734d02b5159ac7ce43c2259fa5cfe234c9",
+  "api_commit": "c84f03734d02b5159ac7ce43c2259fa5cfe234c9",
+  "worker_commit": "c84f03734d02b5159ac7ce43c2259fa5cfe234c9",
+  "rc1_launch": "NO-GO",
+  "rc1_one_candidate_canary_state": "READY_INACTIVE",
+  "rc1_effective_canary_cap": 0,
+  "rc1_real_canary_designation_count": 0
+}

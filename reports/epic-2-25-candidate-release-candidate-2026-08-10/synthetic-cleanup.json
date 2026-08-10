@@ -1,0 +1,5 @@
+{
+  "immutable_audits_may_remain": true,
+  "mutable_residue_target": 0,
+  "policy": "per_journey_teardown_delete_account_and_revoke"
+}

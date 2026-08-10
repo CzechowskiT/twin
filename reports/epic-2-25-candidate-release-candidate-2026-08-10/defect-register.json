@@ -1,0 +1,21 @@
+{
+  "schema_id": "twin.candidate_rc_defect_register/v1",
+  "p0": [],
+  "p1": [
+    {
+      "id": "OPS_EXPECTED_ALEMBIC_HEAD_STALE",
+      "severity": "EXPECTED_ALEMBIC_HEAD lagged at 126 while DB/code were 138",
+      "fix": "c84f0373 admin_ops.EXPECTED_ALEMBIC_HEAD=138_candidate_totp_mfa",
+      "status": "CLOSED"
+    }
+  ],
+  "candidate_critical_p2": [],
+  "test_stabilization": [
+    "epic-2-11 PP1 discoverability accepts READ_ONLY_SYNTHETIC ENABLED",
+    "pilot-consolidation accepts OPERATIONALLY_READY_INACTIVE + alembic 138",
+    "epic-2-23 e2e accepts DEFERRED_NOT_STARTED passkeys after 2.24 TOTP"
+  ],
+  "unresolved_p0": 0,
+  "unresolved_p1": 0,
+  "unresolved_candidate_critical_p2": 0
+}
