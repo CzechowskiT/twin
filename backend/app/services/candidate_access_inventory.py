@@ -157,6 +157,30 @@ def _auth_session_items(
     return out
 
 
+def _mfa_items(db: Session, *, user: User) -> list[dict[str, Any]]:
+    from app.services import candidate_mfa as mfa
+
+    item = mfa.inventory_item(db, user=user)
+    if item is None:
+        return []
+    return [
+        _item(
+            kind=str(item["kind"]),
+            access_key=str(item["access_key"]),
+            title=str(item["title"]),
+            scope=str(item["scope"]),
+            state=str(item["state"]),
+            owner_module="auth.mfa_totp",
+            revocable=bool(item.get("revocable")),
+            revision=str(item["revision"]),
+            expires_at=item.get("expires_at"),
+            consequence=str(item["consequence"]),
+            provider="twin",
+            source_ref=item.get("source_ref") or {},
+        )
+    ]
+
+
 def _pending_recovery_items(db: Session, *, user: User) -> list[dict[str, Any]]:
     """Epic 2.23 — pending password recovery challenges (no secrets)."""
     from app.services.password_reset import list_pending_recovery
@@ -436,6 +460,7 @@ def build_inventory(
         ("TEMPORARY_CAREER_PACK_ARTIFACT", lambda: _pack_artifact_items(db, candidate_id=candidate_id)),
         ("TEMPORARY_PRIVACY_EXPORT", lambda: _privacy_export_items(db, candidate_id=candidate_id)),
         ("PENDING_RECOVERY", lambda: _pending_recovery_items(db, user=user)),
+        ("MFA_TOTP", lambda: _mfa_items(db, user=user)),
     ]
     for kind, fn in adapters:
         try:
@@ -539,6 +564,12 @@ def revoke_access(
         if cid is None:
             raise ValueError("not_revocable")
         cancel_pending_recovery(db, user_id=user.id, challenge_id=int(cid))
+    elif kind == "MFA_TOTP":
+        from app.services import candidate_mfa as mfa
+
+        if not match.get("source_ref", {}).get("enabled"):
+            raise ValueError("not_revocable")
+        mfa.disable_mfa(db, user=user)
     else:
         raise ValueError("unsupported_kind")
 

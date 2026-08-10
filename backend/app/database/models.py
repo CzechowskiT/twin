@@ -326,6 +326,75 @@ class CandidateRecoverySecurityReceipt(Base):
     kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
 
 
+class CandidateMfaFactor(Base):
+    """Epic 2.24 — opt-in TOTP factor (encrypted secret; no SMS/email OTP)."""
+
+    __tablename__ = "candidate_mfa_factors"
+    __table_args__ = (UniqueConstraint("factor_key", name="uq_mfa_factor_key"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    factor_key: Mapped[str] = mapped_column(String(64))
+    factor_type: Mapped[str] = mapped_column(String(16), default="totp")
+    state: Mapped[str] = mapped_column(String(32), default="DISABLED", index=True)
+    secret_ciphertext: Mapped[str | None] = mapped_column(Text, nullable=True)
+    secret_key_version: Mapped[int] = mapped_column(Integer, default=1)
+    issuer_label: Mapped[str] = mapped_column(String(64), default="TWIN")
+    account_label: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    last_accepted_counter: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    schema_version: Mapped[str] = mapped_column(
+        String(64), default="twin.candidate_mfa_factor/v1"
+    )
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    verified_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    enabled_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    disabled_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+
+
+class CandidateMfaChallenge(Base):
+    """Epic 2.24 — restricted pre-auth MFA challenge (TTL≤5m)."""
+
+    __tablename__ = "candidate_mfa_challenges"
+    __table_args__ = (
+        UniqueConstraint("challenge_key", name="uq_mfa_challenge_key"),
+        UniqueConstraint("token_digest", name="uq_mfa_challenge_digest"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    challenge_key: Mapped[str] = mapped_column(String(64))
+    token_digest: Mapped[str] = mapped_column(String(128))
+    kind: Mapped[str] = mapped_column(String(32))
+    state: Mapped[str] = mapped_column(String(32), default="ACTIVE", index=True)
+    schema_version: Mapped[str] = mapped_column(
+        String(64), default="twin.candidate_mfa_challenge/v1"
+    )
+    expires_at: Mapped[datetime] = mapped_column(DateTime)
+    used_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+
+
+class CandidateMfaRecoveryCode(Base):
+    """Epic 2.24 — one-time hashed recovery codes (shown once)."""
+
+    __tablename__ = "candidate_mfa_recovery_codes"
+    __table_args__ = (UniqueConstraint("code_digest", name="uq_mfa_recovery_code_digest"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    set_key: Mapped[str] = mapped_column(String(64), index=True)
+    code_digest: Mapped[str] = mapped_column(String(128))
+    state: Mapped[str] = mapped_column(String(32), default="ACTIVE", index=True)
+    schema_version: Mapped[str] = mapped_column(
+        String(64), default="twin.candidate_mfa_recovery_code_set/v1"
+    )
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    used_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+
+
 class EmailVerificationToken(Base):
     __tablename__ = "email_verification_tokens"
 
@@ -7795,6 +7864,7 @@ class CandidateAuthSession(Base):
     updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
     first_value_satisfied: Mapped[bool] = mapped_column(Boolean, default=False)
+    assurance_level: Mapped[str] = mapped_column(String(32), default="AAL1_PRIMARY")
 
 
 class CandidateRefreshTokenFamily(Base):

@@ -24,7 +24,13 @@ import { postLoginPath, REGISTER_PATH } from "@/lib/persona-auth";
 import { hasConfiguredOAuthProvider } from "@/lib/oauth-auth";
 import { useOAuthProviderStatus } from "@/lib/use-oauth-provider-status";
 
-type TokenResponse = { access_token: string; refresh_token?: string | null };
+type TokenResponse = {
+  access_token?: string | null;
+  refresh_token?: string | null;
+  mfa_required?: boolean;
+  mfa_challenge_token?: string | null;
+  mfa_methods?: string[];
+};
 
 const ZONE_TITLE: Record<LoginZone, TranslationKey> = {
   candidate: "login.zoneCandidateTitle",
@@ -47,6 +53,8 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
   const { setPersona } = useMarketingPersona();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [mfaChallenge, setMfaChallenge] = useState<string | null>(null);
+  const [mfaCode, setMfaCode] = useState("");
 
   const nextPath = useMemo(() => {
     const raw = searchParams.get("next");
@@ -107,6 +115,23 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
     prepareForCredentialLogin();
     setLoading(true);
     try {
+      if (mfaChallenge) {
+        const { completeMfaLogin } = await import("@/lib/mfa");
+        const payload = await completeMfaLogin({
+          mfa_challenge_token: mfaChallenge,
+          totp_code: mfaCode.trim() || undefined,
+        });
+        const accessToken = parseLoginAccessToken(payload);
+        if (!accessToken) {
+          setError(t("login.malformedResponse"));
+          return;
+        }
+        setToken(accessToken, payload.refresh_token || null);
+        setSessionPersona(zone);
+        setPersona(zone);
+        router.push(nextPath);
+        return;
+      }
       const payload = await apiFetch<TokenResponse>(
         "/api/v1/auth/login/json",
         {
@@ -120,6 +145,11 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
         },
         null,
       );
+      if (payload.mfa_required && payload.mfa_challenge_token) {
+        setMfaChallenge(payload.mfa_challenge_token);
+        setMfaCode("");
+        return;
+      }
       const accessToken = parseLoginAccessToken(payload);
       if (!accessToken) {
         setError(t("login.malformedResponse"));
@@ -164,19 +194,37 @@ export function LoginZoneForm({ zone }: { zone: LoginZone }) {
         </p>
       ) : null}
       <LinkedInLoginSection emailLoginHref="#login-email" />
-      <form onSubmit={onSubmit} className="mt-4">
-        <Label htmlFor="login-email">{t("login.email")}</Label>
-        <Input id="login-email" name="email" type="email" required autoComplete="email" />
-        <Label>{t("login.password")}</Label>
-        <Input name="password" type="password" required autoComplete="current-password" />
-        <p className="mb-4 text-right text-sm">
-          <Link href="/forgot-password" className="twin-link">
-            {t("login.forgotPassword")}
-          </Link>
-        </p>
+      <form onSubmit={onSubmit} className="mt-4" data-mfa-challenge={mfaChallenge ? "1" : "0"}>
+        {!mfaChallenge ? (
+          <>
+            <Label htmlFor="login-email">{t("login.email")}</Label>
+            <Input id="login-email" name="email" type="email" required autoComplete="email" />
+            <Label>{t("login.password")}</Label>
+            <Input name="password" type="password" required autoComplete="current-password" />
+            <p className="mb-4 text-right text-sm">
+              <Link href="/forgot-password" className="twin-link">
+                {t("login.forgotPassword")}
+              </Link>
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="twin-muted mb-3 text-sm">{t("login.mfaLead")}</p>
+            <Label htmlFor="login-mfa">{t("login.mfaCode")}</Label>
+            <Input
+              id="login-mfa"
+              name="mfa_code"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              required
+              value={mfaCode}
+              onChange={(ev) => setMfaCode(ev.target.value)}
+            />
+          </>
+        )}
         {displayError && <p className="mb-4 text-sm text-red-600">{displayError}</p>}
         <Button type="submit" disabled={loading}>
-          {loading ? t("login.signingIn") : t("login.submit")}
+          {loading ? t("login.signingIn") : mfaChallenge ? t("login.mfaSubmit") : t("login.submit")}
         </Button>
       </form>
       {!altLoginExpanded ? (

@@ -34,6 +34,7 @@ ACCESS_KINDS = (
     "TEMPORARY_CAREER_PACK_ARTIFACT",
     "TEMPORARY_PRIVACY_EXPORT",
     "PENDING_RECOVERY",
+    "MFA_TOTP",
     "OTHER_EXPLICITLY_ALLOWLISTED",
 )
 
@@ -64,5 +65,6 @@ KIND_TO_GROUP = {
     "TEMPORARY_CAREER_PACK_ARTIFACT": "temporary_files",
     "TEMPORARY_PRIVACY_EXPORT": "temporary_files",
     "PENDING_RECOVERY": "temporary_files",
+    "MFA_TOTP": "connected_services",
     "OTHER_EXPLICITLY_ALLOWLISTED": "connected_services",
 }

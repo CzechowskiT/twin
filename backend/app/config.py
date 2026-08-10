@@ -71,6 +71,13 @@ class Settings(BaseSettings):
     auth_recovery_v2_hash_links: bool = True
     auth_step_up_enforce: bool = True
     auth_legacy_reset_token_acceptance: bool = True
+    # Epic 2.24 — opt-in TOTP MFA (default OFF for users; never mandatory)
+    auth_mfa_totp_enabled: bool = True
+    auth_mfa_default_off: bool = True
+    auth_mfa_enrollment_opt_in_only: bool = True
+    auth_mfa_mandatory: bool = False
+    # Dedicated Fernet key / high-entropy secret — NOT secret_key / JWT signing key
+    mfa_aead_key: str = ""
     # 0 = disabled (local only). Production should keep a positive cap to slow credential stuffing.
     auth_login_rate_limit_per_minute: int = 30
     # Separate bucket for POST /auth/forgot-password (abuse / enumeration). 0 = disabled.

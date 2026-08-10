@@ -70,11 +70,27 @@ class VerifyEmailRequest(BaseModel):
 
 
 class Token(BaseModel):
-    access_token: str
+    access_token: str | None = None
     token_type: str = "bearer"
     refresh_token: str | None = None
     session_key: str | None = None
     managed: bool = False
+    # Epic 2.24 — MFA challenge path (pre-auth; no candidate API access)
+    mfa_required: bool = False
+    mfa_challenge_token: str | None = None
+    mfa_methods: list[str] = Field(default_factory=list)
+    assurance_level: str | None = None
+    pre_auth_only: bool = False
+
+
+class MfaChallengeCompleteIn(BaseModel):
+    mfa_challenge_token: str = Field(min_length=16, max_length=512)
+    totp_code: str | None = Field(default=None, max_length=16)
+    recovery_code: str | None = Field(default=None, max_length=64)
+
+
+class MfaEnrollVerifyIn(BaseModel):
+    code: str = Field(min_length=6, max_length=16)
 
 
 class RefreshIn(BaseModel):

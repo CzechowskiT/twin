@@ -9,7 +9,11 @@ export type StepUpPurpose =
   | "CANCEL_RECOVERY_PENDING"
   | "CHANGE_PASSWORD"
   | "ACCOUNT_DELETION"
-  | "FULL_PRIVACY_EXPORT";
+  | "FULL_PRIVACY_EXPORT"
+  | "MFA_ENROLL"
+  | "MFA_DISABLE"
+  | "MFA_REPLACE"
+  | "MFA_RECOVERY_RESET";
 
 export async function issueStepUpToken(
   purpose: StepUpPurpose,

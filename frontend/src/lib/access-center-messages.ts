@@ -35,6 +35,12 @@ export const ACCESS_CENTER_MESSAGES_EN = {
   stepUpCancel: "Cancel",
   cancelRecovery: "Cancel recovery",
   pendingRecoveryNote: "Pending recovery challenges appear below — cancel requires step-up.",
+  mfaTitle: "Authenticator app (TOTP)",
+  mfaLead: "Optional two-step sign-in. Off by default — never mandatory. No SMS or email codes.",
+  mfaEnroll: "Turn on authenticator",
+  mfaDisable: "Turn off authenticator",
+  mfaNotFirstValue: "Enabling MFA is not first value by itself.",
+  mfaCodesOnce: "Save these recovery codes now — they are shown once.",
 };
 
 export const ACCESS_CENTER_MESSAGES_PL = {
@@ -74,4 +80,10 @@ export const ACCESS_CENTER_MESSAGES_PL = {
   stepUpCancel: "Anuluj",
   cancelRecovery: "Anuluj odzyskiwanie",
   pendingRecoveryNote: "Oczekujące wyzwania odzyskiwania są poniżej — anulowanie wymaga step-up.",
+  mfaTitle: "Aplikacja uwierzytelniająca (TOTP)",
+  mfaLead: "Opcjonalne logowanie dwuetapowe. Domyślnie wyłączone — nigdy obowiązkowe. Bez SMS/e-mail.",
+  mfaEnroll: "Włącz authenticator",
+  mfaDisable: "Wyłącz authenticator",
+  mfaNotFirstValue: "Włączenie MFA samo w sobie nie jest first value.",
+  mfaCodesOnce: "Zapisz te kody odzyskiwania teraz — pokazywane są tylko raz.",
 };

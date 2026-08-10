@@ -295,6 +295,14 @@ def complete_recovery_with_token(db: Session, raw_token: str, new_password: str)
         synchronize_session=False,
     )
 
+    # Epic 2.24 anti-lockout — MFA_RECOVERY_RESET on account recovery
+    try:
+        from app.services import candidate_mfa as mfa
+
+        mfa.reset_after_account_recovery(db, user_id=user.id)
+    except Exception:
+        pass
+
     _add_receipt(
         db,
         user_id=user.id,
@@ -303,6 +311,7 @@ def complete_recovery_with_token(db: Session, raw_token: str, new_password: str)
             "sessions_revoked": revoked_count,
             "auto_mint": False,
             "token_fingerprint": digest[:12],
+            "mfa_recovery_reset": True,
         },
     )
     db.commit()
@@ -313,6 +322,7 @@ def complete_recovery_with_token(db: Session, raw_token: str, new_password: str)
         "auto_mint_session": False,
         "first_value_satisfied": False,
         "require_fresh_login": True,
+        "mfa_recovery_reset": True,
     }
 
 

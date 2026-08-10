@@ -10,6 +10,13 @@ import { apiFetch } from "@/lib/api";
 import { getToken, logoutSession } from "@/lib/auth";
 import { issueStepUpToken, stepUpHeaders, type StepUpPurpose } from "@/lib/step-up";
 import { WorkspaceHandoffBanner } from "@/components/candidate/workspace-handoff-banner";
+import {
+  disableMfa,
+  fetchMfaStatus,
+  presentMfaRecoveryCodes,
+  startMfaEnroll,
+  verifyMfaEnroll,
+} from "@/lib/mfa";
 
 type AccessItem = {
   access_key: string;
@@ -40,6 +47,121 @@ type StepUpPrompt = {
   purpose: StepUpPurpose;
   onToken: (token: string) => Promise<void>;
 };
+
+function MfaOptInPanel({ onChanged }: { onChanged: () => void }) {
+  const { t } = useTranslation();
+  const [enabled, setEnabled] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
+  const [phase, setPhase] = useState<"idle" | "secret" | "verify" | "codes">("idle");
+  const [secretHint, setSecretHint] = useState<string | null>(null);
+  const [codes, setCodes] = useState<string[] | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+
+  useEffect(() => {
+    void fetchMfaStatus()
+      .then((s) => setEnabled(Boolean(s.enabled)))
+      .catch(() => undefined);
+  }, []);
+
+  async function enroll() {
+    setBusy(true);
+    setErr(null);
+    try {
+      const started = await startMfaEnroll(password);
+      setSecretHint(started.otpauth_uri_once ? "otpauth://…" : "secret-ready");
+      setPhase("verify");
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : t("accessCenter.error"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function verify() {
+    setBusy(true);
+    setErr(null);
+    try {
+      await verifyMfaEnroll(code);
+      const presented = await presentMfaRecoveryCodes();
+      setCodes(presented.recovery_codes_once || []);
+      setPhase("codes");
+      setEnabled(true);
+      onChanged();
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : t("accessCenter.error"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function turnOff() {
+    setBusy(true);
+    setErr(null);
+    try {
+      await disableMfa(password);
+      setEnabled(false);
+      setPhase("idle");
+      setCodes(null);
+      onChanged();
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : t("accessCenter.error"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="mt-2 space-y-2">
+      <Label>{t("accessCenter.stepUpPassword")}</Label>
+      <Input
+        type="password"
+        autoComplete="current-password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+      {!enabled ? (
+        <>
+          {phase === "idle" || phase === "secret" ? (
+            <Button type="button" disabled={busy || !password} onClick={() => void enroll()}>
+              {t("accessCenter.mfaEnroll")}
+            </Button>
+          ) : null}
+          {phase === "verify" ? (
+            <>
+              {secretHint ? (
+                <p className="text-xs text-[var(--twin-muted)]" data-mfa-secret-ready>
+                  Authenticator setup ready (URI/secret delivered once — not re-shown).
+                </p>
+              ) : null}
+              <Label>{t("login.mfaCode")}</Label>
+              <Input value={code} onChange={(e) => setCode(e.target.value)} inputMode="numeric" />
+              <Button type="button" disabled={busy || !code} onClick={() => void verify()}>
+                {t("login.mfaSubmit")}
+              </Button>
+            </>
+          ) : null}
+          {phase === "codes" && codes ? (
+            <div data-mfa-recovery-codes-once>
+              <p className="text-sm">{t("accessCenter.mfaCodesOnce")}</p>
+              <p className="text-xs text-[var(--twin-muted)]">{codes.length} codes issued (values not logged).</p>
+            </div>
+          ) : null}
+        </>
+      ) : (
+        <Button type="button" disabled={busy || !password} onClick={() => void turnOff()}>
+          {t("accessCenter.mfaDisable")}
+        </Button>
+      )}
+      {err ? (
+        <p className="text-sm text-red-700" role="alert">
+          {err}
+        </p>
+      ) : null}
+    </div>
+  );
+}
 
 export function AccessControlCenterWorkspace() {
   const { t } = useTranslation();
@@ -180,6 +302,12 @@ export function AccessControlCenterWorkspace() {
           <Link href="/forgot-password" className="text-sm underline">
             {t("accessCenter.recoveryLink")}
           </Link>
+          <div className="mt-4 rounded border border-[var(--twin-border)] p-3" data-mfa-opt-in>
+            <h2 className="text-base font-medium">{t("accessCenter.mfaTitle")}</h2>
+            <p className="mt-1 text-xs text-[var(--twin-muted)]">{t("accessCenter.mfaLead")}</p>
+            <p className="text-xs text-[var(--twin-muted)]">{t("accessCenter.mfaNotFirstValue")}</p>
+            <MfaOptInPanel onChanged={() => void load()} />
+          </div>
           <div className="mt-3">
             <Button
               type="button"

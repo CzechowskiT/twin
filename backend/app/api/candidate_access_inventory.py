@@ -64,22 +64,24 @@ def post_access_revoke(
     _no_store(response)
     cand = _candidate(db, user)
     kind = body.kind.strip().upper()
-    if kind == "PENDING_RECOVERY":
+    if kind in {"PENDING_RECOVERY", "MFA_TOTP"}:
         from app.services import candidate_step_up as step_up
         from app.services.candidate_account_recovery_constants import (
             PURPOSE_CANCEL_RECOVERY,
+            PURPOSE_MFA_DISABLE,
         )
         from app.services.step_up_request import (
             session_binding_from_request,
             step_up_token_from_request,
         )
 
+        purpose = PURPOSE_CANCEL_RECOVERY if kind == "PENDING_RECOVERY" else PURPOSE_MFA_DISABLE
         sid, epoch = session_binding_from_request(request)
         try:
             step_up.require_step_up_or_raise(
                 db,
                 user=user,
-                purpose=PURPOSE_CANCEL_RECOVERY,
+                purpose=purpose,
                 step_up_token=step_up_token_from_request(request),
                 session_key=sid,
                 session_epoch=epoch,

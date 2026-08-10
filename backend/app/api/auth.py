@@ -30,6 +30,8 @@ from app.schemas.auth import (
     ForgotPasswordRequest,
     GdprConsentIn,
     LogoutIn,
+    MfaChallengeCompleteIn,
+    MfaEnrollVerifyIn,
     NotificationPreferencesIn,
     OnboardingProgressIn,
     RefreshIn,
@@ -394,6 +396,149 @@ def auth_step_up_catalog() -> dict:
     return step_up.catalog()
 
 
+@router.get("/mfa/catalog")
+def auth_mfa_catalog() -> dict:
+    from app.services import candidate_mfa as mfa
+
+    return mfa.catalog()
+
+
+@router.get("/mfa/status")
+def auth_mfa_status(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    from app.services import candidate_mfa as mfa
+
+    return mfa.status_for_user(db, user=user)
+
+
+@router.post("/mfa/enroll/start")
+@limiter.limit("10/minute")
+def auth_mfa_enroll_start(
+    request: Request,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    from app.services import candidate_mfa as mfa
+    from app.services.candidate_account_recovery_constants import PURPOSE_MFA_ENROLL
+    from app.services.candidate_mfa_crypto import MfaKeyringUnavailable
+    from app.services.step_up_request import (
+        session_binding_from_request,
+        step_up_token_from_request,
+    )
+
+    sid, epoch = session_binding_from_request(request)
+    try:
+        step_up.require_step_up_or_raise(
+            db,
+            user=user,
+            purpose=PURPOSE_MFA_ENROLL,
+            step_up_token=step_up_token_from_request(request),
+            session_key=sid,
+            session_epoch=epoch,
+        )
+        return mfa.enroll_start(db, user=user)
+    except MfaKeyringUnavailable as exc:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/mfa/enroll/verify")
+@limiter.limit("20/minute")
+def auth_mfa_enroll_verify(
+    request: Request,
+    body: MfaEnrollVerifyIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    from app.services import candidate_mfa as mfa
+    from app.services.candidate_mfa_crypto import MfaKeyringUnavailable
+
+    try:
+        return mfa.enroll_verify(db, user=user, code=body.code)
+    except MfaKeyringUnavailable as exc:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/mfa/enroll/recovery-codes")
+@limiter.limit("10/minute")
+def auth_mfa_enroll_recovery_codes(
+    request: Request,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    from app.services import candidate_mfa as mfa
+
+    try:
+        return mfa.enroll_present_recovery_codes(db, user=user)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/mfa/disable")
+@limiter.limit("10/minute")
+def auth_mfa_disable(
+    request: Request,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    from app.services import candidate_mfa as mfa
+    from app.services.candidate_account_recovery_constants import PURPOSE_MFA_DISABLE
+    from app.services.step_up_request import (
+        session_binding_from_request,
+        step_up_token_from_request,
+    )
+
+    sid, epoch = session_binding_from_request(request)
+    try:
+        step_up.require_step_up_or_raise(
+            db,
+            user=user,
+            purpose=PURPOSE_MFA_DISABLE,
+            step_up_token=step_up_token_from_request(request),
+            session_key=sid,
+            session_epoch=epoch,
+        )
+        return mfa.disable_mfa(db, user=user)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
+
+
+@router.post("/mfa/challenge/complete", response_model=Token)
+@limiter.limit("20/minute")
+def auth_mfa_challenge_complete(
+    request: Request,
+    body: MfaChallengeCompleteIn,
+    db: Session = Depends(get_db),
+) -> Token:
+    from app.services import candidate_mfa as mfa
+    from app.services.candidate_mfa_crypto import MfaKeyringUnavailable
+
+    try:
+        issued = mfa.complete_login_challenge(
+            db,
+            challenge_token=body.mfa_challenge_token,
+            totp_code=body.totp_code,
+            recovery_code=body.recovery_code,
+        )
+    except MfaKeyringUnavailable as exc:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    return Token(
+        access_token=issued["access_token"],
+        refresh_token=issued.get("refresh_token"),
+        session_key=issued.get("session_key"),
+        managed=bool(issued.get("managed")),
+        mfa_required=False,
+        assurance_level=issued.get("assurance_level"),
+    )
+
+
 @router.post("/step-up/issue")
 @limiter.limit("10/minute")
 def auth_step_up_issue(
@@ -572,6 +717,26 @@ def _authenticate(email: str, password: str, db: Session) -> Token:
             pass
     except Exception:
         pass
+
+    # Epic 2.24 — opt-in MFA gate (pre-auth challenge; no access token yet)
+    try:
+        from app.services import candidate_mfa as mfa
+
+        if mfa.user_mfa_enabled(db, user_id=user.id):
+            ch = mfa.issue_login_challenge(db, user=user)
+            return Token(
+                access_token=None,
+                refresh_token=None,
+                session_key=None,
+                managed=False,
+                mfa_required=True,
+                mfa_challenge_token=ch["mfa_challenge_token"],
+                mfa_methods=list(ch.get("methods") or []),
+                pre_auth_only=True,
+            )
+    except Exception:
+        pass
+
     issued = cas.issue_session(
         db,
         user=user,
@@ -582,6 +747,7 @@ def _authenticate(email: str, password: str, db: Session) -> Token:
         refresh_token=issued.get("refresh_token"),
         session_key=issued.get("session_key"),
         managed=bool(issued.get("managed")),
+        assurance_level=issued.get("assurance_level"),
     )
 
 

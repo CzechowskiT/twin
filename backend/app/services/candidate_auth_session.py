@@ -105,6 +105,7 @@ def issue_session(
     expires_minutes: int | None = None,
     kpi_excluded: bool = True,
     label: str = "session",
+    assurance_level: str = "AAL1_PRIMARY",
 ) -> dict[str, Any]:
     """Mint managed access + one-time refresh; or legacy access if mint flag off."""
     f = _flags()
@@ -118,6 +119,7 @@ def issue_session(
             "session_key": None,
             "managed": False,
             "token_type": "bearer",
+            "assurance_level": assurance_level,
         }
 
     now = _utcnow()
@@ -135,6 +137,7 @@ def issue_session(
         created_at=now,
         kpi_excluded=kpi_excluded,
         first_value_satisfied=False,
+        assurance_level=(assurance_level or "AAL1_PRIMARY")[:32],
     )
     db.add(sess)
     db.flush()
@@ -158,6 +161,7 @@ def issue_session(
             MANAGED_CLAIM_SID: session_key,
             MANAGED_CLAIM_EPOCH: 1,
             MANAGED_CLAIM_TYP: ACCESS_TOKEN_TYP,
+            "aal": assurance_level or "AAL1_PRIMARY",
         },
         expires_minutes=ttl,
     )
@@ -168,6 +172,7 @@ def issue_session(
         "managed": True,
         "token_type": "bearer",
         "schema_id": SESSION_SCHEMA_ID,
+        "assurance_level": assurance_level or "AAL1_PRIMARY",
     }
 
 
