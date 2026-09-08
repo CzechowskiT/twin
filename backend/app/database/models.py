@@ -7892,3 +7892,84 @@ class CandidateRefreshTokenFamily(Base):
     created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+
+
+# ─── Epic 2.26: Adaptive Interview Practice ───────────────────────────────────
+
+
+class CandidateInterviewPracticeSession(Base):
+    """Epic 2.26 — candidate-owned adaptive practice session.
+
+    Not a parallel interview record — extends CandidateInterview* domain only.
+    No psychometrics, no hiring probability, no employer ranking.
+    """
+
+    __tablename__ = "candidate_interview_practice_sessions"
+    __table_args__ = (
+        UniqueConstraint("candidate_id", "session_key", name="uq_practice_session_key"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    candidate_id: Mapped[int] = mapped_column(
+        ForeignKey("candidates.id", ondelete="CASCADE"), index=True
+    )
+    session_key: Mapped[str] = mapped_column(String(160))
+    # nullable: exercise-only sessions have no process
+    process_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    exercise_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    state: Mapped[str] = mapped_column(String(32), default="DRAFT")
+    locale: Mapped[str] = mapped_column(String(8), default="en")
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    turn_limit: Mapped[int] = mapped_column(Integer, default=8)
+    consent_ai_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateInterviewPracticeTurn(Base):
+    """One question+answer turn within a practice session.
+
+    State: DRAFT → SUBMITTED (final) or SUPERSEDED by a later turn.
+    """
+
+    __tablename__ = "candidate_interview_practice_turns"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    session_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_interview_practice_sessions.id", ondelete="CASCADE"),
+        index=True,
+    )
+    turn_index: Mapped[int] = mapped_column(Integer, default=0)
+    state: Mapped[str] = mapped_column(String(32), default="DRAFT")
+    question_text: Mapped[str] = mapped_column(Text, default="")
+    answer_draft: Mapped[str] = mapped_column(Text, default="")
+    answer_submitted: Mapped[str | None] = mapped_column(Text, nullable=True)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    submitted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class CandidateInterviewPracticeEvaluation(Base):
+    """Criterion-level evaluation for a submitted practice turn.
+
+    score/score_available are always None/False — no global 0-100 claims.
+    """
+
+    __tablename__ = "candidate_interview_practice_evaluations"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    turn_id: Mapped[int] = mapped_column(
+        ForeignKey("candidate_interview_practice_turns.id", ondelete="CASCADE"),
+        index=True,
+    )
+    evaluation_status: Mapped[str] = mapped_column(String(64), default="PENDING")
+    criteria_json: Mapped[str] = mapped_column(Text, default="[]")
+    strengths_json: Mapped[str] = mapped_column(Text, default="[]")
+    improvements_json: Mapped[str] = mapped_column(Text, default="[]")
+    source: Mapped[str] = mapped_column(String(64), default="DETERMINISTIC_LIBRARY_FALLBACK")
+    source_label: Mapped[str] = mapped_column(String(64), default="deterministic_library")
+    degraded: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)

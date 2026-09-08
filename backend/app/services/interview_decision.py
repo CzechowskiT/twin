@@ -631,33 +631,126 @@ def run_mock(
     process_id: int,
     stage_id: int | None = None,
 ) -> CandidateInterviewMock:
+    """Record a practice mock grounded in the candidate's submitted answers.
+
+    Epic 2.26: template feedback that ignores answers is forbidden.
+    Without submitted answers, assessment is NOT_ASSESSED / not practiced-ready.
+    """
     proc = _process(db, candidate_id=candidate_id, process_id=process_id)
+    answers = (
+        db.query(CandidateInterviewAnswer)
+        .filter_by(process_id=proc.id, candidate_id=candidate_id)
+        .filter(CandidateInterviewAnswer.deleted_at.is_(None))
+        .order_by(CandidateInterviewAnswer.id.asc())
+        .all()
+    )
     hyps = _loads(proc.hypotheses_json, [])
     questions = [h.get("question") for h in hyps[:5] if h.get("question")]
-    assessment = {
-        "clarity": "UNKNOWN",
-        "evidence_use": "reviewed_without_emotion",
-        "unsupported_statements": [],
-        "emotion_recognition": False,
-        "personality_scoring": False,
-        "accent_scoring": False,
-        "protected_attribute_inference": False,
-        "hiring_probability": None,
-        "claim_kind": "SUGGESTION",
-    }
-    feedback = {
-        "what_worked": ["Used confirmed evidence where available"],
-        "what_was_unclear": ["UNKNOWN outcomes remain labeled UNKNOWN"],
-        "unsupported_statements": [],
-        "evidence_gaps": _loads(proc.coverage_json, {}).get("gaps") or [],
-        "unnecessary_detail": [],
-        "missed_result": ["UNKNOWN"],
-        "missing_candidate_contribution": [],
-        "likely_follow_up": ["Can you quantify impact without inventing metrics?"],
-        "improved_outline": {"claim_kind": "SUGGESTION"},
-        "encourages_deception": False,
-        "encourages_fake_enthusiasm": False,
-    }
+    if not questions:
+        questions = [a.question for a in answers if a.question][:5]
+
+    submitted = [a for a in answers if (a.answer_text or "").strip()]
+    gaps = list(_loads(proc.coverage_json, {}).get("gaps") or [])
+
+    if not submitted:
+        assessment = {
+            "clarity": "NOT_ASSESSED",
+            "evidence_use": "NOT_ASSESSED",
+            "unsupported_statements": [],
+            "emotion_recognition": False,
+            "personality_scoring": False,
+            "accent_scoring": False,
+            "protected_attribute_inference": False,
+            "hiring_probability": None,
+            "numeric_score": None,
+            "evaluation_status": "INSUFFICIENT_INFORMATION",
+            "claim_kind": "SUGGESTION",
+            "practiced": False,
+            "source": "no_submitted_answers",
+            "assessment_source": "no_submitted_answers",
+        }
+        feedback = {
+            "what_worked": [],
+            "what_was_unclear": ["No submitted answer text to assess."],
+            "unsupported_statements": [],
+            "evidence_gaps": gaps or ["no_submitted_answers"],
+            "unnecessary_detail": [],
+            "missed_result": [],
+            "missing_candidate_contribution": ["Submit at least one answer before mock practice feedback."],
+            "likely_follow_up": [],
+            "improved_outline": {"claim_kind": "SUGGESTION"},
+            "encourages_deception": False,
+            "encourages_fake_enthusiasm": False,
+            "template_feedback": False,
+            "grounded_in_submitted_answers": False,
+        }
+    else:
+        what_worked: list[str] = []
+        unclear: list[str] = []
+        missing: list[str] = []
+        follow_ups: list[str] = []
+        for ans in submitted:
+            text = (ans.answer_text or "").strip()
+            words = len(text.split())
+            evid = _loads(ans.evidence_ids_json, [])
+            if words >= 40:
+                what_worked.append(
+                    f"Answer to «{(ans.question or '')[:48]}» includes substantive detail ({words} words)."
+                )
+            elif words >= 10:
+                unclear.append(
+                    f"Answer to «{(ans.question or '')[:48]}» is brief — add concrete actions and results."
+                )
+            else:
+                missing.append(
+                    f"Answer to «{(ans.question or '')[:48]}» is too short to demonstrate contribution."
+                )
+            if evid:
+                what_worked.append(
+                    f"Linked {len(evid)} evidence item(s) on «{(ans.question or '')[:40]}»."
+                )
+            else:
+                gaps.append(f"weak_evidence_on_answer_{ans.id}")
+                follow_ups.append(
+                    f"Which confirmed evidence supports «{(ans.question or '')[:40]}»?"
+                )
+            if "UNKNOWN" in text.upper() or "TODO" in text.upper():
+                unclear.append("Labeled UNKNOWN/TODO remains explicit — do not invent metrics.")
+
+        assessment = {
+            "clarity": "REVIEWED_FROM_SUBMITTED_TEXT",
+            "evidence_use": "candidate_linked_evidence_only",
+            "unsupported_statements": [],
+            "emotion_recognition": False,
+            "personality_scoring": False,
+            "accent_scoring": False,
+            "protected_attribute_inference": False,
+            "hiring_probability": None,
+            "numeric_score": None,
+            "evaluation_status": "GROUNDED_QUALITATIVE",
+            "answers_reviewed": len(submitted),
+            "claim_kind": "SUGGESTION",
+            "practiced": True,
+            "source": "submitted_answers",
+            "assessment_source": "submitted_answers_heuristic",
+        }
+        feedback = {
+            "what_worked": what_worked[:8] or ["Submitted answers are present for review."],
+            "what_was_unclear": unclear[:8],
+            "unsupported_statements": [],
+            "evidence_gaps": list(dict.fromkeys(gaps))[:12],
+            "unnecessary_detail": [],
+            "missed_result": ["UNKNOWN"] if any("UNKNOWN" in (a.answer_text or "").upper() for a in submitted) else [],
+            "missing_candidate_contribution": missing[:8],
+            "likely_follow_up": follow_ups[:6]
+            or ["Can you quantify impact without inventing metrics?"],
+            "improved_outline": {"claim_kind": "SUGGESTION"},
+            "encourages_deception": False,
+            "encourages_fake_enthusiasm": False,
+            "template_feedback": False,
+            "grounded_in_submitted_answers": True,
+        }
+
     mock = CandidateInterviewMock(
         candidate_id=candidate_id,
         process_id=proc.id,
@@ -677,7 +770,22 @@ def run_mock(
     )
     db.add(mock)
     db.flush()
-    _refresh_process_gate(db, proc)
+    # Only count as practiced when grounded in submitted answers
+    if submitted:
+        _refresh_process_gate(db, proc)
+    else:
+        # Ensure gate does not treat empty template mock as practiced
+        gate = _loads(proc.prep_gate_json, {}) or {}
+        if gate.get("state") not in ("CANDIDATE_READY",):
+            proc.prep_gate_json = _dumps(
+                _prep_gate(
+                    has_answers=len(answers) > 0,
+                    approved=any(a.approved for a in answers),
+                    practiced=False,
+                    weak_coverage=True,
+                )
+            )
+        proc.updated_at = _utcnow()
     db.commit()
     db.refresh(mock)
     return mock

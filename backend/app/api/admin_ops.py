@@ -31,7 +31,7 @@ def _require_ops_admin(settings: Settings, authorization: str | None) -> None:
 
 
 # Keep in sync with alembic head (138_candidate_totp_mfa). Epic 2.24 / RC 2.25.
-EXPECTED_ALEMBIC_HEAD = "138_candidate_totp_mfa"
+EXPECTED_ALEMBIC_HEAD = "139_candidate_interview_practice"
 
 
 def _read_alembic_current(db: Session) -> str | None:

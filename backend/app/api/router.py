@@ -21,6 +21,7 @@ from app.api import (
     career_evidence,
     application_studio,
     interview_decision,
+    interview_practice,
     career_transition,
     career_lifecycle,
     career_strategy,
@@ -176,6 +177,9 @@ api_router.include_router(
 )
 api_router.include_router(
     interview_decision.router, prefix="/candidates", tags=["Interview Decision"]
+)
+api_router.include_router(
+    interview_practice.router, prefix="/candidates", tags=["Interview Practice"]
 )
 api_router.include_router(
     career_transition.router, prefix="/candidates", tags=["Career Transition"]
