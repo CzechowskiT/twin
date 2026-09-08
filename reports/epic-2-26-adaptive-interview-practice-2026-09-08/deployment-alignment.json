@@ -1,14 +1,23 @@
 {
   "product_sha": "7a214aa8db10059fa9ce9455de5385faf083c85a",
-  "tip_sha": "70a31a31c9ec6460c621189e2e5c963726d805eb",
-  "frontend_commit": "7a214aa8db10059fa9ce9455de5385faf083c85a",
+  "tip_sha_pending": true,
+  "frontend_commit_observed": "6e80caa6ca253f66edd6805a158207edee4d271d",
   "api_commit": "7a214aa8db10059fa9ce9455de5385faf083c85a",
   "backend_git_commit": "7a214aa8db10059fa9ce9455de5385faf083c85a",
-  "git_commit": "7a214aa8db10059fa9ce9455de5385faf083c85a",
+  "worker_git_commit_sha_var": "7a214aa8db10059fa9ce9455de5385faf083c85a",
   "alembic": "139_candidate_interview_practice",
   "alembic_is_at_head": true,
-  "alignment": "ALIGNED",
+  "alignment_at_product": "ALIGNED",
+  "docs_only_drift": true,
   "primary_ia": 7,
   "live_ai": "NOT_RUN_EXTERNAL_PREREQUISITE",
-  "live_ai_source_observed": "DETERMINISTIC_LIBRARY_FALLBACK"
+  "live_ai_source_observed": "DETERMINISTIC_LIBRARY_FALLBACK",
+  "continuation": {
+    "checked_at": "2026-09-08T13:49:27.342777+00:00",
+    "provider_recheck": "railway_twin_anthropic_len=0",
+    "verdict": "REMAIN_PROVIDER_BLOCKED",
+    "unit_tests_continuation": "98 passed",
+    "canary_diff_continuation": 0
+  },
+  "git_commit_observed": "7a214aa8db10059fa9ce9455de5385faf083c85a"
 }

@@ -25,5 +25,13 @@
     "invented_score_fallback",
     "synthco_runChain_ordinary_ui",
     "run_mock_ungrounded_template"
+  ],
+  "continuation_at": "2026-09-08T13:49:27.343263+00:00",
+  "continuation_closed": [
+    "RESUME.md",
+    "provider-gate.md",
+    "path_robust_unit_tests",
+    "section_29_deterministic_shapes",
+    "live_ai_quality_gate_script"
   ]
 }

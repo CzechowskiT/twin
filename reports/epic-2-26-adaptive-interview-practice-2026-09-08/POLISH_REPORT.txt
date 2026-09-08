@@ -1,79 +1,51 @@
-1|Podsumowanie wykonawcze
-Epic 2.26 zamknięty z werdyktem provider-blocked: naprawiono wymyślony score fallback, usunięto SynthCo runChain z UI kandydata, uziemiono run_mock w złożonych odpowiedziach; dostarczono katalog 6 ćwiczeń EN+PL, sesje multi-turn (Alembic 139), feedback kryterialny bez globalnego %, promocję PRACTICE_WORK_SAMPLE, integracje Path/Continuity/Pack. Product 7a214aa8 FE=API=worker ALIGNED; CI SUCCESS 34231911430; canary diff=0; live Claude NOT_RUN_EXTERNAL_PREREQUISITE (ANTHROPIC_API_KEY pusty). Stop — bez Epic 2.27.
-2|Stan wyjściowy
-Tip 0dd49da3 / product c84f0373 / Alembic 138 / canary READY_INACTIVE — zweryfikowane niezależnie przed pracą.
-3|Stan końcowy
-Product 7a214aa8db10059fa9ce9455de5385faf083c85a ALIGNED; tip docs (self-hash after evidence); Alembic 139_candidate_interview_practice is_at_head=true; Launch NO-GO; enrollment OFF; caps 0; designation 0; MFA OPT_IN; PRIMARY_IA=7.
+1|Podsumowanie kontynuacji
+Po zamknięciu Epic 2.26 (provider-blocked) ponownie sprawdzono Railway: ANTHROPIC_API_KEY na API len=0, worker bez klucza Anthropic. Live §29 nie uruchomiono; nie sfabrykowano dowodu AI. Domknięto luki evidence/testów w zakresie 2.26. Product SHA bez zmian 7a214aa8 FE=API=worker ALIGNED @ product; Alembic 139; canary diff kontynuacji=0. Werdykt pozostaje provider-blocked. Stop — bez Epic 2.27.
+2|Re-check providera
+Railway twin ANTHROPIC_API_KEY present=False len=0; enthusiastic-encouragement bez kluczy ANTHROPIC*; lokalny placeholder len=10 nie użyty. live_ai_quality=NOT_RUN_EXTERNAL_PREREQUISITE.
+3|Stan produktu
+product_SHA=7a214aa8db10059fa9ce9455de5385faf083c85a; alignment_at_product=ALIGNED; tip=docs_only_drift; Alembic 139_candidate_interview_practice is_at_head=true; PRIMARY_IA=7.
 4|Werdykt
 IMPLEMENTATION COMPLETE — LIVE AI QUALITY VERIFICATION BLOCKED BY EXTERNAL PROVIDER PREREQUISITE; ADAPTIVE AI NOT CERTIFIED
-5|Naprawione defekty
-(1) ai_interview_coach: brak min(85,40+words//3); score=null + EVALUATION_UNAVAILABLE. (2) interview-decision: usunięto runChain/SynthCo; kandydat tworzy proces formularzem. (3) run_mock: feedback z submitted answers; bez answers → NOT_ASSESSED.
-6|Architektura
-ADR docs/ADR_EPIC_2_26_ADAPTIVE_INTERVIEW_PRACTICE.md; rozszerzenie CandidateInterview*; PARALLEL_PRACTICE_STORE=NONE; brak 8. nav.
-7|Katalog ćwiczeń
-3 rodziny × 2 = 6 (behavioral_star, role_problem, clarifying_questions); title/prompt EN+PL; oryginalna treść.
-8|Sesje i tury
-Tabele sessions/turns/evaluations; lifecycle DRAFT→…→COMPLETED/ABANDONED/DELETED; turn DRAFT/SUBMITTED; eval status osobno; for_update + commit przed modelem.
-9|Feedback
-Kryteria qualitative: SUPPORTED_IN_RESPONSE / PARTIAL / NOT_DEMONSTRATED / NOT_ASSESSED / INSUFFICIENT / EVALUATION_UNAVAILABLE; score_available=false.
-10|Integracje
-Career Evidence PRACTICE_WORK_SAMPLE; Career Pack kind practice_work_sample; Path Readiness optional; Continuity route map; PRIMARY_IA=7.
-11|Testy
-Unit+fixture 92 PASS; code/stance A–H 34/34; auth live product 18/18 stance 6/6 invariant 1/1; FE guard ok; concurrency proof script shipped.
-12|Przeglądarka
-Unauth entitlement redirect PASS; authenticated journeys via synthetic mint API A–H PASS; brak Founder credentials.
-13|Live AI
-NOT_RUN_EXTERNAL_PREREQUISITE — Railway ANTHROPIC_API_KEY len=0; deterministyczny fallback oznaczony CERTIFIED.
-14|CI Deploy
-CI SUCCESS 34231911430 @ 7a214aa8; FE+API+worker ALIGNED; DB 139; PP1 HTTP 200.
-15|Canary
-before/after diff_count=0; READY_INACTIVE; PREPARED_NOT_EXECUTED; Canary Run 1 nie retry.
-16|Hard bans
-Launch NO-GO; signup/enrollment OFF; caps 0; designation 0; Phase 3 NOT_STARTED; MS write OFF; app submit OFF; employer contact OFF; no psychometrics/webcam/keystroke/global skill scores; no PR main; no force push.
-17|Evidence
+5|Co zmieniono w tej kontynuacji
+(1) RESUME.md + provider-gate.md + live-ai-quality-gate.json. (2) Naprawa path-robust testów coach/IA. (3) 10 kształtów §29 na ścieżce deterministycznej (bez certyfikacji live). (4) scripts/epic-2-26-live-ai-quality-gate.py. (5) Odświeżenie known-limitations / canary-after-continuation / deployment-alignment.
+6|Testy kontynuacji
+pytest epic_226 + coach: 98 PASS; live gate: NOT_RUN_EXTERNAL_PREREQUISITE; canary_diff_continuation=0.
+7|Stance zamrożony
+Launch NO-GO; enrollment OFF; caps 0; designation 0; Canary READY_INACTIVE / PREPARED_NOT_EXECUTED; Phase 3 NOT_STARTED; MS write OFF; brak Canary Run 1.
+8|Hard bans
+Bez Epic 2.27; bez PR main; bez force push; bez wymyślania kluczy/live proof; bez psychometrics/webcam/global skill scores.
+9|Evidence
 reports/epic-2-26-adaptive-interview-practice-2026-09-08/
-18|Następny autoryzowany krok
-Ustawić ANTHROPIC_API_KEY na API+worker i ponownie certyfikować live adaptive AI — LUB krytyczny defect RC. Bez Epic 2.27 auto.
+10|Następny autoryzowany krok
+Ustawić produkcyjny ANTHROPIC_API_KEY na API (+ worker jeśli wymagane), uruchomić live §29 gate, dopiero wtedy rozważyć Verdict A. Bez auto Epic 2.27.
 
 Final Answers
 1|exact_verdict: IMPLEMENTATION COMPLETE — LIVE AI QUALITY VERIFICATION BLOCKED BY EXTERNAL PROVIDER PREREQUISITE; ADAPTIVE AI NOT CERTIFIED
 2|epic_226_status: COMPLETE_PROVIDER_BLOCKED
-3|verdict_letter: PROVIDER_BLOCKED
+3|continuation_status: GAPS_CLOSED_PROVIDER_STILL_BLOCKED
 4|product_SHA: 7a214aa8db10059fa9ce9455de5385faf083c85a
-5|tip_SHA: 70a31a31c9ec6460c621189e2e5c963726d805eb
-6|FE_SHA: 7a214aa8db10059fa9ce9455de5385faf083c85a
+5|tip_SHA: TIP_PENDING
+6|FE_product_SHA: 7a214aa8db10059fa9ce9455de5385faf083c85a
 7|API_SHA: 7a214aa8db10059fa9ce9455de5385faf083c85a
 8|worker_SHA: 7a214aa8db10059fa9ce9455de5385faf083c85a
 9|alignment_status_at_product: ALIGNED
 10|docs_only_drift: true
 11|alembic: 139_candidate_interview_practice (is_at_head=true)
-12|CI: SUCCESS 34231911430
+12|CI: SUCCESS 34231911430 (product); continuation=local unit+gate
 13|CI_url: https://github.com/CzechowskiT/twin/actions/runs/34231911430
-14|unit_fixture_tests: 92 PASS
-15|code_stance_E2E: 34/34
-16|auth_E2E_product: 18/18
-17|auth_E2E_stance: 6/6
-18|auth_E2E_invariant: 1/1
-19|evaluation_fixtures: 60
-20|live_ai_quality: NOT_RUN_EXTERNAL_PREREQUISITE
-21|defect_invented_score: CLOSED
-22|defect_synthco_ui: CLOSED
-23|defect_ungrounded_mock: CLOSED
-24|exercise_catalog: 6 (3×2 EN+PL)
-25|primary_ia: 7
-26|pp1_preview: ON HTTP 200
-27|canary_state: READY_INACTIVE
-28|canary_diff: 0
-29|launch: NO-GO
-30|enrollment: OFF
-31|effective_caps: 0/0
-32|designation: 0 NOT_DESIGNATED
-33|phase_3_agent: NOT_STARTED
-34|ms_calendar_write: OFF
-35|application_submission: OFF
-36|employer_contact: OFF
-37|passkeys: DEFERRED_NOT_STARTED
-38|evidence_dir: reports/epic-2-26-adaptive-interview-practice-2026-09-08/
-39|branch_task: cursor/epic-2-26-adaptive-interview-practice
-40|branch_integration: cursor/phase1-monorepo-scaffold
-41|next: set ANTHROPIC_API_KEY then re-cert live AI — no Epic 2.27 auto
+14|unit_tests_continuation: 98 PASS
+15|live_ai_quality: NOT_RUN_EXTERNAL_PREREQUISITE
+16|section_29_live_executed: false
+17|section_29_deterministic_shapes: 10 PASS
+18|canary_diff: 0
+19|canary_diff_continuation: 0
+20|launch: NO-GO
+21|enrollment: OFF
+22|effective_caps: 0/0
+23|designation: 0
+24|phase_3_agent: NOT_STARTED
+25|ms_calendar_write: OFF
+26|primary_ia: 7
+27|evidence_dir: reports/epic-2-26-adaptive-interview-practice-2026-09-08/
+28|what_changed_continuation: RESUME+provider-gate+path-robust-tests+§29-deterministic-shapes+live-gate-script; no Verdict A upgrade
+29|next: set production ANTHROPIC_API_KEY then live §29 — no Epic 2.27
