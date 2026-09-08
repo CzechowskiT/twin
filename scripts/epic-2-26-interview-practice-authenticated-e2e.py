@@ -261,7 +261,7 @@ def main() -> int:
     check("invariant", "H_canary_diff_0", len(diff) == 0, str(diff))
 
     # Best-effort cleanup
-      _req("POST", "/api/v1/candidates/me/delete-account", token=token, body={"confirm": True})
+    _req("POST", "/api/v1/candidates/me/delete-account", token=token, body={"confirm": True})
 
     print(
         f"\nSUMMARY product={PRODUCT_PASS}/{PRODUCT_PASS + PRODUCT_FAIL} "
