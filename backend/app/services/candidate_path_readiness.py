@@ -639,6 +639,25 @@ def _build_requirements(
                 else "/dashboard/interview-decision",
             )
         )
+        # Epic 2.26 — optional adaptive practice (never required for path COMPLETE)
+        practice_link = (
+            f"/dashboard/interview-practice?process_id={object_ref}"
+            if proc
+            else "/dashboard/interview-practice"
+        )
+        reqs.append(
+            _req(
+                key="interview_practice_optional",
+                status="OPTIONAL",
+                required=False,
+                explanation=(
+                    "Optional candidate-authored adaptive practice — criterion feedback only; "
+                    "not a hiring score."
+                ),
+                source_module="interview_practice",
+                deep_link=practice_link,
+            )
+        )
     elif path_kind == "REVIEW_ONE_CAREER_DECISION":
         dec = (
             db.query(CandidateDecisionRecord)

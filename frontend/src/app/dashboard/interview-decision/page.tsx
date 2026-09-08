@@ -26,6 +26,10 @@ type Aggregate = {
   alembic?: string;
 };
 
+/**
+ * Epic 2.26: ordinary candidate UI must not auto-write synthetic demo chains.
+ * Candidates author process title/company/role; practice lives under /interview-practice.
+ */
 export default function InterviewDecisionPage() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -34,6 +38,11 @@ export default function InterviewDecisionPage() {
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<string>("");
+  const [title, setTitle] = useState("");
+  const [company, setCompany] = useState("");
+  const [roleTitle, setRoleTitle] = useState("");
+  const [question, setQuestion] = useState("");
+  const [answerText, setAnswerText] = useState("");
 
   const load = useCallback(async () => {
     const token = getToken();
@@ -57,94 +66,97 @@ export default function InterviewDecisionPage() {
     });
   }, [load]);
 
-  async function runChain() {
+  async function createProcess() {
     const token = getToken();
     if (!token) return;
+    const trimmedTitle = title.trim();
+    const trimmedCompany = company.trim();
+    if (!trimmedTitle || !trimmedCompany) {
+      setErr(t("interviewDecision.createNeedsFields"));
+      return;
+    }
     setBusy(true);
+    setErr(null);
     setStatus("");
     try {
-      const evidenceRes = await apiFetch<{ evidence: { id: number } }>(
-        "/api/v1/candidates/me/career-evidence/items",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            evidence_type: "achievement",
-            title: "FastAPI delivery for interview prep",
-            summary: "Built APIs with FastAPI — candidate-confirmed",
-            claim_kind: "CANDIDATE_CONFIRMED",
-            skills: ["Python", "FastAPI"],
-          }),
-        },
-        token,
-      );
-      const eid = evidenceRes.evidence?.id;
       const created = await apiFetch<{ process: Process }>(
         "/api/v1/candidates/me/interview-decision/processes",
         {
           method: "POST",
           body: JSON.stringify({
-            title: "Synthetic interview process",
-            company: "SynthCo",
-            role_title: "Backend Engineer",
+            title: trimmedTitle,
+            company: trimmedCompany,
+            role_title: roleTitle.trim() || trimmedTitle,
           }),
         },
         token,
       );
-      const pid = created.process.id;
+      setActive(created.process);
+      setStatus(t("interviewDecision.processCreated"));
+      setTitle("");
+      setCompany("");
+      setRoleTitle("");
+      await load();
+    } catch {
+      setErr(t("interviewDecision.actionFailed"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function submitAnswer() {
+    const token = getToken();
+    if (!token || !active) return;
+    const q = question.trim();
+    const a = answerText.trim();
+    if (!q || !a) {
+      setErr(t("interviewDecision.answerNeedsFields"));
+      return;
+    }
+    setBusy(true);
+    setErr(null);
+    try {
       const ans = await apiFetch<{ answer: { id: number } }>(
-        `/api/v1/candidates/me/interview-decision/processes/${pid}/answers`,
+        `/api/v1/candidates/me/interview-decision/processes/${active.id}/answers`,
         {
           method: "POST",
           body: JSON.stringify({
-            question: "Tell me about a delivery challenge",
-            evidence_ids: eid ? [eid] : [],
+            question: q,
+            answer_text: a,
             likelihood: "LIKELY",
+            evidence_ids: [],
           }),
         },
         token,
       );
       await apiFetch(
-        `/api/v1/candidates/me/interview-decision/processes/${pid}/answers/approve`,
+        `/api/v1/candidates/me/interview-decision/processes/${active.id}/answers/approve`,
         { method: "POST", body: JSON.stringify({ answer_id: ans.answer.id, approved: true }) },
         token,
       );
+      setQuestion("");
+      setAnswerText("");
+      setStatus(t("interviewDecision.answerSaved"));
+      await load();
+    } catch {
+      setErr(t("interviewDecision.actionFailed"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function runGroundedMock() {
+    const token = getToken();
+    if (!token || !active) return;
+    setBusy(true);
+    setErr(null);
+    try {
       await apiFetch(
-        `/api/v1/candidates/me/interview-decision/processes/${pid}/mocks`,
+        `/api/v1/candidates/me/interview-decision/processes/${active.id}/mocks`,
         { method: "POST", body: "{}" },
         token,
       );
-      const offer = await apiFetch<{ offer: { id: number } }>(
-        "/api/v1/candidates/me/interview-decision/offers",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            title: "Backend Engineer offer",
-            company: "SynthCo",
-            process_id: pid,
-            provenance: "candidate_declared",
-            terms: { base: "UNKNOWN", equity: "UNKNOWN" },
-          }),
-        },
-        token,
-      );
-      const memo = await apiFetch<{ memo: { id: number } }>(
-        "/api/v1/candidates/me/interview-decision/memos",
-        {
-          method: "POST",
-          body: JSON.stringify({ process_id: pid, offer_id: offer.offer.id }),
-        },
-        token,
-      );
-      await apiFetch(
-        `/api/v1/candidates/me/interview-decision/memos/${memo.memo.id}/declare`,
-        {
-          method: "POST",
-          body: JSON.stringify({ decision: "hold", notes: "Need clarity on UNKNOWN terms" }),
-        },
-        token,
-      );
-      setStatus(t("interviewDecision.chainDone"));
-      setActive(created.process);
+      setStatus(t("interviewDecision.mockDone"));
       await load();
     } catch {
       setErr(t("interviewDecision.actionFailed"));
@@ -170,14 +182,44 @@ export default function InterviewDecisionPage() {
 
       {err ? <p className="mb-3 text-sm text-red-700">{err}</p> : null}
 
-      <Card className="mb-4" id="offers">
+      <Card className="mb-4" id="create-process">
         <p className="text-xs text-neutral-500">{t("interviewDecision.safetyBanner")}</p>
         <p className="mt-1 text-sm font-medium">
           {t("interviewDecision.noCovert")} · alembic={agg?.alembic || "—"}
         </p>
+        <p className="twin-muted mt-2 text-sm">{t("interviewDecision.noSyntheticAutoWrite")}</p>
+        <div className="mt-3 grid gap-2 sm:grid-cols-3">
+          <label className="text-sm">
+            <span className="twin-muted block text-xs">{t("interviewDecision.fieldTitle")}</span>
+            <input
+              className="mt-1 w-full rounded border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-2 py-1.5"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              maxLength={200}
+            />
+          </label>
+          <label className="text-sm">
+            <span className="twin-muted block text-xs">{t("interviewDecision.fieldCompany")}</span>
+            <input
+              className="mt-1 w-full rounded border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-2 py-1.5"
+              value={company}
+              onChange={(e) => setCompany(e.target.value)}
+              maxLength={200}
+            />
+          </label>
+          <label className="text-sm">
+            <span className="twin-muted block text-xs">{t("interviewDecision.fieldRole")}</span>
+            <input
+              className="mt-1 w-full rounded border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-2 py-1.5"
+              value={roleTitle}
+              onChange={(e) => setRoleTitle(e.target.value)}
+              maxLength={200}
+            />
+          </label>
+        </div>
         <div className="mt-3 flex flex-wrap gap-2">
-          <Button type="button" disabled={busy} onClick={() => void runChain()}>
-            {t("interviewDecision.runChain")}
+          <Button type="button" disabled={busy} onClick={() => void createProcess()}>
+            {t("interviewDecision.createProcess")}
           </Button>
           <Button
             type="button"
@@ -186,6 +228,16 @@ export default function InterviewDecisionPage() {
             onClick={() => void load()}
           >
             {t("interviewDecision.refresh")}
+          </Button>
+          <Button
+            type="button"
+            className="border border-[var(--twin-border)] bg-transparent"
+            disabled={busy || !active}
+            onClick={() => {
+              if (active) router.push(`/dashboard/interview-practice?process_id=${active.id}`);
+            }}
+          >
+            {t("interviewDecision.openPractice")}
           </Button>
         </div>
         {status ? <p className="twin-muted mt-2 text-sm">{status}</p> : null}
@@ -204,7 +256,7 @@ export default function InterviewDecisionPage() {
                 >
                   <p className="font-medium">{p.title}</p>
                   <p className="twin-muted text-xs">
-                    {p.prep_gate?.state || "—"} · immutable=
+                    {p.company || "—"} · {p.prep_gate?.state || "—"} · immutable=
                     {String(p.snapshot_immutable ?? true)}
                   </p>
                 </button>
@@ -219,32 +271,49 @@ export default function InterviewDecisionPage() {
         <Card>
           <h2 className="text-base font-semibold">{t("interviewDecision.active")}</h2>
           {active ? (
-            <div className="mt-2 space-y-2 text-sm">
-              <p>
-                <span className="twin-muted">{t("interviewDecision.gate")}: </span>
-                {active.prep_gate?.state || "—"}
+            <div className="mt-2 space-y-3 text-sm">
+              <p className="font-medium">{active.title}</p>
+              <p className="twin-muted text-xs">
+                {active.company} · {active.role_title || "—"}
               </p>
-              <p>
-                <span className="twin-muted">{t("interviewDecision.company")}: </span>
-                {active.company || "—"} / {active.role_title || "—"}
-              </p>
-              <p className="twin-muted text-xs">{t("interviewDecision.noGuaranteed")}</p>
+              <label className="block">
+                <span className="twin-muted text-xs">{t("interviewDecision.fieldQuestion")}</span>
+                <input
+                  className="mt-1 w-full rounded border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-2 py-1.5"
+                  value={question}
+                  onChange={(e) => setQuestion(e.target.value)}
+                  maxLength={2000}
+                />
+              </label>
+              <label className="block">
+                <span className="twin-muted text-xs">{t("interviewDecision.fieldAnswer")}</span>
+                <textarea
+                  className="mt-1 w-full rounded border border-[var(--twin-border)] bg-[var(--twin-input-bg)] px-2 py-1.5"
+                  rows={4}
+                  value={answerText}
+                  onChange={(e) => setAnswerText(e.target.value)}
+                  maxLength={8000}
+                />
+              </label>
+              <div className="flex flex-wrap gap-2">
+                <Button type="button" disabled={busy} onClick={() => void submitAnswer()}>
+                  {t("interviewDecision.saveAnswer")}
+                </Button>
+                <Button
+                  type="button"
+                  className="border border-[var(--twin-border)] bg-transparent"
+                  disabled={busy}
+                  onClick={() => void runGroundedMock()}
+                >
+                  {t("interviewDecision.runMock")}
+                </Button>
+              </div>
             </div>
           ) : (
             <p className="twin-muted mt-2 text-sm">{t("interviewDecision.selectProcess")}</p>
           )}
-          <h3 className="mt-4 text-sm font-semibold">{t("interviewDecision.offers")}</h3>
-          <ul className="mt-1 space-y-1">
-            {(agg?.offers || []).map((o) => (
-              <li key={o.id} className="twin-muted text-xs">
-                {o.title} · {o.company}
-              </li>
-            ))}
-          </ul>
         </Card>
       </div>
-
-      <p className="twin-muted mt-4 text-[11px]">{t("interviewDecision.disclaimer")}</p>
     </Shell>
   );
 }

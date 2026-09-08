@@ -1,14 +1,27 @@
-"""AI Interview Coach — generate questions and evaluate answers."""
+"""AI Interview Coach — generate questions and evaluate answers.
+
+Epic 2.26: never invent numeric precision when AI is unavailable.
+Use EVALUATION_UNAVAILABLE + criterion outcomes instead of word-count scores.
+"""
 
 from __future__ import annotations
 
-import json
 import re
 from typing import Any
 
 from app.database.models import Job
 from app.services.anthropic_client import is_anthropic_configured
 from app.services.career_assistant_common import call_claude_json, job_posting_text
+from app.services.candidate_interview_practice_constants import (
+    DETERMINISTIC_FALLBACK_LABEL,
+    EVAL_INSUFFICIENT,
+    EVAL_UNAVAILABLE,
+    OUTCOME_INSUFFICIENT,
+    OUTCOME_NOT_ASSESSED,
+    OUTCOME_PARTIAL,
+    OUTCOME_SUPPORTED,
+    OUTCOME_UNAVAILABLE,
+)
 
 _QUESTIONS_PROMPT = """Generate interview practice for this role. Return ONLY JSON:
 {{
@@ -25,12 +38,19 @@ CV SNIPPET:
 
 _EVAL_PROMPT = """Evaluate a candidate's interview answer. Return ONLY JSON:
 {{
-  "score": 0,
+  "evaluation_status": "COMPLETE",
+  "criteria": [
+    {{"id": "relevance", "outcome": "SUPPORTED_IN_RESPONSE|PARTIALLY_SUPPORTED|NOT_DEMONSTRATED|INSUFFICIENT_INFORMATION", "note": "..."}},
+    {{"id": "evidence_use", "outcome": "...", "note": "..."}},
+    {{"id": "structure", "outcome": "...", "note": "..."}},
+    {{"id": "outcome_clarity", "outcome": "...", "note": "..."}}
+  ],
   "strengths": ["..."],
   "improvements": ["..."],
   "sample_better_answer": "..."
 }}
-Score 0-100. Question: {question}
+Do NOT invent a hiring probability or global skill percentage.
+Question: {question}
 Answer: {answer}
 Job context: {job_ctx}
 """
@@ -48,7 +68,8 @@ def _fallback_questions(job: Job) -> dict[str, Any]:
             {"id": "q5", "text": "What questions do you have for us?", "category": "culture"},
         ],
         "tips": ["Use STAR for behavioral questions.", "Reference the job description vocabulary."],
-        "source": "fallback",
+        "source": DETERMINISTIC_FALLBACK_LABEL,
+        "source_label": "deterministic_library",
     }
 
 
@@ -61,31 +82,220 @@ def generate_practice_questions(job: Job, cv_text: str) -> dict[str, Any]:
         data = call_claude_json(prompt, max_tokens=1800)
         if data and isinstance(data.get("questions"), list):
             data["source"] = "claude"
+            data["source_label"] = "live_ai"
             return data
     return _fallback_questions(job)
 
 
-def _fallback_evaluation(question: str, answer: str) -> dict[str, Any]:
+def _unavailable_evaluation(*, reason: str, answer: str = "") -> dict[str, Any]:
+    """Honest degraded state — never invent a 0–100 precision score."""
     words = len(re.findall(r"\w+", answer or ""))
-    score = min(85, 40 + words // 3)
+    criteria = [
+        {
+            "id": "relevance",
+            "outcome": OUTCOME_UNAVAILABLE,
+            "note": reason,
+        },
+        {
+            "id": "evidence_use",
+            "outcome": OUTCOME_UNAVAILABLE,
+            "note": reason,
+        },
+        {
+            "id": "structure",
+            "outcome": OUTCOME_NOT_ASSESSED if words == 0 else OUTCOME_UNAVAILABLE,
+            "note": reason,
+        },
+        {
+            "id": "outcome_clarity",
+            "outcome": OUTCOME_UNAVAILABLE,
+            "note": reason,
+        },
+    ]
     return {
-        "score": score,
-        "strengths": ["You provided a concrete response."] if words > 20 else [],
-        "improvements": ["Add a measurable outcome (numbers or timeline)."] if words < 40 else ["Tighten the opening sentence."],
-        "sample_better_answer": "Situation → your action → measurable result tied to the question.",
-        "source": "fallback",
+        "evaluation_status": EVAL_UNAVAILABLE,
+        "score": None,
+        "score_available": False,
+        "criteria": criteria,
+        "strengths": [],
+        "improvements": [
+            "AI evaluation is unavailable. Your answer was saved; try again when the coach is ready, "
+            "or use the deterministic practice checklist without a numeric score."
+        ],
+        "sample_better_answer": None,
+        "source": DETERMINISTIC_FALLBACK_LABEL,
+        "source_label": "unavailable_no_invented_score",
+        "degraded": True,
     }
 
 
-def evaluate_answer(job: Job, question: str, answer: str) -> dict[str, Any]:
-    """Score a practice answer against the job context."""
+def _insufficient_evaluation(answer: str) -> dict[str, Any]:
+    return {
+        "evaluation_status": EVAL_INSUFFICIENT,
+        "score": None,
+        "score_available": False,
+        "criteria": [
+            {
+                "id": "relevance",
+                "outcome": OUTCOME_INSUFFICIENT,
+                "note": "Empty or too short to assess",
+            },
+            {
+                "id": "evidence_use",
+                "outcome": OUTCOME_NOT_ASSESSED,
+                "note": "No content",
+            },
+            {
+                "id": "structure",
+                "outcome": OUTCOME_NOT_ASSESSED,
+                "note": "No content",
+            },
+            {
+                "id": "outcome_clarity",
+                "outcome": OUTCOME_NOT_ASSESSED,
+                "note": "No content",
+            },
+        ],
+        "strengths": [],
+        "improvements": ["Answer cannot be empty."],
+        "sample_better_answer": None,
+        "source": DETERMINISTIC_FALLBACK_LABEL,
+        "source_label": "insufficient_input",
+        "degraded": True,
+    }
+
+
+def _heuristic_grounded_criteria(answer: str) -> list[dict[str, str]]:
+    """Non-scoring grounded checks used only when labeled deterministic — no fake %."""
+    words = len(re.findall(r"\w+", answer or ""))
+    has_number = bool(re.search(r"\d", answer or ""))
+    has_structure = bool(
+        re.search(r"\b(situation|task|action|result|first|then|because)\b", answer or "", re.I)
+    )
+    return [
+        {
+            "id": "relevance",
+            "outcome": OUTCOME_PARTIAL if words >= 20 else OUTCOME_INSUFFICIENT,
+            "note": "Length/heuristic only — not an AI assessment",
+        },
+        {
+            "id": "evidence_use",
+            "outcome": OUTCOME_SUPPORTED if has_number else OUTCOME_PARTIAL if words >= 20 else OUTCOME_INSUFFICIENT,
+            "note": "Looks for concrete markers; not verified employer truth",
+        },
+        {
+            "id": "structure",
+            "outcome": OUTCOME_SUPPORTED if has_structure else OUTCOME_PARTIAL if words >= 30 else OUTCOME_INSUFFICIENT,
+            "note": "Keyword structure heuristic",
+        },
+        {
+            "id": "outcome_clarity",
+            "outcome": OUTCOME_PARTIAL if words >= 40 else OUTCOME_INSUFFICIENT,
+            "note": "Heuristic only",
+        },
+    ]
+
+
+def evaluate_answer(
+    job: Job,
+    question: str,
+    answer: str,
+    *,
+    allow_deterministic_heuristics: bool = False,
+) -> dict[str, Any]:
+    """Evaluate a practice answer.
+
+    When Anthropic is not configured or the call fails, return EVALUATION_UNAVAILABLE
+    with score=None — never invent a numeric precision score from answer length.
+    """
     if not (answer or "").strip():
-        return {"score": 0, "strengths": [], "improvements": ["Answer cannot be empty."], "source": "fallback"}
+        return _insufficient_evaluation(answer)
+
     ctx = job_posting_text(job)[:4000]
     if is_anthropic_configured():
-        prompt = _EVAL_PROMPT.format(question=question[:500], answer=answer[:3000], job_ctx=ctx)
+        prompt = _EVAL_PROMPT.format(
+            question=question[:500],
+            answer=answer[:3000],
+            job_ctx=ctx,
+        )
         data = call_claude_json(prompt, max_tokens=1200)
-        if data and "score" in data:
+        if data and isinstance(data.get("criteria"), list):
             data["source"] = "claude"
+            data["source_label"] = "live_ai"
+            data["score_available"] = False
+            data["score"] = None  # Epic 2.26: no global 0–100 claim from coach
+            data["evaluation_status"] = data.get("evaluation_status") or "COMPLETE"
+            data["degraded"] = False
+            # Drop legacy invented scores if model still emits them
+            if "score" in data and data.get("score") is not None:
+                data["legacy_score_ignored"] = True
+                data["score"] = None
+                data["score_available"] = False
             return data
-    return _fallback_evaluation(question, answer)
+        return _unavailable_evaluation(reason="AI provider returned unusable evaluation", answer=answer)
+
+    if allow_deterministic_heuristics:
+        return {
+            "evaluation_status": "COMPLETE",
+            "score": None,
+            "score_available": False,
+            "criteria": _heuristic_grounded_criteria(answer),
+            "strengths": [],
+            "improvements": [
+                "This is a labeled deterministic checklist, not a live AI score.",
+                "Add a measurable outcome if missing.",
+            ],
+            "sample_better_answer": "Situation → your action → measurable result tied to the question.",
+            "source": DETERMINISTIC_FALLBACK_LABEL,
+            "source_label": "deterministic_library",
+            "degraded": True,
+        }
+
+    return _unavailable_evaluation(
+        reason="AI evaluation provider not configured",
+        answer=answer,
+    )
+
+
+def evaluate_submitted_answer_text(
+    *,
+    question: str,
+    answer: str,
+    job_ctx: str = "",
+    allow_deterministic_heuristics: bool = True,
+) -> dict[str, Any]:
+    """Evaluate without a Job ORM row (process-scoped practice)."""
+    if not (answer or "").strip():
+        return _insufficient_evaluation(answer)
+    if is_anthropic_configured():
+        prompt = _EVAL_PROMPT.format(
+            question=question[:500],
+            answer=answer[:3000],
+            job_ctx=(job_ctx or "No job posting attached")[:4000],
+        )
+        data = call_claude_json(prompt, max_tokens=1200)
+        if data and isinstance(data.get("criteria"), list):
+            data["source"] = "claude"
+            data["source_label"] = "live_ai"
+            data["score"] = None
+            data["score_available"] = False
+            data["evaluation_status"] = data.get("evaluation_status") or "COMPLETE"
+            data["degraded"] = False
+            return data
+        return _unavailable_evaluation(reason="AI provider returned unusable evaluation", answer=answer)
+    if allow_deterministic_heuristics:
+        return {
+            "evaluation_status": "COMPLETE",
+            "score": None,
+            "score_available": False,
+            "criteria": _heuristic_grounded_criteria(answer),
+            "strengths": [],
+            "improvements": [
+                "Labeled deterministic checklist — not a live AI score or hiring probability."
+            ],
+            "sample_better_answer": "Situation → your action → measurable result tied to the question.",
+            "source": DETERMINISTIC_FALLBACK_LABEL,
+            "source_label": "deterministic_library",
+            "degraded": True,
+        }
+    return _unavailable_evaluation(reason="AI evaluation provider not configured", answer=answer)

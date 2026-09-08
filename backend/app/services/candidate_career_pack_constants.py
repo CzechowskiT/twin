@@ -53,6 +53,8 @@ ARTIFACT_KINDS = frozenset(
         "app_studio_workspace",
         "app_studio_cv_draft",
         "app_studio_cover_draft",
+        # Epic 2.26 — optional promotion of practice work samples (never auto-included)
+        "practice_work_sample",
     }
 )
 

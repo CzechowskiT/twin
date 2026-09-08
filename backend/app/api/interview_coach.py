@@ -57,6 +57,7 @@ def post_generate_questions(
         questions=data.get("questions") or [],
         tips=data.get("tips") or [],
         source=str(data.get("source") or "fallback"),
+        source_label=data.get("source_label"),
     )
 
 
@@ -68,14 +69,34 @@ def post_evaluate_answer(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> EvaluateAnswerOut:
-    """Evaluate a practice answer with AI or deterministic fallback."""
+    """Evaluate a practice answer — never invent a 0–100 score when AI is unavailable."""
     _require_coach_access(current_user)
     job = _load_job(db, body.job_id)
-    data = evaluate_answer(job, body.question, body.answer)
+    data = evaluate_answer(
+        job,
+        body.question,
+        body.answer,
+        allow_deterministic_heuristics=body.allow_deterministic_heuristics,
+    )
+    raw_score = data.get("score")
+    score: int | None
+    if raw_score is None:
+        score = None
+    else:
+        try:
+            score = int(raw_score)
+        except (TypeError, ValueError):
+            score = None
     return EvaluateAnswerOut(
-        score=int(data.get("score") or 0),
+        evaluation_status=str(data.get("evaluation_status") or "EVALUATION_UNAVAILABLE"),
+        score=score,
+        score_available=bool(data.get("score_available")) and score is not None,
+        criteria=list(data.get("criteria") or []),
         strengths=list(data.get("strengths") or []),
         improvements=list(data.get("improvements") or []),
         sample_better_answer=data.get("sample_better_answer"),
         source=str(data.get("source") or "fallback"),
+        source_label=data.get("source_label"),
+        degraded=bool(data.get("degraded")),
+        legacy_score_ignored=data.get("legacy_score_ignored"),
     )
