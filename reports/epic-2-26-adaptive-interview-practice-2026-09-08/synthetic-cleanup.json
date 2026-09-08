@@ -1,0 +1,5 @@
+{
+  "policy": "mint_synthetic + soft_delete session + best-effort delete-account",
+  "kpi_excluded": true,
+  "canary_mutation": 0
+}

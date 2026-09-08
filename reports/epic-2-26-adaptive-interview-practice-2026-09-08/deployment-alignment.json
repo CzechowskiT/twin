@@ -1,0 +1,9 @@
+{
+  "product_sha": "7a214aa8db10059fa9ce9455de5385faf083c85a",
+  "frontend_commit": "7a214aa8db10059fa9ce9455de5385faf083c85a",
+  "api_commit": "7a214aa8db10059fa9ce9455de5385faf083c85a",
+  "worker_commit": "7a214aa8db10059fa9ce9455de5385faf083c85a",
+  "alignment": "ALIGNED",
+  "alembic": "139_candidate_interview_practice",
+  "ci_run": "34231911430"
+}

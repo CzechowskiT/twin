@@ -1,0 +1,27 @@
+PASS  stance/launch_nogo
+PASS  stance/enrollment_off
+PASS  stance/canary_inactive
+PASS  stance/activation_prepared
+PASS  stance/designation_0
+PASS  stance/caps_zero
+PASS  product/A_catalog_requires_auth — 401
+PASS  product/mint_synthetic — 200
+PASS  product/B_catalog_en — 200
+PASS  product/B_six_exercises — 6
+PASS  product/B_catalog_pl — 200
+PASS  product/B_three_families — {'clarifying_questions', 'behavioral_star', 'role_problem'}
+PASS  product/C_create_process — 201
+PASS  product/D_create_session — 201
+PASS  product/D_first_turn — 1
+PASS  product/D_save_draft — 200
+PASS  product/D_submit — 200
+PASS  product/E_no_invented_score — None
+PASS  product/E_criteria_present
+PASS  product/E_status_honest — COMPLETE
+PASS  product/D_next_turn — 200
+PASS  product/D_complete — 200
+PASS  product/F_promote — {'session_id': 1, 'label': 'PRACTICE_WORK_SAMPLE', 'turns_promoted': 1, 'evidence_ids': [92], 'note': 'PRACTICE_WORK_SAMPLE — not employer-confirmed evidence'}
+PASS  product/G_soft_delete — 200
+PASS  invariant/H_canary_diff_0 — {}
+
+SUMMARY product=18/18 stance=6/6 invariant=1/1

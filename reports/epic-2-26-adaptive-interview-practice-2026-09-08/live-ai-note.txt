@@ -1,0 +1,1 @@
+ANTHROPIC_API_KEY len=0 on Railway production twin service; live Claude evaluation NOT_RUN_EXTERNAL_PREREQUISITE. Deterministic labeled fallback certified.

@@ -1,0 +1,29 @@
+{
+  "schema_id": "twin.candidate_adaptive_interview_practice_release/v1",
+  "generated_at": "2026-09-08T13:32:54.117028+00:00",
+  "product_sha": "7a214aa8db10059fa9ce9455de5385faf083c85a",
+  "tip_sha": "e3b5bee78ce332ce43a8553daadb9167261dbfcd",
+  "docs_only_drift": true,
+  "fe": "7a214aa8db10059fa9ce9455de5385faf083c85a",
+  "api": "7a214aa8db10059fa9ce9455de5385faf083c85a",
+  "worker": "7a214aa8db10059fa9ce9455de5385faf083c85a",
+  "alembic": "139_candidate_interview_practice",
+  "ci_run_id": "34231911430",
+  "ci_url": "https://github.com/CzechowskiT/twin/actions/runs/34231911430",
+  "ci_result": "SUCCESS",
+  "unit_tests": "92+",
+  "code_stance_e2e": "34/34",
+  "auth_e2e_product": "18/18",
+  "auth_e2e_stance": "6/6",
+  "auth_e2e_invariant": "1/1",
+  "fixtures": 60,
+  "live_ai_quality": "NOT_RUN_EXTERNAL_PREREQUISITE",
+  "canary_diff": 0,
+  "primary_ia": 7,
+  "verdict": "IMPLEMENTATION COMPLETE \u2014 LIVE AI QUALITY VERIFICATION BLOCKED BY EXTERNAL PROVIDER PREREQUISITE; ADAPTIVE AI NOT CERTIFIED",
+  "defects_closed": [
+    "invented_score_fallback",
+    "synthco_runChain_ordinary_ui",
+    "run_mock_ungrounded_template"
+  ]
+}
