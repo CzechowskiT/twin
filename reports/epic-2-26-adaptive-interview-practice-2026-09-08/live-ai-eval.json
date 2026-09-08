@@ -1,0 +1,9 @@
+{
+  "evaluation_status": "COMPLETE",
+  "source": "DETERMINISTIC_LIBRARY_FALLBACK",
+  "source_label": "deterministic_library",
+  "degraded": true,
+  "score": null,
+  "score_available": false,
+  "criteria_count": 4
+}

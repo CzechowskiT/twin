@@ -1,0 +1,46 @@
+PASS  A no wordcount formula
+PASS  A EVALUATION_UNAVAILABLE
+PASS  A score None path
+PASS  B no runChain
+PASS  B no SynthCo company write
+PASS  B practice link
+PASS  C family behavioral
+PASS  C family role_problem
+PASS  C family clarifying
+PASS  C six ids
+PASS  C bilingual titles
+PASS  D alembic 139
+PASS  D service
+PASS  D api
+PASS  D fe page
+PASS  D adr
+PASS  D revises 138
+PASS  D expected head
+PASS  E grounded mock
+PASS  E NOT_ASSESSED empty
+PASS  E submit + next-turn
+PASS  F PRACTICE_WORK_SAMPLE
+PASS  F promote endpoint
+PASS  F for_update submit
+PASS  F commit before model
+PASS  G primary IA 7
+PASS  G practice secondary
+PASS  G soft delete
+PASS  G kpi excluded
+PASS  H no canary activation in practice
+PASS  H no banned columns
+PASS  H router mounted
+PASS  H unit fixtures —  in UTC: datetime.datetime.now(datetime.UTC).
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+77 passed, 119 warnings in 4.29s
+
+PASS  H fe guard — 
+> frontend@0.1.0 test:epic-226-interview-practice-guard
+> npx --yes tsx scripts/epic-226-interview-practice-guard.test.ts
+
+epic-226-interview-practice-guard: ok
+
+
+SUMMARY PASS=34 FAIL=0

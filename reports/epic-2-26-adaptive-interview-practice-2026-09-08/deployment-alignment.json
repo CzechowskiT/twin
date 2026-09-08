@@ -1,9 +1,14 @@
 {
   "product_sha": "7a214aa8db10059fa9ce9455de5385faf083c85a",
+  "tip_sha": "7c90b4e75666ab6160731e89ac8c487d0b81b7cc",
   "frontend_commit": "7a214aa8db10059fa9ce9455de5385faf083c85a",
   "api_commit": "7a214aa8db10059fa9ce9455de5385faf083c85a",
-  "worker_commit": "7a214aa8db10059fa9ce9455de5385faf083c85a",
-  "alignment": "ALIGNED",
+  "backend_git_commit": "7a214aa8db10059fa9ce9455de5385faf083c85a",
+  "git_commit": "7a214aa8db10059fa9ce9455de5385faf083c85a",
   "alembic": "139_candidate_interview_practice",
-  "ci_run": "34231911430"
+  "alembic_is_at_head": true,
+  "alignment": "ALIGNED",
+  "primary_ia": 7,
+  "live_ai": "NOT_RUN_EXTERNAL_PREREQUISITE",
+  "live_ai_source_observed": "DETERMINISTIC_LIBRARY_FALLBACK"
 }

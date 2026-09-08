@@ -11,5 +11,9 @@
   "rc1_real_canary_designation_status": "NOT_DESIGNATED",
   "rc1_real_canary_candidate_designated_ready": false,
   "rc1_pilot_runtime_state": "OPERATIONALLY_READY_INACTIVE",
-  "rc1_invite_send_enabled": false
+  "rc1_invite_send_enabled": false,
+  "git_commit": "7a214aa8db10059fa9ce9455de5385faf083c85a",
+  "frontend_commit": "7a214aa8db10059fa9ce9455de5385faf083c85a",
+  "api_commit": "7a214aa8db10059fa9ce9455de5385faf083c85a",
+  "backend_git_commit": "7a214aa8db10059fa9ce9455de5385faf083c85a"
 }

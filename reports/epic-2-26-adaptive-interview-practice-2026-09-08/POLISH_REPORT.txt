@@ -3,7 +3,7 @@ Epic 2.26 zamknięty z werdyktem provider-blocked: naprawiono wymyślony score f
 2|Stan wyjściowy
 Tip 0dd49da3 / product c84f0373 / Alembic 138 / canary READY_INACTIVE — zweryfikowane niezależnie przed pracą.
 3|Stan końcowy
-Product 7a214aa8db10059fa9ce9455de5385faf083c85a ALIGNED; tip docs e3b5bee7; Alembic 139_candidate_interview_practice is_at_head=true; Launch NO-GO; enrollment OFF; caps 0; designation 0; MFA OPT_IN; PRIMARY_IA=7.
+Product 7a214aa8db10059fa9ce9455de5385faf083c85a ALIGNED; tip docs (self-hash after evidence); Alembic 139_candidate_interview_practice is_at_head=true; Launch NO-GO; enrollment OFF; caps 0; designation 0; MFA OPT_IN; PRIMARY_IA=7.
 4|Werdykt
 IMPLEMENTATION COMPLETE — LIVE AI QUALITY VERIFICATION BLOCKED BY EXTERNAL PROVIDER PREREQUISITE; ADAPTIVE AI NOT CERTIFIED
 5|Naprawione defekty
