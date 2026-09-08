@@ -1,6 +1,5 @@
 {
   "product_sha": "7a214aa8db10059fa9ce9455de5385faf083c85a",
-  "tip_sha_pending": true,
   "frontend_commit_observed": "6e80caa6ca253f66edd6805a158207edee4d271d",
   "api_commit": "7a214aa8db10059fa9ce9455de5385faf083c85a",
   "backend_git_commit": "7a214aa8db10059fa9ce9455de5385faf083c85a",
@@ -19,5 +18,6 @@
     "unit_tests_continuation": "98 passed",
     "canary_diff_continuation": 0
   },
-  "git_commit_observed": "7a214aa8db10059fa9ce9455de5385faf083c85a"
+  "git_commit_observed": "7a214aa8db10059fa9ce9455de5385faf083c85a",
+  "tip_sha": "082ac5366823fb310b648c3bd34c9cfff4657957"
 }
