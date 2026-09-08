@@ -51,6 +51,8 @@ ROUTE_KEYS = {
     "data_trust": "/dashboard/data-trust",
     "career_pack": "/dashboard/career-pack",
     "application_studio": "/dashboard/application-studio",
+    "interview_decision": "/dashboard/interview-decision",
+    "interview_practice": "/dashboard/interview-practice",
     "approvals": "/dashboard/approvals",
     "privacy_center": "/dashboard/privacy-center",
 }

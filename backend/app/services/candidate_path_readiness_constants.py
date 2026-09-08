@@ -42,6 +42,7 @@ RESOLUTION_DEEP_LINKS = frozenset(
         "/dashboard/matches",
         "/dashboard/application-studio",
         "/dashboard/interview-decision",
+        "/dashboard/interview-practice",
         "/dashboard/approvals",
         "/dashboard/execution-calendar",
         "/dashboard/portfolio",
