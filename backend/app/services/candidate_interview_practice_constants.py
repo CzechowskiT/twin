@@ -65,7 +65,9 @@ DETERMINISTIC_FALLBACK_LABEL = "DETERMINISTIC_LIBRARY_FALLBACK"
 EVIDENCE_LABEL_PRACTICE_WORK_SAMPLE = "PRACTICE_WORK_SAMPLE"
 CLAIM_KIND_PRACTICE = "CANDIDATE_CONFIRMED"
 
-FAMILIES = ("behavioral_star", "role_problem", "clarifying_questions")
+# v2 exercise tracks (M2 rewrite); v1 families kept as FAMILIES_V1 for legacy refs
+FAMILIES = ("software_backend", "business_data", "customer_b2b")
+FAMILIES_V1 = ("behavioral_star", "role_problem", "clarifying_questions")
 
 # Frozenset of all valid criterion outcome values
 CRITERION_OUTCOMES = frozenset(

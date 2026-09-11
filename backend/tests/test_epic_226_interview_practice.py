@@ -138,6 +138,11 @@ def test_catalog_pl_locale_differs():
 
 
 @pytest.mark.parametrize("ex_id", [
+    # v2 exercise IDs
+    "sw_backend_objective_1", "sw_backend_rubric_1",
+    "biz_data_objective_1", "biz_data_rubric_1",
+    "cust_b2b_objective_1", "cust_b2b_rubric_1",
+    # v1 IDs kept as aliases for historical sessions
     "behavioral_star_1", "behavioral_star_2",
     "role_problem_1", "role_problem_2",
     "clarifying_1", "clarifying_2",
@@ -150,10 +155,14 @@ def test_each_exercise_resolves(ex_id):
 
 
 def test_follow_up_library_deterministic():
-    a = follow_up_question("behavioral_star", 0, "en")
-    b = follow_up_question("behavioral_star", 0, "en")
+    # v2 family names
+    a = follow_up_question("software_backend", 0, "en")
+    b = follow_up_question("software_backend", 0, "en")
     assert a == b
-    assert follow_up_question("behavioral_star", 1, "en") != a
+    assert follow_up_question("software_backend", 1, "en") != a
+    # v1 family aliases still resolve
+    a_v1 = follow_up_question("behavioral_star", 0, "en")
+    assert a_v1  # resolves without error
 
 
 # ── Coach honesty ─────────────────────────────────────────────────────────────
@@ -220,7 +229,7 @@ def test_session_create_submit_next_complete_promote(monkeypatch):
     created = prac.create_session(
         db,
         candidate_id=cand.id,
-        exercise_id="behavioral_star_1",
+        exercise_id="sw_backend_objective_1",  # v2 exercise ID
         locale="en",
         ai_prep_opt_in=False,
     )
@@ -263,7 +272,7 @@ def test_turn_limit_enforced(monkeypatch):
     db, user, cand = _setup_db(monkeypatch)
     monkeypatch.setattr(coach, "is_anthropic_configured", lambda: False)
     created = prac.create_session(
-        db, candidate_id=cand.id, exercise_id="role_problem_1", locale="en"
+        db, candidate_id=cand.id, exercise_id="biz_data_objective_1", locale="en"
     )
     sid = created["id"]
     # Force turn_limit small
@@ -282,7 +291,7 @@ def test_turn_limit_enforced(monkeypatch):
 def test_delete_session_soft(monkeypatch):
     db, user, cand = _setup_db(monkeypatch)
     created = prac.create_session(
-        db, candidate_id=cand.id, exercise_id="clarifying_1", locale="pl"
+        db, candidate_id=cand.id, exercise_id="cust_b2b_objective_1", locale="pl"
     )
     out = prac.delete_session(db, candidate_id=cand.id, session_id=created["id"])
     assert out["deleted"] is True
