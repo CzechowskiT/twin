@@ -141,7 +141,7 @@ def main() -> int:
     check(
         "product",
         "B_three_families",
-        families >= {"behavioral_star", "role_problem", "clarifying_questions"},
+        families >= {"software_backend", "business_data", "customer_b2b"},
         str(families),
     )
 
