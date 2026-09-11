@@ -1,0 +1,53 @@
+{
+  "journeys": [
+    {
+      "id": "A",
+      "status": "PASS",
+      "detail": "consent default off, submit, feedback visible"
+    },
+    {
+      "id": "B",
+      "status": "PASS",
+      "detail": "usable without AI; browser-visible provider hits=0"
+    },
+    {
+      "id": "C",
+      "status": "PASS",
+      "detail": "reloaded session_id URL; url_had_session=true"
+    },
+    {
+      "id": "D",
+      "status": "PASS",
+      "detail": "catalog rendered with exercise choices"
+    },
+    {
+      "id": "E",
+      "status": "PASS",
+      "detail": "explicit promote action completed"
+    },
+    {
+      "id": "F-cross",
+      "status": "PASS",
+      "detail": "foreign session_id does not leak content"
+    },
+    {
+      "id": "F-delete",
+      "status": "PASS",
+      "detail": "delete control exercised for owner"
+    },
+    {
+      "id": "G",
+      "status": "PASS",
+      "detail": "authed UI ok; anon API=401; kpi_excluded=true"
+    },
+    {
+      "id": "H",
+      "status": "PASS",
+      "detail": "focusable start + keyboard typing on mobile viewport"
+    }
+  ],
+  "pass": 9,
+  "fail": 0,
+  "blocked": 0,
+  "verdict": "PASS"
+}

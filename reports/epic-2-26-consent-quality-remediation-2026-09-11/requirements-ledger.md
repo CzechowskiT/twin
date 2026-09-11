@@ -1,62 +1,64 @@
 # Epic 2.26 remediation — requirements-to-evidence ledger
 
-Updated: 2026-09-11 (Milestones 1–4 complete)
+Updated: 2026-09-11 (post browser + PG + deploy)
+
+## Product / deploy
+
+| Field | Value |
+|-------|-------|
+| Product feature SHA | `924bc7d684880c25a045ba69b7ed7441f1e79c7f` |
+| Tip (docs ledger merge) | `d36e15ee943082b25ddcd1d039a1bd2a5c305410` |
+| Remediation branch | `cursor/epic-2-26-consent-quality-remediation` |
+| Integration | `cursor/phase1-monorepo-scaffold` |
+| Alembic | `139_candidate_interview_practice` (unchanged; no additive migration required) |
 
 | ID | Defect | Repro | Fix | Test | Status |
 |----|--------|-------|-----|------|--------|
-| A | `_evaluate_turn` ignores `ai_prep_opt_in` — always calls provider | spy counter with consent=False | `authorize_practice_ai` reads canonical privacy; `_evaluate_turn` passes `ai_authorized=` | test_A, test_B, test_D | ✅ FIXED |
-| B | `evaluate_submitted_answer_text` decides Claude via `is_anthropic_configured()` — no consent | configured + consent=False → Claude called | `ai_authorized: bool = False` param; Claude path gated on both `ai_authorized AND is_anthropic_configured()` | test_E, test evaluate_submitted | ✅ FIXED |
-| C | FE body `ai_prep_opt_in:true` could forge consent | body true + privacy false → 0 calls expected | API/service ignores body; `submit_turn` calls `_evaluate_turn(db, candidate_id, ...)` which reads privacy | test_C forged body | ✅ FIXED |
-| D | `CandidateInterviewPrivacy` model default True | new candidate → privacy row auto-created with ai_prep_opt_in=True | model default changed to False; `get_or_create_privacy` sets explicitly False on new rows | `test_new_privacy_row_default_off` | ✅ FIXED |
-| E | `_heuristic_grounded_criteria`: answer "1" → SUPPORTED_IN_RESPONSE evidence_use | call heuristic with answer="1" | All semantic criteria = NOT_ASSESSED; factual observations in separate field; no SUPPORTED/PARTIAL from word count/digit | `test_answer_one_digit_not_supported`, `test_heuristic_never_assigns_semantic_outcomes` | ✅ FIXED |
-| F | `next_turn` uses fixed family/index — not adaptive | same session, diff answers → same follow-up | `generate_adaptive_follow_up` called with answer content; library path (`_library_adaptive_follow_up`) varies by length/topics/STAR; contrasting-answer test added | `test_contrasting_answers_yield_different_library_follow_ups` | ✅ FIXED |
-| G | `promote_to_evidence` hardcodes `is_synthetic=False`; reports total but promotes first-3 | promote with 4 submitted turns | `is_synthetic=session.kpi_excluded`; `turn_ids` explicit list; `turns_promoted==len(created_ids)` | `test_promote_to_evidence_count_matches_created` | ✅ FIXED |
-| H | Session delete marks parent only; delayed eval persists after delete | delete then check eval | `delete_session` soft-deletes child turns; `submit_turn` re-checks `session.deleted_at` before writing eval | `test_delete_session_rejects_delayed_eval_write`, `test_delete_session_supersedes_open_turns` | ✅ FIXED |
-| I | Live AI gate script is placeholder; exits 0 claiming cert when skipped | run script when provider absent | Script exits 2 (BLOCKED) with `certified: false` in `live-ai-gate-status.json`; never claims certified when skipped | script output + `live-ai-gate-status.json` | ✅ FIXED |
-| J | FE locale via `navigator.language` not app locale | switch app locale → catalog still EN | Use `locale` from `useTranslation()` instead | FE lint/tsc | ✅ FIXED |
-| K | Practice UI lacks session list/pause/resume/delete; no `?session_id=` routing | inspect page | Prior session list with resume/delete+confirm; `?session_id=` auto-opens session; URL updated on create/open | FE code + tsc | ✅ FIXED |
+| A | `_evaluate_turn` ignores consent | spy + consent false | `authorize_practice_ai` + `ai_authorized` | consent matrix | FIXED |
+| B | provider gated on config only | configured + consent false | Claude only if authorized AND configured | consent matrix | FIXED |
+| C | body forge consent | body true + privacy false | body ignored; privacy row authoritative | consent matrix | FIXED |
+| D | digit "1" → SUPPORTED | answer="1" | semantic NOT_ASSESSED; factual observations separate | honesty tests | FIXED |
+| E | fixed next_turn | contrasting answers | adaptive library follow-up by content | contrasting-answer test | FIXED |
+| F | live AI gate placeholder | no provider | exits 2 + certified:false | live-ai-gate-status.json | FIXED |
+| G | promote is_synthetic=False / count mismatch | promote N turns | kpi_excluded + explicit turn_ids | promote tests + auth e2e | FIXED |
+| H | delete parent only / delayed eval | delete during eval | soft-delete children; reject delayed write | delete tests | FIXED |
+| I | UI pause/resume/delete | inspect FE | session list + ?session_id= + delete confirm | browser C/F | FIXED |
+| J | locale via navigator | app locale | useTranslation locale | FE | FIXED |
+| K | catalog tracks incomplete | only v1 families | 3 tracks × 2 exercises EN/PL + aliases | auth e2e B_three_families | FIXED |
 
-## Exercise catalog (M2 rewrite — 2026-09-11)
+## Gates
 
-v2 tracks (3 × 2 = 6):
-- `software_backend`: `sw_backend_objective_1` (debug latency, objective), `sw_backend_rubric_1` (rate-limiter design, open rubric)
-- `business_data`: `biz_data_objective_1` (retention diagnosis, objective), `biz_data_rubric_1` (backlog prioritization, open rubric)
-- `customer_b2b`: `cust_b2b_objective_1` (procurement objection, objective), `cust_b2b_rubric_1` (account rescue, open rubric)
+| Gate | Result |
+|------|--------|
+| 1 IMPLEMENTATION_AND_PRIVACY | PASS (consent matrix + honesty + adaptive + sessions + promote/delete) |
+| 2 BROWSER_AND_DATABASE_VERIFICATION | PASS (Playwright A–H 8/8; PG concurrency PASS) |
+| 3 LIVE_PROVIDER_QUALITY | NOT_RUN_NO_PROVIDER (ANTHROPIC_API_KEY len=0; certified:false) |
 
-Legacy v1 IDs (`behavioral_star_1/2`, `role_problem_1/2`, `clarifying_1/2`) kept as aliases.
+## Test counters (separate)
 
-## Test counts (2026-09-11 M1–M4 commit)
+| Category | Result |
+|----------|--------|
+| Unit (practice + coach honesty) | 117 passed |
+| Consent provider matrix (included in suite history) | PASS |
+| HTTP authenticated e2e | product 18/18, stance 6/6, invariant 1/1 |
+| PostgreSQL concurrency | PASS — dialect postgresql 18.6; 1×200 + 1×turn_already_submitted |
+| Browser Playwright A–H | 8 passed (42.3s); journeys-summary PASS |
+| Live provider §29 | NOT_RUN_NO_PROVIDER; exit 2; certified false |
 
-| Test file | Count |
-|-----------|-------|
-| `test_epic_226_consent_provider_matrix.py` | 15 |
-| `test_epic_226_interview_practice.py` | 106 |
-| `test_ai_interview_coach_no_invented_score.py` | 11 |
-| **Total** | **132 passed, 0 failed** |
+## Canary / launch stance (before=after)
 
-## E2E script result (2026-09-11)
+- rc1_launch=NO-GO
+- enrollment OFF
+- canary READY_INACTIVE / active false
+- activation PREPARED_NOT_EXECUTED
+- caps 0 / designation 0
+- pilot OPERATIONALLY_READY_INACTIVE
+- Phase 3B BLOCKED; Agent NOT_STARTED
 
-`scripts/epic-2-26-interview-practice-e2e.py`: **SUMMARY PASS=34 FAIL=0**
+## Correction vs earlier COMPLETE_PROVIDER_BLOCKED claim
 
-## Consent matrix verdict
+Earlier tip docs claimed gaps closed while consent bypass, heuristic SUPPORTED, non-adaptive next_turn, promote/synthetic bugs, and missing real browser/PG proofs remained. Those are closed in this remediation. Live AI remains externally blocked (empty Anthropic key) — do not collapse into a single flattering COMPLETE label.
 
-PASS — all 6 scenarios verified:
-- never_consented → 0 provider calls ✅
-- consent_false → 0 provider calls ✅
-- forged_body_true (privacy=false) → 0 provider calls ✅
-- privacy_paused → 0 provider calls ✅
-- consent_true + not_paused → 1 provider call ✅
-- session_deleted before eval → eval not persisted ✅
+## Final outcome
 
-## Hard bans (unchanged)
-- NO numeric 0-100 score from heuristics
-- NO SUPPORTED_IN_RESPONSE from word count / digit presence
-- NO AI path without canonical privacy authorization
-- NO body boolean overriding DB privacy row
-- DO NOT merge to main until consent+honesty+adaptive+UI tests all pass
-- Live AI `certified: false` until full §29 matrix run against production with provider key present
-
-## Remaining blockers / NOT_RUN
-- Live AI §29 matrix: NOT_RUN_NO_PROVIDER (ANTHROPIC_API_KEY not set in env) — `certified: false`
-- Browser Playwright journeys A–H: NOT_RUN (Playwright not installed in this environment) — static code proof only
-- PG concurrency test: NOT_RUN_NO_PG (DATABASE_URL not set) — static `with_for_update` proof passes
+`EPIC_2_26_IMPLEMENTATION_VERIFIED_LIVE_AI_BLOCKED`
