@@ -53,10 +53,21 @@ type PracticeSession = {
   id: number;
   exercise_id?: string | null;
   state: string;
+  locale: string;
+  ai_consented: boolean;
   turns: Turn[];
   evaluations: Record<string, Evaluation>;
   score: null;
   score_available: false;
+  created_at?: string | null;
+};
+
+type SessionSummary = {
+  id: number;
+  exercise_id?: string | null;
+  state: string;
+  locale: string;
+  ai_consented: boolean;
   created_at?: string | null;
   updated_at?: string | null;
 };
@@ -80,6 +91,9 @@ function outcomeColour(outcome: string): string {
  * Secondary surface — NOT a primary nav item.
  * Linked from /dashboard/interview-decision via "Open adaptive practice" button.
  *
+ * Session discovery: ?session_id=<id> opens an existing session directly.
+ * Session list: prior sessions shown below with resume/delete actions.
+ *
  * AI consent is loaded from canonical privacy row (server-authoritative).
  * The FE checkbox PATCHes privacy; the body ai_prep_opt_in is NOT the authority —
  * the server always reads from the privacy row.
@@ -93,7 +107,7 @@ export default function InterviewPracticePage() {
   const processId = searchParams.get("process_id")
     ? Number(searchParams.get("process_id"))
     : null;
-
+  // ?session_id=<id> — open an existing session directly
   const sessionIdParam = searchParams.get("session_id")
     ? Number(searchParams.get("session_id"))
     : null;
@@ -107,7 +121,9 @@ export default function InterviewPracticePage() {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [status, setStatus] = useState("");
-  const [priorSessions, setPriorSessions] = useState<PracticeSession[]>([]);
+
+  // Prior session list
+  const [priorSessions, setPriorSessions] = useState<SessionSummary[]>([]);
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
 
   // Privacy state — loaded from canonical server row; never derived from request body
@@ -159,69 +175,73 @@ export default function InterviewPracticePage() {
     }
   }, []);
 
+  const loadPriorSessions = useCallback(async () => {
+    const token = getToken();
+    if (!token) return;
+    try {
+      const data = await apiFetch<{ sessions?: SessionSummary[] }>(
+        "/api/v1/candidates/me/interview-practice/sessions?limit=10",
+        {},
+        token,
+      );
+      setPriorSessions(data.sessions ?? []);
+    } catch {
+      // Non-critical — list failure should not block the main panel
+    }
+  }, []);
+
+  const openSessionById = useCallback(
+    async (sessionId: number) => {
+      const token = getToken();
+      if (!token) return;
+      setBusy(true);
+      setErr(null);
+      try {
+        const data = await apiFetch<PracticeSession>(
+          `/api/v1/candidates/me/interview-practice/sessions/${sessionId}`,
+          {},
+          token,
+        );
+        setSession(data);
+        setLastEval(null);
+        setAnswerDraft("");
+        // Find the latest non-submitted turn as the active one
+        const openTurn = [...(data.turns ?? [])]
+          .reverse()
+          .find((t) => t.state !== "SUBMITTED" && t.state !== "SUPERSEDED");
+        const lastSubmitted = [...(data.turns ?? [])]
+          .reverse()
+          .find((t) => t.state === "SUBMITTED");
+        setActiveTurn(openTurn ?? lastSubmitted ?? null);
+        // Update URL to reflect opened session without full navigation
+        const params = new URLSearchParams(searchParams.toString());
+        params.set("session_id", String(sessionId));
+        router.replace(`/dashboard/interview-practice?${params.toString()}`);
+      } catch (ex) {
+        setErr(ex instanceof Error ? ex.message : t("interviewPractice.actionFailed"));
+      } finally {
+        setBusy(false);
+      }
+    },
+    [router, searchParams, t],
+  );
+
   useEffect(() => {
     queueMicrotask(() => {
       void loadCatalog();
       void loadPrivacy();
-      void loadSessions();
-      if (sessionIdParam) void loadSessionById(sessionIdParam);
+      void loadPriorSessions();
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function loadSessions() {
-    const token = getToken();
-    if (!token) return;
-    try {
-      const data = await apiFetch<{ sessions?: PracticeSession[] }>(
-        "/api/v1/candidates/me/interview-practice/sessions?limit=20",
-        {},
-        token,
-      );
-      setPriorSessions(data?.sessions ?? []);
-    } catch {
-      // non-critical
+  // If ?session_id= param present, auto-open that session
+  useEffect(() => {
+    if (sessionIdParam && !session) {
+      void openSessionById(sessionIdParam);
     }
-  }
-
-  async function loadSessionById(id: number) {
-    const token = getToken();
-    if (!token) return;
-    try {
-      const data = await apiFetch<PracticeSession>(
-        `/api/v1/candidates/me/interview-practice/sessions/${id}`,
-        {},
-        token,
-      );
-      setSession(data);
-      const activeTurnData = data.turns?.find((t) => t.state !== "SUBMITTED") ?? data.turns?.[data.turns.length - 1] ?? null;
-      setActiveTurn(activeTurnData);
-      if (activeTurnData?.answer_draft) setAnswerDraft(activeTurnData.answer_draft);
-    } catch (ex) {
-      setErr(ex instanceof Error ? ex.message : t("interviewPractice.loadFailed"));
-    }
-  }
-
-  async function deleteSessionById(id: number) {
-    const token = getToken();
-    if (!token) return;
-    setBusy(true);
-    setDeleteConfirmId(null);
-    try {
-      await apiFetch(`/api/v1/candidates/me/interview-practice/sessions/${id}`, { method: "DELETE" }, token);
-      if (session?.id === id) {
-        setSession(null);
-        setActiveTurn(null);
-        setLastEval(null);
-      }
-      await loadSessions();
-      setStatus(t("interviewPractice.sessionDeleted"));
-    } catch (ex) {
-      setErr(ex instanceof Error ? ex.message : t("interviewPractice.actionFailed"));
-    } finally {
-      setBusy(false);
-    }
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionIdParam]);
 
   /** PATCH canonical privacy row — server is always authoritative for AI consent. */
   async function toggleAiConsent() {
@@ -285,6 +305,12 @@ export default function InterviewPracticePage() {
       const firstTurn = data.turns?.[0] ?? null;
       setActiveTurn(firstTurn);
       setStatus(t("interviewPractice.sessionStarted"));
+      // Refresh session list
+      void loadPriorSessions();
+      // Reflect new session in URL
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("session_id", String(data.id));
+      router.replace(`/dashboard/interview-practice?${params.toString()}`);
     } catch (ex) {
       setErr(ex instanceof Error ? ex.message : t("interviewPractice.actionFailed"));
     } finally {
@@ -376,6 +402,58 @@ export default function InterviewPracticePage() {
       );
       setStatus(t("interviewPractice.sessionCompleted"));
       setSession((s) => (s ? { ...s, state: "COMPLETED" } : s));
+      void loadPriorSessions();
+    } catch {
+      setErr(t("interviewPractice.actionFailed"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function abandonSession() {
+    const token = getToken();
+    if (!token || !session) return;
+    setBusy(true);
+    try {
+      await apiFetch(
+        `/api/v1/candidates/me/interview-practice/sessions/${session.id}/abandon`,
+        { method: "POST", body: "{}" },
+        token,
+      );
+      setStatus(t("interviewPractice.abandonSession"));
+      setSession((s) => (s ? { ...s, state: "ABANDONED" } : s));
+      void loadPriorSessions();
+    } catch {
+      setErr(t("interviewPractice.actionFailed"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function deleteSession(sessionId: number) {
+    const token = getToken();
+    if (!token) return;
+    setBusy(true);
+    setDeleteConfirmId(null);
+    try {
+      await apiFetch(
+        `/api/v1/candidates/me/interview-practice/sessions/${sessionId}`,
+        { method: "DELETE" },
+        token,
+      );
+      setStatus(t("interviewPractice.sessionDeleted"));
+      if (session?.id === sessionId) {
+        setSession(null);
+        setActiveTurn(null);
+        setLastEval(null);
+        // Clear session_id from URL
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete("session_id");
+        router.replace(
+          `/dashboard/interview-practice${params.toString() ? `?${params.toString()}` : ""}`,
+        );
+      }
+      void loadPriorSessions();
     } catch {
       setErr(t("interviewPractice.actionFailed"));
     } finally {
@@ -457,47 +535,6 @@ export default function InterviewPracticePage() {
       {err ? <p className="mb-3 text-sm text-red-700">{err}</p> : null}
       {status ? <p className="twin-muted mb-3 text-sm">{status}</p> : null}
 
-      {/* Prior sessions — discover, resume, or delete */}
-      {priorSessions.length > 0 ? (
-        <Card className="mb-4">
-          <h2 className="text-sm font-semibold">{t("interviewPractice.priorSessions")}</h2>
-          <div className="mt-2 space-y-1.5">
-            {priorSessions.map((s) => (
-              <div key={s.id} className="flex items-center gap-2 rounded border border-[var(--twin-border)] px-2 py-1.5 text-xs">
-                <span className="flex-1 truncate">
-                  #{s.id} · {s.exercise_id ?? "—"} · <span className="font-medium">{s.state}</span>
-                  {s.created_at ? ` · ${new Date(s.created_at).toLocaleDateString(locale === "pl" ? "pl-PL" : "en-GB")}` : ""}
-                </span>
-                {s.state !== "DELETED" && s.state !== "ABANDONED" ? (
-                  <button
-                    className="rounded border border-[var(--twin-border)] px-2 py-0.5 text-xs hover:bg-neutral-100"
-                    onClick={() => { void loadSessionById(s.id); router.replace(`?session_id=${s.id}`, { scroll: false }); }}
-                    disabled={busy}
-                  >
-                    {t("interviewPractice.resumeSession")}
-                  </button>
-                ) : null}
-                {deleteConfirmId === s.id ? (
-                  <>
-                    <span className="text-red-700">{t("interviewPractice.deleteConfirm")}</span>
-                    <button className="rounded bg-red-600 px-2 py-0.5 text-white" onClick={() => void deleteSessionById(s.id)} disabled={busy}>✓</button>
-                    <button className="rounded border border-[var(--twin-border)] px-2 py-0.5" onClick={() => setDeleteConfirmId(null)}>✕</button>
-                  </>
-                ) : (
-                  <button
-                    className="rounded border border-red-300 px-2 py-0.5 text-xs text-red-700 hover:bg-red-50"
-                    onClick={() => setDeleteConfirmId(s.id)}
-                    disabled={busy}
-                  >
-                    {t("interviewPractice.deleteSession")}
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        </Card>
-      ) : null}
-
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Left: catalog picker + start */}
         <Card>
@@ -532,14 +569,24 @@ export default function InterviewPracticePage() {
                 {t("interviewPractice.startSession")}
               </Button>
             ) : (
-              <Button
-                type="button"
-                className="border border-[var(--twin-border)] bg-transparent"
-                disabled={busy}
-                onClick={() => void completeSession()}
-              >
-                {t("interviewPractice.completeSession")}
-              </Button>
+              <>
+                <Button
+                  type="button"
+                  className="border border-[var(--twin-border)] bg-transparent"
+                  disabled={busy}
+                  onClick={() => void completeSession()}
+                >
+                  {t("interviewPractice.completeSession")}
+                </Button>
+                <Button
+                  type="button"
+                  className="border border-[var(--twin-border)] bg-transparent"
+                  disabled={busy}
+                  onClick={() => void abandonSession()}
+                >
+                  {t("interviewPractice.abandonSession")}
+                </Button>
+              </>
             )}
             {session?.state === "COMPLETED" ? (
               <Button
@@ -550,6 +597,35 @@ export default function InterviewPracticePage() {
               >
                 {t("interviewPractice.promoteEvidence")}
               </Button>
+            ) : null}
+            {session ? (
+              deleteConfirmId === session.id ? (
+                <span className="flex items-center gap-2 text-xs">
+                  <span className="text-red-700">{t("interviewPractice.deleteConfirm")}</span>
+                  <button
+                    className="font-medium text-red-700 underline"
+                    onClick={() => void deleteSession(session.id)}
+                    disabled={busy}
+                  >
+                    {t("interviewPractice.deleteSession")}
+                  </button>
+                  <button
+                    className="twin-muted"
+                    onClick={() => setDeleteConfirmId(null)}
+                  >
+                    ✕
+                  </button>
+                </span>
+              ) : (
+                <Button
+                  type="button"
+                  className="border border-[var(--twin-border)] bg-transparent text-red-700"
+                  disabled={busy}
+                  onClick={() => setDeleteConfirmId(session.id)}
+                >
+                  {t("interviewPractice.deleteSession")}
+                </Button>
+              )
             ) : null}
             <Button
               type="button"
@@ -668,6 +744,64 @@ export default function InterviewPracticePage() {
           <p className="twin-muted mt-2 text-xs">{t("interviewPractice.noScoreClaim")}</p>
         </Card>
       ) : null}
+
+      {/* Prior sessions list — discover, resume, delete */}
+      <Card className="mt-4">
+        <h2 className="text-base font-semibold">{t("interviewPractice.priorSessions")}</h2>
+        {priorSessions.length === 0 ? (
+          <p className="twin-muted mt-2 text-sm">{t("interviewPractice.noSessions")}</p>
+        ) : (
+          <ul className="mt-2 divide-y divide-[var(--twin-border)]">
+            {priorSessions.map((s) => (
+              <li key={s.id} className="flex items-center justify-between gap-2 py-2 text-sm">
+                <div className="min-w-0 flex-1">
+                  <span className="font-medium">#{s.id}</span>
+                  <span className="twin-muted ml-2">
+                    {s.exercise_id ?? "no-exercise"} · {s.state} · {s.locale}
+                    {s.created_at
+                      ? ` · ${new Date(s.created_at).toLocaleDateString(locale)}`
+                      : ""}
+                  </span>
+                </div>
+                <div className="flex shrink-0 gap-2">
+                  {s.state !== "DELETED" ? (
+                    <button
+                      className="text-xs underline"
+                      disabled={busy}
+                      onClick={() => void openSessionById(s.id)}
+                    >
+                      {t("interviewPractice.resumeSession")}
+                    </button>
+                  ) : null}
+                  {deleteConfirmId === s.id ? (
+                    <span className="flex items-center gap-1 text-xs">
+                      <span className="text-red-700">{t("interviewPractice.deleteConfirm")}</span>
+                      <button
+                        className="font-medium text-red-700 underline"
+                        onClick={() => void deleteSession(s.id)}
+                        disabled={busy}
+                      >
+                        ✓
+                      </button>
+                      <button className="twin-muted" onClick={() => setDeleteConfirmId(null)}>
+                        ✕
+                      </button>
+                    </span>
+                  ) : (
+                    <button
+                      className="text-xs text-red-700 underline"
+                      disabled={busy}
+                      onClick={() => setDeleteConfirmId(s.id)}
+                    >
+                      {t("interviewPractice.deleteSession")}
+                    </button>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
     </Shell>
   );
 }
