@@ -104,7 +104,14 @@ def get_or_create_privacy(db: Session, *, candidate_id: int) -> CandidateIntervi
     row = db.query(CandidateInterviewPrivacy).filter_by(candidate_id=candidate_id).one_or_none()
     if row:
         return row
-    row = CandidateInterviewPrivacy(candidate_id=candidate_id, created_at=_utcnow(), updated_at=_utcnow())
+    # Epic 2.26: new rows default ai_prep_opt_in=False (consent off until candidate opts in).
+    # Do NOT mass-update existing rows — only newly created ones.
+    row = CandidateInterviewPrivacy(
+        candidate_id=candidate_id,
+        ai_prep_opt_in=False,  # explicit DEFAULT OFF for new privacy rows
+        created_at=_utcnow(),
+        updated_at=_utcnow(),
+    )
     db.add(row)
     db.commit()
     db.refresh(row)
@@ -121,6 +128,21 @@ def update_privacy(db: Session, *, candidate_id: int, **kwargs: Any) -> Candidat
     db.commit()
     db.refresh(row)
     return row
+
+
+def authorize_practice_ai(db: Session, *, candidate_id: int) -> dict:
+    """Return AI authorization status for interview practice (canonical authority).
+
+    Request-body boolean MUST NOT override this. Server always reads from DB.
+    authorized = ai_prep_opt_in is True AND paused is False.
+    """
+    privacy = get_or_create_privacy(db, candidate_id=candidate_id)
+    authorized = bool(privacy.ai_prep_opt_in) and not bool(privacy.paused)
+    return {
+        "authorized": authorized,
+        "ai_prep_opt_in": bool(privacy.ai_prep_opt_in),
+        "paused": bool(privacy.paused),
+    }
 
 
 def _default_hypotheses(role: str, stage_kind: str) -> list[dict]:

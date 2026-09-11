@@ -34,6 +34,7 @@ type Evaluation = {
   improvements: string[];
   source_label?: string;
   degraded?: boolean;
+  consent_denied?: boolean;
   score: null;
   score_available: false;
 };
@@ -56,9 +57,17 @@ type PracticeSession = {
   evaluations: Record<string, Evaluation>;
   score: null;
   score_available: false;
+  created_at?: string | null;
+  updated_at?: string | null;
+};
+
+type PrivacyState = {
+  ai_prep_opt_in: boolean;
+  paused: boolean;
 };
 
 function outcomeColour(outcome: string): string {
+  if (outcome === "NOT_ASSESSED") return "text-neutral-500";
   if (outcome === "SUPPORTED_IN_RESPONSE") return "text-green-700";
   if (outcome === "PARTIALLY_SUPPORTED") return "text-yellow-700";
   if (outcome === "NOT_DEMONSTRATED") return "text-red-700";
@@ -70,13 +79,23 @@ function outcomeColour(outcome: string): string {
  * Epic 2.26 adaptive practice panel.
  * Secondary surface — NOT a primary nav item.
  * Linked from /dashboard/interview-decision via "Open adaptive practice" button.
+ *
+ * AI consent is loaded from canonical privacy row (server-authoritative).
+ * The FE checkbox PATCHes privacy; the body ai_prep_opt_in is NOT the authority —
+ * the server always reads from the privacy row.
  */
 export default function InterviewPracticePage() {
-  const { t } = useTranslation();
+  // Locale from app language provider (NOT navigator.language — avoids SSR mismatch
+  // and respects the in-app locale toggle, not the browser default).
+  const { t, locale } = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
   const processId = searchParams.get("process_id")
     ? Number(searchParams.get("process_id"))
+    : null;
+
+  const sessionIdParam = searchParams.get("session_id")
+    ? Number(searchParams.get("session_id"))
     : null;
 
   const [catalog, setCatalog] = useState<Catalog | null>(null);
@@ -88,10 +107,15 @@ export default function InterviewPracticePage() {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [status, setStatus] = useState("");
+  const [priorSessions, setPriorSessions] = useState<PracticeSession[]>([]);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
 
-  // Locale for catalog fetching
-  const locale =
-    typeof navigator !== "undefined" && navigator.language.startsWith("pl") ? "pl" : "en";
+  // Privacy state — loaded from canonical server row; never derived from request body
+  const [privacy, setPrivacy] = useState<PrivacyState>({
+    ai_prep_opt_in: false,
+    paused: false,
+  });
+  const [privacyBusy, setPrivacyBusy] = useState(false);
 
   const loadCatalog = useCallback(async () => {
     const token = getToken();
@@ -114,12 +138,123 @@ export default function InterviewPracticePage() {
     }
   }, [router, t, locale, selectedExercise]);
 
+  const loadPrivacy = useCallback(async () => {
+    const token = getToken();
+    if (!token) return;
+    try {
+      // The interview-decision endpoint returns { privacy: { ai_prep_opt_in, paused, ... } }
+      const data = await apiFetch<{ privacy?: PrivacyState }>(
+        "/api/v1/candidates/me/interview-decision",
+        {},
+        token,
+      );
+      if (data?.privacy) {
+        setPrivacy({
+          ai_prep_opt_in: data.privacy.ai_prep_opt_in ?? false,
+          paused: data.privacy.paused ?? false,
+        });
+      }
+    } catch {
+      // Non-critical — default remains OFF which is safe
+    }
+  }, []);
+
   useEffect(() => {
     queueMicrotask(() => {
       void loadCatalog();
+      void loadPrivacy();
+      void loadSessions();
+      if (sessionIdParam) void loadSessionById(sessionIdParam);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  async function loadSessions() {
+    const token = getToken();
+    if (!token) return;
+    try {
+      const data = await apiFetch<{ sessions?: PracticeSession[] }>(
+        "/api/v1/candidates/me/interview-practice/sessions?limit=20",
+        {},
+        token,
+      );
+      setPriorSessions(data?.sessions ?? []);
+    } catch {
+      // non-critical
+    }
+  }
+
+  async function loadSessionById(id: number) {
+    const token = getToken();
+    if (!token) return;
+    try {
+      const data = await apiFetch<PracticeSession>(
+        `/api/v1/candidates/me/interview-practice/sessions/${id}`,
+        {},
+        token,
+      );
+      setSession(data);
+      const activeTurnData = data.turns?.find((t) => t.state !== "SUBMITTED") ?? data.turns?.[data.turns.length - 1] ?? null;
+      setActiveTurn(activeTurnData);
+      if (activeTurnData?.answer_draft) setAnswerDraft(activeTurnData.answer_draft);
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : t("interviewPractice.loadFailed"));
+    }
+  }
+
+  async function deleteSessionById(id: number) {
+    const token = getToken();
+    if (!token) return;
+    setBusy(true);
+    setDeleteConfirmId(null);
+    try {
+      await apiFetch(`/api/v1/candidates/me/interview-practice/sessions/${id}`, { method: "DELETE" }, token);
+      if (session?.id === id) {
+        setSession(null);
+        setActiveTurn(null);
+        setLastEval(null);
+      }
+      await loadSessions();
+      setStatus(t("interviewPractice.sessionDeleted"));
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : t("interviewPractice.actionFailed"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /** PATCH canonical privacy row — server is always authoritative for AI consent. */
+  async function toggleAiConsent() {
+    const token = getToken();
+    if (!token) return;
+    setPrivacyBusy(true);
+    try {
+      const next = !privacy.ai_prep_opt_in;
+      const result = await apiFetch<{ privacy?: PrivacyState }>(
+        "/api/v1/candidates/me/interview-decision/privacy",
+        {
+          method: "PATCH",
+          body: JSON.stringify({ ai_prep_opt_in: next }),
+        },
+        token,
+      );
+      if (result?.privacy) {
+        setPrivacy({
+          ai_prep_opt_in: result.privacy.ai_prep_opt_in ?? false,
+          paused: result.privacy.paused ?? false,
+        });
+      }
+      setStatus(
+        next
+          ? t("interviewPractice.aiConsentEnabled")
+          : t("interviewPractice.aiConsentDisabled"),
+      );
+    } catch {
+      setErr(t("interviewPractice.actionFailed"));
+    } finally {
+      setPrivacyBusy(false);
+    }
+  }
 
   async function startSession() {
     const token = getToken();
@@ -139,6 +274,8 @@ export default function InterviewPracticePage() {
             exercise_id: selectedExercise || null,
             process_id: processId,
             locale,
+            // ai_prep_opt_in is NOT the authority — server reads from canonical privacy row.
+            // We send false always; server ignores it and reads DB.
             ai_prep_opt_in: false,
           }),
         },
@@ -179,11 +316,12 @@ export default function InterviewPracticePage() {
     setBusy(true);
     setErr(null);
     try {
-      const result = await apiFetch<{ turn: Turn; evaluation: Evaluation }>(
+      const result = await apiFetch<{ turn: Turn; evaluation: Evaluation | null }>(
         `/api/v1/candidates/me/interview-practice/sessions/${session.id}/turns/${activeTurn.id}/submit`,
         {
           method: "POST",
-          body: JSON.stringify({ answer_text: answerDraft, ai_prep_opt_in: false }),
+          // ai_prep_opt_in body value is IGNORED by server — consent read from DB.
+          body: JSON.stringify({ answer_text: answerDraft }),
         },
         token,
       );
@@ -214,7 +352,7 @@ export default function InterviewPracticePage() {
     try {
       const result = await apiFetch<{ turn: Turn }>(
         `/api/v1/candidates/me/interview-practice/sessions/${session.id}/next-turn`,
-        { method: "POST", body: JSON.stringify({ ai_prep_opt_in: false }) },
+        { method: "POST", body: "{}" },
         token,
       );
       setActiveTurn(result.turn);
@@ -270,6 +408,7 @@ export default function InterviewPracticePage() {
   const isSessionActive = session && !["COMPLETED", "ABANDONED", "DELETED"].includes(session.state);
   const canSubmit = !!activeTurn && activeTurn.state !== "SUBMITTED" && answerDraft.trim().length > 0;
   const canNext = !!activeTurn && activeTurn.state === "SUBMITTED";
+  const aiEffective = privacy.ai_prep_opt_in && !privacy.paused;
 
   return (
     <Shell wide rail>
@@ -288,8 +427,76 @@ export default function InterviewPracticePage() {
 
       <p className="twin-muted mb-3 text-xs">{t("interviewPractice.safetyNote")}</p>
 
+      {/* AI Consent panel — default OFF; user must explicitly opt in */}
+      <Card className="mb-4">
+        <div className="flex items-start gap-3">
+          <input
+            id="ai-consent-toggle"
+            type="checkbox"
+            className="mt-0.5 h-4 w-4 cursor-pointer rounded border border-[var(--twin-border)]"
+            checked={privacy.ai_prep_opt_in}
+            onChange={() => void toggleAiConsent()}
+            disabled={privacyBusy || privacy.paused}
+          />
+          <div className="flex-1">
+            <label htmlFor="ai-consent-toggle" className="cursor-pointer text-sm font-medium">
+              {t("interviewPractice.aiConsentLabel")}
+            </label>
+            <p className="twin-muted mt-0.5 text-xs">
+              {privacy.paused
+                ? t("interviewPractice.aiConsentPaused")
+                : aiEffective
+                  ? t("interviewPractice.aiConsentActive")
+                  : t("interviewPractice.aiConsentOff")}
+            </p>
+            <p className="twin-muted mt-1 text-xs">{t("interviewPractice.aiConsentNote")}</p>
+          </div>
+        </div>
+      </Card>
+
       {err ? <p className="mb-3 text-sm text-red-700">{err}</p> : null}
       {status ? <p className="twin-muted mb-3 text-sm">{status}</p> : null}
+
+      {/* Prior sessions — discover, resume, or delete */}
+      {priorSessions.length > 0 ? (
+        <Card className="mb-4">
+          <h2 className="text-sm font-semibold">{t("interviewPractice.priorSessions")}</h2>
+          <div className="mt-2 space-y-1.5">
+            {priorSessions.map((s) => (
+              <div key={s.id} className="flex items-center gap-2 rounded border border-[var(--twin-border)] px-2 py-1.5 text-xs">
+                <span className="flex-1 truncate">
+                  #{s.id} · {s.exercise_id ?? "—"} · <span className="font-medium">{s.state}</span>
+                  {s.created_at ? ` · ${new Date(s.created_at).toLocaleDateString(locale === "pl" ? "pl-PL" : "en-GB")}` : ""}
+                </span>
+                {s.state !== "DELETED" && s.state !== "ABANDONED" ? (
+                  <button
+                    className="rounded border border-[var(--twin-border)] px-2 py-0.5 text-xs hover:bg-neutral-100"
+                    onClick={() => { void loadSessionById(s.id); router.replace(`?session_id=${s.id}`, { scroll: false }); }}
+                    disabled={busy}
+                  >
+                    {t("interviewPractice.resumeSession")}
+                  </button>
+                ) : null}
+                {deleteConfirmId === s.id ? (
+                  <>
+                    <span className="text-red-700">{t("interviewPractice.deleteConfirm")}</span>
+                    <button className="rounded bg-red-600 px-2 py-0.5 text-white" onClick={() => void deleteSessionById(s.id)} disabled={busy}>✓</button>
+                    <button className="rounded border border-[var(--twin-border)] px-2 py-0.5" onClick={() => setDeleteConfirmId(null)}>✕</button>
+                  </>
+                ) : (
+                  <button
+                    className="rounded border border-red-300 px-2 py-0.5 text-xs text-red-700 hover:bg-red-50"
+                    onClick={() => setDeleteConfirmId(s.id)}
+                    disabled={busy}
+                  >
+                    {t("interviewPractice.deleteSession")}
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </Card>
+      ) : null}
 
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Left: catalog picker + start */}
@@ -420,7 +627,11 @@ export default function InterviewPracticePage() {
             {lastEval.evaluation_status}
             {lastEval.source_label ? ` · ${lastEval.source_label}` : ""}
             {lastEval.degraded ? ` · ${t("interviewPractice.degraded")}` : ""}
+            {lastEval.consent_denied ? ` · ${t("interviewPractice.consentDenied")}` : ""}
           </p>
+          {lastEval.consent_denied ? (
+            <p className="mt-1 text-xs text-yellow-700">{t("interviewPractice.consentNeeded")}</p>
+          ) : null}
           {/* Criterion-level outcomes only — no global score/100 */}
           <div className="mt-2 space-y-1">
             {(lastEval.criteria || []).map((c) => (

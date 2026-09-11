@@ -2610,7 +2610,7 @@ class CandidateInterviewPrivacy(Base):
     candidate_id: Mapped[int] = mapped_column(
         ForeignKey("candidates.id", ondelete="CASCADE"), unique=True
     )
-    ai_prep_opt_in: Mapped[bool] = mapped_column(Boolean, default=True)
+    ai_prep_opt_in: Mapped[bool] = mapped_column(Boolean, default=False)  # Epic 2.26: DEFAULT OFF
     transcript_retention_opt_in: Mapped[bool] = mapped_column(Boolean, default=False)
     export_include_transcripts: Mapped[bool] = mapped_column(Boolean, default=False)
     paused: Mapped[bool] = mapped_column(Boolean, default=False)

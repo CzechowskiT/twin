@@ -40,7 +40,7 @@ class SessionCreateIn(BaseModel):
     exercise_id: str | None = Field(default=None, max_length=64)
     process_id: int | None = None
     locale: str = Field(default="en", max_length=8)
-    ai_prep_opt_in: bool = False
+    ai_prep_opt_in: bool = False  # kept for compat; server reads canonical privacy row
 
 
 class DraftPatchIn(BaseModel):
@@ -49,14 +49,33 @@ class DraftPatchIn(BaseModel):
 
 class TurnSubmitIn(BaseModel):
     answer_text: str = Field(..., max_length=8000)
-    ai_prep_opt_in: bool = False
+    ai_prep_opt_in: bool = False  # IGNORED by server; consent read from privacy row
 
 
 class NextTurnIn(BaseModel):
-    ai_prep_opt_in: bool = False
+    ai_prep_opt_in: bool = False  # IGNORED; server reads privacy row
+
+
+class PromoteEvidenceIn(BaseModel):
+    turn_ids: list[int] | None = Field(
+        default=None,
+        description="Explicit turn IDs to promote. If omitted, all submitted turns are promoted.",
+    )
 
 
 # ── Endpoints ──────────────────────────────────────────────────────────────────
+
+
+@router.get("/me/interview-practice/sessions")
+def list_sessions(
+    limit: int = 20,
+    offset: int = 0,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> Any:
+    """List practice sessions (paginated, excluding deleted)."""
+    cand = _candidate(db, user)
+    return _handle(prac.list_sessions, db, candidate_id=cand.id, limit=limit, offset=offset)
 
 
 @router.get("/me/interview-practice/catalog")
@@ -195,9 +214,19 @@ def delete_session(
 @router.post("/me/interview-practice/sessions/{session_id}/promote-to-evidence")
 def promote_to_evidence(
     session_id: int,
+    body: PromoteEvidenceIn = PromoteEvidenceIn(),
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> Any:
-    """Promote practice turns as PRACTICE_WORK_SAMPLE career evidence."""
+    """Promote practice turns as PRACTICE_WORK_SAMPLE career evidence.
+
+    Pass turn_ids to promote specific turns; omit to promote all submitted turns.
+    """
     cand = _candidate(db, user)
-    return _handle(prac.promote_to_evidence, db, candidate_id=cand.id, session_id=session_id)
+    return _handle(
+        prac.promote_to_evidence,
+        db,
+        candidate_id=cand.id,
+        session_id=session_id,
+        turn_ids=body.turn_ids,
+    )
