@@ -57,6 +57,8 @@ type PracticeSession = {
   evaluations: Record<string, Evaluation>;
   score: null;
   score_available: false;
+  created_at?: string | null;
+  updated_at?: string | null;
 };
 
 type PrivacyState = {
@@ -92,6 +94,10 @@ export default function InterviewPracticePage() {
     ? Number(searchParams.get("process_id"))
     : null;
 
+  const sessionIdParam = searchParams.get("session_id")
+    ? Number(searchParams.get("session_id"))
+    : null;
+
   const [catalog, setCatalog] = useState<Catalog | null>(null);
   const [selectedExercise, setSelectedExercise] = useState<string>("");
   const [session, setSession] = useState<PracticeSession | null>(null);
@@ -101,6 +107,8 @@ export default function InterviewPracticePage() {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [status, setStatus] = useState("");
+  const [priorSessions, setPriorSessions] = useState<PracticeSession[]>([]);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
 
   // Privacy state — loaded from canonical server row; never derived from request body
   const [privacy, setPrivacy] = useState<PrivacyState>({
@@ -155,9 +163,65 @@ export default function InterviewPracticePage() {
     queueMicrotask(() => {
       void loadCatalog();
       void loadPrivacy();
+      void loadSessions();
+      if (sessionIdParam) void loadSessionById(sessionIdParam);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  async function loadSessions() {
+    const token = getToken();
+    if (!token) return;
+    try {
+      const data = await apiFetch<{ sessions?: PracticeSession[] }>(
+        "/api/v1/candidates/me/interview-practice/sessions?limit=20",
+        {},
+        token,
+      );
+      setPriorSessions(data?.sessions ?? []);
+    } catch {
+      // non-critical
+    }
+  }
+
+  async function loadSessionById(id: number) {
+    const token = getToken();
+    if (!token) return;
+    try {
+      const data = await apiFetch<PracticeSession>(
+        `/api/v1/candidates/me/interview-practice/sessions/${id}`,
+        {},
+        token,
+      );
+      setSession(data);
+      const activeTurnData = data.turns?.find((t) => t.state !== "SUBMITTED") ?? data.turns?.[data.turns.length - 1] ?? null;
+      setActiveTurn(activeTurnData);
+      if (activeTurnData?.answer_draft) setAnswerDraft(activeTurnData.answer_draft);
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : t("interviewPractice.loadFailed"));
+    }
+  }
+
+  async function deleteSessionById(id: number) {
+    const token = getToken();
+    if (!token) return;
+    setBusy(true);
+    setDeleteConfirmId(null);
+    try {
+      await apiFetch(`/api/v1/candidates/me/interview-practice/sessions/${id}`, { method: "DELETE" }, token);
+      if (session?.id === id) {
+        setSession(null);
+        setActiveTurn(null);
+        setLastEval(null);
+      }
+      await loadSessions();
+      setStatus(t("interviewPractice.sessionDeleted"));
+    } catch (ex) {
+      setErr(ex instanceof Error ? ex.message : t("interviewPractice.actionFailed"));
+    } finally {
+      setBusy(false);
+    }
+  }
 
   /** PATCH canonical privacy row — server is always authoritative for AI consent. */
   async function toggleAiConsent() {
@@ -392,6 +456,47 @@ export default function InterviewPracticePage() {
 
       {err ? <p className="mb-3 text-sm text-red-700">{err}</p> : null}
       {status ? <p className="twin-muted mb-3 text-sm">{status}</p> : null}
+
+      {/* Prior sessions — discover, resume, or delete */}
+      {priorSessions.length > 0 ? (
+        <Card className="mb-4">
+          <h2 className="text-sm font-semibold">{t("interviewPractice.priorSessions")}</h2>
+          <div className="mt-2 space-y-1.5">
+            {priorSessions.map((s) => (
+              <div key={s.id} className="flex items-center gap-2 rounded border border-[var(--twin-border)] px-2 py-1.5 text-xs">
+                <span className="flex-1 truncate">
+                  #{s.id} · {s.exercise_id ?? "—"} · <span className="font-medium">{s.state}</span>
+                  {s.created_at ? ` · ${new Date(s.created_at).toLocaleDateString(locale === "pl" ? "pl-PL" : "en-GB")}` : ""}
+                </span>
+                {s.state !== "DELETED" && s.state !== "ABANDONED" ? (
+                  <button
+                    className="rounded border border-[var(--twin-border)] px-2 py-0.5 text-xs hover:bg-neutral-100"
+                    onClick={() => { void loadSessionById(s.id); router.replace(`?session_id=${s.id}`, { scroll: false }); }}
+                    disabled={busy}
+                  >
+                    {t("interviewPractice.resumeSession")}
+                  </button>
+                ) : null}
+                {deleteConfirmId === s.id ? (
+                  <>
+                    <span className="text-red-700">{t("interviewPractice.deleteConfirm")}</span>
+                    <button className="rounded bg-red-600 px-2 py-0.5 text-white" onClick={() => void deleteSessionById(s.id)} disabled={busy}>✓</button>
+                    <button className="rounded border border-[var(--twin-border)] px-2 py-0.5" onClick={() => setDeleteConfirmId(null)}>✕</button>
+                  </>
+                ) : (
+                  <button
+                    className="rounded border border-red-300 px-2 py-0.5 text-xs text-red-700 hover:bg-red-50"
+                    onClick={() => setDeleteConfirmId(s.id)}
+                    disabled={busy}
+                  >
+                    {t("interviewPractice.deleteSession")}
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </Card>
+      ) : null}
 
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Left: catalog picker + start */}

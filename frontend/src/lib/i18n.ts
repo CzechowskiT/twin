@@ -14297,6 +14297,7 @@ const pl: MessageTree = {
     improvements: "Sugestie",
     noScoreClaim: "Brak globalnego wyniku ani prawdopodobieństwa hiring — tylko wyniki kryteriów.",
     consentNeeded: "Włącz AI prep w ustawieniach prywatności, aby uzyskać ocenę semantyczną.",
+    priorSessions: "Twoje sesje ćwiczeniowe",
     promoteEvidence: "Promuj jako evidence ćwiczeniowe",
     promoteNote:
       "Promocja jest świadoma i opcjonalna. Etykieta PRACTICE_WORK_SAMPLE — nigdy FACT potwierdzony przez pracodawcę.",
