@@ -65,7 +65,7 @@ export function SiteFooter() {
         <div className="grid min-w-0 grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-10 lg:grid-cols-4">
           <div className="min-w-0">
             <Link href="/" className="twin-logo inline-block text-lg no-underline hover:opacity-90">
-              TWIN<span className="twin-logo-accent">.</span>
+              TWIN
             </Link>
             <p className="mt-3 text-sm leading-relaxed text-[var(--twin-muted)]">{t("site.footerTagline")}</p>
           </div>
