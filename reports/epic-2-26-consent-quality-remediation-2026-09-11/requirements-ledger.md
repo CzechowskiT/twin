@@ -20,9 +20,12 @@ Updated: 2026-09-11 (M1–M4 remediation complete)
 ## Test counts (2026-09-11 M1–M4 remediation complete)
 
 - `test_epic_226_consent_provider_matrix.py`: 15 passed
-- `test_epic_226_interview_practice.py`: 95 passed
-- **Total: 110 passed, 0 failed**
-- Frontend build: ✅ CLEAN (244 static pages compiled)
+- `test_epic_226_interview_practice.py`: 95 passed (includes contrasting-answer M2 test + v2 ID resolution test)
+- `test_ai_interview_coach_no_invented_score.py`: 11 passed
+- **Total: 121 passed, 0 failed**
+- Frontend build: ✅ CLEAN
+- Concurrency proof: ✅ submit_turn uses with_for_update + commit-before-model + duplicate guard
+- Live AI gate: ✅ exits 2 (BLOCKED) when provider absent; writes certified=false
 
 ## Consent matrix verdict
 

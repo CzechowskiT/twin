@@ -8,7 +8,7 @@ Tracks (v2):
   - customer_b2b      — customer-facing & stakeholder work
 
 Legacy v1 family IDs (behavioral_star, role_problem, clarifying_questions) are
-kept as aliases pointing to canonical v2 exercises so historical session
+kept as _ALIASES pointing to canonical v2 exercises so historical session
 exercise_id values continue to resolve via get_exercise().
 
 EN + PL locale-aware content.
@@ -17,7 +17,7 @@ Original content — not copied from copyrighted question banks.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 from app.services.candidate_interview_practice_constants import (
@@ -37,7 +37,6 @@ class Exercise:
     title_pl: str
     prompt_en: str
     prompt_pl: str
-    # v2 fields
     exercise_type: str = "open_rubric"  # objective | open_rubric
     version: int = 2
 
@@ -60,7 +59,6 @@ class Exercise:
 _CATALOG: tuple[Exercise, ...] = (
     # ── Track 1: software_backend ─────────────────────────────────────────────
 
-    # Objective: explicit correctness rules — debugging a latency spike
     Exercise(
         id="sw_backend_objective_1",
         family="software_backend",
@@ -88,7 +86,6 @@ _CATALOG: tuple[Exercise, ...] = (
         ),
     ),
 
-    # Open rubric: system design with evaluative criteria
     Exercise(
         id="sw_backend_rubric_1",
         family="software_backend",
@@ -120,7 +117,6 @@ _CATALOG: tuple[Exercise, ...] = (
 
     # ── Track 2: business_data ─────────────────────────────────────────────────
 
-    # Objective: explicit correctness rules — retention drop diagnosis
     Exercise(
         id="biz_data_objective_1",
         family="business_data",
@@ -149,7 +145,6 @@ _CATALOG: tuple[Exercise, ...] = (
         ),
     ),
 
-    # Open rubric: backlog prioritization framework
     Exercise(
         id="biz_data_rubric_1",
         family="business_data",
@@ -181,7 +176,6 @@ _CATALOG: tuple[Exercise, ...] = (
 
     # ── Track 3: customer_b2b ──────────────────────────────────────────────────
 
-    # Objective: explicit rules — handling a technical objection
     Exercise(
         id="cust_b2b_objective_1",
         family="customer_b2b",
@@ -213,7 +207,6 @@ _CATALOG: tuple[Exercise, ...] = (
         ),
     ),
 
-    # Open rubric: account health and relationship management
     Exercise(
         id="cust_b2b_rubric_1",
         family="customer_b2b",
@@ -249,27 +242,27 @@ _CATALOG: tuple[Exercise, ...] = (
 # Fast lookup by canonical id
 _BY_ID: dict[str, Exercise] = {ex.id: ex for ex in _CATALOG}
 
-# ── Legacy v1 aliases ─────────────────────────────────────────────────────────
-# Map v1 exercise IDs (behavioral_star, role_problem, clarifying_questions families)
-# to their closest v2 canonical counterpart.
+# ── Legacy v1 and v2 verbose aliases ─────────────────────────────────────────
+# Map v1 IDs (behavioral_star, role_problem, clarifying_questions families) and
+# verbose v2 IDs to canonical v2 exercise objects.
 # Historical session.exercise_id values continue to resolve via get_exercise().
 _ALIASES: dict[str, Exercise] = {
-    # behavioral_star family aliases (v1 IDs → v2 canonical IDs)
-    "behavioral_star_1": _BY_ID["sw_backend_objective_1"],   # STAR achievement → backend debug
-    "behavioral_star_2": _BY_ID["cust_b2b_objective_1"],     # STAR conflict → B2B objection
-    # role_problem family aliases
-    "role_problem_1": _BY_ID["biz_data_objective_1"],        # retention drop (same content)
-    "role_problem_2": _BY_ID["biz_data_rubric_1"],           # backlog prioritization (same)
-    # clarifying_questions family aliases
-    "clarifying_1": _BY_ID["sw_backend_rubric_1"],           # API latency → backend design
-    "clarifying_2": _BY_ID["cust_b2b_rubric_1"],             # account rescue
-    # Cross-naming aliases for historical sessions using longer names
-    "customer_b2b_1": _BY_ID["cust_b2b_objective_1"],
-    "customer_b2b_2": _BY_ID["cust_b2b_rubric_1"],
-    "business_data_1": _BY_ID["biz_data_objective_1"],
-    "business_data_2": _BY_ID["biz_data_rubric_1"],
+    # v1 behavioral_star → sw_backend / cust_b2b
+    "behavioral_star_1": _BY_ID["sw_backend_objective_1"],
+    "behavioral_star_2": _BY_ID["cust_b2b_objective_1"],
+    # v1 role_problem → biz_data
+    "role_problem_1": _BY_ID["biz_data_objective_1"],
+    "role_problem_2": _BY_ID["biz_data_rubric_1"],
+    # v1 clarifying_questions → sw_backend / cust_b2b rubrics
+    "clarifying_1": _BY_ID["sw_backend_rubric_1"],
+    "clarifying_2": _BY_ID["cust_b2b_rubric_1"],
+    # v2 verbose aliases for convenience
     "software_backend_1": _BY_ID["sw_backend_objective_1"],
     "software_backend_2": _BY_ID["sw_backend_rubric_1"],
+    "business_data_1": _BY_ID["biz_data_objective_1"],
+    "business_data_2": _BY_ID["biz_data_rubric_1"],
+    "customer_b2b_1": _BY_ID["cust_b2b_objective_1"],
+    "customer_b2b_2": _BY_ID["cust_b2b_rubric_1"],
 }
 
 
@@ -284,7 +277,7 @@ def get_catalog(locale: str = "en") -> dict[str, object]:
 
 
 def get_exercise(exercise_id: str) -> Exercise | None:
-    """Lookup by canonical or legacy alias id; return None if unknown."""
+    """Lookup by canonical id or alias; return None if unknown."""
     return _BY_ID.get(exercise_id) or _ALIASES.get(exercise_id)
 
 
@@ -297,8 +290,7 @@ def first_question_for_exercise(exercise_id: str, locale: str = "en") -> str:
 
 
 # ── Adaptive follow-up library ─────────────────────────────────────────────────
-# Deterministic, labeled (no AI required).
-# Indexed by v2 family name; v1 family names also kept for follow_up_question compat.
+# Deterministic, labeled. Indexed by v2 family name; v1 names also kept.
 _FOLLOW_UPS: dict[str, list[str]] = {
     # v2 tracks
     "software_backend": [
@@ -314,9 +306,9 @@ _FOLLOW_UPS: dict[str, list[str]] = {
     "customer_b2b": [
         "What would you do differently to surface this risk earlier next time?",
         "How would you document the outcome for future account health reviews?",
-        "Which stakeholder in the account is your most reliable internal champion — how would you leverage them?",
+        "Which stakeholder in the account is your most reliable internal champion?",
     ],
-    # v1 family aliases (kept for backward-compat with follow_up_question calls)
+    # v1 family aliases (kept for backward-compat with legacy follow_up_question calls)
     "behavioral_star": [
         "What would you do differently if you faced this situation again?",
         "How did you measure the impact of your actions?",
@@ -341,7 +333,7 @@ def follow_up_question(family: str, turn_index: int, locale: str = "en") -> str:
     q_en = questions[turn_index % len(questions)]
     if not locale.startswith("pl"):
         return q_en
-    # Best-effort Polish translations for follow-up library questions
+    # Best-effort Polish translations
     _pl_map: dict[str, str] = {
         # v2 translations
         "What specific signals or metrics would tell you the problem is fully resolved?":
@@ -360,8 +352,8 @@ def follow_up_question(family: str, turn_index: int, locale: str = "en") -> str:
             "Co zrobiłbyś inaczej, żeby wcześniej wykryć to ryzyko następnym razem?",
         "How would you document the outcome for future account health reviews?":
             "Jak udokumentowałbyś wynik na potrzeby przyszłych przeglądów zdrowia konta?",
-        "Which stakeholder in the account is your most reliable internal champion — how would you leverage them?":
-            "Który interesariusz w koncie jest Twoim najbardziej niezawodnym wewnętrznym mistrzem — jak go wykorzystasz?",
+        "Which stakeholder in the account is your most reliable internal champion?":
+            "Który interesariusz w koncie jest Twoim najbardziej niezawodnym wewnętrznym mistrzem?",
         # v1 translations (kept for compat)
         "What would you do differently if you faced this situation again?":
             "Co zrobiłbyś inaczej, gdybyś znów stanął w obliczu tej sytuacji?",
