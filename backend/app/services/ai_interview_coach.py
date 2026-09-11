@@ -25,6 +25,18 @@ from app.services.candidate_interview_practice_constants import (
     OUTCOME_UNAVAILABLE,
 )
 
+_ADAPTIVE_FOLLOWUP_PROMPT = """You are an interview coach generating a single follow-up question.
+The candidate just answered the practice question below. Generate ONE targeted follow-up that:
+- Probes a gap, assumption, or claim in their answer
+- Is specific to THEIR answer, not generic
+- Is a single clear sentence ending with '?'
+Return ONLY JSON: {{"follow_up": "..."}}
+Do NOT invent hiring probability, score, or claim the candidate is hired/rejected.
+Question: {question}
+Answer: {answer}
+Exercise rubric: {rubric}
+"""
+
 _QUESTIONS_PROMPT = """Generate interview practice for this role. Return ONLY JSON:
 {{
   "questions": [{{"id": "q1", "text": "...", "category": "behavioral|technical|culture"}}],
@@ -334,3 +346,70 @@ def evaluate_submitted_answer_text(
             "degraded": True,
         }
     return _unavailable_evaluation(reason="AI evaluation provider not configured", answer=answer)
+
+
+def generate_adaptive_follow_up(
+    *,
+    question: str,
+    answer: str,
+    rubric: str = "",
+    ai_authorized: bool = False,
+    provider_call=None,
+) -> dict[str, Any]:
+    """Generate a follow-up question adaptive to the submitted answer.
+
+    When ai_authorized and Anthropic configured: calls Claude (or injectable stub).
+    Otherwise: returns library-selected follow-up based on answer content (labeled library_not_adaptive_ai).
+    Never claims AI adaptation without actual provider call.
+    """
+    if ai_authorized and is_anthropic_configured():
+        if provider_call is not None:
+            result = provider_call(question, answer, rubric)
+            if result and result.get("follow_up"):
+                return {
+                    "follow_up": result["follow_up"],
+                    "source": "claude",
+                    "source_label": "live_ai_adaptive",
+                    "degraded": False,
+                }
+        else:
+            prompt = _ADAPTIVE_FOLLOWUP_PROMPT.format(
+                question=question[:500],
+                answer=answer[:2000],
+                rubric=(rubric or "General behavioral interview")[:500],
+            )
+            data = call_claude_json(prompt, max_tokens=300)
+            if data and data.get("follow_up"):
+                return {
+                    "follow_up": data["follow_up"],
+                    "source": "claude",
+                    "source_label": "live_ai_adaptive",
+                    "degraded": False,
+                }
+
+    # Deterministic library — vary by answer content but NEVER claim adaptive AI
+    return {
+        "follow_up": _library_adaptive_follow_up(question=question, answer=answer),
+        "source": DETERMINISTIC_FALLBACK_LABEL,
+        "source_label": "library_not_adaptive_ai",
+        "degraded": True,
+        "consent_denied": not ai_authorized,
+    }
+
+
+def _library_adaptive_follow_up(*, question: str, answer: str) -> str:
+    """Pick a library follow-up that varies by answer content — no AI, but not purely index-based."""
+    words = len(re.findall(r"\w+", answer or ""))
+    has_number = bool(re.search(r"\d", answer or ""))
+    has_star = bool(re.search(r"\b(situation|task|action|result)\b", answer or "", re.I))
+    has_outcome = bool(re.search(r"\b(result|outcome|achieved|delivered|improved|reduced)\b", answer or "", re.I))
+
+    if words < 30:
+        return "Can you walk me through this in more detail — what specifically was your role and what was the measurable outcome?"
+    if has_number and not has_outcome:
+        return "You mentioned some metrics — how did you measure the impact of your actions and verify those numbers?"
+    if not has_star:
+        return "That's a good start — could you structure this using the Situation, Task, Action, Result format to make it clearer?"
+    if has_outcome:
+        return "What would you do differently if you faced this situation again, knowing what you know now?"
+    return "How did you decide on that particular approach over other options you might have considered?"

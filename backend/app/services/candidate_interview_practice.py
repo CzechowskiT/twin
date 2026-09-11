@@ -20,7 +20,10 @@ from app.database.models import (
     CandidateInterviewPracticeSession,
     CandidateInterviewPracticeTurn,
 )
-from app.services.ai_interview_coach import evaluate_submitted_answer_text
+from app.services.ai_interview_coach import (
+    evaluate_submitted_answer_text,
+    generate_adaptive_follow_up,
+)
 from app.services.interview_decision import get_or_create_privacy
 from app.services.candidate_interview_exercise_catalog import (
     first_question_for_exercise,
@@ -390,9 +393,16 @@ def next_turn(
     *,
     candidate_id: int,
     session_id: int,
-    ai_prep_opt_in: bool = False,
+    ai_prep_opt_in: bool = False,  # IGNORED — server reads privacy row
+    follow_up_provider_call=None,
 ) -> dict[str, Any]:
-    """Create next adaptive turn (deterministic library or AI follow-up)."""
+    """Create next adaptive turn — AI follow-up when consent authorized, library otherwise.
+
+    When AI is authorized: calls generate_adaptive_follow_up with the last submitted answer
+    so the follow-up question is specifically tailored to the candidate's answer content.
+    When not authorized: picks a library follow-up that varies by answer content
+    (length/topics/STAR keywords) without claiming AI adaptation.
+    """
     session = _get_session(db, candidate_id=candidate_id, session_id=session_id)
 
     submitted = _submitted_turns_count(db, session_id=session.id)
@@ -412,8 +422,25 @@ def next_turn(
     family = exercise.family if exercise else "behavioral_star"
     turn_idx = (last_turn.turn_index + 1) if last_turn else 1
 
-    # Deterministic follow-up from library (no AI needed for the question itself)
-    question = follow_up_question(family, turn_index=turn_idx - 1, locale=locale)
+    # Check consent from canonical privacy row (not body)
+    auth = authorize_practice_ai(db, candidate_id)
+
+    if last_turn and last_turn.answer_submitted:
+        # Adaptive: varies by answer content whether AI or library
+        rubric = (exercise.prompt_en if exercise else "") if not locale.startswith("pl") else (exercise.prompt_pl if exercise else "")
+        follow_result = generate_adaptive_follow_up(
+            question=last_turn.question_text or "",
+            answer=last_turn.answer_submitted or "",
+            rubric=rubric,
+            ai_authorized=auth["authorized"],
+            provider_call=follow_up_provider_call,
+        )
+        question = follow_result.get("follow_up", follow_up_question(family, turn_index=turn_idx - 1, locale=locale))
+        follow_source = follow_result.get("source_label", "library_not_adaptive_ai")
+    else:
+        # No previous answer — use library question
+        question = follow_up_question(family, turn_index=turn_idx - 1, locale=locale)
+        follow_source = "library_no_prior_answer"
 
     now = _utcnow()
     turn = CandidateInterviewPracticeTurn(
@@ -429,7 +456,7 @@ def next_turn(
     db.add(turn)
     db.commit()
     db.refresh(turn)
-    return {"turn": _ser_turn(turn), "turns_submitted": submitted}
+    return {"turn": _ser_turn(turn), "turns_submitted": submitted, "follow_up_source": follow_source}
 
 
 def complete_session(
