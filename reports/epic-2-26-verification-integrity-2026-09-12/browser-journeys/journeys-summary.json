@@ -1,0 +1,59 @@
+{
+  "required": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H"
+  ],
+  "journeys": [
+    {
+      "id": "A",
+      "status": "PASS",
+      "detail": "consent off default; submit; feedback visible"
+    },
+    {
+      "id": "B",
+      "status": "PASS",
+      "detail": "browser Anthropic hits=0 (server-side egress verified separately in unit matrix)"
+    },
+    {
+      "id": "C",
+      "status": "PASS",
+      "detail": "exact draft restored: DRAFT_SENTINEL_3dc37d6a"
+    },
+    {
+      "id": "D",
+      "status": "PASS",
+      "detail": "objective correct≠wrong; catalog visible"
+    },
+    {
+      "id": "E",
+      "status": "PASS",
+      "detail": "explicit promote completed"
+    },
+    {
+      "id": "F",
+      "status": "PASS",
+      "detail": "sentinel isolated; delete denied reads; users 86≠87"
+    },
+    {
+      "id": "G",
+      "status": "PASS",
+      "detail": "authed UI; anon=401; isolated candidate 74"
+    },
+    {
+      "id": "H",
+      "status": "PASS",
+      "detail": "mobile viewport + keyboard typing"
+    }
+  ],
+  "pass": 8,
+  "fail": 0,
+  "not_run": 0,
+  "verdict": "PASS",
+  "note": "All eight required journeys PASS"
+}

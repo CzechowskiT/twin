@@ -1,0 +1,6 @@
+{
+  "defect": "Card dropped data-testid so getByTestId('prior-sessions') never matched despite visible 'Your practice sessions' heading",
+  "failing_run": "browser-run2.log journey F",
+  "evidence": "error-context.md showed sessions list + cookie dialog; attribute absent from DOM",
+  "fix": "forward HTMLAttributes on Card + native wrapper data-testid=prior-sessions; list delete testids; cancel/confirm flow; status file durable across worker restart"
+}
