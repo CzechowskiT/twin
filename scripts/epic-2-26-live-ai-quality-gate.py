@@ -186,12 +186,19 @@ def _api(path: str, *, method: str = "GET", body: dict | None = None, token: str
 
 def _railway_anthropic_len(service: str = "twin") -> int | None:
     try:
+        railway_cwd = os.environ.get("RAILWAY_PROJECT_CWD") or str(ROOT)
+        twin_home = Path.home() / "Projects" / "twin"
+        if (twin_home / ".railway").exists() or True:
+            # Prefer the Founder-linked twin checkout when present.
+            candidate = Path(os.environ.get("TWIN_RAILWAY_CWD", str(twin_home)))
+            if candidate.exists():
+                railway_cwd = str(candidate)
         raw = subprocess.check_output(
             ["railway", "variables", "--service", service, "--json"],
             text=True,
             stderr=subprocess.DEVNULL,
             timeout=15,
-            cwd=str(ROOT),
+            cwd=railway_cwd,
         )
         data = json.loads(raw)
     except Exception:
