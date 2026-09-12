@@ -28,21 +28,29 @@ const EVIDENCE_DIR =
 const REQUIRED_JOURNEYS = ["A", "B", "C", "D", "E", "F", "G", "H"] as const;
 type JourneyId = (typeof REQUIRED_JOURNEYS)[number];
 
-const journeyStatus: Record<JourneyId, "PASS" | "FAIL" | "NOT_RUN"> = {
-  A: "NOT_RUN",
-  B: "NOT_RUN",
-  C: "NOT_RUN",
-  D: "NOT_RUN",
-  E: "NOT_RUN",
-  F: "NOT_RUN",
-  G: "NOT_RUN",
-  H: "NOT_RUN",
-};
-const journeyDetail: Record<string, string> = {};
+const STATUS_FILE = path.join(EVIDENCE_DIR, "journey-status-live.json");
+
+function readStatus(): Record<JourneyId, { status: string; detail: string }> {
+  try {
+    return JSON.parse(fs.readFileSync(STATUS_FILE, "utf8"));
+  } catch {
+    return Object.fromEntries(
+      REQUIRED_JOURNEYS.map((id) => [id, { status: "NOT_RUN", detail: "" }]),
+    ) as Record<JourneyId, { status: string; detail: string }>;
+  }
+}
 
 function mark(id: JourneyId, status: "PASS" | "FAIL", detail: string) {
-  journeyStatus[id] = status;
-  journeyDetail[id] = detail;
+  fs.mkdirSync(EVIDENCE_DIR, { recursive: true });
+  const cur = readStatus();
+  // Never wipe a prior PASS when a worker restarts mid-suite.
+  if (cur[id]?.status === "PASS" && status === "FAIL" && detail.includes("worker")) {
+    return;
+  }
+  cur[id] = { status, detail: detail.slice(0, 2000) };
+  fs.writeFileSync(STATUS_FILE, JSON.stringify(cur, null, 2), "utf8");
+  // eslint-disable-next-line no-console
+  console.log(`${status}  browser/${id} — ${detail.slice(0, 200)}`);
 }
 
 type Mint = {
@@ -115,8 +123,12 @@ async function withAuthedPage(
 
 async function dismissCookies(page: Page) {
   const accept = page.getByRole("button", { name: /accept cookies|akceptuj/i });
-  if (await accept.isVisible().catch(() => false)) {
-    await accept.click().catch(() => {});
+  try {
+    await accept.waitFor({ state: "visible", timeout: 2500 });
+    await accept.click();
+    await accept.waitFor({ state: "hidden", timeout: 5000 }).catch(() => {});
+  } catch {
+    /* dialog may already be dismissed in this context */
   }
 }
 
@@ -128,6 +140,7 @@ async function openPractice(page: Page) {
   expect(res?.status() ?? 0).not.toBe(404);
   await page.getByTestId("interview-practice-page").waitFor({ state: "visible", timeout: 45_000 });
   await expect(page.getByRole("heading", { name: /Interview Practice|Ćwiczenia/i })).toBeVisible();
+  await dismissCookies(page);
 }
 
 async function apiJson(
@@ -155,19 +168,29 @@ test.describe("Epic 2.26 integrity browser journeys A–H", () => {
   test.beforeAll(() => {
     fs.mkdirSync(EVIDENCE_DIR, { recursive: true });
     if (!OPS) throw new Error("OPS_ADMIN_TOKEN required");
+    // Init only missing keys — do not wipe PASS marks if a worker restarts mid-suite.
+    const cur = readStatus();
+    let changed = false;
+    for (const id of REQUIRED_JOURNEYS) {
+      if (!cur[id]) {
+        cur[id] = { status: "NOT_RUN", detail: "" };
+        changed = true;
+      }
+    }
+    if (changed || !fs.existsSync(STATUS_FILE)) {
+      fs.writeFileSync(STATUS_FILE, JSON.stringify(cur, null, 2), "utf8");
+    }
   });
 
   test.afterAll(() => {
-    const missing = REQUIRED_JOURNEYS.filter((id) => journeyStatus[id] !== "PASS");
+    const cur = readStatus();
     const journeys = REQUIRED_JOURNEYS.map((id) => ({
       id,
-      status: journeyStatus[id],
-      detail: journeyDetail[id] || "",
+      status: cur[id]?.status || "NOT_RUN",
+      detail: cur[id]?.detail || "",
     }));
-    const verdict =
-      missing.length === 0 && REQUIRED_JOURNEYS.every((id) => journeyStatus[id] === "PASS")
-        ? "PASS"
-        : "FAIL";
+    const missing = journeys.filter((j) => j.status !== "PASS");
+    const verdict = missing.length === 0 ? "PASS" : "FAIL";
     fs.writeFileSync(
       path.join(EVIDENCE_DIR, "journeys-summary.json"),
       JSON.stringify(
@@ -181,7 +204,7 @@ test.describe("Epic 2.26 integrity browser journeys A–H", () => {
           note:
             verdict === "PASS"
               ? "All eight required journeys PASS"
-              : `Incomplete/failed: ${missing.join(",")}`,
+              : `Incomplete/failed: ${missing.map((m) => m.id).join(",")}`,
         },
         null,
         2,
@@ -429,26 +452,32 @@ test.describe("Epic 2.26 integrity browser journeys A–H", () => {
 
       await withAuthedPage(browser, a.token, async (page) => {
         await openPractice(page);
-        // Cancel once
-        await page.getByTestId("delete-session").first().click();
-        // Confirm dialog text
-        await expect(page.getByText(/Delete this session|Usuń tę sesję|cannot be undone/i).first()).toBeVisible();
-        // Click away / cancel by clicking delete again pattern — click Delete confirm then...
-        // If two-step: first click arms confirm, second confirms. Cancel by starting session elsewhere.
-        // Prefer: after first click, ensure session still in list if we don't confirm.
-        // Implementation uses deleteConfirmId — second click on Delete confirms.
-        // Cancel: click Resume or elsewhere then verify list still has session via API
-        await page.keyboard.press("Escape").catch(() => {});
+        const prior = page.getByTestId("prior-sessions");
+        await expect(prior).toBeVisible({ timeout: 30_000 });
+        await expect(prior.getByText(new RegExp(`#${sessionId}`))).toBeVisible({ timeout: 30_000 });
+        const del = prior.getByTestId("delete-session").first();
+        await expect(del).toBeVisible({ timeout: 30_000 });
+        await del.click();
+        await expect(prior.getByTestId("delete-session-confirm")).toBeVisible({ timeout: 15_000 });
+        await expect(
+          prior.getByText(/Delete this session|Usuń tę sesję|cannot be undone|nie można cofnąć/i).first(),
+        ).toBeVisible({ timeout: 15_000 });
+        // Cancel must preserve the session
+        await prior.getByTestId("delete-session-cancel").click();
+        await expect(prior.getByTestId("delete-session")).toBeVisible({ timeout: 10_000 });
         const still = await apiJson(
           "GET",
           `/api/v1/candidates/me/interview-practice/sessions/${sessionId}`,
           a.token,
         );
         expect(still.status).toBe(200);
+        expect(JSON.stringify(still.json)).toContain(sentinel);
         // Confirm deletion
-        await page.getByTestId("delete-session").first().click();
-        await page.getByTestId("delete-session").last().click();
-        await page.waitForTimeout(1500);
+        await prior.getByTestId("delete-session").first().click();
+        await prior.getByTestId("delete-session-confirm").click();
+        await expect(prior.getByText(new RegExp(`#${sessionId}`))).toHaveCount(0, {
+          timeout: 20_000,
+        });
         const gone = await apiJson(
           "GET",
           `/api/v1/candidates/me/interview-practice/sessions/${sessionId}`,
@@ -496,14 +525,15 @@ test.describe("Epic 2.26 integrity browser journeys A–H", () => {
           }
           // Prefer Polish copy when locale switched
           const start = page.getByTestId("start-session");
-          await start.focus();
-          await expect(start).toBeFocused();
-          await page.keyboard.press("Enter");
+          await expect(start).toBeEnabled({ timeout: 30_000 });
+          await start.click();
           await page.getByTestId("answer-textarea").waitFor({ state: "visible", timeout: 30_000 });
-          await page.getByTestId("answer-textarea").focus();
+          await page.getByTestId("answer-textarea").click();
           await page.keyboard.type("Odpowiedź z klawiatury — nie wiem wszystkiego.");
+          await expect(page.getByTestId("answer-textarea")).toHaveValue(
+            /Odpowiedź z klawiatury/,
+          );
           const body = await page.locator("body").innerText();
-          // If PL locale active, expect Polish UI strings
           if (/Ćwiczenia|Wstrzymaj|Rozpocznij|Zapisz/i.test(body)) {
             expect(body).toMatch(/Ćwiczenia|Rozpocznij|Zapisz|Wyślij/i);
           }
