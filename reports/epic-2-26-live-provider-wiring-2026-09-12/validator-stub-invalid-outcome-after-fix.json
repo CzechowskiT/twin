@@ -1,0 +1,20 @@
+{
+  "case_id": "concise_relevant",
+  "status": "FAIL",
+  "verification_kind": "LIVE_QUALITY_FAILED",
+  "failures": [
+    "non_live_source:provider_stub_certified",
+    "eval_source_not_in_live_allowlist",
+    "criterion_invalid_outcome:relevance:INVALID_OUTCOME",
+    "provider_execution_not_live:kind=stub:provider=harness_stub"
+  ],
+  "passed": false,
+  "contract_ok": false,
+  "quality_ok": false,
+  "eval_status": "COMPLETED",
+  "source": "provider_stub_certified",
+  "source_label": "provider_stub_certified",
+  "model": "synthetic-harness",
+  "execution_id": "03ed8eb0-c90b-48dd-b8d2-b9589b83554b",
+  "execution_kind": "stub"
+}

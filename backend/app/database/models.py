@@ -7976,4 +7976,6 @@ class CandidateInterviewPracticeEvaluation(Base):
     source: Mapped[str] = mapped_column(String(64), default="DETERMINISTIC_LIBRARY_FALLBACK")
     source_label: Mapped[str] = mapped_column(String(64), default="deterministic_library")
     degraded: Mapped[bool] = mapped_column(Boolean, default=False)
+    # Server-owned adapter metadata (JSON). Never candidate- or model-authored authority.
+    provider_execution_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
