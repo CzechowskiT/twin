@@ -1,5 +1,5 @@
 """Health check endpoints."""
-# Launch readiness handoff 2026-07-23 (execution pack + decision record; force Railway SHA).
+# Epic 2.26 verification integrity 2026-09-12 (force Railway SHA after FE-only merge).
 
 
 import os
