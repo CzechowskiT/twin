@@ -1,0 +1,19 @@
+{
+  "epic": "2.26",
+  "batch": "verification-integrity-repair",
+  "generated_at": "2026-09-12T06:35:43.417564+00:00",
+  "verdict": "EPIC_2_26_IMPLEMENTATION_VERIFIED_LIVE_AI_BLOCKED",
+  "repo_head_remediation": "f145c1c9",
+  "scaffold_tip": "ea26c620",
+  "prod_api_commit": "cd5316eb431f72e1f9b283d327563819567834b2",
+  "alignment_note": "FE-only commit ea26c620 on Vercel (delete-session-confirm present). API still at prior tip when Railway skips backend-noop push; API behavior for this fix unchanged.",
+  "gates": {
+    "live_ai_validator_negatives": "PASS",
+    "pause_resume_draft": "PASS",
+    "isolation_two_identity": "PASS",
+    "browser_A_H": "PASS",
+    "pg_concurrency_duplicate_submit": "PASS",
+    "live_ai_certification": "NOT_RUN_NO_PROVIDER",
+    "unit_integrity_rerun": "18 passed"
+  }
+}

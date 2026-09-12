@@ -2,7 +2,7 @@
 
 - status: NOT_RUN_NO_PROVIDER
 - certified: False
-- checked_at: 2026-09-12T05:47:49.461036+00:00
+- checked_at: 2026-09-12T06:28:36.190317+00:00
 - cases_run: 0
 - cases_passed: 0
 - cases_failed: 0
