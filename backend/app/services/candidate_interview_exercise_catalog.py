@@ -30,7 +30,7 @@ class Exercise:
     """Immutable exercise definition with bilingual content."""
 
     id: str
-    family: str  # software_backend | business_data | customer_b2b
+    family: str  # software_backend | business_data | customer_b2b | legacy_*
     difficulty: str  # easy | medium | hard
     criteria_ids: tuple[str, ...]
     title_en: str
@@ -39,6 +39,10 @@ class Exercise:
     prompt_pl: str
     exercise_type: str = "open_rubric"  # objective | open_rubric
     version: int = 2
+    # Deterministic checker for objective exercises only.
+    # required_groups: each group is OR of keywords; all groups must match for correct.
+    # forbidden_any: if present → wrong.
+    objective_rules: dict[str, object] | None = None
 
     def to_dict(self, locale: str = "en") -> dict[str, Any]:
         pl = locale.startswith("pl")
@@ -53,7 +57,16 @@ class Exercise:
             "title_pl": self.title_pl,
             "exercise_type": self.exercise_type,
             "version": self.version,
+            "has_objective_rules": bool(self.objective_rules),
+            "limitations_en": (
+                "Deterministic keyword/concept check against supplied answer rules — "
+                "not psychometric validation."
+                if self.exercise_type == "objective"
+                else "Open rubric; alternative valid approaches accepted."
+            ),
+            "estimated_minutes": 15 if self.exercise_type == "objective" else 20,
         }
+
 
 
 _CATALOG: tuple[Exercise, ...] = (
@@ -84,6 +97,14 @@ _CATALOG: tuple[Exercise, ...] = (
             "i jakie rollback/mitygację uruchamiasz przed potwierdzeniem przyczyny. "
             "Bądź konkretny: podaj nazwy komend lub dashboardów."
         ),
+        objective_rules={
+            "required_groups": [
+                ["latency", "p95", "apm", "opóźnień", "metryk"],
+                ["database", "db", "sql", "redis", "network", "sieć", "aplikac"],
+                ["rollback", "feature flag", "mitigat", "cofnąć", "mityg"],
+            ],
+            "forbidden_any": ["rewrite overnight", "10000x", "hire more engineers first"],
+        },
     ),
 
     Exercise(
@@ -143,6 +164,14 @@ _CATALOG: tuple[Exercise, ...] = (
             "jak wykluczasz błąd instrumentacji i jak wygląda minimalne naprawienie. "
             "Powiedz wprost: czego NIE badasz najpierw i dlaczego."
         ),
+        objective_rules={
+            "required_groups": [
+                ["retention", "retenc"],
+                ["instrument", "event log", "analytics", "log", "ticket", "support"],
+                ["hypothes", "hipotez", "a/b", "ab test", "cohort", "kohort"],
+            ],
+            "forbidden_any": ["ignore the data", "guess randomly"],
+        },
     ),
 
     Exercise(
@@ -205,6 +234,14 @@ _CATALOG: tuple[Exercise, ...] = (
             "jak eskalujesz wewnętrznie i jak piszesz follow-up email. "
             "Powiedz, jakich zobowiązań NIE złożysz i dlaczego."
         ),
+        objective_rules={
+            "required_groups": [
+                ["soc 2", "soc2", "audit", "audyt"],
+                ["interim", "bridge", "letter", "assurance", "tymczas", "zapewn"],
+                ["escalat", "eskal", "follow-up", "email", "nie złoż", "would not"],
+            ],
+            "forbidden_any": ["fake the report", "backdate the audit"],
+        },
     ),
 
     Exercise(
@@ -242,21 +279,93 @@ _CATALOG: tuple[Exercise, ...] = (
 # Fast lookup by canonical id
 _BY_ID: dict[str, Exercise] = {ex.id: ex for ex in _CATALOG}
 
-# ── Legacy v1 and v2 verbose aliases ─────────────────────────────────────────
-# Map v1 IDs (behavioral_star, role_problem, clarifying_questions families) and
-# verbose v2 IDs to canonical v2 exercise objects.
-# Historical session.exercise_id values continue to resolve via get_exercise().
+# ── Legacy v1 exercises (preserve historical meaning — do NOT remap to unrelated v2) ──
+_LEGACY_V1: tuple[Exercise, ...] = (
+    Exercise(
+        id="behavioral_star_1",
+        family="behavioral_star",
+        difficulty="medium",
+        exercise_type="open_rubric",
+        version=1,
+        criteria_ids=("relevance", "evidence_use", "structure", "outcome_clarity"),
+        title_en="STAR story — conflict at work",
+        title_pl="Historia STAR — konflikt w pracy",
+        prompt_en=(
+            "Tell me about a time you resolved a conflict with a colleague. "
+            "Use Situation, Task, Action, Result. Do not invent employers or figures."
+        ),
+        prompt_pl=(
+            "Opowiedz o sytuacji, w której rozwiązałeś konflikt ze współpracownikiem. "
+            "Użyj schematu Sytuacja, Zadanie, Działanie, Rezultat."
+        ),
+    ),
+    Exercise(
+        id="behavioral_star_2",
+        family="behavioral_star",
+        difficulty="medium",
+        exercise_type="open_rubric",
+        version=1,
+        criteria_ids=("relevance", "evidence_use", "structure", "outcome_clarity"),
+        title_en="STAR story — delivering under pressure",
+        title_pl="Historia STAR — dostarczenie pod presją",
+        prompt_en="Describe a time you delivered an important outcome under time pressure.",
+        prompt_pl="Opisz sytuację, w której dostarczyłeś ważny rezultat pod presją czasu.",
+    ),
+    Exercise(
+        id="role_problem_1",
+        family="role_problem",
+        difficulty="medium",
+        exercise_type="open_rubric",
+        version=1,
+        criteria_ids=("relevance", "structure", "outcome_clarity"),
+        title_en="Role problem — ambiguous requirements",
+        title_pl="Problem roli — niejasne wymagania",
+        prompt_en="How do you approach a project when requirements are incomplete or conflicting?",
+        prompt_pl="Jak podchodzisz do projektu, gdy wymagania są niekompletne lub sprzeczne?",
+    ),
+    Exercise(
+        id="role_problem_2",
+        family="role_problem",
+        difficulty="medium",
+        exercise_type="open_rubric",
+        version=1,
+        criteria_ids=("relevance", "structure", "outcome_clarity"),
+        title_en="Role problem — prioritizing work",
+        title_pl="Problem roli — priorytetyzacja",
+        prompt_en="How do you prioritize competing tasks when everything is marked urgent?",
+        prompt_pl="Jak priorytetyzujesz konkurujące zadania, gdy wszystko jest oznaczone jako pilne?",
+    ),
+    Exercise(
+        id="clarifying_1",
+        family="clarifying_questions",
+        difficulty="easy",
+        exercise_type="open_rubric",
+        version=1,
+        criteria_ids=("relevance", "structure"),
+        title_en="Clarifying questions — vague brief",
+        title_pl="Pytania wyjaśniające — niejasny brief",
+        prompt_en="You receive a vague project brief. List the clarifying questions you would ask first.",
+        prompt_pl="Dostajesz niejasny brief projektu. Wymień pytania wyjaśniające, które zadasz najpierw.",
+    ),
+    Exercise(
+        id="clarifying_2",
+        family="clarifying_questions",
+        difficulty="easy",
+        exercise_type="open_rubric",
+        version=1,
+        criteria_ids=("relevance", "structure"),
+        title_en="Clarifying questions — stakeholder ask",
+        title_pl="Pytania wyjaśniające — prośba interesariusza",
+        prompt_en="A stakeholder asks for 'something better.' What clarifying questions do you ask?",
+        prompt_pl="Interesariusz prosi o 'coś lepszego'. Jakie pytania wyjaśniające zadajesz?",
+    ),
+)
+
+for _lex in _LEGACY_V1:
+    _BY_ID[_lex.id] = _lex
+
+# Verbose v2 convenience aliases only (same exercise, same meaning)
 _ALIASES: dict[str, Exercise] = {
-    # v1 behavioral_star → sw_backend / cust_b2b
-    "behavioral_star_1": _BY_ID["sw_backend_objective_1"],
-    "behavioral_star_2": _BY_ID["cust_b2b_objective_1"],
-    # v1 role_problem → biz_data
-    "role_problem_1": _BY_ID["biz_data_objective_1"],
-    "role_problem_2": _BY_ID["biz_data_rubric_1"],
-    # v1 clarifying_questions → sw_backend / cust_b2b rubrics
-    "clarifying_1": _BY_ID["sw_backend_rubric_1"],
-    "clarifying_2": _BY_ID["cust_b2b_rubric_1"],
-    # v2 verbose aliases for convenience
     "software_backend_1": _BY_ID["sw_backend_objective_1"],
     "software_backend_2": _BY_ID["sw_backend_rubric_1"],
     "business_data_1": _BY_ID["biz_data_objective_1"],
@@ -264,6 +373,84 @@ _ALIASES: dict[str, Exercise] = {
     "customer_b2b_1": _BY_ID["cust_b2b_objective_1"],
     "customer_b2b_2": _BY_ID["cust_b2b_rubric_1"],
 }
+
+
+def evaluate_objective_answer(exercise: Exercise, answer: str) -> dict[str, Any] | None:
+    """Deterministic objective check against explicit answer rules.
+
+    Returns None when the exercise is not objective or has no rules.
+    Does not invent semantic judgments beyond rule matches.
+    """
+    if exercise.exercise_type != "objective" or not exercise.objective_rules:
+        return None
+    text = (answer or "").strip().lower()
+    rules = exercise.objective_rules
+    forbidden = [str(x).lower() for x in (rules.get("forbidden_any") or [])]
+    for bad in forbidden:
+        if bad and bad in text:
+            return {
+                "evaluation_status": "COMPLETE",
+                "objective_result": "incorrect",
+                "score": None,
+                "score_available": False,
+                "source": "OBJECTIVE_ANSWER_KEY",
+                "source_label": "objective_answer_rules",
+                "degraded": False,
+                "criteria": [
+                    {
+                        "id": cid,
+                        "outcome": "NOT_DEMONSTRATED",
+                        "note": f"Matched forbidden pattern for objective check: {bad}",
+                    }
+                    for cid in exercise.criteria_ids
+                ],
+                "strengths": [],
+                "improvements": ["Avoid forbidden shortcuts; follow the supplied investigation rules."],
+            }
+
+    required_groups = rules.get("required_groups") or []
+    missing: list[str] = []
+    matched = 0
+    for group in required_groups:
+        keywords = [str(k).lower() for k in group]
+        if any(k in text for k in keywords):
+            matched += 1
+        else:
+            missing.append("|".join(keywords[:3]))
+
+    total = len(required_groups) or 1
+    if matched == total:
+        outcome = "SUPPORTED_IN_RESPONSE"
+        result = "correct"
+        note = "All required concept groups present per exercise answer rules."
+    elif matched == 0:
+        outcome = "NOT_DEMONSTRATED"
+        result = "incorrect"
+        note = "No required concept groups matched the answer rules."
+    else:
+        outcome = "PARTIALLY_SUPPORTED"
+        result = "partial"
+        note = f"Matched {matched}/{total} required concept groups. Missing: {', '.join(missing)}"
+
+    return {
+        "evaluation_status": "COMPLETE",
+        "objective_result": result,
+        "score": None,
+        "score_available": False,
+        "source": "OBJECTIVE_ANSWER_KEY",
+        "source_label": "objective_answer_rules",
+        "degraded": False,
+        "criteria": [
+            {"id": cid, "outcome": outcome, "note": note} for cid in exercise.criteria_ids
+        ],
+        "strengths": ["Covered required concepts."] if result == "correct" else [],
+        "improvements": (
+            []
+            if result == "correct"
+            else ["Address missing required concepts from the exercise answer rules."]
+        ),
+        "factual_observations": [f"objective_groups_matched={matched}/{total}"],
+    }
 
 
 def get_catalog(locale: str = "en") -> dict[str, object]:

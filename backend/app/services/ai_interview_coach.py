@@ -297,8 +297,9 @@ def evaluate_submitted_answer_text(
     if not (answer or "").strip():
         return _insufficient_evaluation(answer)
 
-    # AI path — only when consent is explicitly authorized (not just configured)
-    if ai_authorized and is_anthropic_configured():
+    # AI path — only when consent is explicitly authorized (not just configured).
+    # Injectable provider_call works without a live Anthropic key (test harness).
+    if ai_authorized:
         if provider_call is not None:
             result = provider_call(question, answer, job_ctx or "")
             if result and isinstance(result.get("criteria"), list):
@@ -309,7 +310,10 @@ def evaluate_submitted_answer_text(
                 result.setdefault("evaluation_status", "COMPLETE")
                 result["degraded"] = False
                 return result
-        else:
+            return _unavailable_evaluation(
+                reason="AI provider returned unusable evaluation", answer=answer
+            )
+        if is_anthropic_configured():
             prompt = _EVAL_PROMPT.format(
                 question=question[:500],
                 answer=answer[:3000],
@@ -324,7 +328,9 @@ def evaluate_submitted_answer_text(
                 data["evaluation_status"] = data.get("evaluation_status") or "COMPLETE"
                 data["degraded"] = False
                 return data
-        return _unavailable_evaluation(reason="AI provider returned unusable evaluation", answer=answer)
+            return _unavailable_evaluation(
+                reason="AI provider returned unusable evaluation", answer=answer
+            )
 
     # No-consent / deterministic path — factual observations, semantic criteria = NOT_ASSESSED
     if allow_deterministic_heuristics:
@@ -362,7 +368,7 @@ def generate_adaptive_follow_up(
     Otherwise: returns library-selected follow-up based on answer content (labeled library_not_adaptive_ai).
     Never claims AI adaptation without actual provider call.
     """
-    if ai_authorized and is_anthropic_configured():
+    if ai_authorized:
         if provider_call is not None:
             result = provider_call(question, answer, rubric)
             if result and result.get("follow_up"):
@@ -372,7 +378,7 @@ def generate_adaptive_follow_up(
                     "source_label": "live_ai_adaptive",
                     "degraded": False,
                 }
-        else:
+        elif is_anthropic_configured():
             prompt = _ADAPTIVE_FOLLOWUP_PROMPT.format(
                 question=question[:500],
                 answer=answer[:2000],
