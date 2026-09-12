@@ -1,10 +1,10 @@
 {
-  "checked_at": "2026-09-12T07:44:17.007522+00:00",
-  "run_id": "20260912T074417Z",
+  "checked_at": "2026-09-12T07:45:46.821529+00:00",
+  "run_id": "20260912T074546Z",
   "status": "NOT_RUN_NO_PROVIDER",
   "certified": false,
   "live_provider_quality": "NOT_VERIFIED",
-  "railway_twin_anthropic_len": null,
+  "railway_twin_anthropic_len": 0,
   "cases_run": 0,
   "note": "Provider key absent on Railway twin. Implementation path verified offline; live matrix not run."
 }

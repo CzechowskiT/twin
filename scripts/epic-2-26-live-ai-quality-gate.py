@@ -186,13 +186,8 @@ def _api(path: str, *, method: str = "GET", body: dict | None = None, token: str
 
 def _railway_anthropic_len(service: str = "twin") -> int | None:
     try:
-        railway_cwd = os.environ.get("RAILWAY_PROJECT_CWD") or str(ROOT)
-        twin_home = Path.home() / "Projects" / "twin"
-        if (twin_home / ".railway").exists() or True:
-            # Prefer the Founder-linked twin checkout when present.
-            candidate = Path(os.environ.get("TWIN_RAILWAY_CWD", str(twin_home)))
-            if candidate.exists():
-                railway_cwd = str(candidate)
+        twin_home = Path(os.environ.get("TWIN_RAILWAY_CWD") or (Path.home() / "Projects" / "twin"))
+        railway_cwd = str(twin_home if twin_home.exists() else ROOT)
         raw = subprocess.check_output(
             ["railway", "variables", "--service", service, "--json"],
             text=True,
@@ -208,7 +203,9 @@ def _railway_anthropic_len(service: str = "twin") -> int | None:
         for k, v in data.items():
             vars_map[k] = v.get("value") if isinstance(v, dict) and "value" in v else v
     val = vars_map.get("ANTHROPIC_API_KEY")
-    return len(str(val).strip()) if val else None
+    if val is None:
+        return None
+    return len(str(val).strip())
 
 
 def _mint(ops: str, run_id: str) -> dict:
