@@ -1,0 +1,22 @@
+{
+  "epic": "2.26",
+  "batch": "verification-integrity-repair",
+  "verdict": "EPIC_2_26_IMPLEMENTATION_VERIFIED_LIVE_AI_BLOCKED",
+  "repo_head_remediation": "87518d1c",
+  "scaffold_tip": "bb70616d",
+  "prod_api_commit": "bb70616dfda9bb4c531f4587034d0b0ad6055896",
+  "prod_frontend_commit": "bb70616dfda9bb4c531f4587034d0b0ad6055896",
+  "alignment_status": "ALIGNED",
+  "docs_only_drift": false,
+  "ci_force_sha": "34678613150 success",
+  "browser": "PASS",
+  "live_ai": "NOT_RUN_NO_PROVIDER",
+  "pg": "PASS",
+  "unit_integrity": "18 passed",
+  "hard_bans": {
+    "launch": "NO-GO",
+    "phase_3b": "BLOCKED",
+    "enrollment_off": true,
+    "canary_not_executed": true
+  }
+}
