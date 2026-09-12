@@ -843,7 +843,8 @@ export default function InterviewPracticePage() {
       ) : null}
 
       {/* Prior sessions list — discover, resume, delete */}
-      <Card className="mt-4" data-testid="prior-sessions">
+      <div data-testid="prior-sessions">
+      <Card className="mt-4">
         <h2 className="text-base font-semibold">{t("interviewPractice.priorSessions")}</h2>
         {priorSessions.length === 0 ? (
           <p className="twin-muted mt-2 text-sm">{t("interviewPractice.noSessions")}</p>
@@ -876,18 +877,24 @@ export default function InterviewPracticePage() {
                       <span className="text-red-700">{t("interviewPractice.deleteConfirm")}</span>
                       <button
                         className="font-medium text-red-700 underline"
+                        data-testid="delete-session-confirm"
                         onClick={() => void deleteSession(s.id)}
                         disabled={busy}
                       >
                         ✓
                       </button>
-                      <button className="twin-muted" onClick={() => setDeleteConfirmId(null)}>
+                      <button
+                        className="twin-muted"
+                        data-testid="delete-session-cancel"
+                        onClick={() => setDeleteConfirmId(null)}
+                      >
                         ✕
                       </button>
                     </span>
                   ) : (
                     <button
                       className="text-xs text-red-700 underline"
+                      data-testid="delete-session"
                       disabled={busy}
                       onClick={() => setDeleteConfirmId(s.id)}
                     >
@@ -900,6 +907,7 @@ export default function InterviewPracticePage() {
           </ul>
         )}
       </Card>
+      </div>
       </div>
     </Shell>
   );
