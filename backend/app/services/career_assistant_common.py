@@ -88,18 +88,58 @@ def parse_claude_json(text: str) -> dict[str, Any] | None:
 
 def call_claude_json(prompt: str, *, max_tokens: int = 2500) -> dict[str, Any] | None:
     """Sync Anthropic call; returns parsed JSON dict or None."""
+    data, _meta = call_claude_json_with_meta(prompt, max_tokens=max_tokens)
+    return data
+
+
+def call_claude_json_with_meta(
+    prompt: str, *, max_tokens: int = 2500
+) -> tuple[dict[str, Any] | None, dict[str, Any] | None]:
+    """Sync Anthropic call with server-owned execution metadata.
+
+    Metadata is captured at the adapter boundary (not from model output).
+    """
+    from app.services.provider_execution_metadata import (
+        KIND_LIVE,
+        PROVIDER_ANTHROPIC,
+        build_execution,
+    )
+
     if not is_anthropic_configured():
-        return None
+        return None, None
     client = get_anthropic_client()
     if not client:
-        return None
+        return None, None
+    settings = get_settings()
+    configured = (settings.anthropic_model or "").strip() or None
     try:
         msg = client.messages.create(
-            model=get_settings().anthropic_model,
+            model=configured or settings.anthropic_model,
             max_tokens=max_tokens,
             messages=[{"role": "user", "content": prompt}],
         )
         raw_out = msg.content[0].text if msg.content else ""
-        return parse_claude_json(raw_out)
+        data = parse_claude_json(raw_out)
+        usage = None
+        if getattr(msg, "usage", None) is not None:
+            usage = {
+                "input_tokens": getattr(msg.usage, "input_tokens", None),
+                "output_tokens": getattr(msg.usage, "output_tokens", None),
+            }
+        meta = build_execution(
+            kind=KIND_LIVE,
+            provider=PROVIDER_ANTHROPIC,
+            status="completed" if data else "failed",
+            configured_model=configured,
+            returned_model=(getattr(msg, "model", None) or configured),
+            provider_request_id=getattr(msg, "id", None),
+            usage=usage,
+        )
+        return data, meta
     except Exception:
-        return None
+        return None, build_execution(
+            kind=KIND_LIVE,
+            provider=PROVIDER_ANTHROPIC,
+            status="failed",
+            configured_model=configured,
+        )

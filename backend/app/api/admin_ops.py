@@ -31,7 +31,7 @@ def _require_ops_admin(settings: Settings, authorization: str | None) -> None:
 
 
 # Keep in sync with alembic head (140_practice_session_is_synthetic). Epic 2.26 integrity.
-EXPECTED_ALEMBIC_HEAD = "140_practice_session_is_synthetic"
+EXPECTED_ALEMBIC_HEAD = "141_practice_eval_provider_execution"
 
 
 def _read_alembic_current(db: Session) -> str | None:

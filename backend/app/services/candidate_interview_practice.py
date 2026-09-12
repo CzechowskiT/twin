@@ -370,6 +370,7 @@ def submit_turn(
     session_pk = session.id
     exercise_id = session.exercise_id
     process_id = session.process_id
+    turn_revision = int(turn.version or 1)
     db.commit()
 
     # Re-check authorization immediately before dispatch (consent may have been revoked)
@@ -387,6 +388,17 @@ def submit_turn(
         exercise_id=exercise_id,
         provider_call=provider_call,
     )
+    from app.services.provider_execution_metadata import attach_input_binding
+
+    pe = attach_input_binding(
+        eval_result.get("provider_execution")
+        if isinstance(eval_result.get("provider_execution"), dict)
+        else None,
+        turn_id=turn_id,
+        revision=turn_revision,
+    )
+    if pe:
+        eval_result["provider_execution"] = pe
 
     # Observe committed external changes (delete/revoke) — expire stale identity map
     db.expire_all()
@@ -431,6 +443,7 @@ def submit_turn(
         source=eval_result.get("source", "DETERMINISTIC_LIBRARY_FALLBACK"),
         source_label=eval_result.get("source_label", "deterministic_library"),
         degraded=bool(eval_result.get("degraded", False)),
+        provider_execution_json=_dumps(pe) if pe else None,
         created_at=_utcnow(),
     )
     db.add(evl)
@@ -740,6 +753,19 @@ def _evaluate_turn(
     if ex and ex.exercise_type == "objective":
         objective = evaluate_objective_answer(ex, answer)
         if objective is not None:
+            from app.services.provider_execution_metadata import (
+                KIND_OBJECTIVE,
+                PROVIDER_OBJECTIVE,
+                build_execution,
+            )
+
+            objective = dict(objective)
+            objective["provider_execution"] = build_execution(
+                kind=KIND_OBJECTIVE,
+                provider=PROVIDER_OBJECTIVE,
+                status="completed",
+                rubric_version=str(getattr(ex, "version", None) or ""),
+            )
             return objective
 
     auth = authorize_practice_ai(db, candidate_id)
@@ -811,7 +837,8 @@ def _ser_turn(t: CandidateInterviewPracticeTurn) -> dict[str, Any]:
 
 
 def _ser_evaluation(e: CandidateInterviewPracticeEvaluation) -> dict[str, Any]:
-    return {
+    pe = _loads(getattr(e, "provider_execution_json", None), None)
+    out = {
         "id": e.id,
         "turn_id": e.turn_id,
         "evaluation_status": e.evaluation_status,
@@ -824,6 +851,13 @@ def _ser_evaluation(e: CandidateInterviewPracticeEvaluation) -> dict[str, Any]:
         "score": None,
         "score_available": False,
     }
+    if isinstance(pe, dict):
+        out["provider_execution"] = pe
+        # Convenience mirrors for runners (server-owned only)
+        out["model"] = pe.get("returned_model") or pe.get("configured_model")
+        out["execution_id"] = pe.get("execution_id")
+        out["execution_kind"] = pe.get("kind")
+    return out
 
 
 def _load_evaluations(

@@ -1,0 +1,47 @@
+{
+  "input": {
+    "case": {
+      "id": "concise_relevant",
+      "expect_no_invented_score": true
+    },
+    "eval_data": {
+      "score": null,
+      "score_available": false,
+      "source": "provider_stub_certified",
+      "source_label": "provider_stub_certified",
+      "evaluation_status": "COMPLETED",
+      "degraded": false,
+      "consent_denied": false,
+      "criteria": [
+        {
+          "id": "relevance",
+          "outcome": "INVALID_OUTCOME",
+          "note": "x"
+        },
+        {
+          "id": "specificity",
+          "outcome": "SUPPORTED_IN_RESPONSE",
+          "note": "y"
+        }
+      ]
+    },
+    "provider_execution": {
+      "executed": true,
+      "source": "provider_stub_certified",
+      "model": "synthetic-harness",
+      "case_id": "OTHER_CASE"
+    }
+  },
+  "result": {
+    "case_id": "concise_relevant",
+    "status": "PASS",
+    "failures": [],
+    "passed": true,
+    "contract_ok": true,
+    "quality_ok": true,
+    "eval_status": "COMPLETED",
+    "source": "provider_stub_certified",
+    "source_label": "provider_stub_certified",
+    "model": "synthetic-harness"
+  }
+}

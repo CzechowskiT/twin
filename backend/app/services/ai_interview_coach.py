@@ -13,7 +13,18 @@ from typing import Any, Callable
 
 from app.database.models import Job
 from app.services.anthropic_client import is_anthropic_configured
-from app.services.career_assistant_common import call_claude_json, job_posting_text
+from app.services.career_assistant_common import call_claude_json, call_claude_json_with_meta, job_posting_text
+from app.services.provider_execution_metadata import (
+    KIND_LIBRARY,
+    KIND_LIVE,
+    KIND_STUB,
+    PROMPT_VERSION_ADAPTIVE_FOLLOWUP,
+    PROMPT_VERSION_PRACTICE_EVAL,
+    PROVIDER_ANTHROPIC,
+    PROVIDER_HARNESS,
+    PROVIDER_LIBRARY,
+    build_execution,
+)
 from app.services.candidate_interview_practice_constants import (
     DETERMINISTIC_FALLBACK_LABEL,
     EVAL_INSUFFICIENT,
@@ -309,6 +320,15 @@ def evaluate_submitted_answer_text(
                 result["score_available"] = False
                 result.setdefault("evaluation_status", "COMPLETE")
                 result["degraded"] = False
+                if not isinstance(result.get("provider_execution"), dict):
+                    result["provider_execution"] = build_execution(
+                        kind=KIND_STUB,
+                        provider=PROVIDER_HARNESS,
+                        status="completed",
+                        configured_model=None,
+                        returned_model=str(result.get("model") or "harness_stub"),
+                        prompt_version=PROMPT_VERSION_PRACTICE_EVAL,
+                    )
                 return result
             return _unavailable_evaluation(
                 reason="AI provider returned unusable evaluation", answer=answer
@@ -319,7 +339,7 @@ def evaluate_submitted_answer_text(
                 answer=answer[:3000],
                 job_ctx=(job_ctx or "No job posting attached")[:4000],
             )
-            data = call_claude_json(prompt, max_tokens=1200)
+            data, meta = call_claude_json_with_meta(prompt, max_tokens=1200)
             if data and isinstance(data.get("criteria"), list):
                 data["source"] = "claude"
                 data["source_label"] = "live_ai"
@@ -327,10 +347,19 @@ def evaluate_submitted_answer_text(
                 data["score_available"] = False
                 data["evaluation_status"] = data.get("evaluation_status") or "COMPLETE"
                 data["degraded"] = False
+                if meta:
+                    meta = dict(meta)
+                    meta["prompt_version"] = PROMPT_VERSION_PRACTICE_EVAL
+                    meta["kind"] = KIND_LIVE
+                    meta["provider"] = PROVIDER_ANTHROPIC
+                data["provider_execution"] = meta
                 return data
-            return _unavailable_evaluation(
+            unavailable = _unavailable_evaluation(
                 reason="AI provider returned unusable evaluation", answer=answer
             )
+            if meta:
+                unavailable["provider_execution"] = meta
+            return unavailable
 
     # No-consent / deterministic path — factual observations, semantic criteria = NOT_ASSESSED
     if allow_deterministic_heuristics:
@@ -350,8 +379,23 @@ def evaluate_submitted_answer_text(
             "source_label": "deterministic_library",
             "consent_denied": not ai_authorized,
             "degraded": True,
+            "provider_execution": build_execution(
+                kind=KIND_LIBRARY,
+                provider=PROVIDER_LIBRARY,
+                status="completed",
+                prompt_version=PROMPT_VERSION_PRACTICE_EVAL,
+            ),
         }
-    return _unavailable_evaluation(reason="AI evaluation provider not configured", answer=answer)
+    unavailable = _unavailable_evaluation(
+        reason="AI evaluation provider not configured", answer=answer
+    )
+    unavailable["provider_execution"] = build_execution(
+        kind=KIND_LIBRARY,
+        provider=PROVIDER_LIBRARY,
+        status="unavailable",
+        prompt_version=PROMPT_VERSION_PRACTICE_EVAL,
+    )
+    return unavailable
 
 
 def generate_adaptive_follow_up(
@@ -372,11 +416,21 @@ def generate_adaptive_follow_up(
         if provider_call is not None:
             result = provider_call(question, answer, rubric)
             if result and result.get("follow_up"):
+                pe = result.get("provider_execution")
+                if not isinstance(pe, dict):
+                    pe = build_execution(
+                        kind=KIND_STUB,
+                        provider=PROVIDER_HARNESS,
+                        status="completed",
+                        returned_model="harness_stub",
+                        prompt_version=PROMPT_VERSION_ADAPTIVE_FOLLOWUP,
+                    )
                 return {
                     "follow_up": result["follow_up"],
                     "source": "claude",
                     "source_label": "live_ai_adaptive",
                     "degraded": False,
+                    "provider_execution": pe,
                 }
         elif is_anthropic_configured():
             prompt = _ADAPTIVE_FOLLOWUP_PROMPT.format(
@@ -384,13 +438,17 @@ def generate_adaptive_follow_up(
                 answer=answer[:2000],
                 rubric=(rubric or "General behavioral interview")[:500],
             )
-            data = call_claude_json(prompt, max_tokens=300)
+            data, meta = call_claude_json_with_meta(prompt, max_tokens=300)
             if data and data.get("follow_up"):
+                if meta:
+                    meta = dict(meta)
+                    meta["prompt_version"] = PROMPT_VERSION_ADAPTIVE_FOLLOWUP
                 return {
                     "follow_up": data["follow_up"],
                     "source": "claude",
                     "source_label": "live_ai_adaptive",
                     "degraded": False,
+                    "provider_execution": meta,
                 }
 
     # Deterministic library — vary by answer content but NEVER claim adaptive AI
@@ -400,6 +458,12 @@ def generate_adaptive_follow_up(
         "source_label": "library_not_adaptive_ai",
         "degraded": True,
         "consent_denied": not ai_authorized,
+        "provider_execution": build_execution(
+            kind=KIND_LIBRARY,
+            provider=PROVIDER_LIBRARY,
+            status="completed",
+            prompt_version=PROMPT_VERSION_ADAPTIVE_FOLLOWUP,
+        ),
     }
 
 
