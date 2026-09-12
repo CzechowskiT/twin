@@ -593,6 +593,30 @@ def daily_os_mint_synthetic_session(
     return mint_synthetic_daily_os_session(db, expires_minutes=45)
 
 
+class IsolatedPracticeMintBody(BaseModel):
+    run_id: str | None = Field(default=None, max_length=64)
+
+
+@router.post("/pilot-os/interview-practice/mint-isolated-synthetic")
+def mint_isolated_practice_synthetic(
+    body: IsolatedPracticeMintBody | None = None,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    """Mint a UNIQUE synthetic candidate for practice isolation tests.
+
+    Does not reuse daily-os-synth+kpi@twin.internal. Ops-only.
+    """
+    _require_ops_admin(settings, authorization)
+    import secrets
+
+    from app.services.daily_os_synthetic_proof import mint_isolated_practice_session
+
+    run_id = (body.run_id if body else None) or secrets.token_hex(5)
+    return mint_isolated_practice_session(db, run_id=run_id, expires_minutes=45)
+
+
 @router.post("/pilot-os/auth/mint-synthetic-recovery")
 def mint_synthetic_recovery(
     db: Session = Depends(get_db),

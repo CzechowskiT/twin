@@ -16,6 +16,7 @@ from typing import Any, Callable
 from sqlalchemy.orm import Session
 
 from app.database.models import (
+    CandidateCareerEvidence,
     CandidateInterviewPracticeEvaluation,
     CandidateInterviewPracticeSession,
     CandidateInterviewPracticeTurn,
@@ -26,6 +27,7 @@ from app.services.ai_interview_coach import (
 )
 from app.services.interview_decision import get_or_create_privacy
 from app.services.candidate_interview_exercise_catalog import (
+    evaluate_objective_answer,
     first_question_for_exercise,
     follow_up_question,
     get_catalog,
@@ -42,6 +44,7 @@ from app.services.candidate_interview_practice_constants import (
     STATE_COMPLETED,
     STATE_DELETED,
     STATE_IN_PROGRESS,
+    STATE_PAUSED,
     TURN_SUBMITTED,
     TURN_SUPERSEDED,
 )
@@ -91,10 +94,33 @@ def _get_session(
     )
     if not row:
         raise ValueError("practice_session_not_found")
-    if require_active and row.state in (STATE_DELETED, STATE_ABANDONED):
+    if require_active and row.state in (STATE_DELETED, STATE_ABANDONED, STATE_COMPLETED):
         raise ValueError("practice_session_closed")
+    # PAUSED is readable and resumable but not mutable until resume
+    if require_active and row.state == STATE_PAUSED:
+        raise ValueError("practice_session_paused")
     return row
 
+
+def _candidate_provenance(db: Session, candidate_id: int) -> dict[str, bool]:
+    """Separate synthetic provenance from metrics exclusion."""
+    from app.database.models import Candidate, User
+
+    cand = db.query(Candidate).filter_by(id=candidate_id).one_or_none()
+    if not cand:
+        return {"is_synthetic": False, "kpi_excluded": False}
+    user = db.query(User).filter_by(id=cand.user_id).one_or_none()
+    email = (user.email if user else "") or ""
+    # Explicit synthetic markers — not derived from kpi_excluded alone
+    is_synthetic = bool(
+        email.endswith("@twin.internal")
+        or "+synth" in email
+        or email.startswith("synthetic+")
+        or "epic226-practice+" in email
+        or email.startswith("practice-synth+")
+    )
+    kpi_excluded = bool(user and user.exclude_from_product_metrics)
+    return {"is_synthetic": is_synthetic, "kpi_excluded": kpi_excluded}
 
 def _get_turn(
     db: Session, *, session_id: int, turn_id: int
@@ -176,6 +202,8 @@ def create_session(
     ts = _utcnow().timestamp()
     key = _session_key(candidate_id, exercise_id, ts)
     now = _utcnow()
+    provenance = _candidate_provenance(db, candidate_id)
+    ex = get_exercise(exercise_id) if exercise_id else None
 
     session = CandidateInterviewPracticeSession(
         candidate_id=candidate_id,
@@ -187,7 +215,10 @@ def create_session(
         version=1,
         turn_limit=MAX_TURNS_PER_SESSION,
         consent_ai_at=now if ai_prep_opt_in else None,
-        kpi_excluded=True,
+        # Separate flags — never derive is_synthetic from kpi_excluded.
+        kpi_excluded=bool(provenance["kpi_excluded"]),
+        is_synthetic=bool(provenance["is_synthetic"]),
+        exercise_version=int(ex.version) if ex else None,
         created_at=now,
         updated_at=now,
     )
@@ -255,6 +286,8 @@ def _ser_session_summary(s: CandidateInterviewPracticeSession) -> dict[str, Any]
         "state": s.state,
         "locale": s.locale,
         "ai_consented": s.consent_ai_at is not None,
+        "is_synthetic": bool(getattr(s, "is_synthetic", False)),
+        "kpi_excluded": bool(s.kpi_excluded),
         "created_at": s.created_at.isoformat() if s.created_at else None,
         "updated_at": s.updated_at.isoformat() if s.updated_at else None,
     }
@@ -302,6 +335,7 @@ def submit_turn(
     turn_id: int,
     answer_text: str,
     ai_prep_opt_in: bool = False,  # kept for API compat but IGNORED — server reads privacy
+    provider_call=None,
 ) -> dict[str, Any]:
     """Submit an answer (closes DB txn before model call; writes evaluation after).
 
@@ -333,7 +367,15 @@ def submit_turn(
     turn.updated_at = now
 
     # Commit before calling AI — avoids holding DB txn during model call
+    session_pk = session.id
+    exercise_id = session.exercise_id
+    process_id = session.process_id
     db.commit()
+
+    # Re-check authorization immediately before dispatch (consent may have been revoked)
+    auth = authorize_practice_ai(db, candidate_id)
+    if not auth["authorized"]:
+        provider_call = None  # force non-AI path
 
     # Evaluate — AI authorization read from canonical privacy, NOT from request body
     eval_result = _evaluate_turn(
@@ -341,20 +383,23 @@ def submit_turn(
         candidate_id,
         question=turn.question_text,
         answer=answer,
-        process_id=session.process_id,
+        process_id=process_id,
+        exercise_id=exercise_id,
+        provider_call=provider_call,
     )
 
-    # Reject eval persistence if session was deleted between commit and AI return
+    # Observe committed external changes (delete/revoke) — expire stale identity map
+    db.expire_all()
     fresh_session = (
         db.query(CandidateInterviewPracticeSession)
-        .filter_by(id=session.id)
+        .filter_by(id=session_pk)
         .one_or_none()
     )
     if fresh_session is None or fresh_session.deleted_at is not None:
         logger.warning(
-            "practice eval write rejected — session %s deleted after submit commit", session.id
+            "practice eval write rejected — session %s deleted after submit commit", session_pk
         )
-        db.refresh(turn)
+        turn = db.query(CandidateInterviewPracticeTurn).filter_by(id=turn_id).one()
         return {
             "turn": _ser_turn(turn),
             "evaluation": None,
@@ -362,9 +407,23 @@ def submit_turn(
             "score_available": False,
             "eval_skipped_reason": "session_deleted",
         }
+    # Consent revoked after dispatch — do not persist AI evaluation content
+    auth_after = authorize_practice_ai(db, candidate_id)
+    if eval_result.get("source") not in (
+        "OBJECTIVE_ANSWER_KEY",
+        "DETERMINISTIC_LIBRARY_FALLBACK",
+    ) and not auth_after["authorized"]:
+        turn = db.query(CandidateInterviewPracticeTurn).filter_by(id=turn_id).one()
+        return {
+            "turn": _ser_turn(turn),
+            "evaluation": None,
+            "score": None,
+            "score_available": False,
+            "eval_skipped_reason": "consent_revoked",
+        }
 
     evl = CandidateInterviewPracticeEvaluation(
-        turn_id=turn.id,
+        turn_id=turn_id,
         evaluation_status=eval_result.get("evaluation_status", EVAL_INSUFFICIENT),
         criteria_json=_dumps(eval_result.get("criteria", [])),
         strengths_json=_dumps(eval_result.get("strengths", [])),
@@ -377,7 +436,7 @@ def submit_turn(
     db.add(evl)
     db.commit()
 
-    db.refresh(turn)
+    turn = db.query(CandidateInterviewPracticeTurn).filter_by(id=turn_id).one()
     db.refresh(evl)
 
     return {
@@ -472,17 +531,50 @@ def complete_session(
     return {"session_id": session.id, "state": STATE_COMPLETED, "turns_submitted": submitted}
 
 
+def pause_session(
+    db: Session, *, candidate_id: int, session_id: int
+) -> dict[str, Any]:
+    """Pause an in-progress session so it can be resumed later (not abandon)."""
+    session = _get_session(db, candidate_id=candidate_id, session_id=session_id)
+    if session.state != STATE_IN_PROGRESS:
+        raise ValueError("practice_session_not_pausable")
+    session.state = STATE_PAUSED
+    session.version = int(session.version or 1) + 1
+    session.updated_at = _utcnow()
+    db.commit()
+    return {"session_id": session.id, "state": STATE_PAUSED}
+
+
+def resume_session(
+    db: Session, *, candidate_id: int, session_id: int
+) -> dict[str, Any]:
+    """Resume a paused session back to IN_PROGRESS."""
+    session = _get_session(
+        db, candidate_id=candidate_id, session_id=session_id, require_active=False
+    )
+    if session.state != STATE_PAUSED:
+        raise ValueError("practice_session_not_resumable")
+    session.state = STATE_IN_PROGRESS
+    session.version = int(session.version or 1) + 1
+    session.updated_at = _utcnow()
+    db.commit()
+    return get_session(db, candidate_id=candidate_id, session_id=session_id)
+
+
 def abandon_session(
     db: Session, *, candidate_id: int, session_id: int
 ) -> dict[str, Any]:
-    """Mark session abandoned (reversible via create new session)."""
-    session = _get_session(db, candidate_id=candidate_id, session_id=session_id)
+    """Permanently abandon a session (not resumable — use pause for temporary stop)."""
+    session = _get_session(
+        db, candidate_id=candidate_id, session_id=session_id, require_active=False
+    )
+    if session.state in (STATE_DELETED, STATE_ABANDONED):
+        raise ValueError("practice_session_closed")
     session.state = STATE_ABANDONED
     session.version = int(session.version or 1) + 1
     session.updated_at = _utcnow()
     db.commit()
     return {"session_id": session.id, "state": STATE_ABANDONED}
-
 
 def delete_session(
     db: Session, *, candidate_id: int, session_id: int
@@ -528,13 +620,13 @@ def promote_to_evidence(
             first-3 subset — caller decides scope.
 
     Label is PRACTICE_WORK_SAMPLE — never SOURCE_SUPPORTED or FACT.
-    is_synthetic mirrors session.kpi_excluded (practice sessions are always kpi_excluded=True).
+    is_synthetic uses session.is_synthetic (canonical provenance), NOT kpi_excluded.
     turns_promoted == len(evidence_ids) (no mismatch between reported and created counts).
     """
     session = _get_session(
         db, candidate_id=candidate_id, session_id=session_id, require_active=False
     )
-    if session.state not in (STATE_COMPLETED, "IN_PROGRESS"):
+    if session.state not in (STATE_COMPLETED, STATE_IN_PROGRESS, STATE_PAUSED):
         raise ValueError("session_not_promotable")
 
     # Build candidate turn set
@@ -564,11 +656,34 @@ def promote_to_evidence(
     from app.services.career_evidence import create_evidence
     from app.services.candidate_interview_practice_constants import CLAIM_KIND_PRACTICE
 
-    # is_synthetic mirrors session.kpi_excluded — practice sessions are always kpi_excluded
-    is_synthetic = bool(session.kpi_excluded)
+    # Provenance: synthetic flag is independent of metrics exclusion.
+    is_synthetic = bool(getattr(session, "is_synthetic", False))
+    kpi_excluded = bool(session.kpi_excluded)
 
     created_ids: list[int] = []
     for turn in turns_to_promote:
+        # Idempotent: skip if evidence already exists for this turn
+        existing = (
+            db.query(CandidateCareerEvidence)
+            .filter(
+                CandidateCareerEvidence.candidate_id == candidate_id,
+                CandidateCareerEvidence.deleted_at.is_(None),
+            )
+            .all()
+        )
+        already = False
+        for ev in existing:
+            ctx = _loads(getattr(ev, "context_json", None), {})
+            if (
+                isinstance(ctx, dict)
+                and ctx.get("practice_session_id") == session.id
+                and ctx.get("turn_id") == turn.id
+            ):
+                created_ids.append(int(ev.id))
+                already = True
+                break
+        if already:
+            continue
         row = create_evidence(
             db,
             candidate_id=candidate_id,
@@ -583,6 +698,7 @@ def promote_to_evidence(
                 "turn_id": turn.id,
                 "not_employer_attested": True,
                 "not_global_skill_score": True,
+                "kpi_excluded": kpi_excluded,
             },
             is_synthetic=is_synthetic,
             commit=False,
@@ -590,12 +706,14 @@ def promote_to_evidence(
         created_ids.append(int(row.id))
     db.commit()
 
-    # turns_promoted == len(created_ids) — no silent mismatch
+    # turns_promoted == len(evidence_ids) — no silent mismatch
     return {
         "session_id": session.id,
         "label": EVIDENCE_LABEL_PRACTICE_WORK_SAMPLE,
         "turns_promoted": len(created_ids),
         "evidence_ids": created_ids,
+        "is_synthetic": is_synthetic,
+        "kpi_excluded": kpi_excluded,
         "note": "PRACTICE_WORK_SAMPLE — not employer-confirmed evidence",
     }
 
@@ -610,20 +728,22 @@ def _evaluate_turn(
     question: str,
     answer: str,
     process_id: int | None = None,
+    exercise_id: str | None = None,
     provider_call=None,
 ) -> dict[str, Any]:
     """Evaluate submitted answer.
 
+    Objective exercises use explicit answer rules (no invented semantics).
     AI path ONLY when authorize_practice_ai confirms consent from canonical privacy row.
-    Request-body ai_prep_opt_in is NOT accepted here — consent is always read from DB.
-
-    Args:
-        provider_call: Optional injectable callable(question, answer, job_ctx) → dict.
-            Passed through to evaluate_submitted_answer_text for test stubbing.
     """
+    ex = get_exercise(exercise_id) if exercise_id else None
+    if ex and ex.exercise_type == "objective":
+        objective = evaluate_objective_answer(ex, answer)
+        if objective is not None:
+            return objective
+
     auth = authorize_practice_ai(db, candidate_id)
     if not auth["authorized"]:
-        # No AI — deterministic checklist with factual_observations only
         result = evaluate_submitted_answer_text(
             question=question,
             answer=answer,
@@ -637,7 +757,6 @@ def _evaluate_turn(
         result["source_label"] = "deterministic_library_consent_denied"
         return result
 
-    # Authorized AI path — injectable for tests
     return evaluate_submitted_answer_text(
         question=question,
         answer=answer,
@@ -668,6 +787,8 @@ def _ser_session(
         "turn_limit": s.turn_limit,
         "ai_consented": s.consent_ai_at is not None,
         "kpi_excluded": s.kpi_excluded,
+        "is_synthetic": bool(getattr(s, "is_synthetic", False)),
+        "exercise_version": getattr(s, "exercise_version", None),
         "turns": [_ser_turn(t) for t in turns],
         "evaluations": {str(k): _ser_evaluation(v) for k, v in evaluations.items()},
         "score": None,

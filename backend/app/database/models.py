@@ -7923,6 +7923,10 @@ class CandidateInterviewPracticeSession(Base):
     turn_limit: Mapped[int] = mapped_column(Integer, default=8)
     consent_ai_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     kpi_excluded: Mapped[bool] = mapped_column(Boolean, default=True)
+    # Synthetic test provenance — NOT derived from kpi_excluded / metrics flags.
+    is_synthetic: Mapped[bool] = mapped_column(Boolean, default=False)
+    # Snapshotted exercise catalog version at session create (no silent re-grade).
+    exercise_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
     created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)

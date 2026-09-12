@@ -1,0 +1,16 @@
+{
+  "old_weak_gate_passed": true,
+  "eval": {
+    "score": null,
+    "score_available": false,
+    "source": "DETERMINISTIC_LIBRARY_FALLBACK",
+    "source_label": "deterministic_library_consent_denied",
+    "degraded": true,
+    "criteria": [
+      {
+        "id": "relevance",
+        "outcome": "NOT_ASSESSED"
+      }
+    ]
+  }
+}

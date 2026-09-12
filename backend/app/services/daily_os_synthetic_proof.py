@@ -113,3 +113,75 @@ def mint_synthetic_daily_os_session(db: Session, *, expires_minutes: int = 45) -
         "label": "synthetic_auth_jwt≠real_customer",
         "note": "Ops-minted JWT for authenticated Daily OS product proof; not a real invitee.",
     }
+
+
+def mint_isolated_practice_session(
+    db: Session,
+    *,
+    run_id: str,
+    expires_minutes: int = 45,
+    complete_onboarding: bool = True,
+) -> dict:
+    """Mint a UNIQUE synthetic candidate for isolation tests (not the shared Daily OS user).
+
+    Email: epic226-practice+{run_id}@twin.internal
+    Preserves shared daily-os-synth+kpi@twin.internal for other suites.
+    """
+    import re
+    import secrets
+
+    rid = re.sub(r"[^a-zA-Z0-9_-]", "", (run_id or "").strip())[:24] or secrets.token_hex(4)
+    email = f"epic226-practice+{rid}@twin.internal"
+    user = db.query(User).filter(User.email == email).one_or_none()
+    if not user:
+        user = User(
+            email=email,
+            hashed_password=hash_password(f"synth-isolated-{rid}"),
+            gdpr_consent_at=datetime.now(timezone.utc),
+            exclude_from_product_metrics=True,
+        )
+        db.add(user)
+        db.flush()
+    else:
+        user.exclude_from_product_metrics = True
+    if complete_onboarding and user.onboarding_completed_at is None:
+        user.onboarding_completed_at = datetime.now(timezone.utc)
+        user.onboarding_step = "complete"
+    cand = db.query(Candidate).filter(Candidate.user_id == user.id).one_or_none()
+    if not cand:
+        cand = Candidate(
+            user_id=user.id,
+            name=f"Epic226 Isolated {rid}",
+            skills='["Python"]',
+            experience_years=3,
+            cv_text="Isolated synthetic practice candidate — not a real person.",
+        )
+        db.add(cand)
+        db.flush()
+    db.commit()
+    db.refresh(user)
+    db.refresh(cand)
+
+    issued = cas.issue_session(
+        db,
+        user=user,
+        expires_minutes=expires_minutes,
+        kpi_excluded=True,
+        label="synthetic_isolated",
+    )
+    return {
+        "ok": True,
+        "email": user.email,
+        "candidate_id": cand.id,
+        "user_id": user.id,
+        "access_token": issued["access_token"],
+        "refresh_token": issued.get("refresh_token"),
+        "session_key": issued.get("session_key"),
+        "kpi_excluded": True,
+        "synthetic": True,
+        "isolated": True,
+        "run_id": rid,
+        "real_person": False,
+        "label": "isolated_synthetic≠shared_daily_os",
+        "note": "Per-run isolated synthetic candidate for practice isolation proofs.",
+    }

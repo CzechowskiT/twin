@@ -189,13 +189,35 @@ def complete_session(
     return _handle(prac.complete_session, db, candidate_id=cand.id, session_id=session_id)
 
 
+@router.post("/me/interview-practice/sessions/{session_id}/pause")
+def pause_session(
+    session_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> Any:
+    """Pause an in-progress session (resumable). Distinct from abandon."""
+    cand = _candidate(db, user)
+    return _handle(prac.pause_session, db, candidate_id=cand.id, session_id=session_id)
+
+
+@router.post("/me/interview-practice/sessions/{session_id}/resume")
+def resume_session(
+    session_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> Any:
+    """Resume a paused session and return full session payload."""
+    cand = _candidate(db, user)
+    return _handle(prac.resume_session, db, candidate_id=cand.id, session_id=session_id)
+
+
 @router.post("/me/interview-practice/sessions/{session_id}/abandon")
 def abandon_session(
     session_id: int,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> Any:
-    """Abandon a session."""
+    """Abandon a session (not resumable)."""
     cand = _candidate(db, user)
     return _handle(prac.abandon_session, db, candidate_id=cand.id, session_id=session_id)
 
