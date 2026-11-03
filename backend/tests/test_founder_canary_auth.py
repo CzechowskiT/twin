@@ -33,6 +33,7 @@ def canary_client(monkeypatch):
     monkeypatch.setenv("SECRET_KEY", "founder-canary-test-secret-at-least-32-chars")
     monkeypatch.setenv("FOUNDER_COMMAND_ALLOWLIST", "founder@example.org")
     monkeypatch.setenv("AUTH_STEP_UP_ENFORCE", "true")
+    monkeypatch.setenv("RECRUITER_INBOX_TOKEN", "recruiter-valid-test-token")
     get_settings.cache_clear()
     db = _sqlite_session()
     founder = User(
@@ -91,6 +92,12 @@ def test_normal_candidate_and_unauthenticated_users_are_denied(canary_client):
     assert denied.status_code == 403
     assert denied.json()["detail"] == "founder_access_required"
     assert client.get("/api/v1/admin/canary/control").status_code == 401
+    recruiter = client.get(
+        "/api/v1/admin/canary/control",
+        headers=_bearer("recruiter-valid-test-token"),
+    )
+    assert recruiter.status_code == 401
+    assert recruiter.json()["detail"] == "invalid_canary_session"
     for path in (
         "/api/v1/admin/canary/control",
         "/api/v1/admin/canary/completion-report",
