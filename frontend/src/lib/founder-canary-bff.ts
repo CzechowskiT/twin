@@ -164,4 +164,31 @@ export function verifyBoundCsrf(elevated: string, bound: string | null, header: 
   }
 }
 
+/**
+ * Mutating canary BFF requests must send an explicit X-CSRF-Token header.
+ * A valid CSRF cookie alone must never authorize the request.
+ */
+export function assertMutatingCsrf(opts: {
+  elevated: string | null;
+  csrfCookie: string | null;
+  csrfHeader: string | null;
+}): { ok: true; rawCsrf: string } | { ok: false; detail: string; status: number } {
+  if (!opts.elevated?.trim()) {
+    return { ok: false, detail: "Founder elevated session required for canary mutations", status: 403 };
+  }
+  const header = (opts.csrfHeader || "").trim();
+  if (!header) {
+    return { ok: false, detail: "CSRF header required", status: 403 };
+  }
+  const cookie = (opts.csrfCookie || "").trim();
+  if (!cookie) {
+    return { ok: false, detail: "CSRF cookie missing", status: 403 };
+  }
+  if (!verifyBoundCsrf(opts.elevated, cookie, header)) {
+    return { ok: false, detail: "Invalid CSRF token", status: 403 };
+  }
+  const rawCsrf = cookie.includes(".") ? cookie.slice(0, cookie.lastIndexOf(".")) : cookie;
+  return { ok: true, rawCsrf };
+}
+
 export { COOKIE_PATH };

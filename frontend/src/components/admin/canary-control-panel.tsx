@@ -78,6 +78,7 @@ export function CanaryControlPanel() {
   const [roster, setRoster] = useState("");
   const [password, setPassword] = useState("");
   const [mfaCode, setMfaCode] = useState("");
+  const [mfaEnabled, setMfaEnabled] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -166,6 +167,14 @@ export function CanaryControlPanel() {
           return;
         }
         if (!body.elevated) {
+          // Probe MFA so unlock UI can require TOTP when enrolled.
+          try {
+            const { fetchMfaStatus } = await import("@/lib/mfa");
+            const st = await fetchMfaStatus();
+            if (!cancelled) setMfaEnabled(Boolean(st.enabled));
+          } catch {
+            if (!cancelled) setMfaEnabled(false);
+          }
           setAuthGate("need_elevate");
           return;
         }
@@ -204,13 +213,18 @@ export function CanaryControlPanel() {
         return;
       }
       headers.Authorization = `Bearer ${token}`;
-      if (mfaCode.trim()) {
+      // When MFA is enrolled, TOTP is mandatory — password step-up alone is insufficient.
+      if (mfaEnabled) {
+        if (!mfaCode.trim()) {
+          setErr("mfa_required");
+          return;
+        }
         headers["X-Twin-Mfa-Code"] = mfaCode.trim();
       } else if (password.trim()) {
         const step = await issueStepUpToken("CANARY_ADMIN_MUTATE", password.trim());
         headers["X-Twin-Step-Up"] = step;
       } else {
-        setErr("step_up_or_mfa_required");
+        setErr("step_up_required");
         return;
       }
       const res = await fetch(SESSION_API, {
@@ -368,33 +382,36 @@ export function CanaryControlPanel() {
         <h2 className="text-lg font-medium">{t("canaryJourney.adminTitle")}</h2>
         <p className="text-sm opacity-80">{t("canaryJourney.authElevateLead")}</p>
         {err ? <p className="text-sm text-red-700">{err}</p> : null}
-        <label className="block text-xs">
-          {t("canaryJourney.authPassword")}
-          <input
-            type="password"
-            className="mt-1 w-full border px-2 py-2 text-sm sm:py-1"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="current-password"
-            data-testid="canary-elevate-password"
-          />
-        </label>
-        <label className="block text-xs">
-          {t("canaryJourney.authMfaCode")}
-          <input
-            type="text"
-            inputMode="numeric"
-            className="mt-1 w-full border px-2 py-2 text-sm sm:py-1"
-            value={mfaCode}
-            onChange={(e) => setMfaCode(e.target.value)}
-            autoComplete="one-time-code"
-            data-testid="canary-elevate-mfa"
-          />
-        </label>
+        {mfaEnabled ? (
+          <label className="block text-xs">
+            {t("canaryJourney.authMfaCode")}
+            <input
+              type="text"
+              inputMode="numeric"
+              className="mt-1 w-full border px-2 py-2 text-sm sm:py-1"
+              value={mfaCode}
+              onChange={(e) => setMfaCode(e.target.value)}
+              autoComplete="one-time-code"
+              data-testid="canary-elevate-mfa"
+            />
+          </label>
+        ) : (
+          <label className="block text-xs">
+            {t("canaryJourney.authPassword")}
+            <input
+              type="password"
+              className="mt-1 w-full border px-2 py-2 text-sm sm:py-1"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+              data-testid="canary-elevate-password"
+            />
+          </label>
+        )}
         <button
           type="button"
           className="twin-btn-solid text-sm"
-          disabled={busy || (!password.trim() && !mfaCode.trim())}
+          disabled={busy || (mfaEnabled ? !mfaCode.trim() : !password.trim())}
           onClick={() => void elevate()}
           data-testid="canary-elevate-submit"
         >

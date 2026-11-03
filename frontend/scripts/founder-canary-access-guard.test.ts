@@ -23,11 +23,14 @@ test("2 BFF control/designation reject browser OPS and use founder proxy", () =>
   const control = read("src/app/api/ops-admin/canary/control/route.ts");
   const des = read("src/app/api/ops-admin/canary/designation/route.ts");
   const rev = read("src/app/api/ops-admin/canary/designation/revoke/route.ts");
+  const proxy = read("src/lib/founder-canary-proxy.ts");
   for (const src of [control, des, rev]) {
     assert.match(src, /proxyFounderCanary/);
     assert.doesNotMatch(src, /auth !== `Bearer \$\{serverToken\}`/);
     assert.doesNotMatch(src, /Authorization: auth/);
   }
+  assert.match(proxy, /assertMutatingCsrf/);
+  assert.doesNotMatch(proxy, /csrfHeader \|\| csrfCookie/);
 });
 
 test("3 session route sets HttpOnly cookies and blocks machine secrets", () => {

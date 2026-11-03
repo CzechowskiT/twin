@@ -10,17 +10,17 @@ import {
   CANARY_CSRF_COOKIE,
   CANARY_ELEVATED_COOKIE,
   assertFounderUserJwt,
+  assertMutatingCsrf,
   cookieValue,
   looksLikeMachineOpsSecret,
   readBrowserBearer,
-  verifyBoundCsrf,
 } from "@/lib/founder-canary-bff";
 import { getUpstreamApiBase } from "@/lib/public-api-base";
 
 function upstreamHeaders(opts: {
   accessToken: string | null;
   elevated: string | null;
-  csrf: string | null;
+  rawCsrf: string | null;
   contentType: string | null;
   stepUp: string | null;
   mfaCode: string | null;
@@ -29,12 +29,8 @@ function upstreamHeaders(opts: {
   const headers: Record<string, string> = { Accept: "application/json" };
   if (opts.accessToken) headers.Authorization = `Bearer ${opts.accessToken}`;
   if (opts.elevated) headers["X-Twin-Founder-Canary-Elevated"] = opts.elevated;
-  if (opts.mutating && opts.csrf) {
-    // Upstream expects raw csrf token (without binding suffix).
-    const raw = opts.csrf.includes(".")
-      ? opts.csrf.slice(0, opts.csrf.lastIndexOf("."))
-      : opts.csrf;
-    headers["X-CSRF-Token"] = raw;
+  if (opts.mutating && opts.rawCsrf) {
+    headers["X-CSRF-Token"] = opts.rawCsrf;
   }
   if (opts.contentType) headers["Content-Type"] = opts.contentType;
   if (opts.stepUp) headers["X-Twin-Step-Up"] = opts.stepUp;
@@ -76,17 +72,17 @@ export async function proxyFounderCanary(
     }
   }
 
+  let rawCsrf: string | null = null;
   if (mutating) {
-    if (!elevated) {
-      return NextResponse.json(
-        { detail: "Founder elevated session required for canary mutations" },
-        { status: 403 },
-      );
+    const csrf = assertMutatingCsrf({
+      elevated,
+      csrfCookie,
+      csrfHeader: req.headers.get("x-csrf-token"),
+    });
+    if (!csrf.ok) {
+      return NextResponse.json({ detail: csrf.detail }, { status: csrf.status });
     }
-    const csrfHeader = req.headers.get("x-csrf-token");
-    if (!verifyBoundCsrf(elevated, csrfCookie, csrfHeader || csrfCookie)) {
-      return NextResponse.json({ detail: "Invalid CSRF token" }, { status: 403 });
-    }
+    rawCsrf = csrf.rawCsrf;
   }
 
   const base = getUpstreamApiBase();
@@ -100,7 +96,7 @@ export async function proxyFounderCanary(
     headers: upstreamHeaders({
       accessToken,
       elevated,
-      csrf: csrfCookie,
+      rawCsrf,
       contentType: req.headers.get("content-type"),
       stepUp: req.headers.get("x-twin-step-up"),
       mfaCode: req.headers.get("x-twin-mfa-code"),
