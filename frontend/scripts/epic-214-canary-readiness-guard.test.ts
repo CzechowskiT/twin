@@ -39,4 +39,6 @@ const adminPanel = readFileSync(
 );
 assert.match(adminPanel, /canary-designation-panel/);
 assert.match(adminPanel, /never mints|never raises|does not raise/i);
+assert.doesNotMatch(adminPanel, /twin_ops_admin_token|sessionStorage|Ops token/);
+assert.match(adminPanel, /canary-founder-session/);
 console.log("epic-214-canary-readiness-guard: ok");

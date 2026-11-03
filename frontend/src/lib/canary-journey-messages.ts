@@ -13,6 +13,16 @@ export const CANARY_JOURNEY_MESSAGES_EN = {
   adminTitle: "One-candidate canary control",
   adminLead:
     "Prepare and evaluate readiness only. Activation stays Founder-executed — this UI never sends a real invite.",
+  adminSessionTitle: "Founder security session",
+  adminSessionLead:
+    "Sign in with an allowlisted Founder account. Changes require MFA or a one-time password recheck.",
+  adminSessionActive: "Protected Founder session active",
+  adminSessionLogin: "Sign in before opening canary controls.",
+  adminSessionPassword: "Current password for one-time verification",
+  adminSessionUnlock: "Unlock canary controls",
+  adminSessionLock: "Lock controls",
+  adminSessionMfa: "MFA-verified session",
+  adminAccessError: "Founder authorization failed. Sign in again or verify your password.",
   adminState: "State",
   adminGate: "Gate ONE_CANDIDATE_CANARY_READY",
   adminActivation: "Activation command",
@@ -57,6 +67,16 @@ export const CANARY_JOURNEY_MESSAGES_PL: Record<keyof typeof CANARY_JOURNEY_MESS
   adminTitle: "Sterowanie canary jednego kandydata",
   adminLead:
     "Tylko przygotowanie i ocena gotowości. Aktywacja zostaje u Foundera — ten UI nigdy nie wysyła realnego zaproszenia.",
+  adminSessionTitle: "Bezpieczna sesja Foundera",
+  adminSessionLead:
+    "Zaloguj się kontem Foundera z allowlisty. Zmiany wymagają MFA lub jednorazowej ponownej weryfikacji hasła.",
+  adminSessionActive: "Chroniona sesja Foundera jest aktywna",
+  adminSessionLogin: "Zaloguj się przed otwarciem sterowania canary.",
+  adminSessionPassword: "Bieżące hasło do jednorazowej weryfikacji",
+  adminSessionUnlock: "Odblokuj sterowanie canary",
+  adminSessionLock: "Zablokuj sterowanie",
+  adminSessionMfa: "Sesja zweryfikowana MFA",
+  adminAccessError: "Autoryzacja Foundera nie powiodła się. Zaloguj się ponownie lub zweryfikuj hasło.",
   adminState: "Stan",
   adminGate: "Brama ONE_CANDIDATE_CANARY_READY",
   adminActivation: "Komenda aktywacji",

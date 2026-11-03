@@ -1,7 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "@/components/language-provider";
+import { getToken } from "@/lib/auth";
+import { issueStepUpToken } from "@/lib/step-up";
 
 type Designation = {
   status?: string;
@@ -35,7 +38,12 @@ type Snapshot = {
   checklist?: { all_pass?: boolean };
 };
 
-const STORAGE_KEY = "twin_ops_admin_token";
+type CanarySession = {
+  authenticated?: boolean;
+  csrf_token?: string;
+  auth_method?: string;
+  assurance_level?: string;
+};
 
 /**
  * Founder/ops canary control + real-candidate designation.
@@ -43,7 +51,10 @@ const STORAGE_KEY = "twin_ops_admin_token";
  */
 export function CanaryControlPanel() {
   const { t } = useTranslation();
-  const [token, setToken] = useState("");
+  const [session, setSession] = useState<CanarySession | null>(null);
+  const [checkingSession, setCheckingSession] = useState(true);
+  const [needsStepUp, setNeedsStepUp] = useState(false);
+  const [password, setPassword] = useState("");
   const [snap, setSnap] = useState<Snapshot | null>(null);
   const [des, setDes] = useState<Designation | null>(null);
   const [identity, setIdentity] = useState("");
@@ -51,55 +62,113 @@ export function CanaryControlPanel() {
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
-    try {
-      setToken(sessionStorage.getItem(STORAGE_KEY) || "");
-    } catch {
-      /* ignore */
-    }
-  }, []);
-
-  const refresh = useCallback(async (tok: string) => {
-    if (!tok.trim()) return;
+  const refresh = useCallback(async () => {
     setErr(null);
     try {
       const [cRes, dRes] = await Promise.all([
         fetch("/api/ops-admin/canary/control", {
-          headers: { Authorization: `Bearer ${tok.trim()}`, Accept: "application/json" },
+          headers: { Accept: "application/json" },
           cache: "no-store",
         }),
         fetch("/api/ops-admin/canary/designation", {
-          headers: { Authorization: `Bearer ${tok.trim()}`, Accept: "application/json" },
+          headers: { Accept: "application/json" },
           cache: "no-store",
         }),
       ]);
       const cBody = (await cRes.json().catch(() => ({}))) as Snapshot & { detail?: string };
       const dBody = (await dRes.json().catch(() => ({}))) as Designation & { detail?: string };
       if (!cRes.ok) {
-        setErr(typeof cBody.detail === "string" ? cBody.detail : `HTTP ${cRes.status}`);
+        if (cRes.status === 401 || cRes.status === 403) setSession(null);
+        setErr(t("canaryJourney.adminAccessError"));
         return;
       }
       setSnap(cBody);
       if (dRes.ok) setDes(dBody);
       else setDes((cBody.designation as Designation) || null);
-    } catch (e) {
-      setErr(e instanceof Error ? e.message : "fetch_failed");
+    } catch {
+      setErr(t("canaryJourney.adminAccessError"));
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
-    if (token) void refresh(token);
-  }, [token, refresh]);
+    void (async () => {
+      try {
+        const response = await fetch("/api/ops-admin/canary/session", { cache: "no-store" });
+        if (!response.ok) return;
+        const body = (await response.json()) as CanarySession;
+        setSession(body);
+        await refresh();
+      } finally {
+        setCheckingSession(false);
+      }
+    })();
+  }, [refresh]);
+
+  const openSession = async () => {
+    const userToken = getToken();
+    if (!userToken || busy) {
+      setErr(t("canaryJourney.adminAccessError"));
+      return;
+    }
+    setBusy(true);
+    setErr(null);
+    try {
+      let stepUp: string | null = null;
+      if (needsStepUp) {
+        stepUp = await issueStepUpToken("FOUNDER_CANARY_ADMIN", password);
+      }
+      const response = await fetch("/api/ops-admin/canary/session", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+          ...(stepUp ? { "X-Twin-Step-Up": stepUp } : {}),
+        },
+      });
+      const body = (await response.json().catch(() => ({}))) as CanarySession & {
+        detail?: string;
+      };
+      if (!response.ok) {
+        if (body.detail === "step_up_required") setNeedsStepUp(true);
+        setErr(t("canaryJourney.adminAccessError"));
+        return;
+      }
+      setSession(body);
+      setNeedsStepUp(false);
+      setPassword("");
+      await refresh();
+    } catch {
+      setErr(t("canaryJourney.adminAccessError"));
+    } finally {
+      setBusy(false);
+      setCheckingSession(false);
+    }
+  };
+
+  const closeSession = async () => {
+    if (!session?.csrf_token || busy) return;
+    setBusy(true);
+    try {
+      await fetch("/api/ops-admin/canary/session", {
+        method: "DELETE",
+        headers: { "X-CSRF-Token": session.csrf_token },
+      });
+      setSession(null);
+      setSnap(null);
+      setDes(null);
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const act = async (action: string) => {
-    if (!token.trim() || busy) return;
+    if (!session?.csrf_token || busy) return;
     setBusy(true);
     setErr(null);
     try {
       const res = await fetch("/api/ops-admin/canary/control", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token.trim()}`,
+          "X-CSRF-Token": session.csrf_token,
           "Content-Type": "application/json",
           Accept: "application/json",
         },
@@ -107,7 +176,7 @@ export function CanaryControlPanel() {
       });
       const body = (await res.json().catch(() => ({}))) as Snapshot & { detail?: string };
       if (!res.ok) {
-        setErr(typeof body.detail === "string" ? body.detail : `HTTP ${res.status}`);
+        setErr(t("canaryJourney.adminAccessError"));
         return;
       }
       setSnap(body);
@@ -118,14 +187,14 @@ export function CanaryControlPanel() {
   };
 
   const saveDesignation = async () => {
-    if (!token.trim() || busy || !identity.trim()) return;
+    if (!session?.csrf_token || busy || !identity.trim()) return;
     setBusy(true);
     setErr(null);
     try {
       const res = await fetch("/api/ops-admin/canary/designation", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token.trim()}`,
+          "X-CSRF-Token": session.csrf_token,
           "Content-Type": "application/json",
           Accept: "application/json",
         },
@@ -138,26 +207,26 @@ export function CanaryControlPanel() {
       });
       const body = (await res.json().catch(() => ({}))) as Designation & { detail?: string };
       if (!res.ok) {
-        setErr(typeof body.detail === "string" ? body.detail : `HTTP ${res.status}`);
+        setErr(t("canaryJourney.adminAccessError"));
         return;
       }
       setDes(body);
       setIdentity("");
-      await refresh(token);
+      await refresh();
     } finally {
       setBusy(false);
     }
   };
 
   const revokeDesignation = async () => {
-    if (!token.trim() || busy) return;
+    if (!session?.csrf_token || busy) return;
     setBusy(true);
     setErr(null);
     try {
       const res = await fetch("/api/ops-admin/canary/designation/revoke", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token.trim()}`,
+          "X-CSRF-Token": session.csrf_token,
           "Content-Type": "application/json",
           Accept: "application/json",
         },
@@ -165,22 +234,13 @@ export function CanaryControlPanel() {
       });
       const body = (await res.json().catch(() => ({}))) as Designation & { detail?: string };
       if (!res.ok) {
-        setErr(typeof body.detail === "string" ? body.detail : `HTTP ${res.status}`);
+        setErr(t("canaryJourney.adminAccessError"));
         return;
       }
       setDes(body);
-      await refresh(token);
+      await refresh();
     } finally {
       setBusy(false);
-    }
-  };
-
-  const saveToken = (value: string) => {
-    setToken(value);
-    try {
-      sessionStorage.setItem(STORAGE_KEY, value);
-    } catch {
-      /* ignore */
     }
   };
 
@@ -194,19 +254,67 @@ export function CanaryControlPanel() {
 
   return (
     <div className="space-y-6">
+      <section
+        data-testid="canary-founder-session"
+        className="space-y-3 rounded border border-black/10 p-4"
+      >
+        <h2 className="text-lg font-medium">{t("canaryJourney.adminSessionTitle")}</h2>
+        <p className="text-sm opacity-80">{t("canaryJourney.adminSessionLead")}</p>
+        {session?.authenticated ? (
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-emerald-700" role="status">
+              {t("canaryJourney.adminSessionActive")}
+              {session.auth_method === "mfa"
+                ? ` · ${t("canaryJourney.adminSessionMfa")}`
+                : ""}
+            </p>
+            <button
+              type="button"
+              className="twin-btn-secondary text-sm"
+              disabled={busy}
+              onClick={() => void closeSession()}
+            >
+              {t("canaryJourney.adminSessionLock")}
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <p className="text-sm opacity-80">{t("canaryJourney.adminSessionLogin")}</p>
+            {needsStepUp ? (
+              <label className="block text-xs">
+                {t("canaryJourney.adminSessionPassword")}
+                <input
+                  type="password"
+                  className="mt-1 w-full border px-2 py-2 text-base"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  autoComplete="current-password"
+                />
+              </label>
+            ) : null}
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                className="twin-btn-solid text-sm"
+                disabled={busy || checkingSession || (needsStepUp && !password)}
+                onClick={() => void openSession()}
+              >
+                {t("canaryJourney.adminSessionUnlock")}
+              </button>
+              <Link
+                className="twin-btn-secondary text-sm"
+                href="/login/candidate?next=/admin/canary"
+              >
+                {t("login.submit")}
+              </Link>
+            </div>
+          </div>
+        )}
+      </section>
+
       <section data-testid="canary-control-panel" className="space-y-3 rounded border border-black/10 p-4">
         <h2 className="text-lg font-medium">{t("canaryJourney.adminTitle")}</h2>
         <p className="text-sm opacity-80">{t("canaryJourney.adminLead")}</p>
-        <label className="block text-xs">
-          Ops token
-          <input
-            type="password"
-            className="mt-1 w-full border px-2 py-1 text-sm"
-            value={token}
-            onChange={(e) => saveToken(e.target.value)}
-            autoComplete="off"
-          />
-        </label>
         {err ? <p className="text-sm text-red-700">{err}</p> : null}
         {snap ? (
           <dl className="grid gap-1 text-sm sm:grid-cols-2">
@@ -250,7 +358,7 @@ export function CanaryControlPanel() {
               key={action}
               type="button"
               className="twin-btn-secondary text-sm"
-              disabled={busy || !token.trim()}
+              disabled={busy || !session?.authenticated}
               onClick={() => void act(action)}
             >
               {t(`canaryJourney.${key}`)}
@@ -324,7 +432,7 @@ export function CanaryControlPanel() {
           <button
             type="button"
             className="twin-btn-solid text-sm"
-            disabled={busy || !token.trim() || !identity.trim()}
+            disabled={busy || !session?.authenticated || !identity.trim()}
             onClick={() => void saveDesignation()}
             data-testid="canary-designation-save"
           >
@@ -333,7 +441,7 @@ export function CanaryControlPanel() {
           <button
             type="button"
             className="twin-btn-secondary text-sm"
-            disabled={busy || !token.trim() || des?.status !== "DESIGNATED_READY"}
+            disabled={busy || !session?.authenticated || des?.status !== "DESIGNATED_READY"}
             onClick={() => void revokeDesignation()}
             data-testid="canary-designation-revoke"
           >
