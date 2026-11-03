@@ -16,7 +16,12 @@ from app.database.session import get_db
 from app.main import app
 from app.services.founder_command.approval_policy import classify_operation
 from app.services.founder_command.auth import FounderPrincipal, issue_csrf_token, verify_csrf
-from app.services.founder_command.constants import AutonomyLevel, GATE_F_STATUS, LAUNCH_STANCE
+from app.services.founder_command.constants import (
+    AutonomyLevel,
+    GATE_F_STATUS,
+    KNOWN_PROD_SHA_HINT,
+    LAUNCH_STANCE,
+)
 from app.services.founder_command.planner import plan_from_command
 from app.services.founder_command.state_resolver import resolve_project_state
 
@@ -401,6 +406,72 @@ def test_state_resolver_includes_gate_and_launch(founder_client):
     assert state["gate_f"]["status"] == GATE_F_STATUS
     assert state["launch"]["stance"] == LAUNCH_STANCE
     assert "counters" in state
+
+
+def test_state_resolver_aligns_verified_platform_deploy(founder_client, monkeypatch):
+    _, db = founder_client
+    monkeypatch.setattr(
+        "app.services.founder_command.state_resolver.collect_deployment_identity",
+        lambda **_kwargs: {
+            "git_commit": KNOWN_PROD_SHA_HINT,
+            "source_revision": KNOWN_PROD_SHA_HINT,
+            "runtime_label": KNOWN_PROD_SHA_HINT,
+            "deployment_id": "deploy-test",
+            "provenance": "platform",
+        },
+    )
+
+    production = resolve_project_state(db, get_settings())["production"]
+
+    assert production["api_git_commit"] == KNOWN_PROD_SHA_HINT
+    assert production["repo_head_hint"] == KNOWN_PROD_SHA_HINT
+    assert production["repo_head_source"] == "known_four_way_deploy"
+    assert production["deployment_provenance"] == "platform"
+    assert production["alignment_status"] == "aligned"
+
+
+def test_state_resolver_reports_configured_head_drift(founder_client, monkeypatch):
+    _, db = founder_client
+    settings = get_settings()
+    monkeypatch.setattr(
+        settings,
+        "founder_command_repo_head_hint",
+        "1a5d577c9c21279bb68c19bc1cfa5d7bcac04dfe",
+    )
+    monkeypatch.setattr(
+        "app.services.founder_command.state_resolver.collect_deployment_identity",
+        lambda **_kwargs: {
+            "git_commit": "844176fb158555c8dd0c1d60dcaba29eb9e66915",
+            "source_revision": "844176fb158555c8dd0c1d60dcaba29eb9e66915",
+            "runtime_label": None,
+            "deployment_id": "deploy-test",
+            "provenance": "platform",
+        },
+    )
+
+    production = resolve_project_state(db, settings)["production"]
+
+    assert production["repo_head_source"] == "configured"
+    assert production["alignment_status"] == "drift"
+
+
+def test_state_resolver_does_not_mask_provenance_mismatch(founder_client, monkeypatch):
+    _, db = founder_client
+    monkeypatch.setattr(
+        "app.services.founder_command.state_resolver.collect_deployment_identity",
+        lambda **_kwargs: {
+            "git_commit": KNOWN_PROD_SHA_HINT,
+            "source_revision": KNOWN_PROD_SHA_HINT,
+            "runtime_label": "different-runtime-label",
+            "deployment_id": "deploy-test",
+            "provenance": "mismatched",
+        },
+    )
+
+    production = resolve_project_state(db, get_settings())["production"]
+
+    assert production["deployment_provenance"] == "mismatched"
+    assert production["alignment_status"] == "provenance_mismatch"
 
 
 def test_create_analyze_command_no_manual_prompt_copy(founder_client):

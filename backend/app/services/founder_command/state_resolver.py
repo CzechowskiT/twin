@@ -16,7 +16,9 @@ from app.database.models import (
     FounderCommand,
     FounderDecision,
 )
+from app.services.agent_dispatch.artifacts import sha_matches
 from app.services.agent_dispatch.constants import ACTIVE_LOCK_STATUSES, DISPATCH_RUN_TERMINAL
+from app.services.deployment_identity import collect_deployment_identity
 from app.services.founder_command.constants import (
     ACTIVE_COMMAND_STATUSES,
     GATE_F_STATUS,
@@ -34,15 +36,6 @@ def _safe_json(raw: str | None) -> Any:
     try:
         return json.loads(raw)
     except (json.JSONDecodeError, TypeError):
-        return None
-
-
-def _git_commit_from_health() -> str | None:
-    try:
-        from app.api.health import _git_commit_sha
-
-        return _git_commit_sha() or None
-    except Exception:
         return None
 
 
@@ -80,10 +73,34 @@ def _pilot_slice(db: Session, settings: Settings) -> dict[str, Any]:
         }
 
 
+def _production_alignment(settings: Settings) -> dict[str, Any]:
+    identity = collect_deployment_identity(service_role="api")
+    configured = (settings.founder_command_repo_head_hint or "").strip()
+    expected_sha = configured or KNOWN_PROD_SHA_HINT
+    provenance = str(identity.get("provenance") or "unknown")
+    api_sha = identity.get("source_revision") or identity.get("git_commit")
+    if provenance == "mismatched":
+        status = "provenance_mismatch"
+    elif provenance != "platform":
+        status = "unknown"
+    elif sha_matches(str(api_sha or ""), expected_sha):
+        status = "aligned"
+    else:
+        status = "drift"
+    return {
+        "api_git_commit": api_sha if api_sha != "unknown" else None,
+        "repo_head_hint": expected_sha,
+        "repo_head_source": "configured" if configured else "known_four_way_deploy",
+        "deployment_provenance": provenance,
+        "runtime_label": identity.get("runtime_label"),
+        "deployment_id": identity.get("deployment_id"),
+        "alignment_status": status,
+    }
+
+
 def resolve_project_state(db: Session, settings: Settings) -> dict[str, Any]:
     """Build canonical ProjectState — not merely the last Cursor report."""
-    api_sha = _git_commit_from_health()
-    repo_head_hint = KNOWN_PROD_SHA_HINT
+    production = _production_alignment(settings)
 
     active_runs = (
         db.execute(
@@ -153,10 +170,6 @@ def resolve_project_state(db: Session, settings: Settings) -> dict[str, Any]:
                 }
             )
 
-    alignment = "aligned" if api_sha and api_sha.startswith(repo_head_hint[:12]) else "unknown"
-    if api_sha and repo_head_hint and api_sha == repo_head_hint:
-        alignment = "aligned"
-
     return {
         "resolved_at": datetime.utcnow().isoformat() + "Z",
         "repo": {
@@ -167,9 +180,7 @@ def resolve_project_state(db: Session, settings: Settings) -> dict[str, Any]:
             "allowlist_configured": bool((settings.agent_dispatch_repo_allowlist or "").strip()),
         },
         "production": {
-            "api_git_commit": api_sha,
-            "repo_head_hint": repo_head_hint,
-            "alignment_status": alignment,
+            **production,
             "frontend_url": "https://twin-sooty.vercel.app",
             "api_url": "https://twin-production-bcd9.up.railway.app",
         },
