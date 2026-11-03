@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from app.config import Settings, get_settings
 from app.core.deps import get_current_user, get_db
 from app.database.models import Candidate, User
+from app.limiter import limiter
 from app.services import canary_journey as journey
 from app.services import first_value_ladder as ladder
 from app.services import private_canary as canary
@@ -128,6 +129,7 @@ def post_friction(
 
 
 @admin_router.post("/canary/session")
+@limiter.limit("10/minute")
 def admin_canary_session_issue(
     request: Request,
     db: Session = Depends(get_db),
