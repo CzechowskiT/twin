@@ -26,6 +26,18 @@ export const CANARY_JOURNEY_MESSAGES_EN = {
   adminClose: "Close",
   adminRealInvites: "Real invites created",
   adminNeverAuto: "Never auto ACTIVE_ONE_CANDIDATE",
+  authSignIn: "Sign in with your Founder account to continue.",
+  authForbidden: "This account is not on the Founder canary allowlist.",
+  authElevateLead:
+    "Unlock with authenticator code when MFA is enrolled (required in production). Dev-only password step-up applies only before MFA enrollment. Secrets stay in HttpOnly cookies — never in browser storage.",
+  authPassword: "Password (step-up, non-prod bootstrap only)",
+  authMfaCode: "Authenticator code (required when MFA enrolled)",
+  authMfaEnrollRequired:
+    "Production Founder canary requires TOTP enrollment before access. Enroll MFA, then unlock with an authenticator code.",
+  authUnlock: "Unlock canary admin",
+  authLock: "Lock session",
+  authElevated: "Founder canary session elevated",
+  authChecking: "Checking Founder session…",
   desTitle: "Real canary candidate designation",
   desLead:
     "Save exactly one delivery identity. This does not raise caps, send an invite, create an account, or activate the canary.",
@@ -70,6 +82,18 @@ export const CANARY_JOURNEY_MESSAGES_PL: Record<keyof typeof CANARY_JOURNEY_MESS
   adminClose: "Zamknij",
   adminRealInvites: "Utworzone realne zaproszenia",
   adminNeverAuto: "Nigdy auto ACTIVE_ONE_CANDIDATE",
+  authSignIn: "Zaloguj się kontem Foundera, aby kontynuować.",
+  authForbidden: "To konto nie jest na liście Founder canary.",
+  authElevateLead:
+    "Odblokuj kodem authenticatora, gdy MFA jest włączone (wymagane na produkcji). Hasło step-up tylko w bootstrapie bez MFA poza prod. Sekrety zostają w HttpOnly cookies — nigdy w storage przeglądarki.",
+  authPassword: "Hasło (step-up, tylko bootstrap poza prod)",
+  authMfaCode: "Kod authenticatora (wymagany przy włączonym MFA)",
+  authMfaEnrollRequired:
+    "Produkcyjny dostęp Founder canary wymaga enrollmentu TOTP. Włącz MFA, potem odblokuj kodem authenticatora.",
+  authUnlock: "Odblokuj admin canary",
+  authLock: "Zablokuj sesję",
+  authElevated: "Sesja Founder canary podniesiona",
+  authChecking: "Sprawdzanie sesji Foundera…",
   desTitle: "Desygnacja realnego kandydata canary",
   desLead:
     "Zapisz dokładnie jedną tożsamość dostawy. To nie podnosi capów, nie wysyła zaproszenia, nie tworzy konta i nie aktywuje canary.",

@@ -1,7 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
 import { useTranslation } from "@/components/language-provider";
+import { getToken, hasActiveSession } from "@/lib/auth";
+import { issueStepUpToken } from "@/lib/step-up";
 
 type Designation = {
   status?: string;
@@ -35,46 +39,76 @@ type Snapshot = {
   checklist?: { all_pass?: boolean };
 };
 
-const STORAGE_KEY = "twin_ops_admin_token";
+type AuthGate = "checking" | "need_login" | "forbidden" | "need_elevate" | "ready";
+
+const LOGIN_NEXT = "/login?next=%2Fadmin%2Fcanary";
+const SESSION_API = "/api/ops-admin/canary/session";
 
 /**
- * Founder/ops canary control + real-candidate designation.
+ * Founder canary control + real-candidate designation.
+ * Auth: Founder allowlist + elevated HttpOnly cookie session (step-up/MFA).
+ * CSRF for mutations comes from authenticated GET/POST /session JSON
+ * (cookie Path is BFF-only — page JS cannot read the Path-scoped CSRF cookie).
+ * Never stores OPS_ADMIN_TOKEN in browser storage.
  * Save designation never mints/sends/activates or raises caps.
  */
 export function CanaryControlPanel() {
   const { t } = useTranslation();
-  const [token, setToken] = useState("");
+  const router = useRouter();
+  const [authGate, setAuthGate] = useState<AuthGate>("checking");
+  const [csrf, setCsrf] = useState<string>("");
   const [snap, setSnap] = useState<Snapshot | null>(null);
   const [des, setDes] = useState<Designation | null>(null);
   const [identity, setIdentity] = useState("");
   const [roster, setRoster] = useState("");
+  const [password, setPassword] = useState("");
+  const [mfaCode, setMfaCode] = useState("");
+  const [mfaEnabled, setMfaEnabled] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
-    try {
-      setToken(sessionStorage.getItem(STORAGE_KEY) || "");
-    } catch {
-      /* ignore */
-    }
-  }, []);
+  const canaryHeaders = useCallback(
+    (extra?: Record<string, string>, csrfOverride?: string): HeadersInit => {
+      const headers: Record<string, string> = {
+        Accept: "application/json",
+        ...(extra || {}),
+      };
+      const csrfToken = (csrfOverride || csrf || "").trim();
+      if (csrfToken) headers["X-CSRF-Token"] = csrfToken;
+      const token = getToken()?.trim();
+      // Optional bearer for first elevate / status before cookies exist — never OPS token.
+      if (token) headers.Authorization = `Bearer ${token}`;
+      return headers;
+    },
+    [csrf],
+  );
 
-  const refresh = useCallback(async (tok: string) => {
-    if (!tok.trim()) return;
+  const refresh = useCallback(async (csrfOverride?: string) => {
     setErr(null);
     try {
       const [cRes, dRes] = await Promise.all([
         fetch("/api/ops-admin/canary/control", {
-          headers: { Authorization: `Bearer ${tok.trim()}`, Accept: "application/json" },
+          headers: canaryHeaders(undefined, csrfOverride),
+          credentials: "same-origin",
           cache: "no-store",
         }),
         fetch("/api/ops-admin/canary/designation", {
-          headers: { Authorization: `Bearer ${tok.trim()}`, Accept: "application/json" },
+          headers: canaryHeaders(undefined, csrfOverride),
+          credentials: "same-origin",
           cache: "no-store",
         }),
       ]);
       const cBody = (await cRes.json().catch(() => ({}))) as Snapshot & { detail?: string };
       const dBody = (await dRes.json().catch(() => ({}))) as Designation & { detail?: string };
+      if (cRes.status === 401) {
+        setAuthGate("need_login");
+        return;
+      }
+      if (cRes.status === 403) {
+        setAuthGate("forbidden");
+        setErr(typeof cBody.detail === "string" ? cBody.detail : null);
+        return;
+      }
       if (!cRes.ok) {
         setErr(typeof cBody.detail === "string" ? cBody.detail : `HTTP ${cRes.status}`);
         return;
@@ -82,30 +116,179 @@ export function CanaryControlPanel() {
       setSnap(cBody);
       if (dRes.ok) setDes(dBody);
       else setDes((cBody.designation as Designation) || null);
+      setAuthGate("ready");
     } catch (e) {
       setErr(e instanceof Error ? e.message : "fetch_failed");
     }
-  }, []);
+  }, [canaryHeaders]);
 
   useEffect(() => {
-    if (token) void refresh(token);
-  }, [token, refresh]);
+    let cancelled = false;
+    async function gate() {
+      if (!hasActiveSession()) {
+        if (!cancelled) setAuthGate("need_login");
+        router.replace(LOGIN_NEXT);
+        return;
+      }
+      try {
+        const res = await fetch(SESSION_API, {
+          headers: canaryHeaders(),
+          credentials: "same-origin",
+          cache: "no-store",
+        });
+        const body = (await res.json().catch(() => ({}))) as {
+          founder?: boolean;
+          elevated?: boolean;
+          csrf_token?: string | null;
+          mfa_enabled?: boolean;
+          detail?: string;
+        };
+        if (cancelled) return;
+        if (res.status === 401 || !hasActiveSession()) {
+          setAuthGate("need_login");
+          router.replace(LOGIN_NEXT);
+          return;
+        }
+        if (body.founder === false || res.status === 403) {
+          setAuthGate("forbidden");
+          return;
+        }
+        if (typeof body.mfa_enabled === "boolean") {
+          setMfaEnabled(body.mfa_enabled);
+        }
+        if (!body.elevated) {
+          // Probe MFA so unlock UI can require TOTP when enrolled.
+          if (typeof body.mfa_enabled !== "boolean") {
+            try {
+              const { fetchMfaStatus } = await import("@/lib/mfa");
+              const st = await fetchMfaStatus();
+              if (!cancelled) setMfaEnabled(Boolean(st.enabled));
+            } catch {
+              if (!cancelled) setMfaEnabled(false);
+            }
+          }
+          setCsrf("");
+          setAuthGate("need_elevate");
+          return;
+        }
+        // CSRF recovered via authenticated same-origin session endpoint (not client cookie reads).
+        const recovered = (body.csrf_token || "").trim();
+        if (!recovered) {
+          setCsrf("");
+          setAuthGate("need_elevate");
+          return;
+        }
+        setCsrf(recovered);
+        setAuthGate("ready");
+        await refresh(recovered);
+      } catch {
+        if (!cancelled) {
+          setErr("session_check_failed");
+          setAuthGate("need_elevate");
+        }
+      }
+    }
+    void gate();
+    return () => {
+      cancelled = true;
+    };
+    // Intentionally once on mount — refresh/canaryHeaders stable enough for gate.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router]);
+
+  const elevate = async () => {
+    if (busy) return;
+    setBusy(true);
+    setErr(null);
+    try {
+      const headers: Record<string, string> = {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      };
+      const token = getToken()?.trim();
+      if (!token) {
+        setAuthGate("need_login");
+        router.replace(LOGIN_NEXT);
+        return;
+      }
+      headers.Authorization = `Bearer ${token}`;
+      // When MFA is enrolled, TOTP is mandatory — password step-up alone is insufficient.
+      if (mfaEnabled) {
+        if (!mfaCode.trim()) {
+          setErr("mfa_required");
+          return;
+        }
+        headers["X-Twin-Mfa-Code"] = mfaCode.trim();
+      } else if (password.trim()) {
+        const step = await issueStepUpToken("CANARY_ADMIN_MUTATE", password.trim());
+        headers["X-Twin-Step-Up"] = step;
+      } else {
+        setErr("step_up_required");
+        return;
+      }
+      const res = await fetch(SESSION_API, {
+        method: "POST",
+        headers,
+        credentials: "same-origin",
+        body: "{}",
+        cache: "no-store",
+      });
+      const body = (await res.json().catch(() => ({}))) as {
+        csrf_token?: string;
+        detail?: string;
+        elevated?: boolean;
+      };
+      if (!res.ok) {
+        const detail = typeof body.detail === "string" ? body.detail : `HTTP ${res.status}`;
+        setErr(detail === "mfa_enrollment_required" ? t("canaryJourney.authMfaEnrollRequired") : detail);
+        return;
+      }
+      const elevatedCsrf = (body.csrf_token || "").trim();
+      if (elevatedCsrf) setCsrf(elevatedCsrf);
+      setPassword("");
+      setMfaCode("");
+      setAuthGate("ready");
+      await refresh(elevatedCsrf || undefined);
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "elevate_failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const lockSession = async () => {
+    setBusy(true);
+    try {
+      await fetch(SESSION_API, {
+        method: "DELETE",
+        credentials: "same-origin",
+        cache: "no-store",
+      });
+    } finally {
+      setCsrf("");
+      setSnap(null);
+      setDes(null);
+      setAuthGate("need_elevate");
+      setBusy(false);
+    }
+  };
 
   const act = async (action: string) => {
-    if (!token.trim() || busy) return;
+    if (busy || authGate !== "ready") return;
     setBusy(true);
     setErr(null);
     try {
       const res = await fetch("/api/ops-admin/canary/control", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token.trim()}`,
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
+        headers: canaryHeaders({ "Content-Type": "application/json" }),
+        credentials: "same-origin",
         body: JSON.stringify({ action }),
       });
       const body = (await res.json().catch(() => ({}))) as Snapshot & { detail?: string };
+      if (res.status === 403 && String(body.detail || "").includes("elevated")) {
+        setAuthGate("need_elevate");
+        return;
+      }
       if (!res.ok) {
         setErr(typeof body.detail === "string" ? body.detail : `HTTP ${res.status}`);
         return;
@@ -118,17 +301,14 @@ export function CanaryControlPanel() {
   };
 
   const saveDesignation = async () => {
-    if (!token.trim() || busy || !identity.trim()) return;
+    if (busy || authGate !== "ready" || !identity.trim()) return;
     setBusy(true);
     setErr(null);
     try {
       const res = await fetch("/api/ops-admin/canary/designation", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token.trim()}`,
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
+        headers: canaryHeaders({ "Content-Type": "application/json" }),
+        credentials: "same-origin",
         body: JSON.stringify({
           delivery_identity: identity.trim(),
           delivery_channel: "email",
@@ -143,24 +323,21 @@ export function CanaryControlPanel() {
       }
       setDes(body);
       setIdentity("");
-      await refresh(token);
+      await refresh();
     } finally {
       setBusy(false);
     }
   };
 
   const revokeDesignation = async () => {
-    if (!token.trim() || busy) return;
+    if (busy || authGate !== "ready") return;
     setBusy(true);
     setErr(null);
     try {
       const res = await fetch("/api/ops-admin/canary/designation/revoke", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token.trim()}`,
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
+        headers: canaryHeaders({ "Content-Type": "application/json" }),
+        credentials: "same-origin",
         body: JSON.stringify({ designation_id: des?.designation_id || null }),
       });
       const body = (await res.json().catch(() => ({}))) as Designation & { detail?: string };
@@ -169,18 +346,9 @@ export function CanaryControlPanel() {
         return;
       }
       setDes(body);
-      await refresh(token);
+      await refresh();
     } finally {
       setBusy(false);
-    }
-  };
-
-  const saveToken = (value: string) => {
-    setToken(value);
-    try {
-      sessionStorage.setItem(STORAGE_KEY, value);
-    } catch {
-      /* ignore */
     }
   };
 
@@ -192,21 +360,89 @@ export function CanaryControlPanel() {
     canary_active: false,
   };
 
+  if (authGate === "checking" || authGate === "need_login") {
+    return (
+      <div data-testid="canary-control-panel" className="space-y-3 rounded border border-black/10 p-4">
+        <p className="text-sm opacity-80">{t("canaryJourney.authChecking")}</p>
+      </div>
+    );
+  }
+
+  if (authGate === "forbidden") {
+    return (
+      <div data-testid="canary-control-panel" className="space-y-3 rounded border border-black/10 p-4">
+        <h2 className="text-lg font-medium">{t("canaryJourney.adminTitle")}</h2>
+        <p className="text-sm text-red-700">{t("canaryJourney.authForbidden")}</p>
+      </div>
+    );
+  }
+
+  if (authGate === "need_elevate") {
+    return (
+      <div data-testid="canary-control-panel" className="space-y-3 rounded border border-black/10 p-4">
+        <h2 className="text-lg font-medium">{t("canaryJourney.adminTitle")}</h2>
+        <p className="text-sm opacity-80">{t("canaryJourney.authElevateLead")}</p>
+        {err ? <p className="text-sm text-red-700">{err}</p> : null}
+        {mfaEnabled ? (
+          <label className="block text-xs">
+            {t("canaryJourney.authMfaCode")}
+            <input
+              type="text"
+              inputMode="numeric"
+              className="mt-1 w-full border px-2 py-2 text-sm sm:py-1"
+              value={mfaCode}
+              onChange={(e) => setMfaCode(e.target.value)}
+              autoComplete="one-time-code"
+              data-testid="canary-elevate-mfa"
+            />
+          </label>
+        ) : (
+          <label className="block text-xs">
+            {t("canaryJourney.authPassword")}
+            <input
+              type="password"
+              className="mt-1 w-full border px-2 py-2 text-sm sm:py-1"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+              data-testid="canary-elevate-password"
+            />
+          </label>
+        )}
+        <button
+          type="button"
+          className="twin-btn-solid text-sm"
+          disabled={busy || (mfaEnabled ? !mfaCode.trim() : !password.trim())}
+          onClick={() => void elevate()}
+          data-testid="canary-elevate-submit"
+        >
+          {t("canaryJourney.authUnlock")}
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <section data-testid="canary-control-panel" className="space-y-3 rounded border border-black/10 p-4">
-        <h2 className="text-lg font-medium">{t("canaryJourney.adminTitle")}</h2>
-        <p className="text-sm opacity-80">{t("canaryJourney.adminLead")}</p>
-        <label className="block text-xs">
-          Ops token
-          <input
-            type="password"
-            className="mt-1 w-full border px-2 py-1 text-sm"
-            value={token}
-            onChange={(e) => saveToken(e.target.value)}
-            autoComplete="off"
-          />
-        </label>
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div>
+            <h2 className="text-lg font-medium">{t("canaryJourney.adminTitle")}</h2>
+            <p className="text-sm opacity-80">{t("canaryJourney.adminLead")}</p>
+            <p className="mt-1 text-xs opacity-60" data-testid="canary-elevated-badge">
+              {t("canaryJourney.authElevated")}
+            </p>
+          </div>
+          <button
+            type="button"
+            className="twin-btn-secondary text-sm"
+            disabled={busy}
+            onClick={() => void lockSession()}
+            data-testid="canary-lock-session"
+          >
+            {t("canaryJourney.authLock")}
+          </button>
+        </div>
         {err ? <p className="text-sm text-red-700">{err}</p> : null}
         {snap ? (
           <dl className="grid gap-1 text-sm sm:grid-cols-2">
@@ -250,7 +486,7 @@ export function CanaryControlPanel() {
               key={action}
               type="button"
               className="twin-btn-secondary text-sm"
-              disabled={busy || !token.trim()}
+              disabled={busy}
               onClick={() => void act(action)}
             >
               {t(`canaryJourney.${key}`)}
@@ -302,7 +538,7 @@ export function CanaryControlPanel() {
           {t("canaryJourney.desIdentity")}
           <input
             type="email"
-            className="mt-1 w-full border px-2 py-1 text-sm"
+            className="mt-1 w-full border px-2 py-2 text-sm sm:py-1"
             value={identity}
             onChange={(e) => setIdentity(e.target.value)}
             autoComplete="off"
@@ -313,7 +549,7 @@ export function CanaryControlPanel() {
           {t("canaryJourney.desRoster")}
           <input
             type="text"
-            className="mt-1 w-full border px-2 py-1 text-sm"
+            className="mt-1 w-full border px-2 py-2 text-sm sm:py-1"
             value={roster}
             onChange={(e) => setRoster(e.target.value)}
             autoComplete="off"
@@ -324,7 +560,7 @@ export function CanaryControlPanel() {
           <button
             type="button"
             className="twin-btn-solid text-sm"
-            disabled={busy || !token.trim() || !identity.trim()}
+            disabled={busy || !identity.trim()}
             onClick={() => void saveDesignation()}
             data-testid="canary-designation-save"
           >
@@ -333,7 +569,7 @@ export function CanaryControlPanel() {
           <button
             type="button"
             className="twin-btn-secondary text-sm"
-            disabled={busy || !token.trim() || des?.status !== "DESIGNATED_READY"}
+            disabled={busy || des?.status !== "DESIGNATED_READY"}
             onClick={() => void revokeDesignation()}
             data-testid="canary-designation-revoke"
           >

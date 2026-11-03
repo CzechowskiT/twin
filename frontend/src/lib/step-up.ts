@@ -13,7 +13,8 @@ export type StepUpPurpose =
   | "MFA_ENROLL"
   | "MFA_DISABLE"
   | "MFA_REPLACE"
-  | "MFA_RECOVERY_RESET";
+  | "MFA_RECOVERY_RESET"
+  | "CANARY_ADMIN_MUTATE";
 
 export async function issueStepUpToken(
   purpose: StepUpPurpose,
