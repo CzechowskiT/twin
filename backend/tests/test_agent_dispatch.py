@@ -896,6 +896,204 @@ def test_oauth_rejects_wrong_token(dispatch_client):
     assert res.status_code == 401
 
 
+@pytest.fixture
+def cimd_metadata(monkeypatch):
+    """Public metadata is simulated; no DNS or live HTTP is needed."""
+    from app.services.agent_dispatch import oauth_as
+
+    client_id = "https://chatgpt.com/oauth/codex/test-callback/client.json"
+    document = {"client_id": client_id, "redirect_uris": ["http://127.0.0.1/callback/test-callback"]}
+    state = {"document": document, "status": 200, "requests": []}
+    original_client = httpx.Client
+
+    def check_url(url):
+        assert url == client_id
+        return url
+
+    def handler(request):
+        assert str(request.url) == client_id
+        state["requests"].append(request)
+        return httpx.Response(state["status"], json=state["document"])
+
+    def mocked_client(**kwargs):
+        assert kwargs == {"timeout": 5.0, "follow_redirects": False}
+        return original_client(transport=httpx.MockTransport(handler))
+
+    monkeypatch.setattr("app.services.url_safety.assert_public_https_url", check_url)
+    monkeypatch.setattr(oauth_as.httpx, "Client", mocked_client)
+    return client_id, state
+
+
+def test_cimd_desktop_loopback_authorize_and_exchange(dispatch_client, cimd_metadata):
+    client, _ = dispatch_client
+    client_id, metadata = cimd_metadata
+    verifier, challenge = _pkce_pair()
+    redirect = "http://127.0.0.1:49152/callback/test-callback"
+    params = {
+        "response_type": "code", "client_id": client_id, "redirect_uri": redirect,
+        "code_challenge": challenge, "code_challenge_method": "S256",
+        "scope": "agent_runs:read", "state": "desktop-login",
+        "resource": "http://testserver/api/internal/agent-dispatch/mcp",
+    }
+    page = client.get("/api/internal/agent-dispatch/oauth/authorize", params=params)
+    assert page.status_code == 200
+    consent = client.post(
+        "/api/internal/agent-dispatch/oauth/authorize", params=params,
+        data={"token": "test-dispatch-token"}, follow_redirects=False,
+    )
+    assert consent.status_code == 302
+    from urllib.parse import parse_qs, urlparse
+
+    location = urlparse(consent.headers["location"])
+    assert location.netloc == "127.0.0.1:49152"
+    assert location.path == "/callback/test-callback"
+    query = parse_qs(location.query)
+    assert query["state"] == ["desktop-login"]
+    exchange = {
+        "grant_type": "authorization_code", "code": query["code"][0],
+        "redirect_uri": redirect, "client_id": client_id, "code_verifier": verifier,
+        "resource": params["resource"],
+    }
+    wrong_port = client.post("/api/internal/agent-dispatch/oauth/token", data={
+        **exchange, "redirect_uri": "http://127.0.0.1:49153/callback/test-callback",
+    })
+    assert wrong_port.status_code == 400
+    assert wrong_port.json() == {"error": "invalid_grant"}
+    token = client.post("/api/internal/agent-dispatch/oauth/token", data=exchange)
+    assert token.status_code == 200
+    assert token.json()["scope"] == "agent_runs:read"
+    assert len(metadata["requests"]) == 2
+
+
+@pytest.mark.parametrize(("registered", "requested", "allowed"), [
+    ("http://127.0.0.1/callback/a", "http://127.0.0.1:49152/callback/a", True),
+    ("http://127.0.0.1:12345/callback/a", "http://127.0.0.1:49152/callback/a", True),
+    ("http://[::1]/callback/a", "http://[::1]:49152/callback/a", True),
+    ("https://chatgpt.com/connector/oauth/a", "https://chatgpt.com/connector/oauth/a", True),
+    ("http://127.0.0.1/callback/a", "http://127.0.0.1:49152/callback/b", False),
+    ("http://127.0.0.1/callback/a", "http://[::1]:49152/callback/a", False),
+    ("http://127.0.0.1/callback/a", "http://localhost:49152/callback/a", False),
+    ("http://localhost/callback/a", "http://localhost:49152/callback/a", False),
+    ("https://chatgpt.com/connector/oauth/a", "https://chatgpt.com:8443/connector/oauth/a", False),
+    ("http://127.0.0.1/callback/a", "https://127.0.0.1:49152/callback/a", False),
+    ("http://127.0.0.1/callback/a", "http://127.0.0.1:49152/callback/a?next=other", False),
+    ("http://127.0.0.1/callback/a?app=one", "http://127.0.0.1:49152/callback/a?app=two", False),
+    ("http://127.0.0.1/callback/a", "http://127.0.0.1:49152/callback/a;other", False),
+])
+@pytest.mark.parametrize("registration", ["cimd", "dcr"])
+def test_oauth_registered_redirect_matching(cimd_metadata, registered, requested, allowed, registration):
+    from fastapi import HTTPException
+    from app.services.agent_dispatch import oauth_as
+
+    settings = get_settings()
+    client_id, metadata = cimd_metadata
+    metadata["document"]["redirect_uris"] = [registered]
+    if registration == "dcr":
+        client_id = oauth_as.register_client(settings, {"redirect_uris": [registered]})["client_id"]
+    if allowed:
+        oauth_as.validate_client_redirect(settings, client_id, requested)
+    else:
+        with pytest.raises(HTTPException) as error:
+            oauth_as.validate_client_redirect(settings, client_id, requested)
+        assert error.value.status_code == 400
+
+
+@pytest.mark.parametrize("redirect", [
+    "http://localhost.evil.example/callback", "http://127.0.0.1.evil.example/callback",
+    "http://127.0.0.1@evil.example/callback", "http://evil@127.0.0.1/callback",
+    "https://evil@chatgpt.com/connector/oauth/a", "http://127.0.0.1:bad/callback",
+    "http://127.0.0.1:65536/callback", "http://127.0.0.1:0/callback",
+    "http://127.0.0.1:/callback", "http://127.0.0.1/callback#fragment",
+    "http://127.0.0.1/callback#", "http://127.0.0.1/call\nback",
+    " http://127.0.0.1/callback", "http://127.0.0.1/callback\\other",
+])
+def test_oauth_redirect_rejects_spoofed_and_malformed_urls(redirect):
+    from app.services.agent_dispatch import oauth_as
+
+    assert oauth_as.is_allowed_redirect(redirect) is False
+
+
+@pytest.mark.parametrize("document", [
+    {}, {"redirect_uris": []}, {"redirect_uris": "http://127.0.0.1/callback"},
+    {"redirect_uris": [None]}, [], None,
+])
+def test_cimd_missing_or_malformed_redirects_fail_closed(cimd_metadata, document):
+    from fastapi import HTTPException
+    from app.services.agent_dispatch import oauth_as
+
+    client_id, metadata = cimd_metadata
+    metadata["document"] = document
+    with pytest.raises(HTTPException) as error:
+        oauth_as.validate_client_redirect(get_settings(), client_id, "http://127.0.0.1:49152/callback/a")
+    assert error.value.status_code == 400
+
+
+@pytest.mark.parametrize("metadata_status", [302, 404, 500])
+def test_cimd_http_errors_do_not_bypass_registration(cimd_metadata, metadata_status):
+    from fastapi import HTTPException
+    from app.services.agent_dispatch import oauth_as
+
+    client_id, metadata = cimd_metadata
+    metadata["status"] = metadata_status
+    with pytest.raises(HTTPException) as error:
+        oauth_as.validate_client_redirect(get_settings(), client_id, "http://127.0.0.1:49152/callback/a")
+    assert error.value.status_code == 400
+
+
+def test_cimd_private_resolution_never_fetches_or_authorizes(monkeypatch, cimd_metadata):
+    from fastapi import HTTPException
+    from app.services.agent_dispatch import oauth_as
+
+    client_id, metadata = cimd_metadata
+
+    def blocked(_url):
+        raise ValueError("target_url_ssrf_blocked")
+
+    monkeypatch.setattr("app.services.url_safety.assert_public_https_url", blocked)
+    with pytest.raises(HTTPException) as error:
+        oauth_as.validate_client_redirect(get_settings(), client_id, "http://127.0.0.1:49152/callback/a")
+    assert error.value.status_code == 400
+    assert metadata["requests"] == []
+
+
+def test_cimd_document_may_also_list_unsupported_callbacks(cimd_metadata):
+    from app.services.agent_dispatch import oauth_as
+
+    client_id, metadata = cimd_metadata
+    metadata["document"]["redirect_uris"].append("other-app://callback")
+    oauth_as.validate_client_redirect(
+        get_settings(), client_id, "http://127.0.0.1:49152/callback/test-callback"
+    )
+
+
+def test_cimd_network_failure_does_not_bypass_registration(monkeypatch, cimd_metadata):
+    from fastapi import HTTPException
+    from app.services.agent_dispatch import oauth_as
+
+    client_id, _ = cimd_metadata
+
+    def unavailable(**_kwargs):
+        raise httpx.ConnectError("metadata unavailable")
+
+    monkeypatch.setattr(oauth_as.httpx, "Client", unavailable)
+    with pytest.raises(HTTPException) as error:
+        oauth_as.validate_client_redirect(get_settings(), client_id, "http://127.0.0.1:49152/callback/a")
+    assert error.value.status_code == 400
+
+
+def test_cimd_untrusted_host_never_fetches_or_authorizes(cimd_metadata):
+    from fastapi import HTTPException
+    from app.services.agent_dispatch import oauth_as
+
+    _, metadata = cimd_metadata
+    with pytest.raises(HTTPException) as error:
+        oauth_as.validate_client_redirect(
+            get_settings(), "https://untrusted.example/client.json", "http://127.0.0.1:49152/callback/a"
+        )
+    assert error.value.status_code == 400
+    assert metadata["requests"] == []
+
+
 def _expected(prompt: str) -> dict[str, bool]:
     return infer_expected_artifacts(prompt)
 

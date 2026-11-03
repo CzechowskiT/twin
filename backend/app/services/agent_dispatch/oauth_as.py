@@ -47,12 +47,8 @@ def _validated_scopes(value: Any) -> list[str]:
         raise HTTPException(400, detail="invalid_scope")
     return sorted(set(value))
 
-CHATGPT_REDIRECT_PREFIXES = (
-    "https://chatgpt.com/connector/oauth/",
-    "https://chatgpt.com/connector_platform_oauth_redirect",
-    "https://chat.openai.com/connector/oauth/",
-    "https://chat.openai.com/connector_platform_oauth_redirect",
-)
+LOOPBACK_IP_HOSTS = frozenset({"127.0.0.1", "::1"})
+HTTPS_REDIRECT_HOSTS = frozenset({"chatgpt.com", "chat.openai.com", "localhost", "127.0.0.1"})
 
 
 def public_api_base(settings: Settings, request_base: str | None = None) -> str:
@@ -163,17 +159,44 @@ def match_dispatcher_token(settings: Settings, presented: str) -> AgentDispatchP
 
 
 def is_allowed_redirect(uri: str) -> bool:
-    u = (uri or "").strip()
-    if not u.startswith("https://"):
-        # Local MCP Inspector / dev only
-        if u.startswith("http://localhost") or u.startswith("http://127.0.0.1"):
-            return True
+    if not isinstance(uri, str) or not uri or any(c.isspace() or ord(c) < 32 for c in uri):
         return False
-    if any(u.startswith(p) or u == p.rstrip("/") for p in CHATGPT_REDIRECT_PREFIXES):
+    if "#" in uri or "\\" in uri:
+        return False
+    try:
+        parsed = urlparse(uri)
+        port = parsed.port
+        host = parsed.hostname
+        if parsed.username is not None or parsed.password is not None:
+            return False
+        if parsed.netloc.endswith(":") or (port is not None and not 1 <= port <= 65535):
+            return False
+    except ValueError:
+        return False
+    if parsed.scheme == "http":
+        # Native desktop callbacks and the local MCP Inspector.
+        return host in LOOPBACK_IP_HOSTS or host == "localhost"
+    return parsed.scheme == "https" and host in HTTPS_REDIRECT_HOSTS
+
+
+def _redirect_uri_matches(registered: str, requested: str) -> bool:
+    """Exact match except the HTTP loopback IP port (RFC 8252 sections 7.3/8.4).
+
+    Desktop CIMD registers a portless URI, then selects a free port at login.
+    Keep the host, callback path (including its server ID) and query unchanged.
+    Hostnames, HTTPS callbacks and token-exchange binding get no port exception.
+    """
+    if not is_allowed_redirect(registered) or not is_allowed_redirect(requested):
+        return False
+    if registered == requested:
         return True
-    # CIMD / custom clients: host allowlist for openai/chatgpt only unless DCR JWT.
-    host = (urlparse(u).hostname or "").lower()
-    return host in {"chatgpt.com", "chat.openai.com", "localhost", "127.0.0.1"}
+    expected, actual = urlparse(registered), urlparse(requested)
+    return (
+        expected.scheme == actual.scheme == "http"
+        and expected.hostname in LOOPBACK_IP_HOSTS
+        and expected.hostname == actual.hostname
+        and expected._replace(netloc=expected.hostname) == actual._replace(netloc=actual.hostname)
+    )
 
 
 def mint_authorization_code(
@@ -427,7 +450,7 @@ def validate_client_redirect(settings: Settings, client_id: str, redirect_uri: s
     payload = _decode(settings, client_id)
     if payload and payload.get("typ") == OAUTH_CLIENT_TYP:
         allowed = payload.get("redirect_uris") or []
-        if redirect_uri not in allowed:
+        if not any(_redirect_uri_matches(uri, redirect_uri) for uri in allowed):
             raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="redirect_uri mismatch")
         return
     # CIMD: client_id is an HTTPS metadata URL
@@ -441,9 +464,8 @@ def validate_client_redirect(settings: Settings, client_id: str, redirect_uri: s
 def _validate_cimd_redirect(client_id_url: str, redirect_uri: str) -> None:
     """Fetch CIMD metadata only for allowlisted public hosts — no SSRF.
 
-    Fail closed on blocked hosts / private IPs. Redirect following disabled.
-    When metadata cannot be fetched safely, rely on ChatGPT redirect allowlist
-    already enforced by ``is_allowed_redirect``.
+    Fail closed on blocked hosts, unavailable or malformed metadata. Redirect
+    following is disabled; a callback must be registered in the fetched document.
     """
     from app.services.url_safety import assert_public_https_url, hostname_is_cimd_allowlisted
 
@@ -451,21 +473,23 @@ def _validate_cimd_redirect(client_id_url: str, redirect_uri: str) -> None:
     host = (parsed.hostname or "").lower()
     if not hostname_is_cimd_allowlisted(host):
         # Do not server-fetch arbitrary client_id URLs (unauthenticated SSRF).
-        return
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="CIMD metadata URL not allowed")
     try:
         assert_public_https_url(client_id_url)
-    except ValueError:
-        return
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="CIMD metadata URL not allowed") from exc
     try:
         with httpx.Client(timeout=5.0, follow_redirects=False) as client:
             res = client.get(client_id_url)
             if res.status_code != 200:
-                return
+                raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="CIMD metadata unavailable")
             data = res.json()
-    except Exception:
-        return
-    uris = data.get("redirect_uris") or []
-    if uris and redirect_uri not in uris:
+    except (httpx.HTTPError, ValueError) as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="CIMD metadata unavailable") from exc
+    uris = data.get("redirect_uris") if isinstance(data, dict) else None
+    if not isinstance(uris, list) or not uris or not all(isinstance(uri, str) and uri for uri in uris):
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="invalid CIMD redirect_uris")
+    if not any(_redirect_uri_matches(uri, redirect_uri) for uri in uris):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="redirect_uri not in CIMD")
 
 

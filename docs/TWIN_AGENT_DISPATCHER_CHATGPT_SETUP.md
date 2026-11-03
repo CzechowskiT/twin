@@ -45,10 +45,34 @@ supported connection UI. This is a one-time account action, not prompt copying.
 | Setup hint (public) | `GET /api/internal/agent-dispatch/chatgpt/setup` |
 | Actions OpenAPI (public) | `GET /api/internal/agent-dispatch/chatgpt/openapi.json` |
 
-## Why OAuth (not static Bearer) for ChatGPT MCP
+## Desktop OAuth callback compatibility (pending deployment)
 
-Official ChatGPT **Developer Mode** remote MCP auth (OpenAI docs, 2026): **OAuth**, **No Authentication**, or **Mixed Authentication**.  
-ChatGPT does **not** accept a static API key / Bearer field for MCP connectors.
+The desktop connection was saved with Streamable HTTP and no bearer/header
+credentials. Its live authorization page returned `redirect_uri not in CIMD`.
+The screenshot does not expose the complete requested callback URL. An offline
+regression reproduced rejection when the CIMD registers a portless loopback
+callback but the desktop client supplies its selected listener port.
+
+The prepared fix permits a different port only for HTTP loopback IP callbacks
+(`127.0.0.1` or `[::1]`), preserving the registered host, path/server callback ID,
+and query. HTTPS and hostname callbacks retain exact matching. DCR uses the same
+rule. The authorization-code exchange still requires the exact redirect URI used
+to issue that code. Unavailable, unsafe or malformed CIMD metadata now rejects
+authorization instead of bypassing client registration.
+
+Do not enter the production dispatcher secret or complete consent on the errored
+page. The callback fix, narrowed read-only OAuth grants and cost interlock all
+remain pending deployment; saving the MCP entry does not make them active.
+
+References: [OpenAI MCP callback rules](https://learn.chatgpt.com/docs/extend/mcp)
+and [RFC 8252 sections 7.3 and 8.4](https://www.rfc-editor.org/rfc/rfc8252.html).
+
+## Why OAuth for this connection
+
+Use OAuth for this TWIN connection. Desktop MCP also supports bearer tokens via
+environment variables, but switching authentication is not a workaround for the
+pending callback, scope and cost-control fixes. Keep bearer/header fields empty
+for this OAuth setup. Hosted ChatGPT web uses remote MCP tools through plugins.
 
 TWIN therefore co-hosts a minimal OAuth 2.1 authorization server (auth code + PKCE S256) that issues short-lived access tokens after the founder proves possession of `AGENT_DISPATCH_TOKEN`. CLI / Custom GPT Actions still use `Authorization: Bearer <AGENT_DISPATCH_TOKEN>` directly.
 
