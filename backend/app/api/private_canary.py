@@ -22,6 +22,7 @@ from app.services.founder_canary_auth import (
     actor_label,
     elevate_founder_canary,
     founder_allowlist,
+    founder_canary_mfa_required,
     require_founder_canary_mutate,
     require_founder_canary_read,
 )
@@ -160,6 +161,10 @@ def admin_canary_auth_status(
         "mfa_enabled": mfa_on,
         "allowlist_configured": bool(founder_allowlist(settings)),
         "mutates_require_elevated_or_step_up": True,
+        "mfa_enrollment_required": founder_canary_mfa_required(settings),
+        "dedicated_session_secret_configured": bool(
+            (getattr(settings, "founder_canary_session_secret", "") or "").strip()
+        ),
     }
 
 

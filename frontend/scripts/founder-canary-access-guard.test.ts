@@ -51,6 +51,9 @@ test("4 founder-canary-bff helpers exist with allowlist + CSRF bind", () => {
   assert.match(bff, /bindCsrfToElevated/);
   assert.match(bff, /looksLikeMachineOpsSecret/);
   assert.match(bff, /twin_founder_canary_at/);
+  assert.match(bff, /founderCanaryConfigAudit/);
+  assert.match(bff, /isProductionLikeRuntime/);
+  assert.match(bff, /silent_secret_key_fallback_allowed/);
 });
 
 test("5 step-up purpose includes CANARY_ADMIN_MUTATE", () => {
@@ -66,6 +69,39 @@ test("6 designation UX and fail-closed copy preserved", () => {
   assert.match(panel, /canary-designation-revoke/);
   assert.match(msgs, /authElevateLead/);
   assert.match(msgs, /HttpOnly/);
+});
+
+test("7 CSRF after refresh comes from session JSON, not client cookie reads", () => {
+  const panel = read("src/components/admin/canary-control-panel.tsx");
+  const session = read("src/app/api/ops-admin/canary/session/route.ts");
+  const bff = read("src/lib/founder-canary-bff.ts");
+  assert.doesNotMatch(panel, /document\.cookie/);
+  assert.match(panel, /csrf_token/);
+  assert.match(panel, /refresh\(recovered\)/);
+  assert.match(session, /verifyElevatedUpstream|auth-status/);
+  assert.match(session, /csrf_token:\s*csrfForClient|csrf_token: csrfForClient/);
+  assert.match(bff, /csrfCookieAttrs/);
+  assert.match(bff, /COOKIE_PATH\s*=\s*["']\/api\/ops-admin\/canary["']/);
+  assert.match(bff, /Path=\$\{COOKIE_PATH\}/);
+  // Cookie Path is BFF-only; page Path=/admin/canary cannot read it via JS.
+  assert.match(bff, /never reads it via document\.cookie|page never reads it/i);
+});
+
+test("8 GET session clears invalid elevated cookies (not cookie-presence alone)", () => {
+  const session = read("src/app/api/ops-admin/canary/session/route.ts");
+  assert.match(session, /clearElevatedCookies/);
+  assert.match(session, /Elevated session invalid|cleared:\s*true/);
+  assert.match(session, /Cookie present is insufficient|must re-validate elevated/i);
+});
+
+test("9 e2e browser suite is mock-isolated (no prod canary DB writes)", () => {
+  const e2e = read("e2e/founder-canary-access-browser.spec.ts");
+  assert.match(e2e, /mockFounderCanaryApis/);
+  assert.match(e2e, /Never hits production canary DB|mocked only/i);
+  assert.match(e2e, /IPHONE|390.*844|viewport/);
+  assert.match(e2e, /x-csrf-token/);
+  assert.match(e2e, /CSRF header required/);
+  assert.doesNotMatch(e2e, /PLAYWRIGHT_ALLOW_PROD_SMOKE/);
 });
 
 console.log("founder-canary-access-guard: ok");

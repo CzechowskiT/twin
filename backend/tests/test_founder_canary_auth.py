@@ -340,6 +340,49 @@ def test_mfa_enabled_rejects_password_step_up_alone(client, monkeypatch):
     assert elev.json()["detail"] == "mfa_required"
 
 
+def test_production_requires_mfa_enrollment_no_password_bootstrap(client, monkeypatch):
+    """Production/staging refuse password-only elevate when TOTP is not enrolled."""
+    c, db, founder, _cand = client
+    monkeypatch.setenv("ENVIRONMENT", "production")
+    monkeypatch.setenv("FOUNDER_CANARY_REQUIRE_MFA", "true")
+    monkeypatch.setattr(
+        "app.services.candidate_mfa.user_mfa_enabled",
+        lambda db, *, user_id: False,
+    )
+    get_settings.cache_clear()
+    mint = _mint_founder(db, founder)
+    headers = _user_headers_from_mint(mint)
+    step = _step_up(db, founder, mint)
+    elev = c.post(
+        "/api/v1/admin/canary/founder-elevate",
+        headers={**headers, "X-Twin-Step-Up": step},
+        json={},
+    )
+    assert elev.status_code == 403
+    assert elev.json()["detail"] == "mfa_enrollment_required"
+    status = c.get("/api/v1/admin/canary/auth-status", headers=headers)
+    assert status.status_code == 200
+    assert status.json()["mfa_enrollment_required"] is True
+    get_settings.cache_clear()
+
+
+def test_development_password_bootstrap_when_mfa_not_required(client, monkeypatch):
+    """Dev bootstrap: password step-up allowed only when MFA not enrolled and require_mfa false."""
+    c, db, founder, _cand = client
+    monkeypatch.setenv("ENVIRONMENT", "development")
+    monkeypatch.setenv("FOUNDER_CANARY_REQUIRE_MFA", "false")
+    monkeypatch.setattr(
+        "app.services.candidate_mfa.user_mfa_enabled",
+        lambda db, *, user_id: False,
+    )
+    get_settings.cache_clear()
+    headers, data = _elevate(c, db, founder)
+    assert data.get("elevated_token")
+    assert data.get("assurance") == "step_up_password"
+    assert data.get("mfa_enrollment_required_in_environment") is False
+    get_settings.cache_clear()
+
+
 def test_ops_machine_bearer_still_works_for_scripts(client):
     c, *_ = client
     headers = {"Authorization": "Bearer ops-machine-secret-token"}

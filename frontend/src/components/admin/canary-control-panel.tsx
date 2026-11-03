@@ -43,27 +43,12 @@ type AuthGate = "checking" | "need_login" | "forbidden" | "need_elevate" | "read
 
 const LOGIN_NEXT = "/login?next=%2Fadmin%2Fcanary";
 const SESSION_API = "/api/ops-admin/canary/session";
-const CSRF_COOKIE = "twin_founder_canary_csrf";
-
-function readCsrfCookie(): string {
-  if (typeof document === "undefined") return "";
-  const parts = document.cookie.split(";");
-  for (const part of parts) {
-    const idx = part.indexOf("=");
-    if (idx < 0) continue;
-    if (part.slice(0, idx).trim() !== CSRF_COOKIE) continue;
-    try {
-      return decodeURIComponent(part.slice(idx + 1).trim());
-    } catch {
-      return part.slice(idx + 1).trim();
-    }
-  }
-  return "";
-}
 
 /**
  * Founder canary control + real-candidate designation.
  * Auth: Founder allowlist + elevated HttpOnly cookie session (step-up/MFA).
+ * CSRF for mutations comes from authenticated GET/POST /session JSON
+ * (cookie Path is BFF-only — page JS cannot read the Path-scoped CSRF cookie).
  * Never stores OPS_ADMIN_TOKEN in browser storage.
  * Save designation never mints/sends/activates or raises caps.
  */
@@ -83,12 +68,12 @@ export function CanaryControlPanel() {
   const [busy, setBusy] = useState(false);
 
   const canaryHeaders = useCallback(
-    (extra?: Record<string, string>): HeadersInit => {
+    (extra?: Record<string, string>, csrfOverride?: string): HeadersInit => {
       const headers: Record<string, string> = {
         Accept: "application/json",
         ...(extra || {}),
       };
-      const csrfToken = csrf || readCsrfCookie();
+      const csrfToken = (csrfOverride || csrf || "").trim();
       if (csrfToken) headers["X-CSRF-Token"] = csrfToken;
       const token = getToken()?.trim();
       // Optional bearer for first elevate / status before cookies exist — never OPS token.
@@ -98,17 +83,17 @@ export function CanaryControlPanel() {
     [csrf],
   );
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (csrfOverride?: string) => {
     setErr(null);
     try {
       const [cRes, dRes] = await Promise.all([
         fetch("/api/ops-admin/canary/control", {
-          headers: canaryHeaders(),
+          headers: canaryHeaders(undefined, csrfOverride),
           credentials: "same-origin",
           cache: "no-store",
         }),
         fetch("/api/ops-admin/canary/designation", {
-          headers: canaryHeaders(),
+          headers: canaryHeaders(undefined, csrfOverride),
           credentials: "same-origin",
           cache: "no-store",
         }),
@@ -154,6 +139,8 @@ export function CanaryControlPanel() {
         const body = (await res.json().catch(() => ({}))) as {
           founder?: boolean;
           elevated?: boolean;
+          csrf_token?: string | null;
+          mfa_enabled?: boolean;
           detail?: string;
         };
         if (cancelled) return;
@@ -162,26 +149,38 @@ export function CanaryControlPanel() {
           router.replace(LOGIN_NEXT);
           return;
         }
-        if (body.founder === false) {
+        if (body.founder === false || res.status === 403) {
           setAuthGate("forbidden");
           return;
         }
+        if (typeof body.mfa_enabled === "boolean") {
+          setMfaEnabled(body.mfa_enabled);
+        }
         if (!body.elevated) {
           // Probe MFA so unlock UI can require TOTP when enrolled.
-          try {
-            const { fetchMfaStatus } = await import("@/lib/mfa");
-            const st = await fetchMfaStatus();
-            if (!cancelled) setMfaEnabled(Boolean(st.enabled));
-          } catch {
-            if (!cancelled) setMfaEnabled(false);
+          if (typeof body.mfa_enabled !== "boolean") {
+            try {
+              const { fetchMfaStatus } = await import("@/lib/mfa");
+              const st = await fetchMfaStatus();
+              if (!cancelled) setMfaEnabled(Boolean(st.enabled));
+            } catch {
+              if (!cancelled) setMfaEnabled(false);
+            }
           }
+          setCsrf("");
           setAuthGate("need_elevate");
           return;
         }
-        const fromCookie = readCsrfCookie();
-        if (fromCookie) setCsrf(fromCookie);
+        // CSRF recovered via authenticated same-origin session endpoint (not client cookie reads).
+        const recovered = (body.csrf_token || "").trim();
+        if (!recovered) {
+          setCsrf("");
+          setAuthGate("need_elevate");
+          return;
+        }
+        setCsrf(recovered);
         setAuthGate("ready");
-        await refresh();
+        await refresh(recovered);
       } catch {
         if (!cancelled) {
           setErr("session_check_failed");
@@ -240,14 +239,16 @@ export function CanaryControlPanel() {
         elevated?: boolean;
       };
       if (!res.ok) {
-        setErr(typeof body.detail === "string" ? body.detail : `HTTP ${res.status}`);
+        const detail = typeof body.detail === "string" ? body.detail : `HTTP ${res.status}`;
+        setErr(detail === "mfa_enrollment_required" ? t("canaryJourney.authMfaEnrollRequired") : detail);
         return;
       }
-      if (body.csrf_token) setCsrf(body.csrf_token);
+      const elevatedCsrf = (body.csrf_token || "").trim();
+      if (elevatedCsrf) setCsrf(elevatedCsrf);
       setPassword("");
       setMfaCode("");
       setAuthGate("ready");
-      await refresh();
+      await refresh(elevatedCsrf || undefined);
     } catch (e) {
       setErr(e instanceof Error ? e.message : "elevate_failed");
     } finally {

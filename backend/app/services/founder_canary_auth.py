@@ -332,6 +332,15 @@ def verify_elevated_csrf(
         raise HTTPException(status.HTTP_403_FORBIDDEN, detail="CSRF signature invalid")
 
 
+def founder_canary_mfa_required(settings: Settings) -> bool:
+    """Production/staging default to mandatory MFA enrollment for Founder canary."""
+    configured = getattr(settings, "founder_canary_require_mfa", None)
+    if configured is not None:
+        return bool(configured)
+    env = (settings.environment or "").strip().lower()
+    return env in ("production", "staging")
+
+
 def _consume_assurance(
     db: Session,
     request: Request,
@@ -339,17 +348,20 @@ def _consume_assurance(
     *,
     step_up_token: str | None,
     mfa_code: str | None,
+    settings: Settings | None = None,
 ) -> None:
     """Founder sensitive assurance.
 
-    When MFA is enabled: TOTP is mandatory (password step-up alone is insufficient).
-    When MFA is not enrolled: password step-up with CANARY_ADMIN_MUTATE is required
-    (bootstrap exception until Founder enrolls MFA — deliberate, documented).
+    When MFA is enrolled: TOTP is mandatory (password step-up alone is insufficient).
+    When FOUNDER_CANARY_REQUIRE_MFA (default true in production/staging): elevation
+    fails closed until TOTP is enrolled — no password-only bootstrap in prod.
+    Development may use password step-up only when MFA is not enrolled (bootstrap).
     """
     sid, epoch = session_binding_from_request(request)
     token = (step_up_token or step_up_token_from_request(request) or "").strip() or None
     code = (mfa_code or "").strip() or None
     mfa_on = bool(mfa.user_mfa_enabled(db, user_id=user.id))
+    cfg = settings or get_settings()
 
     if mfa_on:
         if not code:
@@ -359,6 +371,12 @@ def _consume_assurance(
         except ValueError as exc:
             raise HTTPException(status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
         return
+
+    if founder_canary_mfa_required(cfg):
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN,
+            detail="mfa_enrollment_required",
+        )
 
     if not token:
         raise HTTPException(status.HTTP_403_FORBIDDEN, detail="step_up_required")
@@ -471,6 +489,7 @@ def resolve_founder_canary_mutate(
         user,
         step_up_token=step_up_token,
         mfa_code=mfa_code,
+        settings=settings,
     )
     return principal
 
@@ -503,6 +522,7 @@ def elevate_founder_canary(
         user,
         step_up_token=step_up_token,
         mfa_code=mfa_code,
+        settings=settings,
     )
     sid = getattr(request.state, "session_key", None) or cas.session_key_from_token(raw)
     claims = decode_access_token_claims(raw) or {}
@@ -530,6 +550,7 @@ def elevate_founder_canary(
         "assurance": "aal2_totp" if mfa_on else "step_up_password",
         "mfa_required_when_enrolled": True,
         "password_step_up_insufficient_when_mfa_enabled": True,
+        "mfa_enrollment_required_in_environment": founder_canary_mfa_required(settings),
     }
 
 

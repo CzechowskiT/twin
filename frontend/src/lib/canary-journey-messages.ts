@@ -29,9 +29,11 @@ export const CANARY_JOURNEY_MESSAGES_EN = {
   authSignIn: "Sign in with your Founder account to continue.",
   authForbidden: "This account is not on the Founder canary allowlist.",
   authElevateLead:
-    "Unlock with password step-up or authenticator code. Secrets stay in HttpOnly cookies — never in browser storage.",
-  authPassword: "Password (step-up)",
-  authMfaCode: "Authenticator code (if MFA enabled)",
+    "Unlock with authenticator code when MFA is enrolled (required in production). Dev-only password step-up applies only before MFA enrollment. Secrets stay in HttpOnly cookies — never in browser storage.",
+  authPassword: "Password (step-up, non-prod bootstrap only)",
+  authMfaCode: "Authenticator code (required when MFA enrolled)",
+  authMfaEnrollRequired:
+    "Production Founder canary requires TOTP enrollment before access. Enroll MFA, then unlock with an authenticator code.",
   authUnlock: "Unlock canary admin",
   authLock: "Lock session",
   authElevated: "Founder canary session elevated",
@@ -83,9 +85,11 @@ export const CANARY_JOURNEY_MESSAGES_PL: Record<keyof typeof CANARY_JOURNEY_MESS
   authSignIn: "Zaloguj się kontem Foundera, aby kontynuować.",
   authForbidden: "To konto nie jest na liście Founder canary.",
   authElevateLead:
-    "Odblokuj hasłem (step-up) lub kodem authenticatora. Sekrety zostają w HttpOnly cookies — nigdy w storage przeglądarki.",
-  authPassword: "Hasło (step-up)",
-  authMfaCode: "Kod authenticatora (jeśli MFA włączone)",
+    "Odblokuj kodem authenticatora, gdy MFA jest włączone (wymagane na produkcji). Hasło step-up tylko w bootstrapie bez MFA poza prod. Sekrety zostają w HttpOnly cookies — nigdy w storage przeglądarki.",
+  authPassword: "Hasło (step-up, tylko bootstrap poza prod)",
+  authMfaCode: "Kod authenticatora (wymagany przy włączonym MFA)",
+  authMfaEnrollRequired:
+    "Produkcyjny dostęp Founder canary wymaga enrollmentu TOTP. Włącz MFA, potem odblokuj kodem authenticatora.",
   authUnlock: "Odblokuj admin canary",
   authLock: "Zablokuj sesję",
   authElevated: "Sesja Founder canary podniesiona",

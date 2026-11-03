@@ -52,19 +52,17 @@ export function secureCookieAttrs(maxAge: number): string {
 }
 
 export function csrfCookieAttrs(maxAge: number): string {
-  // Readable by JS for double-submit CSRF header — still SameSite=Strict.
-  const secure =
-    process.env.NODE_ENV === "production" ||
-    (process.env.VERCEL_ENV || "").toLowerCase() === "production" ||
-    (process.env.NEXT_PUBLIC_APP_URL || "").startsWith("https://");
-  const parts = [`Path=${COOKIE_PATH}`, "SameSite=Strict", `Max-Age=${Math.max(0, maxAge)}`];
-  if (secure) parts.push("Secure");
-  return parts.join("; ");
+  /**
+   * CSRF cookie is HttpOnly + Path-scoped to the canary BFF.
+   * The page never reads it via document.cookie (Path=/admin/canary cannot see it).
+   * After elevate or authenticated GET /session, the BFF returns csrf_token in JSON
+   * for the X-CSRF-Token header — double-submit without exposing elevated secrets.
+   */
+  return secureCookieAttrs(maxAge);
 }
 
-export function clearCookie(name: string, httpOnly: boolean): string {
-  const base = httpOnly ? secureCookieAttrs(0) : csrfCookieAttrs(0);
-  return `${name}=; ${base}`;
+export function clearCookie(name: string, _httpOnly: boolean): string {
+  return `${name}=; ${secureCookieAttrs(0)}`;
 }
 
 type MeOut = { email?: string; is_active?: boolean };
@@ -127,13 +125,49 @@ export function looksLikeMachineOpsSecret(token: string): boolean {
   return false;
 }
 
-export function sessionSecret(): string {
+export function isProductionLikeRuntime(): boolean {
+  const vercel = (process.env.VERCEL_ENV || "").trim().toLowerCase();
+  const nodeEnv = (process.env.NODE_ENV || "").trim().toLowerCase();
+  const appEnv = (process.env.ENVIRONMENT || process.env.APP_ENV || "").trim().toLowerCase();
   return (
-    process.env.FOUNDER_CANARY_SESSION_SECRET?.trim() ||
+    vercel === "production" ||
+    nodeEnv === "production" ||
+    appEnv === "production" ||
+    appEnv === "staging"
+  );
+}
+
+/** Dedicated canary session secret — production refuses silent SECRET_KEY broadening. */
+export function sessionSecret(): string {
+  const dedicated = process.env.FOUNDER_CANARY_SESSION_SECRET?.trim() || "";
+  if (dedicated) return dedicated;
+  if (isProductionLikeRuntime()) return "";
+  return (
     process.env.FOUNDER_COMMAND_CSRF_SECRET?.trim() ||
     process.env.SECRET_KEY?.trim() ||
     ""
   );
+}
+
+/** Config audit snapshot — booleans only, never secret values. */
+export function founderCanaryConfigAudit(): {
+  allowlist_configured: boolean;
+  canary_allowlist_exclusive: boolean;
+  dedicated_session_secret: boolean;
+  production_like: boolean;
+  silent_secret_key_fallback_allowed: boolean;
+} {
+  const canary = parseFounderAllowlist(process.env.FOUNDER_CANARY_ALLOWLIST);
+  const shared = parseFounderAllowlist(process.env.FOUNDER_COMMAND_ALLOWLIST);
+  const dedicated = Boolean(process.env.FOUNDER_CANARY_SESSION_SECRET?.trim());
+  const prod = isProductionLikeRuntime();
+  return {
+    allowlist_configured: canary.size > 0 || shared.size > 0,
+    canary_allowlist_exclusive: canary.size > 0,
+    dedicated_session_secret: dedicated,
+    production_like: prod,
+    silent_secret_key_fallback_allowed: !prod && !dedicated,
+  };
 }
 
 /** Bind CSRF cookie value to elevated token so stolen CSRF alone is insufficient. */

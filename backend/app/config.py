@@ -545,7 +545,11 @@ class Settings(BaseSettings):
     # Optional canary-only allowlist; empty → fall back to founder_command_allowlist.
     founder_canary_allowlist: str = ""
     # HMAC secret for short-lived Founder canary elevated sessions (cookies / headers).
+    # Required in production/staging — no silent SECRET_KEY fallback there.
     founder_canary_session_secret: str = ""
+    # When true, Founder must have TOTP enrolled before canary elevate (recommended for prod).
+    # Empty/default: auto-true in production/staging, false in development.
+    founder_canary_require_mfa: bool | None = None
 
     # Product funnel instrumentation (server-side events → /admin/funnel + /admin/retention).
     # Set PRODUCT_FUNNEL_EVENTS_ENABLED=false for instant rollback without migration reverse.
