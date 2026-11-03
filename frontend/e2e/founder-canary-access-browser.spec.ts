@@ -194,6 +194,8 @@ async function mockFounderCanaryApis(page: Page, state: SessionState): Promise<v
 
 async function seedFounderJwt(page: Page): Promise<void> {
   // Synthetic JWT-shaped blob for hasActiveSession() — never a real secret.
+  // Prefer localStorage: getStorage() probes localStorage before sessionStorage.
+  // withFreshContext clears both stores in an earlier init script; this runs after.
   const header = Buffer.from(JSON.stringify({ alg: "none", typ: "JWT" })).toString("base64url");
   const payload = Buffer.from(
     JSON.stringify({
@@ -204,7 +206,8 @@ async function seedFounderJwt(page: Page): Promise<void> {
   const token = `${header}.${payload}.synthetic`;
   await page.addInitScript((t) => {
     try {
-      window.sessionStorage.setItem("twin_access_token", t);
+      window.localStorage?.setItem("twin_access_token", t);
+      window.sessionStorage?.setItem("twin_access_token", t);
     } catch {
       /* ignore */
     }
