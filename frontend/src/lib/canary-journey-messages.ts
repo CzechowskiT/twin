@@ -26,6 +26,16 @@ export const CANARY_JOURNEY_MESSAGES_EN = {
   adminClose: "Close",
   adminRealInvites: "Real invites created",
   adminNeverAuto: "Never auto ACTIVE_ONE_CANDIDATE",
+  authSignIn: "Sign in with your Founder account to continue.",
+  authForbidden: "This account is not on the Founder canary allowlist.",
+  authElevateLead:
+    "Unlock with password step-up or authenticator code. Secrets stay in HttpOnly cookies — never in browser storage.",
+  authPassword: "Password (step-up)",
+  authMfaCode: "Authenticator code (if MFA enabled)",
+  authUnlock: "Unlock canary admin",
+  authLock: "Lock session",
+  authElevated: "Founder canary session elevated",
+  authChecking: "Checking Founder session…",
   desTitle: "Real canary candidate designation",
   desLead:
     "Save exactly one delivery identity. This does not raise caps, send an invite, create an account, or activate the canary.",
@@ -70,6 +80,16 @@ export const CANARY_JOURNEY_MESSAGES_PL: Record<keyof typeof CANARY_JOURNEY_MESS
   adminClose: "Zamknij",
   adminRealInvites: "Utworzone realne zaproszenia",
   adminNeverAuto: "Nigdy auto ACTIVE_ONE_CANDIDATE",
+  authSignIn: "Zaloguj się kontem Foundera, aby kontynuować.",
+  authForbidden: "To konto nie jest na liście Founder canary.",
+  authElevateLead:
+    "Odblokuj hasłem (step-up) lub kodem authenticatora. Sekrety zostają w HttpOnly cookies — nigdy w storage przeglądarki.",
+  authPassword: "Hasło (step-up)",
+  authMfaCode: "Kod authenticatora (jeśli MFA włączone)",
+  authUnlock: "Odblokuj admin canary",
+  authLock: "Zablokuj sesję",
+  authElevated: "Sesja Founder canary podniesiona",
+  authChecking: "Sprawdzanie sesji Foundera…",
   desTitle: "Desygnacja realnego kandydata canary",
   desLead:
     "Zapisz dokładnie jedną tożsamość dostawy. To nie podnosi capów, nie wysyła zaproszenia, nie tworzy konta i nie aktywuje canary.",

@@ -376,6 +376,8 @@
     "test:founder-led-demo-flow": "npx --yes tsx scripts/founder-led-demo-flow.test.ts",
     "test:founder-command-i18n": "npx --yes tsx scripts/founder-command-i18n-guard.test.ts",
     "test:founder-command-bff": "npx --yes tsx scripts/founder-command-bff.test.ts",
+    "test:founder-canary-access-guard": "npx --yes tsx scripts/founder-canary-access-guard.test.ts",
+    "test:founder-canary-bff": "npx --yes tsx scripts/founder-canary-bff.test.ts",
     "test:founder-command-center-prod": "node -e \"if(process.env.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'){console.error('Set PLAYWRIGHT_ALLOW_PROD_SMOKE=1 for production FCC e2e.');process.exit(1)}\" && npm run test:founder-command-center-prod:raw",
     "test:founder-command-center-prod:raw": "playwright test e2e/founder-command-center-prod.spec.ts --workers=1",
     "demo:validate-scenes": "npx --yes tsx scripts/demo-scene-manifest-guard.test.ts",

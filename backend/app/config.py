@@ -540,6 +540,12 @@ class Settings(BaseSettings):
     founder_command_csrf_secret: str = ""
     founder_command_default_autonomy_level: int = 3
     founder_command_poll_interval_seconds: int = 20
+    # Comma-separated Founder emails (shared roster for Command Center + canary admin).
+    founder_command_allowlist: str = ""
+    # Optional canary-only allowlist; empty → fall back to founder_command_allowlist.
+    founder_canary_allowlist: str = ""
+    # HMAC secret for short-lived Founder canary elevated sessions (cookies / headers).
+    founder_canary_session_secret: str = ""
 
     # Product funnel instrumentation (server-side events → /admin/funnel + /admin/retention).
     # Set PRODUCT_FUNNEL_EVENTS_ENABLED=false for instant rollback without migration reverse.

@@ -411,6 +411,11 @@ def _load_challenge(db: Session, raw_token: str) -> CandidateMfaChallenge:
     return row
 
 
+def verify_totp_for_sensitive_action(db: Session, *, user: User, code: str) -> str:
+    """Public TOTP verify for Founder/admin sensitive actions (replay-protected)."""
+    return _accept_totp(db, user=user, code=code)
+
+
 def _accept_totp(db: Session, *, user: User, code: str) -> str:
     """Atomic counter update — exactly one acceptance per TOTP counter."""
     _require_keyring()
