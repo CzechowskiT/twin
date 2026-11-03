@@ -3,7 +3,13 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import { NextRequest } from "next/server";
 
+import {
+  CANARY_CSRF_COOKIE,
+  canaryCookieOptions,
+  validateCanaryMutation,
+} from "../src/lib/canary-admin-bff.ts";
 const frontendRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 const repoRoot = join(frontendRoot, "..");
 const readFrontend = (path: string) => readFileSync(join(frontendRoot, path), "utf8");
@@ -51,4 +57,41 @@ test("backend canary routes use scoped Founder dependencies, never shared token"
   assert.match(auth, /managed_session_required/);
   assert.match(auth, /PURPOSE_FOUNDER_CANARY_ADMIN/);
   assert.match(auth, /CANARY_TOKEN_TYPE/);
+});
+
+function mutationRequest(origin: string | null, header: string, cookie: string): NextRequest {
+  const headers: Record<string, string> = {
+    "X-CSRF-Token": header,
+    Cookie: `${CANARY_CSRF_COOKIE}=${cookie}`,
+  };
+  if (origin) headers.Origin = origin;
+  return new NextRequest("https://twin.test/api/ops-admin/canary/control", {
+    method: "POST",
+    headers,
+  });
+}
+
+test("canary mutation accepts only exact same-origin double-submit CSRF", async () => {
+  assert.equal(validateCanaryMutation(mutationRequest("https://twin.test", "csrf-1", "csrf-1")), null);
+
+  const crossOrigin = validateCanaryMutation(
+    mutationRequest("https://attacker.test", "csrf-1", "csrf-1"),
+  );
+  assert.equal(crossOrigin?.status, 403);
+  assert.equal((await crossOrigin?.json()).detail, "invalid_origin");
+
+  const mismatch = validateCanaryMutation(
+    mutationRequest("https://twin.test", "csrf-1", "csrf-2"),
+  );
+  assert.equal(mismatch?.status, 403);
+  assert.equal((await mismatch?.json()).detail, "invalid_csrf");
+});
+
+test("canary session cookie is HttpOnly, Strict, path-scoped, and high priority", () => {
+  const options = canaryCookieOptions(900);
+  assert.equal(options.httpOnly, true);
+  assert.equal(options.sameSite, "strict");
+  assert.equal(options.path, "/api/ops-admin/canary");
+  assert.equal(options.priority, "high");
+  assert.equal(options.maxAge, 900);
 });
