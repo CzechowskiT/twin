@@ -100,9 +100,14 @@ def test_normal_candidate_and_unauthenticated_users_are_denied(canary_client):
         assert client.get(path, headers=_bearer(candidate_aal2["access_token"])).status_code == 401
 
 
-def test_aal1_founder_requires_and_consumes_purpose_bound_step_up(canary_client):
+def test_aal1_founder_requires_step_up_even_if_global_gate_is_disabled(
+    canary_client,
+    monkeypatch,
+):
     client, db, founder, _, _, _ = canary_client
     aal1 = cas.issue_session(db, user=founder, assurance_level="AAL1_PRIMARY")
+    monkeypatch.setenv("AUTH_STEP_UP_ENFORCE", "false")
+    get_settings.cache_clear()
     required = _issue_canary(client, aal1["access_token"])
     assert required.status_code == 403
     assert required.json()["detail"] == "step_up_required"

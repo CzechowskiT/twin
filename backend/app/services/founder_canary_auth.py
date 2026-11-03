@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Annotated, Any
@@ -46,7 +47,7 @@ class FounderCanaryPrincipal:
 def _founder_emails(settings: Settings) -> frozenset[str]:
     return frozenset(
         value.strip().lower()
-        for value in (settings.founder_command_allowlist or "").replace(";", ",").split(",")
+        for value in re.split(r"[,;\s]+", settings.founder_command_allowlist or "")
         if "@" in value
     )
 
@@ -96,12 +97,15 @@ def issue_founder_canary_session(
     assurance = str(managed.assurance_level or "AAL1_PRIMARY")
     auth_method = "mfa" if assurance in _STRONG_ASSURANCE else "password_step_up"
     if auth_method == "password_step_up":
+        step_token = step_up_token_from_request(request)
+        if not step_token:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, detail="step_up_required")
         try:
-            step_up.require_step_up_or_raise(
+            step_up.consume_step_up(
                 db,
                 user=user,
                 purpose=PURPOSE_FOUNDER_CANARY_ADMIN,
-                step_up_token=step_up_token_from_request(request),
+                step_up_token=step_token,
                 session_key=sid,
                 session_epoch=epoch,
             )
