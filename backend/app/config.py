@@ -499,6 +499,9 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices("CURSOR_CLOUD_AGENTS_API_KEY", "cursor_cloud_agents_api_key"),
     )
     cursor_api_base_url: str = "https://api.cursor.com"
+    # Operator-only interlock. Keep false until the Founder approves a bounded
+    # execution window and provider-side spending controls are verified.
+    agent_dispatch_billable_execution_enabled: bool = False
     # Bearer tokens for /api/internal/agent-dispatch/* (comma list `token:scopes` or single token).
     agent_dispatch_token: str = ""
     agent_dispatch_tokens: str = ""

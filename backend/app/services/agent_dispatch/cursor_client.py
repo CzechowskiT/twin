@@ -16,6 +16,7 @@ import httpx
 
 from app.config import Settings
 from app.services.agent_dispatch.constants import CURSOR_API_BASE_URL, CURSOR_API_CREDENTIAL_SECRET_NAME
+from app.services.agent_dispatch.cost_policy import require_billable_execution
 
 logger = logging.getLogger(__name__)
 
@@ -108,6 +109,7 @@ class CursorCloudAgentsClient:
         name: str | None = None,
     ) -> CursorCreateResult:
         """Create via v0 when webhook configured (v1 webhooks 'coming soon'); else v1."""
+        require_billable_execution(self._settings)
         if webhook_url:
             return self._create_v0(
                 prompt_text=prompt_text,
@@ -139,6 +141,7 @@ class CursorCloudAgentsClient:
         model_id: str | None,
         name: str | None,
     ) -> CursorCreateResult:
+        require_billable_execution(self._settings)
         body: dict[str, Any] = {
             "prompt": {"text": prompt_text},
             "repos": [{"url": repository_url, "startingRef": starting_ref}],
@@ -185,6 +188,7 @@ class CursorCloudAgentsClient:
     ) -> CursorCreateResult:
         # v0 rejects unrecognized top-level keys (e.g. `name` → 400).
         # Display name is derived by Cursor from the prompt; pass `name` only on v1.
+        require_billable_execution(self._settings)
         body: dict[str, Any] = {
             "prompt": {"text": prompt_text},
             "source": {"repository": repository_url, "ref": starting_ref},

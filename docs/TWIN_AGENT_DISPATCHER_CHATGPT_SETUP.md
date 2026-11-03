@@ -5,6 +5,17 @@
 ChatGPT → hosted TWIN MCP → Agent Dispatcher → Cursor Cloud Agent → GitHub branch/PR →
 structured report/handoff — **without** pasting prompts or Cursor API keys into chat.
 
+## Cost approval before execution
+
+See [the no-spend integration runbook](./TWIN_CURSOR_NO_SPEND_INTEGRATION_2026-11-03.md).
+The server defaults to `AGENT_DISPATCH_BILLABLE_EXECUTION_ENABLED=false`.
+First call `get_twin_cursor_readiness` with read scope: it checks configuration
+without contacting Cursor or launching an agent. An API key and a `read_only`
+task are not cost approval. New and deferred dispatch requests are blocked
+until an operator enables a specifically Founder-approved execution window.
+The switch is not a provider spending cap; provider-side limits must be verified
+separately. Connector setup alone never authorizes execution, merge or deploy.
+
 ## Production endpoint
 
 | Item | Value |
@@ -39,8 +50,8 @@ One-time founder UI (cannot be automated via OpenAI API for personal connectors)
    - **MCP server URL:** `https://twin-production-bcd9.up.railway.app/api/internal/agent-dispatch/mcp`
    - **Authentication:** **OAuth** (not “None”)
 4. Complete OAuth: ChatGPT redirects to TWIN authorize page → paste production `AGENT_DISPATCH_TOKEN` from the secret store → Allow.
-5. Confirm tool list includes `dispatch_twin_agent`, `get_twin_agent_status`, `get_twin_agent_report`, `get_twin_agent_handoff`, `cancel_twin_agent`, `list_twin_agent_runs`, `reconcile_twin_agent_run`.
-6. In a new chat: **Developer mode** → enable the TWIN app → ask ChatGPT to dispatch (do not paste Cursor prompts).
+5. Confirm tool list includes `get_twin_cursor_readiness`, `dispatch_twin_agent`, `get_twin_agent_status`, `get_twin_agent_report`, `get_twin_agent_handoff`, `cancel_twin_agent`, `list_twin_agent_runs`, `reconcile_twin_agent_run`.
+6. In a new chat enable the TWIN app, then call `get_twin_cursor_readiness`. Do not dispatch until explicit cost approval and verified provider spending controls are in place.
 
 Discovery endpoints ChatGPT uses automatically:
 
@@ -65,6 +76,7 @@ If MCP connector registration is unavailable on the account:
 
 | Tool | Scope | Purpose |
 |------|-------|---------|
+| `get_twin_cursor_readiness` | `agent_runs:read` | Configuration and cost interlock only; no remote requests |
 | `dispatch_twin_agent` | `agent_runs:create` | Start run |
 | `get_twin_agent_status` | `agent_runs:read` | Status (+ optional refresh) |
 | `get_twin_agent_report` | `agent_runs:read` | Structured report |

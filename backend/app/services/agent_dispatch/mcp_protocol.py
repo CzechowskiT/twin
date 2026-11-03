@@ -15,6 +15,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.config import Settings
+from app.services.agent_dispatch.cost_policy import cursor_integration_readiness
 from app.services.agent_dispatch.auth import AgentDispatchPrincipal, require_scope
 from app.services.agent_dispatch.constants import (
     AGENT_DISPATCH_SCOPE_ADMIN,
@@ -37,7 +38,7 @@ from app.services.agent_dispatch.service import (
 
 MCP_PROTOCOL_VERSION = "2025-06-18"
 MCP_SERVER_NAME = "twin-agent-dispatcher"
-MCP_SERVER_VERSION = "1.0.0"
+MCP_SERVER_VERSION = "1.1.0"
 
 # Hard allowlist — mirrored in Settings defaults; MCP never expands beyond this.
 MCP_REPO_ALLOWLIST = ("https://github.com/CzechowskiT/twin",)
@@ -97,9 +98,17 @@ def tool_definitions() -> list[dict[str, Any]]:
     }
     return [
         _tool(
+            "get_twin_cursor_readiness",
+            "Inspect Cursor integration configuration and cost interlock. "
+            "No remote requests, agent launch, CI or deployment; does not verify credentials.",
+            {},
+            read_only=True,
+        ),
+        _tool(
             "dispatch_twin_agent",
             "Create a TWIN Agent Dispatcher run (Cursor Cloud Agent). "
-            "Repo/branch allowlisted; execution_policy server-enforced.",
+            "Repo/branch allowlisted; execution_policy server-enforced. "
+            "Billable even for read-only tasks; blocked until operator enables Founder-approved execution.",
             {
                 "task_name": {"type": "string", "minLength": 1, "maxLength": 128},
                 "prompt": {"type": "string", "minLength": 1, "maxLength": 200000},
@@ -204,6 +213,10 @@ def call_tool(
 ) -> dict[str, Any]:
     args = arguments or {}
     try:
+        if name == "get_twin_cursor_readiness":
+            require_scope(principal, AGENT_DISPATCH_SCOPE_READ)
+            return _text_result(cursor_integration_readiness(settings))
+
         if name == "dispatch_twin_agent":
             require_scope(principal, AGENT_DISPATCH_SCOPE_CREATE)
             policy = _enforce_policy(args.get("execution_policy") if isinstance(args.get("execution_policy"), dict) else None)
@@ -330,6 +343,8 @@ def handle_jsonrpc(
                     "TWIN Agent Dispatcher MCP for ChatGPT. "
                     "Auth: OAuth 2.1 (ChatGPT connector) or Bearer AGENT_DISPATCH_TOKEN (CLI/Actions). "
                     "Never pass CURSOR_CLOUD_AGENTS_API_KEY. After runs, call get_twin_agent_handoff. "
+                    "First call get_twin_cursor_readiness. Agent launch is billable even for read-only tasks; "
+                    "Founder cost approval is required and cannot be supplied through tool arguments. "
                     "Manual merge only; do not copy prompts from the UI."
                 ),
             }

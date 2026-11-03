@@ -50,6 +50,11 @@ from app.services.agent_dispatch.cursor_client import (
     CursorApiError,
     CursorCloudAgentsClient,
 )
+from app.services.agent_dispatch.cost_policy import (
+    COST_APPROVAL_REQUIRED,
+    CostApprovalRequired,
+    require_billable_execution,
+)
 from app.services.agent_dispatch.github_enricher import GitHubEnricher, GitHubEnrichment
 from app.services.agent_dispatch.locking import (
     LockConflictError,
@@ -214,6 +219,15 @@ def create_dispatch_run(
                 )
             return existing
 
+    # Block even deferred/read-only requests: queued jobs may launch after restart.
+    try:
+        require_billable_execution(settings)
+    except CostApprovalRequired as exc:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN,
+            detail={"error": COST_APPROVAL_REQUIRED},
+        ) from exc
+
     if expected_artifacts["execution_mode"] == "mutating":
         _recover_invalid_read_only_holder(
             db,
@@ -313,6 +327,26 @@ def dispatch_to_cursor(db: Session, settings: Settings, run_id: str) -> AgentDis
     if not run:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="run not found")
     if run.status not in (DispatchRunStatus.QUEUED.value, DispatchRunStatus.DISPATCHING.value):
+        return run
+
+    try:
+        require_billable_execution(settings)
+    except CostApprovalRequired:
+        # Terminal, so polling/recovery cannot resume it after approval changes.
+        run.status = DispatchRunStatus.FAILED.value
+        run.error_code = COST_APPROVAL_REQUIRED
+        run.error_message = "Cursor execution requires explicit Founder cost approval"
+        run.finished_at = datetime.utcnow()
+        release_lock(db, run_id=run.id)
+        write_audit(
+            db,
+            run_id=run.id,
+            event_type="dispatch_cost_blocked",
+            actor_fingerprint=None,
+            detail={"reason_code": COST_APPROVAL_REQUIRED},
+        )
+        db.commit()
+        db.refresh(run)
         return run
 
     run.status = DispatchRunStatus.DISPATCHING.value

@@ -18,6 +18,7 @@ Rate limit: 60/minute (IP). No anonymous access.
 
 | MCP tool | HTTP | Scope |
 |----------|------|-------|
+| `get_twin_cursor_readiness` | MCP configuration-only tool; no downstream HTTP call | `agent_runs:read` |
 | `dispatch_twin_agent` | `POST /runs` | `agent_runs:create` |
 | `get_twin_agent_status` | `GET /runs/{id}` | `agent_runs:read` |
 | `get_twin_agent_report` | `GET /runs/{id}/report` | `agent_runs:read` |
@@ -48,6 +49,13 @@ Rate limit: 60/minute (IP). No anonymous access.
 
 Server rejects any weakened `execution_policy` flag.
 
+The server also defaults to `AGENT_DISPATCH_BILLABLE_EXECUTION_ENABLED=false`.
+New/deferred dispatch, Cursor create and GitHub Operator writes fail closed
+with `founder_cost_approval_required`. Read-only task intent does not waive
+cost approval. No tool argument can enable spending. Start with
+`get_twin_cursor_readiness`; it does not validate the key or live connectivity.
+See [the cost interlock runbook](./TWIN_CURSOR_NO_SPEND_INTEGRATION_2026-11-03.md).
+
 ## Auth for connector
 
 - **ChatGPT MCP connector:** OAuth 2.1 (auth code + PKCE). ChatGPT does not support static API keys for MCP. See [TWIN_AGENT_DISPATCHER_CHATGPT_SETUP.md](./TWIN_AGENT_DISPATCHER_CHATGPT_SETUP.md).
@@ -63,5 +71,5 @@ Pass `idempotency_key` from ChatGPT/MCP so retries do not double-dispatch.
 ## Version metadata
 
 - MCP protocol: `2025-06-18`
-- Server: `twin-agent-dispatcher` `1.0.0`
+- Server: `twin-agent-dispatcher` `1.1.0`
 - Cursor contract date: see `cursor_contract_doc_date` on `/health`

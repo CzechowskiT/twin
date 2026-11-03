@@ -679,6 +679,36 @@ def _timeline_messages(db, command_id: str) -> list[str]:
     )
 
 
+def test_unapproved_cursor_cost_stops_founder_loop_without_retry(founder_client, monkeypatch):
+    from app.database.models import AgentDispatchRun
+    from app.services.agent_dispatch import service as dispatcher
+    from app.services.founder_command.execution_loop import tick_command
+
+    _, db = founder_client
+    monkeypatch.setenv("AGENT_DISPATCH_BILLABLE_EXECUTION_ENABLED", "false")
+    get_settings.cache_clear()
+    monkeypatch.setattr(
+        dispatcher, "CursorCloudAgentsClient", lambda *_: pytest.fail("No Cursor launch allowed")
+    )
+    plan = plan_from_command(
+        command_text="Inspect repository metadata only", project_state={},
+        autonomy_level=1, max_batches=1, max_runtime_minutes=30, action="analyze",
+    )
+    row = _seed_running_command(
+        db, current_stage="dispatch", plan_json=json.dumps(plan), stage_retry_count=0,
+    )
+    for _ in range(2):
+        tick_command(db, get_settings(), row.id, actor_fingerprint="test")
+    db.refresh(row)
+    assert row.status == "needs_founder"
+    assert row.error_code == "founder_cost_approval_required"
+    assert row.stage_retry_count == 0
+    assert row.consecutive_failures == 0
+    assert row.dispatch_run_id is None
+    assert db.query(AgentDispatchRun).count() == 0
+    assert get_settings().agent_dispatch_billable_execution_enabled is False
+
+
 def test_max_consecutive_failures_without_active_run_fails(founder_client):
     client, db = founder_client
     from app.services.founder_command.execution_loop import tick_command

@@ -12,6 +12,11 @@ import httpx
 from jose import jwt
 
 from app.config import Settings
+from app.services.agent_dispatch.cost_policy import (
+    COST_APPROVAL_REQUIRED,
+    CostApprovalRequired,
+    require_billable_execution,
+)
 from app.services.agent_dispatch.github_enricher import parse_github_repo, parse_pr_url
 
 
@@ -492,6 +497,11 @@ class GitHubOperatorClient:
         allowed: set[int] | None = None,
         **kwargs: Any,
     ) -> httpx.Response:
+        if method.upper() not in {"GET", "HEAD", "OPTIONS"}:
+            try:
+                require_billable_execution(self._settings)
+            except CostApprovalRequired as exc:
+                raise OperatorGitHubError(COST_APPROVAL_REQUIRED) from exc
         if not self._configured:
             raise OperatorGitHubError("operator_capability_missing")
         headers = {

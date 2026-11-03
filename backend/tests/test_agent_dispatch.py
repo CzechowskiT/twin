@@ -40,6 +40,8 @@ from app.services.agent_dispatch.webhooks import verify_cursor_webhook_signature
 
 @pytest.fixture
 def dispatch_client(monkeypatch):
+    # These legacy scenarios use mocked Cursor/SQLite, never billable services.
+    monkeypatch.setenv("AGENT_DISPATCH_BILLABLE_EXECUTION_ENABLED", "true")
     monkeypatch.setenv("AGENT_DISPATCH_TOKEN", "test-dispatch-token")
     monkeypatch.setenv("AGENT_DISPATCH_REPO_ALLOWLIST", "https://github.com/CzechowskiT/twin")
     monkeypatch.setenv("AGENT_DISPATCH_BASE_BRANCH_ALLOWLIST", "cursor/phase1-monorepo-scaffold")
@@ -664,6 +666,7 @@ def test_health_exposes_mcp_without_secrets(dispatch_client):
 
 def test_cursor_v0_create_omits_name_key(monkeypatch):
     """Cursor v0 /agents rejects unrecognized top-level `name` (HTTP 400)."""
+    monkeypatch.setenv("AGENT_DISPATCH_BILLABLE_EXECUTION_ENABLED", "true")
     monkeypatch.setenv("CURSOR_CLOUD_AGENTS_API_KEY", "test-cursor-key")
     get_settings.cache_clear()
 
@@ -705,6 +708,7 @@ def test_cursor_v0_create_omits_name_key(monkeypatch):
 
 
 def test_cursor_v1_create_uses_agent_latest_run_id(monkeypatch):
+    monkeypatch.setenv("AGENT_DISPATCH_BILLABLE_EXECUTION_ENABLED", "true")
     monkeypatch.setenv("CURSOR_CLOUD_AGENTS_API_KEY", "test-cursor-key")
     get_settings.cache_clear()
 
@@ -2152,3 +2156,158 @@ def test_polling_delay_rechecks_github_before_success(dispatch_client, monkeypat
     assert response.json()["status"] == "succeeded"
     assert response.json()["verified_artifacts"]["ci_passed"] is True
     assert calls == {"cursor": 2, "github": 2}
+
+
+def test_cost_interlock_defaults_to_blocked(monkeypatch):
+    from app.config import Settings
+
+    monkeypatch.delenv("AGENT_DISPATCH_BILLABLE_EXECUTION_ENABLED", raising=False)
+    assert Settings(_env_file=None).agent_dispatch_billable_execution_enabled is False
+
+
+@pytest.mark.parametrize("dispatch_now", [False, True])
+@pytest.mark.parametrize("read_only", [False, True])
+def test_unapproved_request_cannot_create_or_queue_run(
+    dispatch_client, monkeypatch, dispatch_now, read_only
+):
+    from app.database.models import AgentDispatchLock, AgentDispatchRun
+    from app.services.agent_dispatch import service as svc
+
+    client, db = dispatch_client
+    monkeypatch.setenv("AGENT_DISPATCH_BILLABLE_EXECUTION_ENABLED", "false")
+    get_settings.cache_clear()
+    monkeypatch.setattr(
+        svc, "CursorCloudAgentsClient", lambda *_: pytest.fail("Cursor must not be constructed")
+    )
+    payload = _create_payload(dispatch_now=dispatch_now)
+    if read_only:
+        payload.update(prompt="Inspect repository metadata only", execution_mode="read_only")
+    response = client.post("/api/internal/agent-dispatch/runs", headers=_auth(), json=payload)
+    assert response.status_code == 403
+    assert response.json()["detail"]["error"] == "founder_cost_approval_required"
+    assert db.query(AgentDispatchRun).count() == 0
+    assert db.query(AgentDispatchLock).count() == 0
+
+
+def test_mcp_arguments_cannot_authorize_costs(dispatch_client, monkeypatch):
+    from app.database.models import AgentDispatchRun
+
+    client, db = dispatch_client
+    monkeypatch.setenv("AGENT_DISPATCH_BILLABLE_EXECUTION_ENABLED", "false")
+    get_settings.cache_clear()
+    response = client.post(
+        "/api/internal/agent-dispatch/mcp", headers=_auth(),
+        json={"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": {
+            "name": "dispatch_twin_agent", "arguments": {
+                **_create_payload(), "cost_approved": True,
+                "agent_dispatch_billable_execution_enabled": True,
+                "metadata": {"founder_approval": True},
+            },
+        }},
+    )
+    result = response.json()["result"]
+    assert result["isError"] is True
+    assert "founder_cost_approval_required" in result["content"][0]["text"]
+    assert db.query(AgentDispatchRun).count() == 0
+
+
+def test_cursor_readiness_works_with_read_scope_without_exposing_secrets(
+    dispatch_client, monkeypatch
+):
+    client, _ = dispatch_client
+    monkeypatch.setenv("AGENT_DISPATCH_BILLABLE_EXECUTION_ENABLED", "false")
+    monkeypatch.setenv("AGENT_DISPATCH_TOKENS", "read-only-test-token:read")
+    monkeypatch.setenv("CURSOR_CLOUD_AGENTS_API_KEY", "never-return-this-cursor-key")
+    get_settings.cache_clear()
+    response = client.post(
+        "/api/internal/agent-dispatch/mcp",
+        headers={"Authorization": "Bearer read-only-test-token"},
+        json={"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": {
+            "name": "get_twin_cursor_readiness", "arguments": {},
+        }},
+    )
+    assert response.status_code == 200
+    result = response.json()["result"]
+    assert result["isError"] is False
+    body = json.loads(result["content"][0]["text"])
+    assert body["mode"] == "metadata_only"
+    assert body["cursor_credential_configured"] is True
+    assert body["remote_connection_verified"] is False
+    assert body["credential_validation"] == "not_checked"
+    assert body["launches_agent"] is False
+    assert body["provider_budget_enforced"] is False
+    assert "never-return-this-cursor-key" not in response.text
+    assert "read-only-test-token" not in response.text
+
+
+def test_readiness_is_advertised_as_read_only_without_approval_input(dispatch_client):
+    from app.services.agent_dispatch.mcp_protocol import tool_definitions
+
+    tools = {tool["name"]: tool for tool in tool_definitions()}
+    assert tools["get_twin_cursor_readiness"]["annotations"]["readOnlyHint"] is True
+    assert tools["get_twin_cursor_readiness"]["inputSchema"]["properties"] == {}
+    assert "cost_approved" not in tools["dispatch_twin_agent"]["inputSchema"]["properties"]
+
+
+def test_queued_run_cannot_launch_after_cost_interlock_closes(dispatch_client, monkeypatch):
+    from app.database.models import AgentDispatchLock, AgentDispatchRun
+    from app.services.agent_dispatch import service as svc
+
+    client, db = dispatch_client
+    response = client.post(
+        "/api/internal/agent-dispatch/runs", headers=_auth(), json=_create_payload()
+    )
+    run_id = response.json()["id"]
+    monkeypatch.setenv("AGENT_DISPATCH_BILLABLE_EXECUTION_ENABLED", "false")
+    get_settings.cache_clear()
+    monkeypatch.setattr(
+        svc, "CursorCloudAgentsClient", lambda *_: pytest.fail("Cursor must not be constructed")
+    )
+    result = svc.dispatch_to_cursor(db, get_settings(), run_id)
+    assert result.status == "failed"
+    assert result.error_code == "founder_cost_approval_required"
+    assert result.cursor_agent_id is None
+    assert db.query(AgentDispatchRun).count() == 1
+    assert db.query(AgentDispatchLock).count() == 0
+    # Refresh/recovery must not turn a denied run into success or restart it.
+    assert svc.reconcile_run(db, get_settings(), run_id).status == "failed"
+
+
+@pytest.mark.parametrize("webhook_url", [None, "https://example.test/hooks/cursor"])
+def test_direct_cursor_create_cannot_bypass_cost_interlock(monkeypatch, webhook_url):
+    from app.config import Settings
+    from app.services.agent_dispatch.cost_policy import CostApprovalRequired
+    from app.services.agent_dispatch.cursor_client import CursorCloudAgentsClient
+
+    monkeypatch.delenv("AGENT_DISPATCH_BILLABLE_EXECUTION_ENABLED", raising=False)
+    settings = Settings(_env_file=None, cursor_cloud_agents_api_key="test-key")
+    transport = httpx.MockTransport(lambda _: pytest.fail("No HTTP request is allowed"))
+    client = CursorCloudAgentsClient(settings, transport=transport)
+    with pytest.raises(CostApprovalRequired, match="founder_cost_approval_required"):
+        client.create_agent(
+            prompt_text="Only inspect metadata", repository_url="https://github.com/CzechowskiT/twin",
+            starting_ref="cursor/phase1-monorepo-scaffold", auto_create_pr=False,
+            branch_name=None, model_id=None, webhook_url=webhook_url, webhook_secret=None,
+        )
+
+
+def test_cost_interlock_preserves_metadata_reads_and_cancellation(monkeypatch):
+    from app.config import Settings
+    from app.services.agent_dispatch.cursor_client import CursorCloudAgentsClient
+
+    monkeypatch.delenv("AGENT_DISPATCH_BILLABLE_EXECUTION_ENABLED", raising=False)
+    requests = []
+
+    def handler(request):
+        requests.append((request.method, request.url.path))
+        if request.method == "GET" and request.url.path == "/v1/me":
+            return httpx.Response(200, json={"apiKeyName": "test-key"})
+        assert request.method == "POST"
+        assert request.url.path == "/v1/agents/bc-test/runs/run-test/cancel"
+        return httpx.Response(200, json={})
+
+    settings = Settings(_env_file=None, cursor_cloud_agents_api_key="test-key")
+    client = CursorCloudAgentsClient(settings, transport=httpx.MockTransport(handler))
+    assert client.api_key_info()["apiKeyName"] == "test-key"
+    client.cancel(api_version="v1", agent_id="bc-test", run_id="run-test")
+    assert len(requests) == 2

@@ -14,6 +14,11 @@ from sqlalchemy import func, or_, select, update
 from sqlalchemy.orm import Session
 
 from app.config import Settings
+from app.services.agent_dispatch.cost_policy import (
+    COST_APPROVAL_REQUIRED,
+    CostApprovalRequired,
+    require_billable_execution,
+)
 from app.database.models import (
     AgentDispatchLock,
     AgentDispatchOperatorOperation,
@@ -624,6 +629,10 @@ class OperatorService:
             raise OperatorGitHubError("operator_capability_missing")
         if not self.settings.agent_dispatch_operator_non_bypass_identity:
             raise OperatorGitHubError("operator_capability_missing")
+        try:
+            require_billable_execution(self.settings)
+        except CostApprovalRequired as exc:
+            raise OperatorGitHubError(COST_APPROVAL_REQUIRED) from exc
 
     def _assert_allowlisted(self, run: AgentDispatchRun) -> None:
         repos = {

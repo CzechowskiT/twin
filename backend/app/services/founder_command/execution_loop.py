@@ -14,6 +14,7 @@ from app.database.models import FounderCommand
 from app.services.agent_dispatch.auth import AgentDispatchPrincipal
 from app.services.agent_dispatch.constants import DISPATCH_RUN_TERMINAL, DispatchRunStatus
 from app.services.agent_dispatch.service import create_dispatch_run, reconcile_run
+from app.services.agent_dispatch.cost_policy import COST_APPROVAL_REQUIRED
 from app.services.founder_command.approval_policy import command_has_blocking_pending
 from app.services.founder_command.audit import write_founder_audit
 from app.services.founder_command.constants import (
@@ -422,6 +423,20 @@ def _stage_dispatch(
     except Exception as exc:
         # Active lock: queue/wait only — never rewrite mutating plan to analysis.
         detail = getattr(exc, "detail", None)
+        if isinstance(detail, dict) and detail.get("error") == COST_APPROVAL_REQUIRED:
+            command.status = CommandStatus.NEEDS_FOUNDER.value
+            command.error_code = COST_APPROVAL_REQUIRED
+            command.error_message = "Cursor execution requires explicit Founder cost approval"
+            command.live_summary = "Cursor execution blocked: Founder cost approval required"
+            _append_timeline(
+                db,
+                command,
+                stage=CommandStage.DISPATCH.value,
+                message="Stopped before dispatch: Founder cost approval required",
+                detail={"error": COST_APPROVAL_REQUIRED},
+            )
+            db.commit()
+            return command
         lock_conflict = False
         if isinstance(detail, dict) and detail.get("error") == "active_run_lock":
             lock_conflict = True

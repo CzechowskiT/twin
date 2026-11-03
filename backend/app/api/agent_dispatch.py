@@ -39,6 +39,7 @@ from app.services.agent_dispatch.constants import (
     CURSOR_API_CREDENTIAL_SECRET_NAME,
 )
 from app.services.agent_dispatch.cursor_client import CursorApiError, CursorCloudAgentsClient
+from app.services.agent_dispatch.cost_policy import cursor_integration_readiness
 from app.services.agent_dispatch.mcp_protocol import (
     MCP_PROTOCOL_VERSION,
     MCP_SERVER_NAME,
@@ -113,6 +114,7 @@ def dispatcher_health(
         "auth_token_fingerprint": _secret_fp(settings.agent_dispatch_token)
         or _secret_fp((settings.agent_dispatch_tokens or "").split(",")[0].split(":")[0]),
         "cursor_credential_configured": cursor_configured,
+        "cursor_integration": cursor_integration_readiness(settings),
         "cursor_credential_secret_name": CURSOR_API_CREDENTIAL_SECRET_NAME,
         "webhook_configured": webhook_configured,
         "webhook_secret_fingerprint": _secret_fp(settings.agent_dispatch_webhook_secret),

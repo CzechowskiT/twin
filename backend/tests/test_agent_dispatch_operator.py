@@ -36,6 +36,8 @@ from app.services.agent_dispatch.service import cancel_run
 
 @pytest.fixture
 def operator_db(monkeypatch):
+    # All provider traffic in these scenarios is mocked.
+    monkeypatch.setenv("AGENT_DISPATCH_BILLABLE_EXECUTION_ENABLED", "true")
     monkeypatch.setenv("SECRET_KEY", "operator-test-secret-key-at-least-32-chars")
     monkeypatch.setenv("AGENT_DISPATCH_GITHUB_TOKEN", "test-github-token")
     monkeypatch.setenv("AGENT_DISPATCH_OPERATOR_ENABLED", "true")
@@ -813,3 +815,28 @@ def test_operator_diagnose_required_helper():
     assert _operator_diagnose_required(settings, expected) is True
     expected["merge_required"] = True
     assert _operator_diagnose_required(settings, expected) is False
+
+
+@pytest.mark.parametrize("method", ["POST", "PUT", "PATCH", "DELETE"])
+def test_operator_write_cannot_bypass_cost_interlock(operator_db, method):
+    _, settings = operator_db
+    settings.agent_dispatch_billable_execution_enabled = False
+    client = GitHubOperatorClient(
+        settings,
+        transport=httpx.MockTransport(lambda _: pytest.fail("No GitHub write is allowed")),
+    )
+    with pytest.raises(OperatorGitHubError, match="founder_cost_approval_required"):
+        client._request(method, "/repos/CzechowskiT/twin/actions/workflows/test.yml/dispatches")
+
+
+def test_operator_service_cannot_resume_when_costs_are_blocked(operator_db):
+    db, settings = operator_db
+    settings.agent_dispatch_billable_execution_enabled = False
+    run = _run(db, status="merging")
+    github = FakeGitHub()
+    service = OperatorService(db, settings, github=github)
+    result = service.run(run.id)
+    assert result.status == "needs_attention"
+    assert result.error_code == "founder_cost_approval_required"
+    assert github.merge_calls == 0
+    assert github.regression_dispatches == 0
