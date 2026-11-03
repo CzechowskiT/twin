@@ -15,6 +15,7 @@ import {
   secureCookieAttrs,
   sessionSecret,
 } from "@/lib/founder-canary-bff";
+import { assertPreviewCanaryMutationAllowed } from "@/lib/founder-canary-preview-isolation";
 import { getUpstreamApiBase } from "@/lib/public-api-base";
 
 export const dynamic = "force-dynamic";
@@ -245,6 +246,12 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  // Elevate is state-changing (issues elevated cookies) — block on unisolated Preview.
+  const isolation = assertPreviewCanaryMutationAllowed();
+  if (!isolation.ok) {
+    return NextResponse.json({ detail: isolation.detail }, { status: isolation.status });
+  }
+
   const bearer = readBrowserBearer(req);
   if (!bearer) {
     return NextResponse.json({ detail: "Unauthorized" }, { status: 401 });

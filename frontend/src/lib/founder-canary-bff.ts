@@ -10,6 +10,10 @@ import {
   isEmailInAllowlist,
   parseFounderAllowlist,
 } from "@/lib/founder-command-bff";
+import {
+  founderCanaryPreviewIsolationAudit,
+  type PreviewIsolationAudit,
+} from "@/lib/founder-canary-preview-isolation";
 import { getUpstreamApiBase } from "@/lib/public-api-base";
 
 export const CANARY_AT_COOKIE = "twin_founder_canary_at";
@@ -156,6 +160,7 @@ export function founderCanaryConfigAudit(): {
   dedicated_session_secret: boolean;
   production_like: boolean;
   silent_secret_key_fallback_allowed: boolean;
+  preview_isolation: PreviewIsolationAudit;
 } {
   const canary = parseFounderAllowlist(process.env.FOUNDER_CANARY_ALLOWLIST);
   const shared = parseFounderAllowlist(process.env.FOUNDER_COMMAND_ALLOWLIST);
@@ -167,6 +172,7 @@ export function founderCanaryConfigAudit(): {
     dedicated_session_secret: dedicated,
     production_like: prod,
     silent_secret_key_fallback_allowed: !prod && !dedicated,
+    preview_isolation: founderCanaryPreviewIsolationAudit(),
   };
 }
 

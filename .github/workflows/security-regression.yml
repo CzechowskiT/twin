@@ -41,3 +41,4 @@ jobs:
           npm run test:founder-canary-access-guard
           npm run test:founder-canary-bff
           npm run test:founder-canary-preview-isolation
+          # preview-isolation includes unit fail-closed checks for shared prod API

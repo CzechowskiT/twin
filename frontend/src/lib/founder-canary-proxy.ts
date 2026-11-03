@@ -15,6 +15,7 @@ import {
   looksLikeMachineOpsSecret,
   readBrowserBearer,
 } from "@/lib/founder-canary-bff";
+import { assertPreviewCanaryMutationAllowed } from "@/lib/founder-canary-preview-isolation";
 import { getUpstreamApiBase } from "@/lib/public-api-base";
 
 function upstreamHeaders(opts: {
@@ -74,6 +75,11 @@ export async function proxyFounderCanary(
 
   let rawCsrf: string | null = null;
   if (mutating) {
+    // Fail-closed on Vercel Preview until staging API/DB isolation is certified.
+    const isolation = assertPreviewCanaryMutationAllowed();
+    if (!isolation.ok) {
+      return NextResponse.json({ detail: isolation.detail }, { status: isolation.status });
+    }
     const csrf = assertMutatingCsrf({
       elevated,
       csrfCookie,

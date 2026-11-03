@@ -30,6 +30,7 @@ test("2 BFF control/designation reject browser OPS and use founder proxy", () =>
     assert.doesNotMatch(src, /Authorization: auth/);
   }
   assert.match(proxy, /assertMutatingCsrf/);
+  assert.match(proxy, /assertPreviewCanaryMutationAllowed/);
   assert.doesNotMatch(proxy, /csrfHeader \|\| csrfCookie/);
 });
 
@@ -102,6 +103,17 @@ test("9 e2e browser suite is mock-isolated (no prod canary DB writes)", () => {
   assert.match(e2e, /x-csrf-token/);
   assert.match(e2e, /CSRF header required/);
   assert.doesNotMatch(e2e, /PLAYWRIGHT_ALLOW_PROD_SMOKE/);
+});
+
+test("10 preview isolation fail-closed helper and session elevate guard exist", () => {
+  const iso = read("src/lib/founder-canary-preview-isolation.ts");
+  const session = read("src/app/api/ops-admin/canary/session/route.ts");
+  const bff = read("src/lib/founder-canary-bff.ts");
+  assert.match(iso, /FOUNDER_CANARY_PREVIEW_ISOLATION_CERT/);
+  assert.match(iso, /twin-production-bcd9\.up\.railway\.app/);
+  assert.match(iso, /assertPreviewCanaryMutationAllowed/);
+  assert.match(session, /assertPreviewCanaryMutationAllowed/);
+  assert.match(bff, /preview_isolation/);
 });
 
 console.log("founder-canary-access-guard: ok");
