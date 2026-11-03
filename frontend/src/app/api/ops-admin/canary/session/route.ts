@@ -51,6 +51,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const headers: Record<string, string> = { Authorization: authorization };
   const stepUp = request.headers.get("x-twin-step-up")?.trim();
   if (stepUp) headers["X-Twin-Step-Up"] = stepUp;
+  const locale = request.headers.get("x-locale")?.trim();
+  if (locale) headers["X-Locale"] = locale;
   const upstream = await fetch(`${base}/api/v1/admin/canary/session`, {
     method: "POST",
     headers,
@@ -75,7 +77,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   if (!token) return NextResponse.json({ detail: "canary_session_required" }, { status: 401 });
   if (!base) return NextResponse.json({ detail: "api_base_unavailable" }, { status: 503 });
   const upstream = await fetch(`${base}/api/v1/admin/canary/session`, {
-    headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json",
+      ...(request.headers.get("x-locale")
+        ? { "X-Locale": request.headers.get("x-locale") as string }
+        : {}),
+    },
     cache: "no-store",
   });
   const payload = (await upstream.json().catch(() => ({}))) as SessionPayload;

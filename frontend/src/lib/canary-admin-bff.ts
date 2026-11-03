@@ -70,6 +70,8 @@ export async function proxyCanaryRequest(
   };
   const contentType = request.headers.get("content-type");
   if (contentType) headers["Content-Type"] = contentType;
+  const locale = request.headers.get("x-locale");
+  if (locale) headers["X-Locale"] = locale;
   const mutating = !["GET", "HEAD"].includes(request.method.toUpperCase());
   const upstream = await fetch(`${base.replace(/\/$/, "")}${upstreamPath}`, {
     method: request.method,

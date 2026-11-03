@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "@/components/language-provider";
+import { getClientApiLocale } from "@/lib/api-locale";
 import { getToken } from "@/lib/auth";
 import { issueStepUpToken } from "@/lib/step-up";
 
@@ -45,6 +46,8 @@ type CanarySession = {
   assurance_level?: string;
 };
 
+const localeHeaders = () => ({ "X-Locale": getClientApiLocale() ?? "en" });
+
 /**
  * Founder/ops canary control + real-candidate designation.
  * Save designation never mints/sends/activates or raises caps.
@@ -67,11 +70,11 @@ export function CanaryControlPanel() {
     try {
       const [cRes, dRes] = await Promise.all([
         fetch("/api/ops-admin/canary/control", {
-          headers: { Accept: "application/json" },
+          headers: { ...localeHeaders(), Accept: "application/json" },
           cache: "no-store",
         }),
         fetch("/api/ops-admin/canary/designation", {
-          headers: { Accept: "application/json" },
+          headers: { ...localeHeaders(), Accept: "application/json" },
           cache: "no-store",
         }),
       ]);
@@ -93,7 +96,10 @@ export function CanaryControlPanel() {
   useEffect(() => {
     void (async () => {
       try {
-        const response = await fetch("/api/ops-admin/canary/session", { cache: "no-store" });
+        const response = await fetch("/api/ops-admin/canary/session", {
+          headers: localeHeaders(),
+          cache: "no-store",
+        });
         if (!response.ok) return;
         const body = (await response.json()) as CanarySession;
         setSession(body);
@@ -120,6 +126,7 @@ export function CanaryControlPanel() {
       const response = await fetch("/api/ops-admin/canary/session", {
         method: "POST",
         headers: {
+          ...localeHeaders(),
           Authorization: `Bearer ${userToken}`,
           ...(stepUp ? { "X-Twin-Step-Up": stepUp } : {}),
         },
@@ -150,7 +157,7 @@ export function CanaryControlPanel() {
     try {
       await fetch("/api/ops-admin/canary/session", {
         method: "DELETE",
-        headers: { "X-CSRF-Token": session.csrf_token },
+        headers: { ...localeHeaders(), "X-CSRF-Token": session.csrf_token },
       });
       setSession(null);
       setSnap(null);
@@ -168,6 +175,7 @@ export function CanaryControlPanel() {
       const res = await fetch("/api/ops-admin/canary/control", {
         method: "POST",
         headers: {
+          ...localeHeaders(),
           "X-CSRF-Token": session.csrf_token,
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -194,6 +202,7 @@ export function CanaryControlPanel() {
       const res = await fetch("/api/ops-admin/canary/designation", {
         method: "POST",
         headers: {
+          ...localeHeaders(),
           "X-CSRF-Token": session.csrf_token,
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -226,6 +235,7 @@ export function CanaryControlPanel() {
       const res = await fetch("/api/ops-admin/canary/designation/revoke", {
         method: "POST",
         headers: {
+          ...localeHeaders(),
           "X-CSRF-Token": session.csrf_token,
           "Content-Type": "application/json",
           Accept: "application/json",
