@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Header, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
@@ -13,6 +13,12 @@ from app.services import canary_journey as journey
 from app.services import first_value_ladder as ladder
 from app.services import private_canary as canary
 from app.services import canary_designation as designation
+from app.services.founder_canary_auth import (
+    FounderCanaryPrincipal,
+    issue_founder_canary_session,
+    require_founder_canary_read,
+    require_founder_canary_write,
+)
 
 router = APIRouter()
 admin_router = APIRouter()
@@ -23,14 +29,6 @@ def _candidate(db: Session, user: User) -> Candidate:
     if cand is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="candidate_not_found")
     return cand
-
-
-def _require_ops(settings: Settings, authorization: str | None) -> None:
-    token = settings.ops_admin_token.strip() or settings.beta_admin_token.strip()
-    if not token:
-        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail="Ops admin token not configured")
-    if (authorization or "").strip() != f"Bearer {token}":
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Invalid admin token")
 
 
 class CanaryActionIn(BaseModel):
@@ -129,13 +127,32 @@ def post_friction(
 # --- Admin / Founder control plane ---
 
 
+@admin_router.post("/canary/session")
+def admin_canary_session_issue(
+    request: Request,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    user: User = Depends(get_current_user),
+) -> dict:
+    return issue_founder_canary_session(db, settings, request, user)
+
+
+@admin_router.get("/canary/session")
+def admin_canary_session_status(
+    principal: FounderCanaryPrincipal = Depends(require_founder_canary_read),
+) -> dict:
+    return {
+        "authenticated": True,
+        "principal": {"user_id": principal.user_id},
+        "assurance_level": principal.assurance,
+    }
+
+
 @admin_router.get("/canary/control")
 def admin_canary_snapshot(
     db: Session = Depends(get_db),
-    settings: Settings = Depends(get_settings),
-    authorization: str | None = Header(default=None),
+    _principal: FounderCanaryPrincipal = Depends(require_founder_canary_read),
 ) -> dict:
-    _require_ops(settings, authorization)
     return canary.snapshot(db)
 
 
@@ -143,12 +160,15 @@ def admin_canary_snapshot(
 def admin_canary_action(
     body: CanaryActionIn,
     db: Session = Depends(get_db),
-    settings: Settings = Depends(get_settings),
-    authorization: str | None = Header(default=None),
+    principal: FounderCanaryPrincipal = Depends(require_founder_canary_write),
 ) -> dict:
-    _require_ops(settings, authorization)
     try:
-        return canary.apply_action(db, action=body.action, reason=body.reason)
+        return canary.apply_action(
+            db,
+            action=body.action,
+            reason=body.reason,
+            actor=principal.audit_actor,
+        )
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from None
 
@@ -156,30 +176,24 @@ def admin_canary_action(
 @admin_router.get("/canary/completion-report")
 def admin_canary_report(
     db: Session = Depends(get_db),
-    settings: Settings = Depends(get_settings),
-    authorization: str | None = Header(default=None),
+    _principal: FounderCanaryPrincipal = Depends(require_founder_canary_read),
 ) -> dict:
-    _require_ops(settings, authorization)
     return canary.completion_report(db)
 
 
 @admin_router.post("/canary/evaluate-gate")
 def admin_evaluate_gate(
     db: Session = Depends(get_db),
-    settings: Settings = Depends(get_settings),
-    authorization: str | None = Header(default=None),
+    principal: FounderCanaryPrincipal = Depends(require_founder_canary_write),
 ) -> dict:
-    _require_ops(settings, authorization)
-    return canary.evaluate_gate(db)
+    return canary.evaluate_gate(db, actor=principal.audit_actor)
 
 
 @admin_router.get("/canary/designation")
 def admin_designation_get(
     db: Session = Depends(get_db),
-    settings: Settings = Depends(get_settings),
-    authorization: str | None = Header(default=None),
+    _principal: FounderCanaryPrincipal = Depends(require_founder_canary_read),
 ) -> dict:
-    _require_ops(settings, authorization)
     return designation.designation_status(db)
 
 
@@ -187,11 +201,9 @@ def admin_designation_get(
 def admin_designation_set(
     body: DesignateIn,
     db: Session = Depends(get_db),
-    settings: Settings = Depends(get_settings),
-    authorization: str | None = Header(default=None),
+    principal: FounderCanaryPrincipal = Depends(require_founder_canary_write),
 ) -> dict:
     """Persist Founder designation — never activates, never sends invite, never raises caps."""
-    _require_ops(settings, authorization)
     try:
         return designation.designate(
             db,
@@ -199,7 +211,7 @@ def admin_designation_set(
             delivery_channel=body.delivery_channel,
             secure_roster_reference=body.secure_roster_reference,
             replace_existing=body.replace_existing,
-            actor="ops_admin",
+            actor=principal.audit_actor,
         )
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from None
@@ -209,21 +221,21 @@ def admin_designation_set(
 def admin_designation_revoke(
     body: RevokeDesignationIn,
     db: Session = Depends(get_db),
-    settings: Settings = Depends(get_settings),
-    authorization: str | None = Header(default=None),
+    principal: FounderCanaryPrincipal = Depends(require_founder_canary_write),
 ) -> dict:
-    _require_ops(settings, authorization)
-    return designation.revoke(db, designation_id=body.designation_id, actor="ops_admin")
+    return designation.revoke(
+        db,
+        designation_id=body.designation_id,
+        actor=principal.audit_actor,
+    )
 
 
 @admin_router.get("/canary/activation-preflight")
 def admin_activation_preflight(
     db: Session = Depends(get_db),
-    settings: Settings = Depends(get_settings),
-    authorization: str | None = Header(default=None),
+    _principal: FounderCanaryPrincipal = Depends(require_founder_canary_read),
 ) -> dict:
     """Read-only preflight — never executes activation."""
-    _require_ops(settings, authorization)
     tech = canary.snapshot(db)
     des = designation.activation_preflight(db)
     return {

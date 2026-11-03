@@ -186,6 +186,9 @@ def validate_access_token(db: Session, token: str) -> tuple[str | None, str | No
         return None, "invalid"
     if sub.startswith("__") or ":oauth_state:" in sub or sub.startswith("cal_state:"):
         return sub, None
+    token_type = claims.get(MANAGED_CLAIM_TYP)
+    if token_type and token_type != ACCESS_TOKEN_TYP:
+        return None, "token_type_invalid"
 
     f = _flags()
     sid = claims.get(MANAGED_CLAIM_SID)

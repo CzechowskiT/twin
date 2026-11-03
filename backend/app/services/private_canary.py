@@ -162,7 +162,7 @@ def build_checklist(db: Session) -> dict[str, Any]:
     }
 
 
-def evaluate_gate(db: Session) -> dict[str, Any]:
+def evaluate_gate(db: Session, *, actor: str | None = None) -> dict[str, Any]:
     """May set gate_ready=true while keeping ACTIVE/PRIVATE_PILOT/PUBLIC_*=false."""
     row = ensure_row(db)
     checklist = build_checklist(db)
@@ -177,7 +177,10 @@ def evaluate_gate(db: Session) -> dict[str, Any]:
     )
     row.gate_ready = ready
     row.updated_at = _utcnow()
-    _append_audit(row, "evaluate_gate", {"gate_ready": ready})
+    detail: dict[str, Any] = {"gate_ready": ready}
+    if actor:
+        detail["actor"] = actor[:64]
+    _append_audit(row, "evaluate_gate", detail)
     db.commit()
     db.refresh(row)
     return snapshot(db)
@@ -236,12 +239,20 @@ def snapshot(db: Session | None = None) -> dict[str, Any]:
     }
 
 
-def apply_action(db: Session, *, action: str, reason: str | None = None) -> dict[str, Any]:
+def apply_action(
+    db: Session,
+    *,
+    action: str,
+    reason: str | None = None,
+    actor: str | None = None,
+) -> dict[str, Any]:
     """Founder/ops actions — never send real invite or flip ACTIVE_ONE_CANDIDATE."""
     act = (action or "").strip().lower()
     if act not in FOUNDER_ACTIONS:
         raise ValueError("unknown_action")
     row = ensure_row(db)
+    if actor:
+        _append_audit(row, "authorized_action", {"action": act, "actor": actor[:64]})
 
     if act == "prepare":
         if row.state in {STATE_ABORTED, STATE_DISABLED}:
@@ -266,7 +277,7 @@ def apply_action(db: Session, *, action: str, reason: str | None = None) -> dict
             row.state = STATE_READY_INACTIVE
         _append_audit(row, "revoke_prepared", {})
     elif act == "rotate_checklist":
-        return evaluate_gate(db)
+        return evaluate_gate(db, actor=actor)
     elif act == "pause":
         if row.state not in {STATE_PREPARED, STATE_OBSERVING, STATE_READY_INACTIVE}:
             raise ValueError("invalid_state")
@@ -291,7 +302,7 @@ def apply_action(db: Session, *, action: str, reason: str | None = None) -> dict
             row.state = STATE_COMPLETED
         _append_audit(row, "close", {})
     elif act == "evaluate_gate":
-        return evaluate_gate(db)
+        return evaluate_gate(db, actor=actor)
 
     # Hard ban: never enter ACTIVE_ONE from these actions
     if row.state == STATE_ACTIVE_ONE:
@@ -304,7 +315,7 @@ def apply_action(db: Session, *, action: str, reason: str | None = None) -> dict
     db.commit()
     db.refresh(row)
     if act in {"prepare", "revoke_prepared", "pause", "resume", "abort", "close"}:
-        evaluate_gate(db)
+        evaluate_gate(db, actor=actor)
     return snapshot(db)
 
 

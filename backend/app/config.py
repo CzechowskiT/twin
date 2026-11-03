@@ -540,6 +540,8 @@ class Settings(BaseSettings):
     founder_command_csrf_secret: str = ""
     founder_command_default_autonomy_level: int = 3
     founder_command_poll_interval_seconds: int = 20
+    founder_command_allowlist: str = ""
+    founder_canary_session_minutes: int = 15
 
     # Product funnel instrumentation (server-side events → /admin/funnel + /admin/retention).
     # Set PRODUCT_FUNNEL_EVENTS_ENABLED=false for instant rollback without migration reverse.
