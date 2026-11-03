@@ -2311,3 +2311,105 @@ def test_cost_interlock_preserves_metadata_reads_and_cancellation(monkeypatch):
     assert client.api_key_info()["apiKeyName"] == "test-key"
     client.cancel(api_version="v1", agent_id="bc-test", run_id="run-test")
     assert len(requests) == 2
+
+
+@pytest.mark.parametrize("bad_scopes", [[], ["unknown"], "agent_runs:read", None])
+def test_oauth_empty_or_malformed_scopes_never_grant_admin(bad_scopes):
+    from app.config import Settings
+    from app.services.agent_dispatch import oauth_as
+    from fastapi import HTTPException
+
+    settings = Settings(_env_file=None)
+    with pytest.raises(HTTPException, match="invalid_scope"):
+        oauth_as.mint_access_token(
+            settings, fingerprint="test", scopes=bad_scopes,
+            resource=oauth_as.mcp_resource_url(settings), client_id="test",
+        )
+
+
+def _oauth_readonly_tokens(client):
+    from urllib.parse import parse_qs, urlparse
+
+    verifier, challenge = _pkce_pair()
+    resource = "http://testserver/api/internal/agent-dispatch/mcp"
+    redirect = "https://chatgpt.com/connector/oauth/test-callback"
+    response = client.post(
+        "/api/internal/agent-dispatch/oauth/authorize",
+        params={"client_id": "readonly-client", "redirect_uri": redirect,
+                "code_challenge": challenge, "resource": resource},
+        data={"token": "test-dispatch-token"}, follow_redirects=False,
+    )
+    assert response.status_code == 302
+    code = parse_qs(urlparse(response.headers["location"]).query)["code"][0]
+    response = client.post(
+        "/api/internal/agent-dispatch/oauth/token",
+        data={"grant_type": "authorization_code", "code": code,
+              "client_id": "readonly-client", "redirect_uri": redirect,
+              "code_verifier": verifier, "resource": resource},
+    )
+    assert response.status_code == 200
+    assert response.json()["scope"] == "agent_runs:read"
+    refreshed = client.post(
+        "/api/internal/agent-dispatch/oauth/token",
+        data={"grant_type": "refresh_token", "refresh_token": response.json()["refresh_token"],
+              "client_id": "readonly-client", "resource": resource},
+    )
+    assert refreshed.status_code == 200
+    assert refreshed.json()["scope"] == "agent_runs:read"
+    return response.json()["access_token"], refreshed.json()["access_token"]
+
+
+def test_oauth_readonly_connection_and_refresh_cannot_execute(dispatch_client, monkeypatch):
+    from app.api import agent_dispatch as api
+    from app.services.agent_dispatch import mcp_protocol
+
+    client, _ = dispatch_client
+    run = client.post("/api/internal/agent-dispatch/runs", headers=_auth(),
+                      json=_create_payload()).json()
+    for module in (api, mcp_protocol):
+        monkeypatch.setattr(module, "reconcile_run", lambda *_: pytest.fail("No reconciliation allowed"))
+    for token in _oauth_readonly_tokens(client):
+        headers = {"Authorization": f"Bearer {token}"}
+        assert client.get(f"/api/internal/agent-dispatch/runs/{run['id']}", headers=headers).status_code == 200
+        assert client.get("/api/internal/agent-dispatch/runs", headers=headers).status_code == 200
+        assert client.get(f"/api/internal/agent-dispatch/runs/{run['id']}?refresh=true", headers=headers).status_code == 403
+        assert client.post(f"/api/internal/agent-dispatch/runs/{run['id']}/reconcile", headers=headers).status_code == 403
+        assert client.post("/api/internal/agent-dispatch/runs", headers=headers, json=_create_payload()).status_code == 403
+        for name, args in [("get_twin_agent_status", {"run_id": run["id"], "refresh": True}),
+                           ("reconcile_twin_agent_run", {"run_id": run["id"]})]:
+            result = client.post("/api/internal/agent-dispatch/mcp", headers=headers,
+                json={"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": {
+                    "name": name, "arguments": args}}).json()["result"]
+            assert result["isError"] is True
+            assert json.loads(result["content"][0]["text"])["status"] == 403
+
+
+@pytest.mark.parametrize("scope", ["agent_runs:admin", "unknown"])
+def test_oauth_cannot_grant_more_than_principal(scope):
+    from app.config import Settings
+    from app.services.agent_dispatch import oauth_as
+    from app.services.agent_dispatch.auth import AgentDispatchPrincipal
+    from fastapi import HTTPException
+
+    with pytest.raises(HTTPException, match="invalid_scope"):
+        oauth_as.mint_authorization_code(
+            Settings(_env_file=None), principal=AgentDispatchPrincipal("test", frozenset({"agent_runs:read"})),
+            client_id="test", redirect_uri="https://chatgpt.com/connector/oauth/test",
+            code_challenge="test", resource="https://example.test/mcp", scope=scope,
+        )
+
+
+@pytest.mark.parametrize("bad_scopes", [[], None, ["unknown"], "agent_runs:read"])
+def test_legacy_malformed_access_token_is_rejected(bad_scopes):
+    from app.config import Settings
+    from app.services.agent_dispatch import oauth_as
+
+    settings = Settings(_env_file=None)
+    resource = oauth_as.mcp_resource_url(settings)
+    token, _ = oauth_as.mint_access_token(settings, fingerprint="test",
+        scopes=["agent_runs:read"], resource=resource, client_id="test")
+    claims = oauth_as._decode(settings, token)
+    claims["scopes"] = bad_scopes
+    malformed = oauth_as._encode(settings, claims)
+    assert oauth_as.resolve_oauth_access_principal(
+        settings, malformed, expected_resource=resource) is None

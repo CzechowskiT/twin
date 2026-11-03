@@ -20,12 +20,12 @@ Rate limit: 60/minute (IP). No anonymous access.
 |----------|------|-------|
 | `get_twin_cursor_readiness` | MCP configuration-only tool; no downstream HTTP call | `agent_runs:read` |
 | `dispatch_twin_agent` | `POST /runs` | `agent_runs:create` |
-| `get_twin_agent_status` | `GET /runs/{id}` | `agent_runs:read` |
+| `get_twin_agent_status` | `GET /runs/{id}` | `agent_runs:read`; also create when refresh=true |
 | `get_twin_agent_report` | `GET /runs/{id}/report` | `agent_runs:read` |
 | `get_twin_agent_handoff` | `GET /runs/{id}/handoff` | `agent_runs:read` |
 | `cancel_twin_agent` | `POST /runs/{id}/cancel` | `agent_runs:cancel` |
 | `list_twin_agent_runs` | `GET /runs` | `agent_runs:read` |
-| `reconcile_twin_agent_run` | `POST /runs/{id}/reconcile` | `agent_runs:read` |
+| `reconcile_twin_agent_run` | `POST /runs/{id}/reconcile` | `agent_runs:read` + `agent_runs:create` |
 
 ## Create tool arguments
 

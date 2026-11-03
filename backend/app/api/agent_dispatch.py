@@ -209,6 +209,8 @@ def get_run(
     if not run:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="run not found")
     if refresh:
+        # Reconciliation can hand off to Operator workflows; it is not a pure read.
+        require_scope(principal, AGENT_DISPATCH_SCOPE_CREATE)
         run = reconcile_run(db, settings, run_id)
     return _as_response(run)
 
@@ -233,6 +235,7 @@ def reconcile_dispatch_run(
     principal: AgentDispatchPrincipal = Depends(get_agent_dispatch_principal),
 ) -> dict[str, Any]:
     require_scope(principal, AGENT_DISPATCH_SCOPE_READ)
+    require_scope(principal, AGENT_DISPATCH_SCOPE_CREATE)
     run = reconcile_run(db, settings, run_id)
     return _as_response(run)
 

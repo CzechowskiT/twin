@@ -263,6 +263,7 @@ def call_tool(
             require_scope(principal, AGENT_DISPATCH_SCOPE_READ)
             run_id = str(args.get("run_id") or "")
             if args.get("refresh"):
+                require_scope(principal, AGENT_DISPATCH_SCOPE_CREATE)
                 run = reconcile_run(db, settings, run_id)
             else:
                 from app.database.models import AgentDispatchRun
@@ -294,7 +295,8 @@ def call_tool(
 
         if name == "reconcile_twin_agent_run":
             require_scope(principal, AGENT_DISPATCH_SCOPE_READ)
-            # Admin may also reconcile; read scope is enough for poll.
+            require_scope(principal, AGENT_DISPATCH_SCOPE_CREATE)
+            # Reconcile may enter Operator execution; cached reads remain read-only.
             _ = AGENT_DISPATCH_SCOPE_ADMIN  # documented for ops; not required here
             run = reconcile_run(db, settings, str(args.get("run_id") or ""))
             return _text_result(run_to_public_dict(run))

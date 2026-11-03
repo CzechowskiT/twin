@@ -36,7 +36,16 @@ OAUTH_ACCESS_TYP = "ad_oauth_access"
 OAUTH_CLIENT_TYP = "ad_oauth_client"
 ACCESS_TOKEN_TTL_SECONDS = 3600
 AUTH_CODE_TTL_SECONDS = 300
-DEFAULT_SCOPES = " ".join(sorted(ALL_DISPATCH_SCOPES))
+DEFAULT_SCOPES = "agent_runs:read"
+
+
+def _validated_scopes(value: Any) -> list[str]:
+    """An empty/malformed grant must never expand into administrator access."""
+    if not isinstance(value, (list, tuple, set, frozenset)):
+        raise HTTPException(400, detail="invalid_scope")
+    if not value or any(not isinstance(s, str) or s not in ALL_DISPATCH_SCOPES for s in value):
+        raise HTTPException(400, detail="invalid_scope")
+    return sorted(set(value))
 
 CHATGPT_REDIRECT_PREFIXES = (
     "https://chatgpt.com/connector/oauth/",
@@ -179,18 +188,21 @@ def mint_authorization_code(
     request_base: str | None = None,
 ) -> str:
     now = datetime.now(timezone.utc)
+    granted_scopes = _validated_scopes((scope or DEFAULT_SCOPES).split())
+    if not set(granted_scopes).issubset(principal.scopes):
+        raise HTTPException(400, detail="invalid_scope")
     claims = {
         "typ": OAUTH_CODE_TYP,
         "iss": oauth_issuer_url(settings, request_base),
         "sub": f"dispatch:{principal.token_fingerprint}",
         "fp": principal.token_fingerprint,
-        "scopes": sorted(principal.scopes),
+        "scopes": granted_scopes,
         "client_id": client_id,
         "redirect_uri": redirect_uri,
         "code_challenge": code_challenge,
         "code_challenge_method": "S256",
         "resource": resource,
-        "scope": scope or DEFAULT_SCOPES,
+        "scope": " ".join(granted_scopes),
         "iat": int(now.timestamp()),
         "exp": int((now + timedelta(seconds=AUTH_CODE_TTL_SECONDS)).timestamp()),
         "jti": secrets.token_urlsafe(16),
@@ -209,7 +221,7 @@ def mint_access_token(
 ) -> tuple[str, int]:
     now = datetime.now(timezone.utc)
     exp = int((now + timedelta(seconds=ACCESS_TOKEN_TTL_SECONDS)).timestamp())
-    scope_list = sorted(set(scopes) & ALL_DISPATCH_SCOPES) or sorted(ALL_DISPATCH_SCOPES)
+    scope_list = _validated_scopes(scopes)
     claims = {
         "typ": OAUTH_ACCESS_TYP,
         "iss": oauth_issuer_url(settings, request_base),
@@ -284,9 +296,10 @@ def resolve_oauth_access_principal(
     scopes_raw = payload.get("scopes") or []
     if not isinstance(fp, str) or not fp:
         return None
-    scopes = frozenset(s for s in scopes_raw if s in ALL_DISPATCH_SCOPES)
-    if not scopes:
-        scopes = ALL_DISPATCH_SCOPES
+    try:
+        scopes = frozenset(_validated_scopes(scopes_raw))
+    except HTTPException:
+        return None
     return AgentDispatchPrincipal(token_fingerprint=fp, scopes=scopes)
 
 
@@ -316,7 +329,7 @@ def exchange_authorization_code(
     if payload.get("resource") and resource and payload["resource"] != resource:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="invalid_target")
     fp = str(payload.get("fp") or "")
-    scopes = list(payload.get("scopes") or sorted(ALL_DISPATCH_SCOPES))
+    scopes = _validated_scopes(payload.get("scopes"))
     access, expires_in = mint_access_token(
         settings,
         fingerprint=fp,
@@ -356,7 +369,7 @@ def exchange_refresh_token(
     if payload.get("client_id") != client_id:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="invalid_client")
     fp = str(payload.get("fp") or "")
-    scopes = list(payload.get("scopes") or sorted(ALL_DISPATCH_SCOPES))
+    scopes = _validated_scopes(payload.get("scopes"))
     token_resource = resource or str(
         payload.get("aud") or mcp_resource_url(settings, request_base)
     )

@@ -18,6 +18,24 @@ separately. Connector setup alone never authorizes execution, merge or deploy.
 
 ## Production endpoint
 
+### Read-only connection contract (pending deployment)
+
+For the initial connection use OAuth with `scope=agent_runs:read`. Omitted scope
+now defaults to read-only. Requested scopes must be a subset of the authenticating
+principal's permissions; code exchange and refresh retain the narrowed grant.
+Malformed or empty scope claims never fall back to administrator permissions.
+
+Cached status, list, report and handoff remain available. Status refresh and
+reconciliation require both read and create scopes because they can enter Operator
+execution. This authorization change and the cost interlock are prepared in code;
+do not assume they are deployed to the existing production endpoint below.
+Existing valid broad-scope tokens are not revoked by this patch; issue a new
+read-only grant for the new connection after deployment.
+
+The chat currently has no TWIN tools or API for registering a personal custom MCP
+connection. Its installation and OAuth consent must be completed in the account's
+supported connection UI. This is a one-time account action, not prompt copying.
+
 | Item | Value |
 |------|--------|
 | API base | `https://twin-production-bcd9.up.railway.app` |
@@ -78,12 +96,12 @@ If MCP connector registration is unavailable on the account:
 |------|-------|---------|
 | `get_twin_cursor_readiness` | `agent_runs:read` | Configuration and cost interlock only; no remote requests |
 | `dispatch_twin_agent` | `agent_runs:create` | Start run |
-| `get_twin_agent_status` | `agent_runs:read` | Status (+ optional refresh) |
+| `get_twin_agent_status` | `agent_runs:read` (+ create for refresh) | Cached status; refresh requires execution scope |
 | `get_twin_agent_report` | `agent_runs:read` | Structured report |
 | `get_twin_agent_handoff` | `agent_runs:read` | Full handoff package |
 | `cancel_twin_agent` | `agent_runs:cancel` | Cancel |
 | `list_twin_agent_runs` | `agent_runs:read` | Recent runs |
-| `reconcile_twin_agent_run` | `agent_runs:read` | Force reconcile |
+| `reconcile_twin_agent_run` | `agent_runs:read` + `agent_runs:create` | Force reconcile; may enter Operator execution |
 
 Allowlist: `https://github.com/CzechowskiT/twin` + `cursor/phase1-monorepo-scaffold` only.  
 `execution_policy` is server-enforced (all flags must stay `true`).
