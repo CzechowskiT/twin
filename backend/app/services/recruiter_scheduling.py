@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 
 from sqlalchemy.orm import Session
 
-from app.database.models import Application, ApplicationStatus, Job, RecruiterPipelineStatus
+from app.database.models import Application, ApplicationStatus, Candidate, Job, RecruiterPipelineStatus
 from app.utils.slug import slugify_company
 
 VALID_SCHEDULING_STATUSES = frozenset({"invited", "interview_scheduled"})
@@ -111,4 +111,23 @@ def save_recruiter_manual_schedule(
     db.add(app)
     db.commit()
     db.refresh(app)
+    if status == "interview_scheduled":
+        try:
+            from app.services.product_funnel import emit_funnel_event
+
+            cand = db.query(Candidate).filter(Candidate.id == app.candidate_id).first()
+            if cand is not None:
+                emit_funnel_event(
+                    db,
+                    event_name="interview_scheduled",
+                    user_id=cand.user_id,
+                    properties={
+                        "provider": "recruiter_manual",
+                        "application_id": app.id,
+                    },
+                    once=False,
+                    commit=True,
+                )
+        except Exception:
+            pass
     return {"application_id": app.id, "status": app.status.value, **_scheduling_row_fields(app)}

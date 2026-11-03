@@ -1,0 +1,48 @@
+PASS  A alembic 138
+PASS  A mfa service
+PASS  A crypto
+PASS  A provider gate
+PASS  B mfa default OFF
+PASS  B opt-in only
+PASS  B mandatory OFF
+PASS  C factor schema
+PASS  C challenge schema
+PASS  C recovery codes schema
+PASS  C assurance schema
+PASS  D pyotp
+PASS  D dedicated keyring
+PASS  E no webauthn impl
+PASS  E no sms/email otp
+PASS  F mfa routes
+PASS  G for update replay
+PASS  H not first value
+PASS  H passkeys deferred
+PASS  I primary 7
+PASS  J fe mfa lib
+PASS  J access opt-in
+PASS  K alembic revises 137
+PASS  K assurance column
+PASS  L anti-lockout reset
+PASS  L recovery wires reset
+PASS  M unit —  represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return datetime.utcnow()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+4 passed, 123 warnings in 3.35s
+
+PASS  M fe guard — 
+> frontend@0.1.0 test:epic-224-totp-mfa-guard
+> npx --yes tsx scripts/epic-224-totp-mfa-guard.test.ts
+
+epic-224-totp-mfa-guard: ok
+
+PASS  N stance launch nogo preserved
+PASS  N no canary mutation
+PASS  N inventory MFA_TOTP
+PASS  O public health
+PASS  O launch NO-GO
+PASS  O canary inactive
+PASS  O activation prepared
+PASS  O designation 0
+
+36/36

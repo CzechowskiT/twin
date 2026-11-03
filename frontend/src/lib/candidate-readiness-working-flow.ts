@@ -4,8 +4,6 @@
  * Frontend/UI only — uses existing verified-readiness API when authenticated.
  */
 
-import { SHOW_DASHBOARD_AUTO_APPLY_STRIP } from "@/lib/seven-day-d2-candidate";
-
 /** Canonical launch stance — do not overclaim in this slice. */
 export const CANDIDATE_READINESS_CANONICAL_STANCE =
   "P0_CLOSED|Gate_E_PASS|Gate_F_PENDING|Launch_NO-GO" as const;
@@ -13,8 +11,8 @@ export const CANDIDATE_READINESS_CANONICAL_STANCE =
 /** Delegated apply remains disabled — profile can still reach review-ready. */
 export const CANDIDATE_READINESS_DELEGATED_APPLY_ENABLED = false as const;
 
-/** Auto-apply strip stays hidden / paused on dashboard home. */
-export const CANDIDATE_READINESS_AUTO_APPLY_ENABLED = SHOW_DASHBOARD_AUTO_APPLY_STRIP;
+/** Delegated / autonomous auto-apply remains disabled in readiness flow (strip visibility is separate). */
+export const CANDIDATE_READINESS_AUTO_APPLY_ENABLED = false as const;
 
 /** Dashboard anchor for the verified readiness checklist card. */
 export const CANDIDATE_READINESS_HUB_ANCHOR = "dashboard-readiness" as const;

@@ -59,6 +59,14 @@ export type TalentPoolRecord = {
   archived?: boolean;
   archived_at?: string | null;
   created_at?: string | null;
+  intelligence?: {
+    candidate_id?: number;
+    extraction_status?: string;
+    fit_band?: string | null;
+    top_strengths?: string[];
+    top_gap_or_unknown?: string | null;
+    human_review_required?: boolean;
+  } | null;
 };
 
 export type TalentPoolSummary = {

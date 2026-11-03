@@ -1,0 +1,87 @@
+PASS [stance] public_health 200
+PASS [stance] launch_nogo NO-GO
+PASS [stance] enrollment_off 
+PASS [stance] phase_3b_blocked 
+PASS [stance] ms_write_off 
+PASS [persistence] four_way_aligned fe=8bfc660e7b79 api=8bfc660e7b79 wrk=8bfc660e7b79
+PASS [security] mint_synthetic 200
+PASS [security] kpi_excluded 
+PASS [security] synthetic_ne_real 
+PASS [behavioral] aggregate_200 200
+PASS [persistence] alembic_115 115_unified_career_lifecycle
+PASS [behavioral] schema_v1 
+PASS [security] safety_duplicate_module_stores_off False
+PASS [security] safety_silent_phase_change_off False
+PASS [security] safety_focus_deletes_other_processes_off False
+PASS [security] safety_frozen_snapshots_mutated_off False
+PASS [security] safety_bundled_approvals_off False
+PASS [security] safety_search_leaks_off False
+PASS [security] safety_workplace_monitoring_off False
+PASS [security] safety_external_resignation_off False
+PASS [security] safety_ats_write_off False
+PASS [security] safety_auto_apply_off False
+PASS [security] safety_microsoft_calendar_write_off False
+PASS [security] safety_covert_assistance_off False
+PASS [security] safety_public_lifecycle_off False
+PASS [stance] phase3_not_started 
+PASS [behavioral] context_present 
+PASS [persistence] uuid_context_key 
+PASS [behavioral] phase_valid DECIDE
+PASS [behavioral] fe_command_center 200
+PASS [behavioral] fe_history 200
+PASS [behavioral] fe_search 200
+PASS [behavioral] fe_approvals 200
+PASS [behavioral] fe_recovery 200
+PASS [behavioral] fe_privacy 200
+PASS [behavioral] fe_legacy_lifecycle 200
+PASS [behavioral] fe_legacy_timeline 200
+PASS [behavioral] fe_transition_residual 200
+PASS [behavioral] daily_os_brief_200 200
+PASS [behavioral] daily_os_not_404 200
+PASS [behavioral] epic18_aggregate 200
+PASS [security] epic18_no_monitoring 
+PASS [behavioral] phase_propose 200
+PASS [security] phase_not_silent 
+PASS [behavioral] phase_pending {'status': 'pending_approval', 'active_phase': 'DECIDE', 'proposed_phase': 'APPLICATION', 'approval_id': 1, 'silent_chan
+PASS [behavioral] phase_unchanged_until_approve 
+PASS [persistence] approval_id 1
+PASS [security] approval_not_bundled 
+PASS [behavioral] mid_phase_still_old 
+PASS [behavioral] phase_approve 200
+PASS [behavioral] phase_applied_after_approve {'approval_id': 1, 'status': 'approved', 'active_phase': 'APPLICATION', 'bundled': False}
+PASS [behavioral] focus_set 200
+PASS [security] focus_preserves_others 
+PASS [behavioral] handoff_create 201
+PASS [behavioral] consistency_run 200
+PASS [security] consistency_not_silent 
+PASS [behavioral] search_ok 200
+PASS [security] search_no_leak 
+PASS [security] search_scoped 
+PASS [behavioral] history_ok 200
+PASS [persistence] history_has_events 
+PASS [behavioral] deep_link 200
+PASS [behavioral] deep_link_preserves 
+PASS [behavioral] deep_link_not_lost 
+PASS [behavioral] export_ok 200
+PASS [security] export_no_full_payloads 
+PASS [security] export_secrets_excluded 
+PASS [security] export_notes_default_off 
+PASS [behavioral] deletion_graph 200
+PASS [persistence] deletion_order_has_lifecycle 
+PASS [behavioral] recovery_ok 200
+PASS [behavioral] recovery_recoverable 
+PASS [behavioral] privacy_patch 200
+PASS [security] privacy_propagated_flag 
+PASS [behavioral] archive 200
+PASS [behavioral] reopen 200
+PASS [behavioral] reopen_unarchived 
+PASS [behavioral] next_cycle 200
+PASS [behavioral] next_cycle_understand 
+PASS [security] deny_unauth 401
+PASS [behavioral] delete 200
+PASS [persistence] delete_stale_guard 
+PASS [persistence] db_at_head {'current_revision': '115_unified_career_lifecycle', 'head_revision': '115_unified_career_lifecycle', 'head_revisions': 
+PASS [persistence] db_revision_115 115_unified_career_lifecycle
+SUMMARY total=84/84 behavioral=41/41 security=28/28 persistence=9/9 stance=6/6
+] phase3_not_started 
+SUMMARY total=84/84 behavioral=41/41 security=28/28 persistence=9/9 stance=6/6

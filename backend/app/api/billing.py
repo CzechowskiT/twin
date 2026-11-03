@@ -53,6 +53,27 @@ def _checkout_configured(settings: Settings) -> bool:
     return bool(settings.stripe_secret_key and _any_stripe_price_configured(settings))
 
 
+def _stripe_honesty(settings: Settings) -> dict[str, Any]:
+    """Candidate plan_payments / plat_stripe_public honesty — sandbox ≠ public launch."""
+    key = (settings.stripe_secret_key or "").strip()
+    livemode = key.startswith("sk_live")
+    test_mode = key.startswith("sk_test")
+    sandbox_enabled = bool(getattr(settings, "stripe_sandbox_checkout_enabled", True))
+    not_public = bool(getattr(settings, "stripe_not_public_launch", True))
+    # Sandbox ready when test keys + at least one price exist; never implies public launch.
+    sandbox_ready = bool(
+        sandbox_enabled and test_mode and _any_stripe_price_configured(settings) and not livemode
+    )
+    return {
+        "stripe_sandbox_checkout_enabled": sandbox_enabled,
+        "stripe_not_public_launch": not_public,
+        "sandbox_ready": sandbox_ready,
+        "public_launch": False,
+        "livemode": livemode,
+        "stripe_mode": "live" if livemode else ("test" if test_mode else "unset"),
+    }
+
+
 def _annual_list_price_usd(monthly_usd: float) -> float:
     """25% off 12× monthly annual prepay (pay for 9 months, get 12)."""
     return round(monthly_usd * 12 * 0.75, 2)
@@ -68,10 +89,16 @@ def list_plans(settings: Annotated[Settings, Depends(get_settings)]) -> PlansPub
     pro_annual_ready = bool(settings.stripe_price_id_pro_annual)
     pm_types = stripe_svc.checkout_payment_method_types(settings)
     pm_note = stripe_svc.checkout_payment_methods_note(pm_types)
+    honesty = _stripe_honesty(settings)
     return PlansPublicResponse(
         checkout_configured=_checkout_configured(settings),
         checkout_payment_methods=pm_types,
         payment_methods_note=pm_note,
+        stripe_sandbox_checkout_enabled=honesty["stripe_sandbox_checkout_enabled"],
+        stripe_not_public_launch=honesty["stripe_not_public_launch"],
+        sandbox_ready=bool(honesty["sandbox_ready"]),
+        public_launch=False,
+        stripe_mode=str(honesty["stripe_mode"]),
         plans=[
             PlanOut(
                 id="free",
@@ -187,7 +214,15 @@ def create_checkout_session(
     url = session.get("url") if isinstance(session, dict) else session.url
     if not url:
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Missing checkout URL.")
-    return CheckoutResponse(url=url)
+    honesty = _stripe_honesty(settings)
+    return CheckoutResponse(
+        url=url,
+        stripe_sandbox_checkout_enabled=honesty["stripe_sandbox_checkout_enabled"],
+        stripe_not_public_launch=honesty["stripe_not_public_launch"],
+        sandbox_ready=bool(honesty["sandbox_ready"]),
+        public_launch=False,
+        stripe_mode=str(honesty["stripe_mode"]),
+    )
 
 
 @router.post("/portal-session", response_model=PortalResponse)

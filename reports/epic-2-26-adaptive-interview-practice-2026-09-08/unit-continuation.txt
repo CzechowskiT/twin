@@ -1,0 +1,18 @@
+........................................................................ [ 73%]
+..........................                                               [100%]
+=============================== warnings summary ===============================
+../../../../../Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/slowapi/extension.py:717: 112 warnings
+  /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/slowapi/extension.py:717: DeprecationWarning: 'asyncio.iscoroutinefunction' is deprecated and slated for removal in Python 3.16; use inspect.iscoroutinefunction() instead
+    if asyncio.iscoroutinefunction(func):
+
+tests/test_epic_226_interview_practice.py::test_session_create_submit_next_complete_promote
+tests/test_epic_226_interview_practice.py::test_session_create_submit_next_complete_promote
+tests/test_epic_226_interview_practice.py::test_turn_limit_enforced
+tests/test_epic_226_interview_practice.py::test_turn_limit_enforced
+tests/test_epic_226_interview_practice.py::test_delete_session_soft
+tests/test_epic_226_interview_practice.py::test_delete_session_soft
+  /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/sqlalchemy/sql/schema.py:3624: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+98 passed, 118 warnings in 3.47s

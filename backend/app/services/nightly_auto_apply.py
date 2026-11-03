@@ -115,25 +115,39 @@ def _bump_board_stat(stats: dict[str, dict[str, int]], job: Job, field: str) -> 
     bucket[field] = int(bucket.get(field, 0)) + 1
 
 
+def _should_auto_submit(settings: Settings, *, submit: bool | None) -> bool:
+    """Default REVIEW_BEFORE_SUBMIT — never CAPTCHA bypass; AUTO_SUBMIT only when configured."""
+    if submit is not None:
+        return bool(submit)
+    mode = (settings.nightly_auto_apply_submit_mode or "REVIEW_BEFORE_SUBMIT").strip().upper()
+    return mode == "AUTO_SUBMIT"
+
+
 def process_user_nightly_auto_apply(
     db: Session,
     *,
     user: User,
     consent: AutoApplyConsent,
     settings: Settings,
-    submit: bool = True,
+    submit: bool | None = None,
     max_jobs: int | None = None,
     cooldown_seconds: int | None = None,
     application_method: str = METHOD_NIGHTLY,
     board_stats: dict[str, dict[str, int]] | None = None,
 ) -> dict[str, Any]:
-    """Apply to top eligible matches for one user."""
+    """Prepare (default) or submit top eligible matches for one user.
+
+    Founder RELEASE_WITH_CONTROLS: default submit_mode=REVIEW_BEFORE_SUBMIT
+    (packages prepared for human review). No CAPTCHA bypass path exists.
+    """
+    do_submit = _should_auto_submit(settings, submit=submit)
     result: dict[str, Any] = {
         "user_id": user.id,
         "applications_submitted": 0,
         "applications_failed": 0,
         "applications_skipped": 0,
         "skipped_reason": None,
+        "submit_mode": "AUTO_SUBMIT" if do_submit else "REVIEW_BEFORE_SUBMIT",
     }
     candidate = db.query(Candidate).filter(Candidate.user_id == user.id).first()
     if not candidate:
@@ -191,7 +205,7 @@ def process_user_nightly_auto_apply(
             db,
             user=user,
             job_id=job.id,
-            submit=submit,
+            submit=do_submit,
         )
         _record_event(db, user_id=user.id, job=job, outcome=outcome.value)
 

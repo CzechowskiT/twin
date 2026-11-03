@@ -1,0 +1,27 @@
+PASS  service
+PASS  adapters
+PASS  inventory
+PASS  api
+PASS  fe palette
+PASS  fe page
+PASS  schema id
+PASS  zero mutations
+PASS  no first value
+PASS  no elasticsearch
+PASS  post body search
+PASS  cache no-store
+PASS  inventory complete helper
+PASS  ms calendar excluded
+PASS  raw cv excluded
+PASS  committed import only
+PASS  draft evidence excluded
+PASS  no 8th primary search
+PASS  secondary search entry
+PASS  preview has no workspace search palette
+PASS  pp1 gate
+PASS  unit tests
+PASS  prod launch NO-GO
+PASS  enrollment OFF
+PASS  preview enabled
+
+Epic 2.13 code/stance E2E: 25 pass / 0 fail

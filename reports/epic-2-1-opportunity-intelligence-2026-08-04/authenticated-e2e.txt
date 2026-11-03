@@ -1,0 +1,75 @@
+PASS [stance] public_health 200
+PASS [stance] launch_nogo NO-GO
+PASS [stance] enrollment_off 
+PASS [stance] phase_3b_blocked 
+PASS [stance] ms_write_off 
+PASS [persistence] four_way_aligned fe=dd4e851c778f api=dd4e851c778f wrk=dd4e851c778f
+PASS [security] mint_synthetic 200
+PASS [security] kpi_excluded 
+PASS [security] synthetic_ne_real 
+PASS [normalization_freshness] aggregate_200 200
+PASS [persistence] alembic_117 117_opportunity_market_intelligence
+PASS [normalization_freshness] schema_v1 
+PASS [security] safety_fabricated_activity_off False
+PASS [security] safety_unsourced_salary_off False
+PASS [security] safety_unsourced_market_off False
+PASS [security] safety_ssrf_unsafe_off False
+PASS [security] safety_ranking_bypasses_calibration_off False
+PASS [security] safety_silent_weight_updates_off False
+PASS [security] safety_strong_fit_without_evidence_off False
+PASS [security] safety_stale_studio_without_warning_off False
+PASS [security] safety_non_idempotent_refresh_off False
+PASS [security] safety_search_leaks_off False
+PASS [security] safety_external_apply_off False
+PASS [security] safety_prohibited_scraping_off False
+PASS [security] safety_captcha_bypass_off False
+PASS [security] safety_browser_form_submission_off False
+PASS [security] safety_ats_write_off False
+PASS [security] safety_auto_apply_off False
+PASS [security] safety_microsoft_calendar_write_off False
+PASS [security] safety_workplace_monitoring_off False
+PASS [security] safety_public_opportunity_history_off False
+PASS [security] phase_3_agent_not_started NOT_STARTED
+PASS [market] observed_wording 
+PASS [market] not_fabricated 
+PASS [market] demand_unknown_unless_observed 
+PASS [ingestion_safety] ssrf_blocked 400
+PASS [ingestion_safety] active_content_blocked 400
+PASS [ingestion_safety] paste_accepted 201
+PASS [normalization_freshness] normalized 
+PASS [normalization_freshness] activity_not_fabricated 
+PASS [normalization_freshness] salary_not_fabricated 
+PASS [fit_ranking] no_strong_fit_without_evidence 
+PASS [feed_watch_search] legacy_jobs_compatible 200
+PASS [normalization_freshness] job_ingest 201
+PASS [feed_watch_search] watchlist_create 201
+PASS [feed_watch_search] watchlist_refresh 200
+PASS [feed_watch_search] saved_search 201
+PASS [feed_watch_search] compare 200
+PASS [lifecycle_dailyos_acal] studio_handoff 200
+PASS [lifecycle_dailyos_acal] stale_warning_field 
+PASS [lifecycle_dailyos_acal] daily_os_acal_push 200
+PASS [fit_ranking] ranking_refresh 201
+PASS [fit_ranking] opportunity_in_canonical_ranking cands=9
+PASS [fit_ranking] no_calibration_bypass 
+PASS [normalization_freshness] refresh_ok 200
+PASS [normalization_freshness] refresh_idempotent 200
+PASS [deletion_privacy_recovery] fit_invalidate 200
+PASS [deletion_privacy_recovery] export_safe 200
+PASS [deletion_privacy_recovery] delete_propagated 200
+PASS [security] unauth_denied 401
+PASS [persistence] db_at_head_117 {'current_revision': '117_opportunity_market_intelligence', 'head_revision': '117_opportunity_market_intelligence', 'hea
+PASS [persistence] jobs_route /dashboard/jobs
+PASS [persistence] strategy_route /dashboard/strategy
+---
+ingestion_safety: 3/3
+normalization_freshness: 8/8
+market: 3/3
+fit_ranking: 4/4
+feed_watch_search: 5/5
+lifecycle_dailyos_acal: 3/3
+deletion_privacy_recovery: 3/3
+security: 24/24
+persistence: 5/5
+stance: 5/5
+TOTAL: 63/63

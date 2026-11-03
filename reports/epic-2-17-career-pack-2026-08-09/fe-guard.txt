@@ -1,0 +1,5 @@
+
+> frontend@0.1.0 test:epic-217-career-pack-guard
+> npx --yes tsx scripts/epic-217-career-pack-guard.test.ts
+
+epic-217-career-pack-guard: ok

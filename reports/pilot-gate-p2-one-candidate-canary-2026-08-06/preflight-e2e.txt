@@ -1,0 +1,41 @@
+PASS [stance] public_health 200
+PASS [stance] launch_nogo NO-GO
+PASS [stance] enrollment_off 
+PASS [stance] phase_3b 
+PASS [stance] ms_write_off 
+PASS [baseline] access_inactive OPERATIONALLY_READY_INACTIVE
+PASS [baseline] invite_send_off 
+PASS [baseline] real_invites_zero 0
+PASS [baseline] real_pilots_zero 
+PASS [baseline] invite_only 
+PASS [baseline] api_worker_aligned fe=f1e2de255530 api=e6328c3c746e wrk=e6328c3c746e
+PASS [manifest_auth] no_env_manifest 
+PASS [manifest_auth] no_filesystem_manifest standard_paths_absent
+PASS [manifest_auth] send_auth_absent no_separate_send_authorization
+PASS [manifest_auth] roster_absent no_approved_single_candidate_roster
+PASS [manifest_auth] no_real_invite_generated gate_p2_blocked_path
+PASS [manifest_auth] no_real_invite_sent gate_p2_blocked_path
+PASS [pg_concurrency] evidence_present 
+PASS [pg_concurrency] passed 
+PASS [pg_concurrency] successes_eq_1 1
+PASS [pg_concurrency] rejects_eq_11 11
+PASS [pg_concurrency] overshoot_0 0
+PASS [pg_concurrency] multi_process 12
+PASS [pg_concurrency] no_real_invite_mutation 
+PASS [invite_safety] mint_synth 200
+PASS [invite_safety] kpi_excluded 
+PASS [baseline] runtime_inactive OPERATIONALLY_READY_INACTIVE
+PASS [baseline] eff_gen_0 {'real_cohort': 0, 'canary': 0, 'generation': 0, 'send': 0}
+PASS [baseline] eff_send_0 {'real_cohort': 0, 'canary': 0, 'generation': 0, 'send': 0}
+PASS [baseline] eff_canary_0 {'real_cohort': 0, 'canary': 0, 'generation': 0, 'send': 0}
+PASS [public_gates] uninvited_register_blocked 422
+PASS [public_gates] unauth_blocked 401
+PASS [invite_safety] synth_cannot_send 401
+PASS [invite_safety] activate_dry_run_blocked 200
+PASS [manifest_auth] empty_manifest_invalid 200
+PASS [privacy_support] help_available 200
+PASS [privacy_support] diag_rejects_email 200
+PASS [privacy_support] telemetry_reject_unknown 400
+PASS [baseline] db_at_head 126_fix_support_diagnostic_opt_in
+SUMMARY product=34/34 stance=5/5 all=39/39
+VERDICT_HINT=BLOCKED_NO_FOUNDER_MANIFEST_NO_INVITES

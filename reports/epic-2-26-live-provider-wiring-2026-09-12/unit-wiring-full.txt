@@ -1,0 +1,25 @@
+............................F........................................... [ 48%]
+........................................................................ [ 96%]
+......                                                                   [100%]
+=================================== FAILURES ===================================
+E   AssertionError: assert '141_practice...der_execution' == '140_practice..._is_synthetic'
+      
+      - 140_practice_session_is_synthetic
+      + 141_practice_eval_provider_execution
+/Users/tomek/Projects/twin-worktrees/epic-2-26-consent-quality-remediation/backend/tests/test_admin_migrations_current.py:61: AssertionError: assert '141_practice...der_execution' == '140_practice..._is_synthetic'
+=============================== warnings summary ===============================
+../../../../../../Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/slowapi/extension.py:717: 112 warnings
+  /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/slowapi/extension.py:717: DeprecationWarning: 'asyncio.iscoroutinefunction' is deprecated and slated for removal in Python 3.16; use inspect.iscoroutinefunction() instead
+    if asyncio.iscoroutinefunction(func):
+
+tests/test_epic_226_provider_metadata_integration.py: 6 warnings
+tests/test_epic_226_integrity_repair.py: 13 warnings
+tests/test_epic_226_interview_practice.py: 6 warnings
+tests/test_epic_226_consent_provider_matrix.py: 24 warnings
+  /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/sqlalchemy/sql/schema.py:3624: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_admin_migrations_current.py::test_migrations_current_ok - A...
+1 failed, 149 passed, 161 warnings in 12.35s

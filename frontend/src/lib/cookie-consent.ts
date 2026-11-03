@@ -73,9 +73,10 @@ export function marketingConsentGranted(): boolean {
   return getCookieConsent()?.marketing === true;
 }
 
-/** Show banner site-wide except fleeting OAuth handoff (avoids flash over redirect UI). */
+/** Show banner site-wide except fleeting OAuth handoff and PP1 public preview (zero cookies). */
 function pathShowsCookieBanner(normalized: string): boolean {
   if (normalized.startsWith("/auth/callback")) return false;
+  if (normalized === "/preview" || normalized.startsWith("/preview/")) return false;
   return true;
 }
 

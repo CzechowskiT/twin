@@ -1,0 +1,38 @@
+PASS  stance/public_health
+PASS  stance/launch_nogo
+PASS  stance/enrollment_off
+PASS  stance/canary_inactive
+PASS  stance/activation_prepared
+PASS  stance/designation_0
+PASS  stance/caps_zero
+PASS  product/mint_synthetic — 200
+PASS  product/share_catalog — 200
+PASS  product/schema
+PASS  product/no_outbound
+PASS  product/no_tracking
+PASS  product/not_fv
+PASS  product/parallel_none
+PASS  product/create_draft — 200
+PASS  product/selection — 200
+PASS  product/preview — 200
+PASS  product/confirm_ready — 200
+PASS  product/create_grant — 200
+PASS  product/share_url_once_present
+PASS  product/grant_not_fv
+PASS  security/meta_no_leak — 200
+PASS  security/bad_secret_generic — 404
+PASS  product/exchange_ok — 200
+PASS  product/session_token
+PASS  product/recipient_view — 200
+PASS  security/view_without_session — 404
+PASS  product/revoke — 200
+PASS  security/exchange_after_revoke — 404
+PASS  product/delete_grant — 200
+PASS  product/active_grants_zero — 0
+PASS  security/send_absent — 405
+PASS  invariant/business_state_diff_0 — {}
+PASS  invariant/canary_ready_inactive
+PASS  invariant/designation_still_0
+PASS  invariant/activation_still_prepared
+
+product 20/20 stance 7/7 security 5/5 invariant 4/4

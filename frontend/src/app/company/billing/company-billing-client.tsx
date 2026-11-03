@@ -11,7 +11,10 @@ import { IntegrationRowStatusBadge } from "@/components/workspace/integration-ro
 import { WorkspacePilotPageHeader } from "@/components/workspace/workspace-pilot-page-header";
 import type { TranslationKey } from "@/lib/i18n";
 import { BILLING_PREMIUM_PREVIEW_ONLY } from "@/lib/product-polish-p2";
-import { STRIPE_NOT_PUBLIC_LAUNCH } from "@/lib/seven-day-d6-integrations";
+import {
+  STRIPE_NOT_PUBLIC_LAUNCH,
+  STRIPE_SANDBOX_CHECKOUT_ENABLED,
+} from "@/lib/seven-day-d6-integrations";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
 import {
@@ -26,6 +29,15 @@ import {
   writeRecruiterInboxSession,
 } from "@/lib/recruiter-inbox";
 
+type SandboxCheckoutResult = {
+  checkout_enabled?: boolean;
+  sandbox?: boolean;
+  livemode?: boolean;
+  session_id?: string | null;
+  reason?: string;
+  note?: string;
+};
+
 const INTEGRATION_KEYS = [
   "acceptance_inbox",
   "ats_webhooks",
@@ -39,6 +51,8 @@ export default function CompanyBillingClient() {
   const [companyRaw, setCompanyRaw] = useState("");
   const [payload, setPayload] = useState<CompanyPlanUsagePayload | null>(null);
   const [loading, setLoading] = useState(false);
+  const [checkoutBusy, setCheckoutBusy] = useState(false);
+  const [checkoutMsg, setCheckoutMsg] = useState<string | null>(null);
 
   const companyOptions = useMemo(
     () => mergeCompanyOptions(readRecruiterInboxSession().companySlug, companyRaw),
@@ -83,12 +97,56 @@ export default function CompanyBillingClient() {
     }
   }, [token, companySlug]);
 
+  const startSandboxCheckout = useCallback(async () => {
+    const tkn = token.trim();
+    const slug = companySlug;
+    if (!tkn || !slug || !STRIPE_SANDBOX_CHECKOUT_ENABLED) return;
+    // Public Stripe launch stays HELD — sandbox CTA only.
+    if (!STRIPE_NOT_PUBLIC_LAUNCH) return;
+    writeRecruiterInboxSession(tkn, slug);
+    setCheckoutBusy(true);
+    setCheckoutMsg(null);
+    try {
+      const q = recruiterInboxQuery(tkn, slug);
+      const res = await fetch(`/api/company/billing/checkout-session?${q}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan_sku: "company_pilot" }),
+        cache: "no-store",
+      });
+      const body = (await res.json().catch(() => ({}))) as SandboxCheckoutResult;
+      if (!res.ok) {
+        setCheckoutMsg(t("companyBilling.sandboxCheckoutFailed"));
+        return;
+      }
+      if (body.livemode === true) {
+        setCheckoutMsg(t("companyBilling.sandboxCheckoutLiveForbidden"));
+        return;
+      }
+      if (body.session_id) {
+        setCheckoutMsg(t("companyBilling.sandboxCheckoutOk"));
+        return;
+      }
+      setCheckoutMsg(
+        body.reason === "stripe_keys_missing"
+          ? t("companyBilling.sandboxCheckoutKeysMissing")
+          : t("companyBilling.sandboxCheckoutStub"),
+      );
+    } catch {
+      setCheckoutMsg(t("companyBilling.sandboxCheckoutFailed"));
+    } finally {
+      setCheckoutBusy(false);
+    }
+  }, [token, companySlug, t]);
+
   const planKey = (payload?.plan ?? "free") as "demo" | "pilot" | "free";
   const planTitleKey = `companyBilling.plan_${planKey}` as TranslationKey;
   const planBodyKey = `companyBilling.planBody_${planKey}` as TranslationKey;
 
   const integrationLabel = (key: string): TranslationKey =>
     `companyBilling.integration_${key}` as TranslationKey;
+  const showSandboxCheckout =
+    STRIPE_SANDBOX_CHECKOUT_ENABLED && STRIPE_NOT_PUBLIC_LAUNCH && Boolean(payload);
 
   return (
     <Shell wide data-seven-day-d6-company-billing>
@@ -193,10 +251,26 @@ export default function CompanyBillingClient() {
             </ul>
           </section>
 
-          <Card variant="soft" className="border-[var(--twin-border)]/80 p-4">
+          <Card variant="soft" className="border-[var(--twin-border)]/80 p-4" data-company-billing-sandbox-checkout>
             <h2 className="text-sm font-semibold">{t("companyBilling.ctaTitle")}</h2>
             <p className="twin-muted mt-2 text-sm">{t("companyBilling.ctaBody")}</p>
+            {showSandboxCheckout ? (
+              <p className="twin-muted mt-2 text-sm" data-seven-day-d6-billing-sandbox-cta>
+                {t("companyBilling.sandboxCheckoutLead")}
+              </p>
+            ) : null}
             <div className="mt-4 flex flex-wrap gap-3">
+              {showSandboxCheckout ? (
+                <button
+                  type="button"
+                  onClick={() => void startSandboxCheckout()}
+                  disabled={checkoutBusy || !token.trim() || !companySlug}
+                  className="twin-btn-primary disabled:opacity-50"
+                  data-testid="company-billing-sandbox-checkout"
+                >
+                  {checkoutBusy ? t("companyBilling.sandboxCheckoutBusy") : t("companyBilling.sandboxCheckoutCta")}
+                </button>
+              ) : null}
               <Link href="/contact" className="twin-btn-primary inline-flex">
                 {t("companyBilling.ctaContact")}
               </Link>
@@ -204,6 +278,11 @@ export default function CompanyBillingClient() {
                 {t("companyBilling.ctaPilot")}
               </Link>
             </div>
+            {checkoutMsg ? (
+              <p className="twin-muted mt-3 text-xs" data-testid="company-billing-sandbox-checkout-msg">
+                {checkoutMsg}
+              </p>
+            ) : null}
           </Card>
 
           <p className="twin-muted text-xs leading-relaxed">{t("companyBilling.scopeNote")}</p>

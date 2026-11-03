@@ -1,8 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
+import { useCallback, useEffect, useState } from "react";
 
+import { CandidateTrustLivePrivacyForm } from "@/components/candidate/candidate-trust-live-privacy-form";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
@@ -25,6 +28,23 @@ import { candidateConsentReceiptHref } from "@/lib/candidate-consent-receipt";
 import { candidateTrustAuditExportHref } from "@/lib/candidate-trust-audit-export";
 import type { TranslationKey } from "@/lib/i18n";
 import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
+import { NonLiveMutationBanner } from "@/components/workspace/non-live-mutation-banner";
+import {
+  fetchTrustLiveBundle,
+  isDemoFixtureCandidateId,
+  KYC_CONFIGURED_API_PATH,
+  KYC_STATUS_API_PATH,
+} from "@/lib/candidate-trust-live";
+import { apiFetch } from "@/lib/api";
+import { getToken } from "@/lib/auth";
+import { isDemoOrDevSurface } from "@/lib/production-action-gates";
+
+type KycConfigured = { configured: boolean };
+type KycStatus = {
+  identity_verified_at: string | null;
+  conversation_status: string | null;
+  identity_status: string | null;
+};
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -80,7 +100,17 @@ function IdentityVerificationNotFound() {
   );
 }
 
-function IdentityVerificationContent({ record }: { record: CandidateIdentityVerificationRecord }) {
+function IdentityVerificationContent({
+  record,
+  livePath,
+  kycConfigured,
+  kycStatus,
+}: {
+  record: CandidateIdentityVerificationRecord;
+  livePath: boolean;
+  kycConfigured: boolean | null;
+  kycStatus: KycStatus | null;
+}) {
   const { t } = useTranslation();
 
   return (
@@ -124,6 +154,43 @@ function IdentityVerificationContent({ record }: { record: CandidateIdentityVeri
               </span>
             </div>
           </div>
+          {livePath ? null : <NonLiveMutationBanner kind="sample_only" />}
+          {livePath ? (
+            <div className="space-y-3" data-testid="candidate-identity-verification-live-status">
+              <p className="text-xs text-[var(--twin-muted-strong)]">
+                {t("candidateTrustLive.manualIdentityReviewLead")}
+              </p>
+              <div className="rounded-lg border border-[var(--twin-border)]/70 p-3 text-sm">
+                <p>
+                  {kycConfigured === false
+                    ? t("candidateTrustLive.identityNotConfigured")
+                    : kycConfigured === true
+                      ? t("candidateTrustLive.identityProviderConfiguredHeld")
+                      : t("candidateTrustLive.identityNotStarted")}
+                </p>
+                <p className="mt-2 text-xs text-[var(--twin-muted-strong)]">
+                  {kycStatus?.identity_verified_at
+                    ? `${t("candidateTrustLive.identityVerified")}: ${kycStatus.identity_verified_at}`
+                    : t("candidateTrustLive.identityNotStarted")}
+                </p>
+                <p className="mt-1 text-[10px] text-[var(--twin-muted)]">
+                  {t("candidateTrustLive.providerHeldNotice")}
+                </p>
+              </div>
+              <CandidateTrustLivePrivacyForm
+                requestType="identity_review"
+                testId="candidate-identity-verification-live-form"
+                notePlaceholder={t("candidateTrustLive.identityReviewNotePlaceholder")}
+              />
+              <Link
+                href={CANDIDATE_IDENTITY_VERIFICATION_SAFE_LINKS.identityLegacy}
+                className="twin-link text-xs font-medium"
+                data-testid="candidate-identity-verification-legacy-kyc-link"
+              >
+                {t("candidateTrustLive.openProviderIdentityPage")}
+              </Link>
+            </div>
+          ) : null}
           <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
             <Link
               href={CANDIDATE_IDENTITY_VERIFICATION_SAFE_LINKS.trustCenter}
@@ -353,7 +420,99 @@ type CandidateIdentityVerificationWorkspaceProps = {
 export function CandidateIdentityVerificationWorkspace({
   candidateId,
 }: CandidateIdentityVerificationWorkspaceProps) {
-  const record = resolveCandidateIdentityVerification(candidateId);
-  if (!record) return <IdentityVerificationNotFound />;
-  return <IdentityVerificationContent record={record} />;
+  const router = useRouter();
+  const { t } = useTranslation();
+  const [loading, setLoading] = useState(true);
+  const [livePath, setLivePath] = useState(false);
+  const [record, setRecord] = useState<CandidateIdentityVerificationRecord | null>(null);
+  const [kycConfigured, setKycConfigured] = useState<boolean | null>(null);
+  const [kycStatus, setKycStatus] = useState<KycStatus | null>(null);
+
+  const load = useCallback(async () => {
+    if (isDemoFixtureCandidateId(candidateId) && isDemoOrDevSurface()) {
+      setRecord(resolveCandidateIdentityVerification(candidateId));
+      setLivePath(false);
+      setLoading(false);
+      return;
+    }
+    const token = getToken();
+    if (!token) {
+      router.replace("/login/candidate");
+      return;
+    }
+    setLoading(true);
+    try {
+      const [bundle, cfg, st] = await Promise.all([
+        fetchTrustLiveBundle(token),
+        apiFetch<KycConfigured>(KYC_CONFIGURED_API_PATH, {}, token),
+        apiFetch<KycStatus>(KYC_STATUS_API_PATH, {}, token),
+      ]);
+      const base =
+        resolveCandidateIdentityVerification() ??
+        resolveCandidateIdentityVerification("demo-candidate-001");
+      if (!base) {
+        setRecord(null);
+      } else {
+        setRecord({
+          ...base,
+          id: String(bundle.candidate_id),
+          display_name: bundle.display_name,
+          headline: bundle.trust.twin_knows_summary,
+          last_reviewed_at: bundle.generated_at,
+          verification_label: "MANUAL_IDENTITY_REVIEW_STATUS",
+        });
+      }
+      setKycConfigured(Boolean(cfg.configured));
+      setKycStatus(st);
+      setLivePath(true);
+    } catch {
+      if (isDemoOrDevSurface()) {
+        setRecord(resolveCandidateIdentityVerification(candidateId));
+        setLivePath(false);
+      } else {
+        setRecord(null);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [candidateId, router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  if (loading) {
+    return (
+      <Shell wide rail>
+        <div data-testid="candidate-identity-verification-loading" className="space-y-4 p-6">
+          <div className="h-8 w-48 animate-pulse rounded bg-[var(--twin-border)]/60" />
+          <div className="h-32 animate-pulse rounded bg-[var(--twin-border)]/40" />
+        </div>
+      </Shell>
+    );
+  }
+
+  if (!record) {
+    return (
+      <Shell wide rail>
+        <div className="space-y-4 p-6">
+          <p className="text-sm text-[var(--twin-muted-strong)]">
+            {t("candidateIdentityVerification.notFoundMessage")}
+          </p>
+          <button type="button" className="twin-btn-secondary twin-touch-target" onClick={() => void load()}>
+            {t("candidateIdentityVerification.notFoundCta")}
+          </button>
+        </div>
+      </Shell>
+    );
+  }
+
+  return (
+    <IdentityVerificationContent
+      record={record}
+      livePath={livePath}
+      kycConfigured={kycConfigured}
+      kycStatus={kycStatus}
+    />
+  );
 }

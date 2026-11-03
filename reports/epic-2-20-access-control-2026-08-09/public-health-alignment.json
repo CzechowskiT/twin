@@ -1,0 +1,11 @@
+{
+  "frontend_commit": "5c5498552d247f33a6ad7199282f65b8f88794c4",
+  "api_commit": "5c5498552d247f33a6ad7199282f65b8f88794c4",
+  "worker_commit": "5c5498552d247f33a6ad7199282f65b8f88794c4",
+  "alignment_status": "ALIGNED",
+  "rc1_launch": "NO-GO",
+  "rc1_phase_3b": "BLOCKED",
+  "microsoft_calendar_write_enabled": false,
+  "rc1_public_preview_status": "ENABLED",
+  "rc1_pilot_access_status": "OPERATIONALLY_READY_INACTIVE"
+}

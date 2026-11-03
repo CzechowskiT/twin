@@ -103,6 +103,13 @@ def _next_run_label() -> str:
     return f"{h:02d}:{m:02d} Europe/Warsaw (daily)"
 
 
+def _submit_mode(settings) -> str:
+    raw = (getattr(settings, "nightly_auto_apply_submit_mode", None) or "REVIEW_BEFORE_SUBMIT").strip().upper()
+    if raw == "AUTO_SUBMIT":
+        return "AUTO_SUBMIT"
+    return "REVIEW_BEFORE_SUBMIT"
+
+
 def _to_out(
     consent: AutoApplyConsent | None,
     *,
@@ -113,12 +120,18 @@ def _to_out(
     ready = auto_apply_profile_ready(user, candidate)
     verified_ready = autonomous_apply_allowed(user, candidate)
     onboarding_done = user.onboarding_completed_at is not None
+    mode = _submit_mode(settings)
+    is_active = bool(consent.is_active) if consent else False
+    kill_switch = (not is_active) or (not bool(settings.nightly_auto_apply_beat_enabled))
     base = dict(
         next_run_label=_next_run_label(),
         supported_boards=", ".join(sorted(supported_board_ids(settings))),
         profile_ready=ready,
         verified_readiness_ready=verified_ready,
         onboarding_completed=onboarding_done,
+        submit_mode=mode,
+        kill_switch_active=kill_switch,
+        captcha_bypass=False,
     )
     if not consent:
         return AutoApplySettingsOut(

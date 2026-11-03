@@ -105,6 +105,13 @@ def _application_row(
         "updated_at": app.updated_at.isoformat() if app.updated_at else None,
     }
     item.update(build_recruiter_match_summary(db, cand, job, locale=locale))
+    try:
+        from app.services.candidate_intelligence import attach_compact_intelligence
+
+        attach_compact_intelligence(db, item, cand.id)
+    except Exception:
+        item["candidate_id"] = cand.id
+        item["intelligence"] = None
     return item
 
 

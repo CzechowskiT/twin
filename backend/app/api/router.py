@@ -5,11 +5,43 @@ from fastapi import APIRouter
 from app.api import (
     audit_events,
     auto_apply_settings,
+    acceptance_calendar,
     admin_ops,
+    ats_completion,
+    candidate_intelligence,
+    candidate_owned_import,
+    candidate_data_trust,
+    candidate_path_readiness,
+    candidate_career_pack,
+    career_pack_share_public,
+    candidate_journey_continuity,
+    candidate_access_inventory,
+    candidate_workspace_handoff,
+    unified_workspace_search,
+    career_evidence,
+    application_studio,
+    interview_decision,
+    interview_practice,
+    career_transition,
+    career_lifecycle,
+    career_strategy,
+    opportunity_intelligence,
+    search_strategy_lab,
+    search_outcome_intelligence,
+    strategy_review_governance,
+    decision_calendar_capacity,
+    read_only_calendar_sync,
+    adaptive_execution_intelligence,
+    evidence_investment_intelligence,
+    pilot_consolidation,
+    pilot_operations,
+    guided_first_value,
+    private_canary,
     chatgpt_twin,
     company,
     company_feedback_persistence,
     consent,
+    controlled_pilot_os,
     csp_reports,
     demo,
     export_requests,
@@ -25,8 +57,10 @@ from app.api import (
     candidates,
     candidate_role_status,
     candidate_visibility_preferences,
+    candidate_wave1,
     company,
     career_assistant,
+    career_copilot,
     curated_careers,
     gamification,
     geo,
@@ -41,9 +75,15 @@ from app.api import (
     partner,
     placement,
     placement_events,
+    platform_foundations,
     profile_import,
     public,
     recruiter,
+    recruiter_wave2,
+    company_wave3,
+    integrations_wave5,
+    investor_wave4,
+    ai_compliance,
     referrals,
     request_intake,
     review_queue,
@@ -54,6 +94,42 @@ from app.api import (
 api_router = APIRouter()
 api_router.include_router(health.router, tags=["Health"])
 api_router.include_router(audit_events.router, prefix="/audit-events", tags=["Audit events"])
+api_router.include_router(
+    platform_foundations.router,
+    prefix="/platform/foundations",
+    tags=["Platform foundations"],
+)
+api_router.include_router(
+    candidate_wave1.router,
+    prefix="/platform/wave1",
+    tags=["Candidate Wave 1"],
+)
+api_router.include_router(
+    recruiter_wave2.router,
+    prefix="/platform/wave2",
+    tags=["Recruiter Wave 2"],
+)
+api_router.include_router(
+    company_wave3.router,
+    prefix="/platform/wave3",
+    tags=["Company Wave 3"],
+)
+api_router.include_router(
+    integrations_wave5.router,
+    prefix="/platform/wave5",
+    tags=["Integrations Wave 5"],
+)
+api_router.include_router(
+    investor_wave4.router,
+    prefix="/platform/wave4",
+    tags=["Investor Wave 4"],
+)
+api_router.include_router(
+    ai_compliance.router,
+    prefix="/platform/ai-compliance",
+    tags=["AI Compliance"],
+)
+api_router.include_router(ats_completion.router, tags=["ATS completion"])
 api_router.include_router(work_items.router, prefix="/work-items", tags=["Work items"])
 api_router.include_router(
     candidate_role_status.router,
@@ -87,6 +163,151 @@ api_router.include_router(beta_waitlist.router, prefix="/beta", tags=["Beta wait
 api_router.include_router(billing.router, prefix="/billing", tags=["Billing"])
 api_router.include_router(kyc.router, prefix="/kyc", tags=["KYC"])
 api_router.include_router(candidates.router, prefix="/candidates", tags=["Candidates"])
+api_router.include_router(
+    career_copilot.router, prefix="/candidates", tags=["Career Copilot"]
+)
+api_router.include_router(
+    acceptance_calendar.router, prefix="/candidates", tags=["Acceptance Calendar"]
+)
+api_router.include_router(
+    career_evidence.router, prefix="/candidates", tags=["Career Evidence"]
+)
+api_router.include_router(
+    application_studio.router, prefix="/candidates", tags=["Application Studio"]
+)
+api_router.include_router(
+    interview_decision.router, prefix="/candidates", tags=["Interview Decision"]
+)
+api_router.include_router(
+    interview_practice.router, prefix="/candidates", tags=["Interview Practice"]
+)
+api_router.include_router(
+    career_transition.router, prefix="/candidates", tags=["Career Transition"]
+)
+api_router.include_router(
+    career_lifecycle.router, prefix="/candidates", tags=["Career Lifecycle"]
+)
+api_router.include_router(
+    career_strategy.router, prefix="/candidates", tags=["Career Strategy"]
+)
+api_router.include_router(
+    opportunity_intelligence.router, prefix="/candidates", tags=["Opportunity Intelligence"]
+)
+api_router.include_router(
+    search_strategy_lab.router, prefix="/candidates", tags=["Search Strategy Lab"]
+)
+api_router.include_router(
+    search_outcome_intelligence.router,
+    prefix="/candidates",
+    tags=["Search Outcome Intelligence"],
+)
+api_router.include_router(
+    strategy_review_governance.router,
+    prefix="/candidates",
+    tags=["Strategy Review Decision Governance"],
+)
+api_router.include_router(
+    decision_calendar_capacity.router,
+    prefix="/candidates",
+    tags=["Decision Calendar Capacity Planning"],
+)
+api_router.include_router(
+    read_only_calendar_sync.router,
+    prefix="/candidates",
+    tags=["Read-Only Calendar Sync"],
+)
+api_router.include_router(
+    read_only_calendar_sync.public_router,
+    prefix="",
+    tags=["Private Calendar Feed"],
+)
+api_router.include_router(
+    adaptive_execution_intelligence.router,
+    prefix="/candidates",
+    tags=["Adaptive Execution Intelligence"],
+)
+api_router.include_router(
+    evidence_investment_intelligence.router,
+    prefix="/candidates",
+    tags=["Evidence Investment Intelligence"],
+)
+api_router.include_router(
+    pilot_consolidation.router,
+    prefix="/candidates",
+    tags=["Pilot Consolidation"],
+)
+api_router.include_router(
+    pilot_operations.router,
+    prefix="/candidates",
+    tags=["Pilot Operations"],
+)
+api_router.include_router(
+    guided_first_value.router,
+    prefix="/candidates",
+    tags=["Guided First Value"],
+)
+api_router.include_router(
+    candidate_owned_import.router,
+    prefix="/candidates",
+    tags=["Candidate Owned Import"],
+)
+api_router.include_router(
+    candidate_data_trust.router,
+    prefix="/candidates",
+    tags=["Candidate Data Trust"],
+)
+api_router.include_router(
+    candidate_path_readiness.router,
+    prefix="/candidates",
+    tags=["Candidate Path Readiness"],
+)
+api_router.include_router(
+    candidate_career_pack.router,
+    prefix="/candidates",
+    tags=["Candidate Career Pack"],
+)
+api_router.include_router(
+    career_pack_share_public.router,
+    tags=["Career Pack Share Public"],
+)
+api_router.include_router(
+    candidate_journey_continuity.router,
+    prefix="/candidates",
+    tags=["Candidate Journey Continuity"],
+)
+api_router.include_router(
+    candidate_access_inventory.router,
+    prefix="/candidates",
+    tags=["Candidate Access Inventory"],
+)
+api_router.include_router(
+    candidate_workspace_handoff.router,
+    prefix="/candidates",
+    tags=["Candidate Workspace Handoffs"],
+)
+api_router.include_router(
+    unified_workspace_search.router,
+    prefix="/candidates",
+    tags=["Unified Workspace Search"],
+)
+api_router.include_router(
+    private_canary.router,
+    prefix="/candidates",
+    tags=["Private Canary Journey"],
+)
+api_router.include_router(
+    private_canary.admin_router,
+    prefix="/admin",
+    tags=["Private Canary Admin"],
+)
+api_router.include_router(
+    pilot_operations.admin_router,
+    prefix="/admin",
+    tags=["Pilot Operations Admin"],
+)
+api_router.include_router(
+    candidate_intelligence.router, prefix="", tags=["Candidate Intelligence"]
+)
 api_router.include_router(profile_import.router, prefix="/profile", tags=["Profile import"])
 api_router.include_router(opportunities.router, prefix="/opportunities", tags=["Opportunities"])
 api_router.include_router(gamification.router, prefix="/gamification", tags=["Gamification"])
@@ -109,6 +330,7 @@ api_router.include_router(applications.router, prefix="/applications", tags=["Ap
 api_router.include_router(auto_apply_settings.router, prefix="/auto-apply", tags=["Auto-apply"])
 api_router.include_router(feedback.router, prefix="/feedback", tags=["Feedback"])
 api_router.include_router(admin_ops.router, prefix="/admin", tags=["Admin"])
+api_router.include_router(controlled_pilot_os.router, prefix="/admin", tags=["Controlled Pilot OS"])
 api_router.include_router(ops.router, prefix="/ops", tags=["Ops"])
 api_router.include_router(
     founder_command.router, prefix="/founder-command", tags=["Founder Command"]

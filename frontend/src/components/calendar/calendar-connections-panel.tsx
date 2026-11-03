@@ -54,6 +54,8 @@ export type CalendarConnectionsPanelProps = {
   onSubscribeWebcal: () => void;
   onCopyWebcalLink: () => void;
   onGenerateWebcalLink: () => void;
+  onImportIcsFile?: (file: File) => void;
+  icsImportResult?: string | null;
   onRetryCalendarEvents?: () => void;
   onRetryCalendarStatus?: () => void;
 };
@@ -385,10 +387,13 @@ export function CalendarConnectionsPanel({
   onSubscribeWebcal,
   onCopyWebcalLink,
   onGenerateWebcalLink,
+  onImportIcsFile,
+  icsImportResult,
   onRetryCalendarEvents,
   onRetryCalendarStatus,
 }: CalendarConnectionsPanelProps) {
   const { t } = useTranslation();
+  const icsInputId = "twin-calendar-ics-import-input";
 
   return (
     <section className="mb-6" aria-labelledby="calendar-connections-heading" data-seven-day-d6-candidate-calendar>
@@ -475,6 +480,39 @@ export function CalendarConnectionsPanel({
             {actionBusy === "webcal" ? "…" : t("dashboard.calendarAddToCalendar")}
           </Button>
         </div>
+
+        {onImportIcsFile ? (
+          <div className="mt-5 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-2)]/80 px-3 py-3" data-testid="calendar-ics-import">
+            <p className="text-sm font-medium text-[var(--foreground)]">{t("dashboard.calendarIcsImportTitle")}</p>
+            <p className="twin-muted mt-1 text-xs leading-relaxed">{t("dashboard.calendarIcsImportLead")}</p>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <input
+                id={icsInputId}
+                type="file"
+                accept=".ics,text/calendar"
+                className="sr-only"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) onImportIcsFile(file);
+                  e.currentTarget.value = "";
+                }}
+              />
+              <Button
+                type="button"
+                className="twin-btn-secondary twin-touch-target"
+                disabled={Boolean(actionBusy)}
+                onClick={() => document.getElementById(icsInputId)?.click()}
+              >
+                {actionBusy === "ics-import" ? t("dashboard.calendarIcsImportBusy") : t("dashboard.calendarIcsImportButton")}
+              </Button>
+            </div>
+            {icsImportResult ? (
+              <p className="mt-2 text-sm text-emerald-700 dark:text-emerald-300" role="status">
+                {icsImportResult}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
 
         <ol className="mt-6 list-none space-y-4 p-0">
           {OTHER_STEPS.map((step, index) => {

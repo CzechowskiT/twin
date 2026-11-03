@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { CandidateTrustLivePrivacyForm } from "@/components/candidate/candidate-trust-live-privacy-form";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { ExportPreviewPanel } from "@/components/candidate/export-preview-panel";
 import { ExportRequestPersistenceNote } from "@/components/candidate/export-request-persistence-note";
@@ -25,6 +27,11 @@ import { candidateConsentReceiptHref } from "@/lib/candidate-consent-receipt";
 import { candidateTrustAuditExportHref } from "@/lib/candidate-trust-audit-export";
 import { EXPORT_REQUEST_TYPES, exportRequestsHref } from "@/lib/export-requests";
 import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
+import { NonLiveMutationBanner } from "@/components/workspace/non-live-mutation-banner";
+import { fetchTrustLiveBundle, isDemoFixtureCandidateId, MY_DATA_EXPORT_JSON_PATH } from "@/lib/candidate-trust-live";
+import { apiFetch, saveBlobAsFile } from "@/lib/api";
+import { getToken } from "@/lib/auth";
+import { isDemoOrDevSurface } from "@/lib/production-action-gates";
 
 function sectionCard(marker: string, title: string, children: ReactNode, className = ""): ReactNode {
   return (
@@ -60,9 +67,23 @@ function ExportPreviewNotFound() {
   );
 }
 
-function ExportPreviewContent({ record }: { record: CandidateExportPreviewRecord }) {
+function ExportPreviewContent({
+  record,
+  livePath,
+}: {
+  record: CandidateExportPreviewRecord;
+  livePath: boolean;
+}) {
   const { t } = useTranslation();
   const jsonFull = useMemo(() => JSON.stringify(record.bundle, null, 2), [record.bundle]);
+
+  const downloadMyData = async () => {
+    const token = getToken();
+    if (!token) return;
+    const data = await apiFetch<Record<string, unknown>>(MY_DATA_EXPORT_JSON_PATH, {}, token);
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json;charset=utf-8" });
+    saveBlobAsFile(blob, "twin-my-data.json");
+  };
 
   return (
     <Shell wide rail>
@@ -102,6 +123,24 @@ function ExportPreviewContent({ record }: { record: CandidateExportPreviewRecord
               </span>
             </div>
           </div>
+          {livePath ? null : <NonLiveMutationBanner kind="sample_only" />}
+          {livePath ? (
+            <div className="space-y-3" data-testid="candidate-export-preview-live-lifecycle">
+              <p className="text-xs text-[var(--twin-muted-strong)]">{t("candidateTrustLive.exportLifecycleLead")}</p>
+              <CandidateTrustLivePrivacyForm
+                requestType="export"
+                testId="candidate-export-preview-live-form"
+              />
+              <button
+                type="button"
+                className="twin-btn-secondary twin-touch-target"
+                data-testid="candidate-export-preview-download-live-json"
+                onClick={() => void downloadMyData()}
+              >
+                {t("candidateTrustLive.downloadMyData")}
+              </button>
+            </div>
+          ) : null}
           <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
             <Link
               href={CANDIDATE_EXPORT_PREVIEW_SAFE_LINKS.trustCenter}
@@ -288,7 +327,80 @@ type CandidateExportPreviewWorkspaceProps = {
 };
 
 export function CandidateExportPreviewWorkspace({ candidateId }: CandidateExportPreviewWorkspaceProps) {
-  const record = resolveCandidateExportPreview(candidateId);
-  if (!record) return <ExportPreviewNotFound />;
-  return <ExportPreviewContent record={record} />;
+  const router = useRouter();
+  const { t } = useTranslation();
+  const [loading, setLoading] = useState(true);
+  const [livePath, setLivePath] = useState(false);
+  const [record, setRecord] = useState<CandidateExportPreviewRecord | null>(null);
+
+  const load = useCallback(async () => {
+    if (isDemoFixtureCandidateId(candidateId) && isDemoOrDevSurface()) {
+      setRecord(resolveCandidateExportPreview(candidateId));
+      setLivePath(false);
+      setLoading(false);
+      return;
+    }
+    const token = getToken();
+    if (!token) {
+      router.replace("/login/candidate");
+      return;
+    }
+    setLoading(true);
+    try {
+      const bundle = await fetchTrustLiveBundle(token);
+      const base = resolveCandidateExportPreview() ?? resolveCandidateExportPreview("demo-candidate-001");
+      if (!base) {
+        setRecord(null);
+      } else {
+        setRecord({
+          ...base,
+          id: String(bundle.candidate_id),
+          display_name: bundle.display_name,
+          headline: bundle.trust.twin_knows_summary,
+          last_reviewed_at: bundle.generated_at,
+          export_label: "LIVE_EXPORT_LIFECYCLE",
+        });
+      }
+      setLivePath(true);
+    } catch {
+      if (isDemoOrDevSurface()) {
+        setRecord(resolveCandidateExportPreview(candidateId));
+        setLivePath(false);
+      } else {
+        setRecord(null);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [candidateId, router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  if (loading) {
+    return (
+      <Shell wide rail>
+        <div data-testid="candidate-export-preview-loading" className="space-y-4 p-6">
+          <div className="h-8 w-48 animate-pulse rounded bg-[var(--twin-border)]/60" />
+          <div className="h-32 animate-pulse rounded bg-[var(--twin-border)]/40" />
+        </div>
+      </Shell>
+    );
+  }
+
+  if (!record) {
+    return (
+      <Shell wide rail>
+        <div className="space-y-4 p-6">
+          <p className="text-sm text-[var(--twin-muted-strong)]">{t("candidateExportPreview.notFoundMessage")}</p>
+          <button type="button" className="twin-btn-secondary twin-touch-target" onClick={() => void load()}>
+            {t("candidateExportPreview.notFoundCta")}
+          </button>
+        </div>
+      </Shell>
+    );
+  }
+
+  return <ExportPreviewContent record={record} livePath={livePath} />;
 }

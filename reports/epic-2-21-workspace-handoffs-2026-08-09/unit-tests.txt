@@ -1,0 +1,5 @@
+  /Users/tomek/Projects/twin/backend/tests/test_epic_221_workspace_handoff.py:209: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    created_at=datetime.utcnow(),
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+5 passed, 126 warnings in 3.15s

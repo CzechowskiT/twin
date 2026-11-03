@@ -15,6 +15,11 @@ import {
   RECRUITER_ANALYTICS_PAGE_MARKER,
   type RecruiterAnalyticsPayload,
 } from "@/lib/recruiter-analytics";
+import {
+  RECRUITER_SLA_API_PATH,
+  RECRUITER_SLA_MARKERS,
+  type RecruiterSlaSummary,
+} from "@/lib/recruiter-sla";
 import { RECRUITER_ANALYTICS_SHIP_STATUS } from "@/lib/seven-day-d3-recruiter";
 import {
   mergeCompanyOptions,
@@ -49,6 +54,7 @@ export default function RecruiterAnalyticsClient() {
   const [token, setToken] = useState("");
   const [companyRaw, setCompanyRaw] = useState("");
   const [payload, setPayload] = useState<RecruiterAnalyticsPayload | null>(null);
+  const [sla, setSla] = useState<RecruiterSlaSummary | null>(null);
   const [activeRoles, setActiveRoles] = useState(0);
   const [loading, setLoading] = useState(false);
 
@@ -84,9 +90,10 @@ export default function RecruiterAnalyticsClient() {
     setLoading(true);
     try {
       const q = recruiterInboxQuery(tkn, slug);
-      const [analyticsRes, jobsRes] = await Promise.all([
+      const [analyticsRes, jobsRes, slaRes] = await Promise.all([
         fetch(`/api/recruiter/analytics?${q}`),
         fetch(`/api/recruiter/jobs?${q}`, { cache: "no-store" }),
+        fetch(`${RECRUITER_SLA_API_PATH}?${q}`, { cache: "no-store" }),
       ]);
       if (analyticsRes.ok) {
         setPayload((await analyticsRes.json()) as RecruiterAnalyticsPayload);
@@ -98,6 +105,11 @@ export default function RecruiterAnalyticsClient() {
         setActiveRoles(jobsData.items?.length ?? 0);
       } else {
         setActiveRoles(0);
+      }
+      if (slaRes.ok) {
+        setSla((await slaRes.json()) as RecruiterSlaSummary);
+      } else {
+        setSla(null);
       }
     } finally {
       setLoading(false);
@@ -176,6 +188,49 @@ export default function RecruiterAnalyticsClient() {
                 </ul>
               </Card>
             ) : null}
+            <Card variant="soft" className="p-4" data-testid={RECRUITER_SLA_MARKERS.panel} data-metric="sla_tracking">
+              <h2 className="text-sm font-semibold text-[var(--foreground)]">{t("recruiterAnalytics.slaTitle")}</h2>
+              <p className="twin-muted mt-1 text-xs">{t("recruiterAnalytics.slaLead")}</p>
+              {sla ? (
+                <div className="mt-3 space-y-3">
+                  <div className="flex flex-wrap gap-4 text-sm">
+                    <p data-testid={RECRUITER_SLA_MARKERS.openCount}>
+                      <span className="text-[var(--twin-muted)]">{t("recruiterAnalytics.slaOpen")}: </span>
+                      <span className="font-semibold tabular-nums">{fmt(sla.open_count)}</span>
+                    </p>
+                    <p data-testid={RECRUITER_SLA_MARKERS.breachCount}>
+                      <span className="text-[var(--twin-muted)]">{t("recruiterAnalytics.slaBreaches")}: </span>
+                      <span className="font-semibold tabular-nums">{fmt(sla.breach_count)}</span>
+                    </p>
+                  </div>
+                  {Object.keys(sla.by_stage ?? {}).length ? (
+                    <ul className="space-y-2">
+                      {Object.entries(sla.by_stage).map(([stage, row]) => {
+                        const target =
+                          sla.targets.find((x) => x.stage_key === stage)?.target_hours ?? "—";
+                        return (
+                          <li
+                            key={stage}
+                            className="flex flex-wrap items-center justify-between gap-2 text-sm"
+                          >
+                            <span className="text-[var(--twin-muted-strong)]">
+                              {t("recruiterAnalytics.slaStage")}: {stage}
+                            </span>
+                            <span className="tabular-nums">
+                              {fmt(row.open)} open · {fmt(row.breached)} past · {target}h
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  ) : (
+                    <p className="twin-muted text-xs">{t("recruiterAnalytics.slaEmpty")}</p>
+                  )}
+                </div>
+              ) : (
+                <p className="twin-muted mt-2 text-xs">{t("recruiterAnalytics.slaEmpty")}</p>
+              )}
+            </Card>
             <Card variant="soft" className="border-[var(--twin-accent)]/20 p-4" data-metric="next_action">
               <p className="text-xs uppercase text-[var(--twin-muted)]">{t("recruiterAnalytics.nextActionTitle")}</p>
               <p className="mt-2 text-sm leading-relaxed text-[var(--foreground)]">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/components/language-provider";
+import { NonLiveMutationBanner } from "@/components/workspace/non-live-mutation-banner";
 import {
   COMPANY_TEAM_ROLE_IDS,
   COMPANY_TEAM_VISUAL_MARKERS,
@@ -104,6 +105,7 @@ export function CompanyTeamPanel({ data, loading }: CompanyTeamPanelProps) {
       data-company-team-panel="true"
       data-testid={COMPANY_TEAM_VISUAL_MARKERS.panelRoot}
     >
+      <NonLiveMutationBanner kind="preview_only" />
       <section
         className="rounded-xl border border-amber-500/30 bg-amber-950/30 px-4 py-3"
         data-testid={COMPANY_TEAM_VISUAL_MARKERS.readinessBanner}

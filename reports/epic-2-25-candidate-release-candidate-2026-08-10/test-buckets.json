@@ -1,0 +1,232 @@
+{
+  "auth_security": {
+    "checks": [
+      {
+        "detail": "exit=0",
+        "name": "script_epic-2-22-auth-session-e2e.py",
+        "ok": true
+      },
+      {
+        "detail": "exit=0",
+        "name": "script_epic-2-22-auth-session-authenticated-e2e.py",
+        "ok": true
+      },
+      {
+        "detail": "exit=0",
+        "name": "script_epic-2-23-account-recovery-e2e.py",
+        "ok": true
+      },
+      {
+        "detail": "exit=0",
+        "name": "script_epic-2-23-account-recovery-authenticated-e2e.py",
+        "ok": true
+      },
+      {
+        "detail": "exit=0",
+        "name": "script_epic-2-24-totp-mfa-e2e.py",
+        "ok": true
+      },
+      {
+        "detail": "exit=0",
+        "name": "script_epic-2-24-totp-mfa-authenticated-e2e.py",
+        "ok": true
+      },
+      {
+        "detail": "200",
+        "name": "fresh_mfa_default_off",
+        "ok": true
+      }
+    ],
+    "fail": 0,
+    "pass": 7
+  },
+  "infra": {
+    "checks": [
+      {
+        "detail": "c84f03734d02b5159ac7ce43c2259fa5cfe234c9",
+        "name": "fe_product",
+        "ok": true
+      },
+      {
+        "detail": "c84f03734d02b5159ac7ce43c2259fa5cfe234c9",
+        "name": "api_product",
+        "ok": true
+      },
+      {
+        "detail": "c84f03734d02b5159ac7ce43c2259fa5cfe234c9",
+        "name": "worker_product",
+        "ok": true
+      },
+      {
+        "detail": "",
+        "name": "aligned",
+        "ok": true
+      },
+      {
+        "detail": "138_candidate_totp_mfa",
+        "name": "db_at_138",
+        "ok": true
+      },
+      {
+        "detail": "",
+        "name": "migrations_endpoint",
+        "ok": true
+      },
+      {
+        "detail": "200",
+        "name": "pp1_200",
+        "ok": true
+      },
+      {
+        "detail": "[]",
+        "name": "canary_diff_zero",
+        "ok": true
+      }
+    ],
+    "fail": 0,
+    "pass": 8
+  },
+  "privacy": {
+    "checks": [
+      {
+        "detail": "422",
+        "name": "export_no_secret_leak",
+        "ok": true
+      },
+      {
+        "detail": "200",
+        "name": "pp1_http_200",
+        "ok": true
+      },
+      {
+        "detail": "422",
+        "name": "deletion_attempted",
+        "ok": true
+      }
+    ],
+    "fail": 0,
+    "pass": 3
+  },
+  "product": {
+    "checks": [
+      {
+        "detail": "7",
+        "name": "primary_ia_exactly_7",
+        "ok": true
+      },
+      {
+        "detail": "284",
+        "name": "routes_100pct_classified",
+        "ok": true
+      },
+      {
+        "detail": "Fresh account \u2192 first value (pilot_first_value_v1 sole)",
+        "name": "golden_GJ1",
+        "ok": true
+      },
+      {
+        "detail": "Import \u2192 Search \u2192 Data Trust \u2192 Path Readiness",
+        "name": "golden_GJ2",
+        "ok": true
+      },
+      {
+        "detail": "Opportunity \u2192 App Studio \u2192 Career Pack \u2192 share \u2192 revoke",
+        "name": "golden_GJ3",
+        "ok": true
+      },
+      {
+        "detail": "Interview/decision/Execution Calendar/Daily OS/calibration",
+        "name": "golden_GJ4",
+        "ok": true
+      },
+      {
+        "detail": "Continuity + account security (sessions/MFA/recovery)",
+        "name": "golden_GJ5",
+        "ok": true
+      },
+      {
+        "detail": "Privacy / export / deletion",
+        "name": "golden_GJ6",
+        "ok": true
+      },
+      {
+        "detail": "6/6",
+        "name": "golden_6_of_6",
+        "ok": true
+      }
+    ],
+    "fail": 0,
+    "pass": 9
+  },
+  "stance": {
+    "checks": [
+      {
+        "detail": "",
+        "name": "launch_nogo",
+        "ok": true
+      },
+      {
+        "detail": "",
+        "name": "enrollment_off",
+        "ok": true
+      },
+      {
+        "detail": "",
+        "name": "invite_send_off",
+        "ok": true
+      },
+      {
+        "detail": "",
+        "name": "canary_ready_inactive",
+        "ok": true
+      },
+      {
+        "detail": "",
+        "name": "canary_active_false",
+        "ok": true
+      },
+      {
+        "detail": "",
+        "name": "activation_prepared_not_executed",
+        "ok": true
+      },
+      {
+        "detail": "",
+        "name": "caps_zero",
+        "ok": true
+      },
+      {
+        "detail": "",
+        "name": "designation_zero",
+        "ok": true
+      },
+      {
+        "detail": "",
+        "name": "pilot_inactive",
+        "ok": true
+      },
+      {
+        "detail": "",
+        "name": "phase_3b_blocked",
+        "ok": true
+      },
+      {
+        "detail": "",
+        "name": "ms_write_off",
+        "ok": true
+      },
+      {
+        "detail": "200",
+        "name": "mfa_opt_in_off",
+        "ok": true
+      },
+      {
+        "detail": "404",
+        "name": "signup_blocked",
+        "ok": true
+      }
+    ],
+    "fail": 0,
+    "pass": 13
+  }
+}

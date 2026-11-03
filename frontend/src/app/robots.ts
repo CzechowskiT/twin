@@ -18,6 +18,8 @@ export default function robots(): MetadataRoute.Robots {
         "/reset-password",
         "/onboarding-assistant",
         "/admin",
+        "/preview",
+        "/share/",
       ],
     },
   };

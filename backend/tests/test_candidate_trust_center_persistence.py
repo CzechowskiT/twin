@@ -406,7 +406,14 @@ def test_all_privacy_request_types() -> None:
     try:
         user, _ = _seed_user(db, "privacy-types@example.com")
         client = _client_for(db, user)
-        for req_type in ("correction", "export", "portability", "withdrawal", "deletion"):
+        for req_type in (
+            "correction",
+            "export",
+            "portability",
+            "withdrawal",
+            "deletion",
+            "identity_review",
+        ):
             r = client.post(
                 "/api/v1/candidates/me/privacy-requests",
                 json={"request_type": req_type, "idempotency_key": req_type},

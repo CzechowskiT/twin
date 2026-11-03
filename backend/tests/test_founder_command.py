@@ -7,11 +7,11 @@ import json
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.config import get_settings
-from app.database.models import Base, FounderCommand
+from app.database.models import Base, FounderCommand, FounderDecision
 from app.database.session import get_db
 from app.main import app
 from app.services.founder_command.approval_policy import classify_operation
@@ -19,6 +19,7 @@ from app.services.founder_command.auth import FounderPrincipal, issue_csrf_token
 from app.services.founder_command.constants import (
     AutonomyLevel,
     GATE_F_STATUS,
+    KNOWN_PROD_SHA_HINT,
     LAUNCH_STANCE,
 )
 from app.services.founder_command.planner import plan_from_command
@@ -71,6 +72,18 @@ def _csrf(client: TestClient) -> dict[str, str]:
     assert r.status_code == 200
     token = r.json()["csrf_token"]
     return {**_auth(), "X-CSRF-Token": token, "Content-Type": "application/json"}
+
+
+def _keep_founder_command_queued(
+    session: Session,
+    _settings: object,
+    command_id: str,
+    **_kwargs: object,
+) -> None:
+    command = session.get(FounderCommand, command_id)
+    command.status = "queued"
+    command.current_stage = "resolve_state"
+    session.flush()
 
 
 def test_planner_analysis_preserves_false_flags():
@@ -310,14 +323,73 @@ def test_level4_requires_caps():
 def test_approval_policy_safe_vs_high_risk():
     risk, disp = classify_operation("diagnose", {"execution_mode": "analysis"})
     assert disp == "auto"
-    risk2, disp2 = classify_operation("production_deploy", {"execution_mode": "deploy"})
+    guarded_deploy = {
+        "execution_mode": "deploy",
+        "execution_contract": {
+            "commit_required": True,
+            "pr_required": True,
+            "deployment_required": True,
+            "production_regression_required": True,
+        },
+    }
+    risk2, disp2 = classify_operation("production_deploy", guarded_deploy)
     assert disp2 == "auto"
     assert risk2 == "high"
+    _, unguarded = classify_operation(
+        "production_deploy",
+        {"execution_mode": "deploy"},
+    )
+    assert unguarded == "require_approval"
     risk3, disp3 = classify_operation("force_unlock", {"execution_mode": "deploy"})
     assert disp3 == "require_approval"
     assert risk3 == "critical"
     risk4, disp4 = classify_operation("merge_to_base", {"execution_mode": "deploy"})
     assert disp4 == "require_approval"
+
+
+def test_ci_gated_deploy_command_does_not_wait_for_approval(founder_client, monkeypatch):
+    client, db = founder_client
+    monkeypatch.setattr(
+        "app.services.founder_command.service.tick_command",
+        _keep_founder_command_queued,
+    )
+    monkeypatch.setattr(
+        "app.tasks.founder_command_tasks.tick_founder_command.delay",
+        lambda *_args, **_kwargs: None,
+    )
+
+    response = client.post(
+        "/api/v1/founder-command/commands",
+        headers={**_csrf(client), "Idempotency-Key": "ci-gated-deploy-auto"},
+        json={
+            "direction": "Wdróż standardową zmianę po zielonym CI.",
+            "action": "start",
+            "autonomy_level": 3,
+            "max_batches": 1,
+            "max_runtime_minutes": 60,
+            "execution_mode": "deploy",
+            "execution_contract": {
+                "execution_mode": "mutating",
+                "read_only": False,
+                "mutation_required": True,
+                "commit_required": True,
+                "pr_required": True,
+                "merge_required": False,
+                "deployment_required": True,
+                "production_regression_required": True,
+                "operator_execution_required": True,
+            },
+        },
+    )
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["status"] == "queued"
+    assert body["pending_decisions"] == []
+    decision = db.query(FounderDecision).filter_by(command_id=body["id"]).one()
+    assert decision.operation == "standard_production_deploy"
+    assert decision.risk == "high"
+    assert decision.status == "auto_approved"
 
 
 def test_csrf_roundtrip():
@@ -336,23 +408,29 @@ def test_state_resolver_includes_gate_and_launch(founder_client):
     assert "counters" in state
 
 
-def test_state_resolver_aligns_with_platform_deploy_metadata(founder_client, monkeypatch):
+def test_state_resolver_aligns_verified_platform_deploy(founder_client, monkeypatch):
     _, db = founder_client
-    deployed_sha = "58538e79f8c8e508d27f2aa7cb17450cb15e37c2"
     monkeypatch.setattr(
-        "app.services.founder_command.state_resolver._git_commit_from_health",
-        lambda: deployed_sha,
+        "app.services.founder_command.state_resolver.collect_deployment_identity",
+        lambda **_kwargs: {
+            "git_commit": KNOWN_PROD_SHA_HINT,
+            "source_revision": KNOWN_PROD_SHA_HINT,
+            "runtime_label": KNOWN_PROD_SHA_HINT,
+            "deployment_id": "deploy-test",
+            "provenance": "platform",
+        },
     )
 
     production = resolve_project_state(db, get_settings())["production"]
 
-    assert production["api_git_commit"] == deployed_sha
-    assert production["repo_head_hint"] == deployed_sha
-    assert production["repo_head_source"] == "deployment_metadata"
+    assert production["api_git_commit"] == KNOWN_PROD_SHA_HINT
+    assert production["repo_head_hint"] == KNOWN_PROD_SHA_HINT
+    assert production["repo_head_source"] == "known_four_way_deploy"
+    assert production["deployment_provenance"] == "platform"
     assert production["alignment_status"] == "aligned"
 
 
-def test_state_resolver_does_not_mask_configured_head_mismatch(founder_client, monkeypatch):
+def test_state_resolver_reports_configured_head_drift(founder_client, monkeypatch):
     _, db = founder_client
     settings = get_settings()
     monkeypatch.setattr(
@@ -361,14 +439,39 @@ def test_state_resolver_does_not_mask_configured_head_mismatch(founder_client, m
         "1a5d577c9c21279bb68c19bc1cfa5d7bcac04dfe",
     )
     monkeypatch.setattr(
-        "app.services.founder_command.state_resolver._git_commit_from_health",
-        lambda: "844176fb158555c8dd0c1d60dcaba29eb9e66915",
+        "app.services.founder_command.state_resolver.collect_deployment_identity",
+        lambda **_kwargs: {
+            "git_commit": "844176fb158555c8dd0c1d60dcaba29eb9e66915",
+            "source_revision": "844176fb158555c8dd0c1d60dcaba29eb9e66915",
+            "runtime_label": None,
+            "deployment_id": "deploy-test",
+            "provenance": "platform",
+        },
     )
 
     production = resolve_project_state(db, settings)["production"]
 
     assert production["repo_head_source"] == "configured"
-    assert production["alignment_status"] == "unknown"
+    assert production["alignment_status"] == "drift"
+
+
+def test_state_resolver_does_not_mask_provenance_mismatch(founder_client, monkeypatch):
+    _, db = founder_client
+    monkeypatch.setattr(
+        "app.services.founder_command.state_resolver.collect_deployment_identity",
+        lambda **_kwargs: {
+            "git_commit": KNOWN_PROD_SHA_HINT,
+            "source_revision": KNOWN_PROD_SHA_HINT,
+            "runtime_label": "different-runtime-label",
+            "deployment_id": "deploy-test",
+            "provenance": "mismatched",
+        },
+    )
+
+    production = resolve_project_state(db, get_settings())["production"]
+
+    assert production["deployment_provenance"] == "mismatched"
+    assert production["alignment_status"] == "provenance_mismatch"
 
 
 def test_create_analyze_command_no_manual_prompt_copy(founder_client):
@@ -391,7 +494,7 @@ def test_create_analyze_command_no_manual_prompt_copy(founder_client):
     assert body["plan"]["product_agent_prompt_present"] is True
     assert "product_agent_prompt" not in body["plan"]  # not exposed raw in public payload
     assert body["live_summary"]["gate_f"] == "PASS"
-    assert body["live_summary"]["launch"] == "GO"
+    assert body["live_summary"]["launch"] == "NO-GO"
     # Timeline proves planner ran without founder paste
     assert any("Plan" in (t.get("message") or "") or t.get("stage") == "plan" for t in body["timeline"]) or body[
         "plan"
@@ -596,3 +699,311 @@ def test_e2e_diagnostic_batch_auto_prompt_counters(founder_client, monkeypatch):
     # Manual copy counters — product contract: prompt not in UI payload
     assert out["plan"]["product_agent_prompt_present"] is True
     assert "product_agent_prompt" not in out["plan"]
+
+
+def _seed_running_command(db, **overrides) -> FounderCommand:
+    from datetime import datetime
+    import uuid
+
+    row = FounderCommand(
+        id=str(uuid.uuid4()),
+        status="running",
+        current_stage="report_handoff",
+        direction="Hard limit regression fixture",
+        autonomy_level=3,
+        batch_index=0,
+        max_batches=5,
+        max_runtime_minutes=60,
+        max_consecutive_failures=2,
+        consecutive_failures=0,
+        plan_json=json.dumps(
+            {
+                "execution_mode": "build",
+                "batch_objective": "fixture",
+                "product_agent_prompt": "x",
+            }
+        ),
+        started_at=datetime.utcnow(),
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow(),
+    )
+    for key, value in overrides.items():
+        setattr(row, key, value)
+    db.add(row)
+    db.commit()
+    db.refresh(row)
+    return row
+
+
+def _timeline_messages(db, command_id: str) -> list[str]:
+    from sqlalchemy import select
+    from app.database.models import FounderCommandTimelineEvent
+
+    return list(
+        db.execute(
+            select(FounderCommandTimelineEvent.message)
+            .where(FounderCommandTimelineEvent.command_id == command_id)
+            .order_by(FounderCommandTimelineEvent.created_at.asc())
+        )
+        .scalars()
+        .all()
+    )
+
+
+def test_max_consecutive_failures_without_active_run_fails(founder_client):
+    client, db = founder_client
+    from app.services.founder_command.execution_loop import tick_command
+    from app.services.founder_command.state_resolver import resolve_project_state
+
+    cmd = _seed_running_command(
+        db,
+        consecutive_failures=2,
+        max_consecutive_failures=2,
+        dispatch_run_id=None,
+        current_stage="report_handoff",
+    )
+    settings = get_settings()
+    before = resolve_project_state(db, settings)["counters"]["active_commands"]
+    out = tick_command(db, settings, cmd.id, actor_fingerprint="test")
+    db.refresh(cmd)
+    assert out.status == "failed"
+    assert cmd.status == "failed"
+    assert cmd.error_code == "max_consecutive_failures"
+    assert cmd.finished_at is not None
+    assert cmd.live_summary == "Stopped by hard limit: max_consecutive_failures"
+    assert "needs_founder" not in {cmd.status}
+    after = resolve_project_state(db, settings)["counters"]["active_commands"]
+    assert after == before - 1
+    msgs = _timeline_messages(db, cmd.id)
+    assert msgs.count("Stopped by hard limit: max_consecutive_failures") == 1
+
+
+def test_max_consecutive_failures_after_needs_attention(founder_client, monkeypatch):
+    client, db = founder_client
+    from datetime import datetime
+    from app.database.models import AgentDispatchRun
+    from app.services.founder_command.execution_loop import tick_command
+
+    run = AgentDispatchRun(
+        id="dispatch-needs-attention-hl",
+        status="needs_attention",
+        task_name="hl-needs-attention",
+        repository_url="https://github.com/CzechowskiT/twin",
+        base_branch="cursor/phase1-monorepo-scaffold",
+        prompt_envelope_version="v1",
+        prompt_hash="abc",
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow(),
+    )
+    db.add(run)
+    db.commit()
+    monkeypatch.setattr(
+        "app.services.founder_command.execution_loop.reconcile_run",
+        lambda *a, **k: run,
+    )
+    cmd = _seed_running_command(
+        db,
+        consecutive_failures=1,
+        max_consecutive_failures=2,
+        dispatch_run_id=run.id,
+        current_stage="await_agent",
+    )
+    settings = get_settings()
+    tick_command(db, settings, cmd.id, actor_fingerprint="test")
+    db.refresh(cmd)
+    assert cmd.consecutive_failures == 2
+    assert cmd.current_stage == "report_handoff"
+    tick_command(db, settings, cmd.id, actor_fingerprint="test")
+    db.refresh(cmd)
+    assert cmd.status == "failed"
+    assert cmd.error_code == "max_consecutive_failures"
+    assert cmd.finished_at is not None
+
+
+def test_max_consecutive_failures_after_cursor_error(founder_client, monkeypatch):
+    client, db = founder_client
+    from datetime import datetime
+    from app.database.models import AgentDispatchRun
+    from app.services.founder_command.execution_loop import tick_command
+
+    run = AgentDispatchRun(
+        id="dispatch-cursor-error-hl",
+        status="failed",
+        error_code="cursor_error",
+        task_name="hl-cursor-error",
+        repository_url="https://github.com/CzechowskiT/twin",
+        base_branch="cursor/phase1-monorepo-scaffold",
+        prompt_envelope_version="v1",
+        prompt_hash="abc",
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow(),
+    )
+    db.add(run)
+    db.commit()
+    monkeypatch.setattr(
+        "app.services.founder_command.execution_loop.reconcile_run",
+        lambda *a, **k: run,
+    )
+    cmd = _seed_running_command(
+        db,
+        consecutive_failures=1,
+        max_consecutive_failures=2,
+        dispatch_run_id=run.id,
+        current_stage="await_agent",
+    )
+    settings = get_settings()
+    tick_command(db, settings, cmd.id, actor_fingerprint="test")
+    tick_command(db, settings, cmd.id, actor_fingerprint="test")
+    db.refresh(cmd)
+    assert cmd.status == "failed"
+    assert cmd.error_code == "max_consecutive_failures"
+    assert cmd.finished_at is not None
+
+
+def test_max_runtime_minutes_fails_never_needs_founder(founder_client):
+    client, db = founder_client
+    from datetime import datetime, timedelta
+    from app.services.founder_command.execution_loop import tick_command
+
+    cmd = _seed_running_command(
+        db,
+        max_runtime_minutes=30,
+        started_at=datetime.utcnow() - timedelta(minutes=45),
+        consecutive_failures=0,
+        current_stage="await_agent",
+    )
+    settings = get_settings()
+    tick_command(db, settings, cmd.id, actor_fingerprint="test")
+    db.refresh(cmd)
+    assert cmd.status == "failed"
+    assert cmd.error_code == "max_runtime_minutes"
+    assert cmd.finished_at is not None
+    assert cmd.status != "needs_founder"
+    assert "Stopped by hard limit: max_runtime_minutes" in (cmd.live_summary or "")
+
+
+def test_hard_limit_pending_decisions_zero_and_no_timeline_dupes(founder_client):
+    client, db = founder_client
+    from app.services.founder_command.execution_loop import tick_command
+    from app.services.founder_command.state_resolver import resolve_project_state
+
+    cmd = _seed_running_command(
+        db,
+        consecutive_failures=5,
+        max_consecutive_failures=2,
+    )
+    settings = get_settings()
+    tick_command(db, settings, cmd.id, actor_fingerprint="test")
+    tick_command(db, settings, cmd.id, actor_fingerprint="test")
+    tick_command(db, settings, cmd.id, actor_fingerprint="test")
+    db.refresh(cmd)
+    state = resolve_project_state(db, settings)
+    assert state["counters"]["pending_decisions"] == 0
+    assert cmd.status == "failed"
+    msgs = _timeline_messages(db, cmd.id)
+    assert msgs.count("Stopped by hard limit: max_consecutive_failures") == 1
+
+
+def test_re_reconcile_terminal_hard_limit_is_idempotent(founder_client):
+    client, db = founder_client
+    from datetime import datetime
+    from app.services.founder_command.execution_loop import tick_command
+
+    cmd = _seed_running_command(
+        db,
+        consecutive_failures=3,
+        max_consecutive_failures=2,
+    )
+    settings = get_settings()
+    tick_command(db, settings, cmd.id, actor_fingerprint="test")
+    db.refresh(cmd)
+    finished = cmd.finished_at
+    failures = cmd.consecutive_failures
+    msgs_before = _timeline_messages(db, cmd.id)
+    assert finished is not None
+
+    tick_command(db, settings, cmd.id, actor_fingerprint="test")
+    tick_command(db, settings, cmd.id, actor_fingerprint="test")
+    db.refresh(cmd)
+    assert cmd.status == "failed"
+    assert cmd.finished_at == finished
+    assert cmd.consecutive_failures == failures
+    assert _timeline_messages(db, cmd.id) == msgs_before
+
+
+def test_needs_founder_only_with_real_pending_decision(founder_client):
+    client, db = founder_client
+    from datetime import datetime, timedelta
+    import uuid
+    from app.database.models import FounderDecision
+    from app.services.founder_command.execution_loop import tick_command
+
+    settings = get_settings()
+    # Hard limit must never land in needs_founder.
+    limited = _seed_running_command(
+        db,
+        consecutive_failures=2,
+        max_consecutive_failures=2,
+    )
+    tick_command(db, settings, limited.id, actor_fingerprint="test")
+    db.refresh(limited)
+    assert limited.status == "failed"
+    assert limited.error_code == "max_consecutive_failures"
+
+    # Real pending decision keeps needs_founder and does not terminalize.
+    cmd = _seed_running_command(
+        db,
+        status="needs_founder",
+        current_stage="approval_policy",
+        consecutive_failures=0,
+        live_summary="Waiting for founder decision",
+    )
+    db.add(
+        FounderDecision(
+            id=str(uuid.uuid4()),
+            command_id=cmd.id,
+            operation="force_unlock",
+            title="Needs founder",
+            risk="critical",
+            status="pending",
+            evidence_json="{}",
+            expires_at=datetime.utcnow() + timedelta(hours=1),
+            created_at=datetime.utcnow(),
+        )
+    )
+    db.commit()
+    tick_command(db, settings, cmd.id, actor_fingerprint="test")
+    db.refresh(cmd)
+    assert cmd.status == "needs_founder"
+    assert cmd.finished_at is None
+    assert cmd.error_code is None
+
+
+def test_heal_legacy_needs_founder_hard_limit_residual(founder_client):
+    """Prod residual pattern: needs_founder + hard-limit headline + pending=0."""
+    client, db = founder_client
+    from app.services.founder_command.execution_loop import tick_command
+    from app.services.founder_command.state_resolver import resolve_project_state
+
+    cmd = _seed_running_command(
+        db,
+        status="needs_founder",
+        current_stage="report_handoff",
+        live_summary="Stopped by hard limit: max_runtime_minutes",
+        consecutive_failures=0,
+        finished_at=None,
+        error_code=None,
+    )
+    settings = get_settings()
+    before = resolve_project_state(db, settings)["counters"]["active_commands"]
+    tick_command(db, settings, cmd.id, actor_fingerprint="celery-beat")
+    db.refresh(cmd)
+    assert cmd.status == "failed"
+    assert cmd.error_code == "max_runtime_minutes"
+    assert cmd.finished_at is not None
+    after = resolve_project_state(db, settings)["counters"]["active_commands"]
+    assert after == before - 1
+    # Re-tick must stay idempotent
+    msgs = _timeline_messages(db, cmd.id)
+    tick_command(db, settings, cmd.id, actor_fingerprint="celery-beat")
+    assert _timeline_messages(db, cmd.id) == msgs

@@ -82,6 +82,13 @@ def save_cv_for_candidate(
 
     db.commit()
     db.refresh(candidate)
+    # Async (or eager) Candidate Intelligence — never blocks upload on LLM failure
+    try:
+        from app.services.candidate_intelligence import enqueue_intelligence_for_candidate
+
+        enqueue_intelligence_for_candidate(candidate.id)
+    except Exception:
+        pass
     return candidate
 
 

@@ -1,0 +1,18 @@
+.F.........................                                              [100%]
+=================================== FAILURES ===================================
+E   TypeError: build_execution() got an unexpected keyword argument 'case_id'
+/Users/tomek/Projects/twin-worktrees/epic-2-26-consent-quality-remediation/backend/tests/test_epic_226_live_ai_gate_validator.py:77: TypeError: build_execution() got an unexpected keyword argument 'case_id'
+=============================== warnings summary ===============================
+../../../../../../Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/slowapi/extension.py:717: 112 warnings
+  /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/slowapi/extension.py:717: DeprecationWarning: 'asyncio.iscoroutinefunction' is deprecated and slated for removal in Python 3.16; use inspect.iscoroutinefunction() instead
+    if asyncio.iscoroutinefunction(func):
+
+tests/test_epic_226_provider_metadata_integration.py: 6 warnings
+tests/test_epic_226_integrity_repair.py: 13 warnings
+  /Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages/sqlalchemy/sql/schema.py:3624: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_epic_226_live_ai_gate_validator.py::test_stub_with_invalid_outcome_cannot_certify_live
+1 failed, 26 passed, 131 warnings in 7.62s

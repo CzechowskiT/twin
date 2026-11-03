@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { AcceptanceCalendarPanel } from "@/components/career/acceptance-calendar-panel";
 import { useTranslation } from "@/components/language-provider";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { Button, Card, Shell } from "@/components/ui";
@@ -142,10 +143,14 @@ export default function AcceptanceQueuePage() {
   return (
     <Shell wide rail>
       <div className="mb-4 flex min-w-0 flex-col gap-3 sm:mb-6 sm:flex-row sm:items-start sm:justify-between">
-        <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">{t("acceptanceQueue.title")}</h1>
-        <CandidateWorkspaceSubnav ariaLabel={t("acceptanceQueue.title")} />
+        <h1 className="twin-page-intro twin-section-title text-xl sm:text-2xl">{t("acceptanceCalendar.title")}</h1>
+        <CandidateWorkspaceSubnav ariaLabel={t("acceptanceCalendar.title")} />
+      </div>
+      <div className="mb-6">
+        <AcceptanceCalendarPanel />
       </div>
       <Card>
+        <h2 className="mb-2 text-base font-semibold">{t("acceptanceQueue.title")}</h2>
         <p className="twin-muted mb-4 text-sm leading-relaxed">{t("acceptanceQueue.lead")}</p>
         {loading ? <p className="twin-muted text-sm">{t("acceptanceQueue.loading")}</p> : null}
         {err ? <p className="mb-4 text-sm text-red-600">{err}</p> : null}

@@ -1,0 +1,32 @@
+PASS  stance/public_health
+PASS  stance/launch_nogo
+PASS  stance/enrollment_off
+PASS  stance/canary_inactive
+PASS  stance/activation_prepared
+PASS  stance/designation_0
+PASS  stance/caps_zero
+PASS  product/catalog — 200
+PASS  product/canonical
+PASS  product/parallel_none
+PASS  product/mint_synthetic — 200
+PASS  product/managed_mint
+PASS  product/access_with_managed — 200
+PASS  product/second_session — 200
+PASS  product/revoke_others — 200
+PASS  product/revocation_propagated — 401
+PASS  product/revocation_slo_ms — 221
+PASS  product/inventory_sessions — 200
+PASS  security/no_secrets_in_inventory
+PASS  security/no_raw_refresh_in_inventory
+PASS  product/refresh_rotate — 200
+PASS  security/reuse_contained — 401
+PASS  product/remint_after_reuse — 200
+PASS  product/logout_current — 200
+PASS  product/logout_invalidates — 401
+PASS  security/synthetic_only
+PASS  invariant/business_state_diff_0 — {}
+PASS  invariant/canary_ready_inactive
+PASS  invariant/designation_still_0
+PASS  invariant/activation_still_prepared
+
+product 15/15 stance 7/7 security 4/4 invariant 4/4

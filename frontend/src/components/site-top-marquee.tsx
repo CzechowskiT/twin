@@ -4,7 +4,6 @@ import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 
 import { PerformanceSafeMovingLogoMarquee } from "@/components/marketing/performance-safe-moving-logo-marquee";
-import { useTranslation } from "@/components/language-provider";
 import { isPerformanceLightChromePath } from "@/lib/performance-route-classification";
 
 const CompanyLogoMarquee = dynamic(
@@ -21,23 +20,10 @@ const CompanyLogoMarquee = dynamic(
 export function SiteTopMarquee() {
   const pathname = usePathname() ?? "";
   const lightChrome = isPerformanceLightChromePath(pathname);
-  const { t } = useTranslation();
 
   return (
     <div className="site-top-marquee-band relative z-[45] w-full shrink-0">
-      {lightChrome ? (
-        <PerformanceSafeMovingLogoMarquee />
-      ) : (
-        <>
-          <CompanyLogoMarquee />
-          <p
-            className="border-b border-[var(--twin-border)]/60 bg-[var(--twin-surface)]/95 px-4 py-1.5 text-center text-[10px] leading-relaxed text-[var(--twin-muted)] sm:text-[11px]"
-            data-testid="marquee-logo-disclaimer"
-          >
-            {t("site.marqueeLogoDisclaimer")}
-          </p>
-        </>
-      )}
+      {lightChrome ? <PerformanceSafeMovingLogoMarquee /> : <CompanyLogoMarquee />}
     </div>
   );
 }

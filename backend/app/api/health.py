@@ -1,4 +1,6 @@
 """Health check endpoints."""
+# Epic 2.26 live-provider wiring 2026-09-12 (deployment provenance — platform SHA preferred).
+
 
 import os
 
@@ -7,18 +9,17 @@ from sqlalchemy import text
 from sqlalchemy.engine import Engine
 
 from app.database.session import engine
+from app.services.deployment_identity import collect_deployment_identity
 from app.services.health_ops import build_health_ops_admin_extensions, build_health_ops_public
 
 router = APIRouter()
 
 
 def _git_commit_sha() -> str | None:
-    """Optional deploy traceability (set in Railway/Vercel/Docker build)."""
-    for name in ("GIT_COMMIT_SHA", "RAILWAY_GIT_COMMIT_SHA", "VERCEL_GIT_COMMIT_SHA", "GIT_COMMIT"):
-        raw = (os.getenv(name) or "").strip()
-        if raw:
-            return raw[:64]
-    return None
+    """Backward-compatible single SHA: platform revision first, then runtime label."""
+    identity = collect_deployment_identity(service_role="api")
+    commit = identity.get("git_commit")
+    return None if not commit or commit == "unknown" else str(commit)[:64]
 
 
 def _database_reachable(eng: Engine | None = None) -> bool:
@@ -43,10 +44,15 @@ def health_check(
     ),
 ) -> dict[str, str | bool | int]:
     commit = _git_commit_sha()
+    identity = collect_deployment_identity(service_role="api")
     out: dict[str, str | bool | int] = {
         "status": "ok",
         "service": "twin-api",
         "git_commit": commit if commit else "unknown",
+        "source_revision": identity.get("source_revision") or "unknown",
+        "runtime_label": identity.get("runtime_label") or "",
+        "deployment_id": identity.get("deployment_id") or "",
+        "deployment_provenance": identity.get("provenance") or "unknown",
     }
     if db:
         out["db_ok"] = _database_reachable()
@@ -85,6 +91,7 @@ def celery_status() -> dict[str, str | bool | list[str]]:
     if s.celery_task_always_eager:
         out["worker_active"] = True
         out["mode"] = "eager"
+        out["worker_git_commit"] = _git_commit_sha() or "unknown"
         return out
     try:
         inspect = celery_app.control.inspect(timeout=4.0)
@@ -92,9 +99,22 @@ def celery_status() -> dict[str, str | bool | list[str]]:
         if ping:
             out["worker_active"] = True
             out["worker_nodes"] = list(ping.keys())
+            # Ask a live worker for its deploy SHA (strict Gate F alignment).
+            try:
+                from app.tasks.worker_identity import worker_identity
+
+                async_result = worker_identity.apply_async()
+                identity = async_result.get(timeout=3.0)
+                if isinstance(identity, dict) and identity.get("git_commit"):
+                    out["worker_git_commit"] = str(identity["git_commit"])[:64]
+            except Exception as identity_exc:
+                out["worker_git_commit"] = "unknown"
+                out["worker_identity_error"] = str(identity_exc)[:160]
         else:
             out["mode"] = "no_workers"
+            out["worker_git_commit"] = "unknown"
     except Exception as exc:
         out["error"] = str(exc)[:200]
         out["mode"] = "inspect_failed"
+        out["worker_git_commit"] = "unknown"
     return out

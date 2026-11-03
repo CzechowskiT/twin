@@ -1,0 +1,5 @@
+
+> frontend@0.1.0 test:epic-214-canary-readiness-guard
+> npx --yes tsx scripts/epic-214-canary-readiness-guard.test.ts
+
+epic-214-canary-readiness-guard: ok

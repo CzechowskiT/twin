@@ -1,0 +1,52 @@
+PASS  A service
+PASS  A constants
+PASS  A public api
+PASS  A alembic 135
+PASS  A recipient page
+PASS  B PARALLEL none
+PASS  B revises 134
+PASS  B grants table only
+PASS  B no content columns
+PASS  C INLINE_VIEW
+PASS  C DOWNLOAD perm
+PASS  C state ACTIVE
+PASS  C state EXPIRED
+PASS  C state REVOKED
+PASS  C state PACK_UNAVAILABLE
+PASS  C state DELETED
+PASS  D secret digest
+PASS  D compare_digest
+PASS  D fragment url
+PASS  D SECRET_BYTES >= 32
+PASS  E OUTBOUND_SEND false
+PASS  E RECIPIENT_TRACKING false
+PASS  E ACCESS_ANALYTICS false
+PASS  E EMAIL_SEND false
+PASS  F exchange route
+PASS  F cookie httponly
+PASS  F rate limit
+PASS  F generic unavailable
+PASS  G noindex
+PASS  G no-referrer
+PASS  G no-store
+PASS  G no signup
+PASS  H primary 7
+PASS  H share in career pack
+PASS  I not first value
+PASS  J revoke
+PASS  J pack unavailable
+PASS  K wipe
+PASS  L unit
+PASS  L fe guard
+PASS  L no canary ddl
+PASS  L no invite ddl
+PASS  L max 5
+PASS  L ttl max 72
+PASS  stance launch NO-GO
+PASS  stance enrollment OFF
+PASS  stance canary inactive
+PASS  stance activation prepared
+PASS  stance designation 0
+PASS  stance canary cap 0
+
+50 passed, 0 failed

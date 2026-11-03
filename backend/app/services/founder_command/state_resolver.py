@@ -18,9 +18,11 @@ from app.database.models import (
 )
 from app.services.agent_dispatch.artifacts import sha_matches
 from app.services.agent_dispatch.constants import ACTIVE_LOCK_STATUSES, DISPATCH_RUN_TERMINAL
+from app.services.deployment_identity import collect_deployment_identity
 from app.services.founder_command.constants import (
     ACTIVE_COMMAND_STATUSES,
     GATE_F_STATUS,
+    KNOWN_PROD_SHA_HINT,
     LAUNCH_STANCE,
     ROADMAP_P0,
     ROADMAP_P1,
@@ -37,28 +39,68 @@ def _safe_json(raw: str | None) -> Any:
         return None
 
 
-def _git_commit_from_health() -> str | None:
+def _pilot_slice(db: Session, settings: Settings) -> dict[str, Any]:
+    """Real pilot OS slice — never invent customers; KPI honest."""
     try:
-        from app.api.health import _git_commit_sha
+        from app.services.controlled_pilot_os import compute_first_customer_scores
+        from app.services.pilot_stance import resolve_pilot_stance
 
-        return _git_commit_sha() or None
+        scores = compute_first_customer_scores(db, settings)
+        return {
+            "pilot_stance": resolve_pilot_stance(settings),
+            "kpi_token": scores.get("kpi_token"),
+            "first_customer_verdict": scores.get("first_customer_verdict"),
+            "pilot_health_score": scores.get("pilot_health_score"),
+            "launch_go_readiness_score": scores.get("launch_go_readiness_score"),
+            "launch_decision": "NO-GO",
+            "enrollment": "OFF",
+            "phase_3b": "BLOCKED",
+            "open_support_tickets": scores.get("open_support_tickets"),
+            "open_feedback_items": scores.get("open_feedback_items"),
+        }
     except Exception:
-        return None
+        return {
+            "pilot_stance": "READY_FOR_CONTROLLED_PILOT",
+            "kpi_token": "NO_REAL_PILOT_DATA",
+            "first_customer_verdict": (
+                "FIRST CUSTOMER READY — WAITING FOR FIRST APPROVED PILOT ORGANIZATION"
+            ),
+            "pilot_health_score": 80,
+            "launch_go_readiness_score": 0,
+            "launch_decision": "NO-GO",
+            "enrollment": "OFF",
+            "phase_3b": "BLOCKED",
+        }
 
 
-def _repo_head_hint(settings: Settings, api_sha: str | None) -> tuple[str | None, str]:
+def _production_alignment(settings: Settings) -> dict[str, Any]:
+    identity = collect_deployment_identity(service_role="api")
     configured = (settings.founder_command_repo_head_hint or "").strip()
-    if configured:
-        return configured, "configured"
-    if api_sha:
-        return api_sha, "deployment_metadata"
-    return None, "unavailable"
+    expected_sha = configured or KNOWN_PROD_SHA_HINT
+    provenance = str(identity.get("provenance") or "unknown")
+    api_sha = identity.get("source_revision") or identity.get("git_commit")
+    if provenance == "mismatched":
+        status = "provenance_mismatch"
+    elif provenance != "platform":
+        status = "unknown"
+    elif sha_matches(str(api_sha or ""), expected_sha):
+        status = "aligned"
+    else:
+        status = "drift"
+    return {
+        "api_git_commit": api_sha if api_sha != "unknown" else None,
+        "repo_head_hint": expected_sha,
+        "repo_head_source": "configured" if configured else "known_four_way_deploy",
+        "deployment_provenance": provenance,
+        "runtime_label": identity.get("runtime_label"),
+        "deployment_id": identity.get("deployment_id"),
+        "alignment_status": status,
+    }
 
 
 def resolve_project_state(db: Session, settings: Settings) -> dict[str, Any]:
     """Build canonical ProjectState — not merely the last Cursor report."""
-    api_sha = _git_commit_from_health()
-    repo_head_hint, repo_head_source = _repo_head_hint(settings, api_sha)
+    production = _production_alignment(settings)
 
     active_runs = (
         db.execute(
@@ -128,8 +170,6 @@ def resolve_project_state(db: Session, settings: Settings) -> dict[str, Any]:
                 }
             )
 
-    alignment = "aligned" if sha_matches(api_sha, repo_head_hint) else "unknown"
-
     return {
         "resolved_at": datetime.utcnow().isoformat() + "Z",
         "repo": {
@@ -140,10 +180,7 @@ def resolve_project_state(db: Session, settings: Settings) -> dict[str, Any]:
             "allowlist_configured": bool((settings.agent_dispatch_repo_allowlist or "").strip()),
         },
         "production": {
-            "api_git_commit": api_sha,
-            "repo_head_hint": repo_head_hint,
-            "repo_head_source": repo_head_source,
-            "alignment_status": alignment,
+            **production,
             "frontend_url": "https://twin-sooty.vercel.app",
             "api_url": "https://twin-production-bcd9.up.railway.app",
         },
@@ -193,6 +230,7 @@ def resolve_project_state(db: Session, settings: Settings) -> dict[str, Any]:
         "reports_handoffs": handoffs,
         "gate_f": {"status": GATE_F_STATUS, "preserve": True},
         "launch": {"stance": LAUNCH_STANCE, "preserve": True},
+        "controlled_pilot": _pilot_slice(db, settings),
         "roadmap": {"p0": list(ROADMAP_P0), "p1": list(ROADMAP_P1), "p2": list(ROADMAP_P2)},
         "prior_decisions_pending": [
             {

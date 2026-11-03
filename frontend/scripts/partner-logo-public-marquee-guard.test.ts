@@ -121,12 +121,12 @@ test("5 verified logo assets remain in public marquee", () => {
   assert.ok(publicLogos.length >= 40, "public marquee keeps a substantial verified set");
 });
 
-test("6 disclaimer unchanged — Representative market context", () => {
+test("6 disclaimer removed — no Representative market context caption", () => {
   const siteTop = read("src/components/site-top-marquee.tsx");
-  assert.match(siteTop, /site\.marqueeLogoDisclaimer/);
-  assert.match(siteTop, /data-testid="marquee-logo-disclaimer"/);
-  assert.match(en.site.marqueeLogoDisclaimer ?? "", /^Representative market context\.$/);
-  assert.match(dictionaries.pl.site.marqueeLogoDisclaimer ?? "", /kontekst rynkowy/i);
+  assert.doesNotMatch(siteTop, /site\.marqueeLogoDisclaimer/);
+  assert.doesNotMatch(siteTop, /data-testid="marquee-logo-disclaimer"/);
+  assert.equal(en.site.marqueeLogoDisclaimer, undefined);
+  assert.equal(dictionaries.pl.site.marqueeLogoDisclaimer, undefined);
 });
 
 test("7 npm script test:partner-logo-public-marquee-guard registered", () => {

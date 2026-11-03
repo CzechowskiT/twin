@@ -19,7 +19,8 @@ from app.core.scrape_ops import (
     user_can_trigger_scrape,
     user_has_scrape_ops,
 )
-from app.core.security import create_access_token, hash_password, verify_password
+from app.core.security import hash_password, verify_password
+from app.services import candidate_auth_session as cas
 from app.database.models import User
 from app.database.session import get_db
 from app.limiter import limiter
@@ -28,8 +29,14 @@ from app.schemas.auth import (
     ChangePasswordRequest,
     ForgotPasswordRequest,
     GdprConsentIn,
+    LogoutIn,
+    MfaChallengeCompleteIn,
+    MfaEnrollVerifyIn,
     NotificationPreferencesIn,
+    OnboardingProgressIn,
+    RefreshIn,
     ResetPasswordRequest,
+    StepUpIssueIn,
     VerifyEmailRequest,
     Token,
     UserLogin,
@@ -87,7 +94,20 @@ from app.services.email_verification import (
     verify_email_with_token,
 )
 from app.services.password_change import PasswordChangeError, change_user_password
-from app.services.password_reset import request_password_reset, reset_password_with_token
+from app.services.password_reset import (
+    catalog as recovery_catalog,
+    request_password_reset,
+    reset_password_with_token,
+)
+from app.services import candidate_step_up as step_up
+from app.services.candidate_account_recovery_constants import (
+    PURPOSE_CHANGE_PASSWORD,
+    PURPOSE_SIGN_OUT_EVERYWHERE,
+)
+from app.services.step_up_request import (
+    session_binding_from_request,
+    step_up_token_from_request,
+)
 from app.services.referral_public_token import ensure_user_referral_public_token
 from app.services.recruiter_company_auth import resolve_recruiter_access
 from app.services.signup_referrer import (
@@ -204,6 +224,32 @@ def register(request: Request, body: UserRegister, db: Session = Depends(get_db)
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="All required consents must be accepted (privacy, terms, job data, AI matching)",
         )
+    settings = get_settings()
+    invite_token_to_consume: str | None = None
+    if not settings.external_pilot_enrollment_enabled and settings.pilot_registration_invite_only:
+        allow = {
+            e.strip().lower()
+            for e in (settings.pilot_email_allowlist or "").split(",")
+            if e.strip()
+        }
+        email_l = str(body.email).strip().lower()
+        bridge_ok = False
+        if email_l not in allow:
+            try:
+                from app.services import candidate_invite_tokens as invite_tokens
+
+                bridge_ok = invite_tokens.email_allowed_for_register(
+                    db, email=email_l, invite_token=body.invite_token
+                )
+            except Exception:  # noqa: BLE001
+                bridge_ok = False
+        if email_l not in allow and not bridge_ok:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="registration_invite_only",
+            )
+        if body.invite_token and bridge_ok and email_l not in allow:
+            invite_token_to_consume = body.invite_token.strip()
     if db.query(User).filter(User.email == body.email).first():
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")
     stored_ref_note = normalize_stored_referred_by_note(body.referred_by_note)
@@ -243,6 +289,12 @@ def register(request: Request, body: UserRegister, db: Session = Depends(get_db)
         signup_utm_campaign=normalize_utm_field(body.utm_campaign),
         signup_utm_content=normalize_utm_field(body.utm_content) or normalize_utm_field(body.ref),
     )
+    try:
+        from app.services.metrics_exclusion import apply_metrics_exclusion_to_user
+
+        apply_metrics_exclusion_to_user(user)
+    except Exception:
+        pass
     db.add(user)
     db.flush()
     ensure_user_referral_public_token(db, user)
@@ -268,6 +320,30 @@ def register(request: Request, body: UserRegister, db: Session = Depends(get_db)
         )
     db.commit()
     db.refresh(user)
+    if invite_token_to_consume:
+        try:
+            from app.services import candidate_invite_tokens as invite_tokens
+
+            invite_tokens.validate_invite_token(
+                db,
+                email=str(body.email).strip().lower(),
+                raw_token=invite_token_to_consume,
+                consume=True,
+            )
+        except Exception:  # noqa: BLE001
+            pass
+    try:
+        from app.services.product_funnel import emit_funnel_event
+
+        emit_funnel_event(
+            db,
+            event_name="signup_completed",
+            user_id=user.id,
+            properties={"source": "register"},
+            commit=True,
+        )
+    except Exception:
+        pass
     try:
         from app.tasks.notification_tasks import send_welcome_email_task
 
@@ -278,9 +354,15 @@ def register(request: Request, body: UserRegister, db: Session = Depends(get_db)
         issue_verification_email(db, get_settings(), user)
     except Exception:
         pass
-    token = create_access_token(user.email)
+    issued = cas.issue_session(db, user=user, kpi_excluded=bool(getattr(user, "exclude_from_product_metrics", False)))
     out = UserOut.from_user(user)
-    return UserRegisteredOut(**out.model_dump(), access_token=token)
+    return UserRegisteredOut(
+        **out.model_dump(),
+        access_token=issued["access_token"],
+        refresh_token=issued.get("refresh_token"),
+        session_key=issued.get("session_key"),
+        managed=bool(issued.get("managed")),
+    )
 
 
 @router.post("/login", response_model=Token)
@@ -297,6 +379,253 @@ def login(
 @limiter.limit("5/minute")
 def login_json(request: Request, body: UserLogin, db: Session = Depends(get_db)) -> Token:
     return _authenticate(body.email, body.password, db)
+
+
+@router.get("/session/catalog")
+def session_catalog() -> dict:
+    return cas.catalog()
+
+
+@router.get("/recovery/catalog")
+def auth_recovery_catalog() -> dict:
+    return recovery_catalog()
+
+
+@router.get("/step-up/catalog")
+def auth_step_up_catalog() -> dict:
+    return step_up.catalog()
+
+
+@router.get("/mfa/catalog")
+def auth_mfa_catalog() -> dict:
+    from app.services import candidate_mfa as mfa
+
+    return mfa.catalog()
+
+
+@router.get("/mfa/status")
+def auth_mfa_status(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    from app.services import candidate_mfa as mfa
+
+    return mfa.status_for_user(db, user=user)
+
+
+@router.post("/mfa/enroll/start")
+@limiter.limit("10/minute")
+def auth_mfa_enroll_start(
+    request: Request,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    from app.services import candidate_mfa as mfa
+    from app.services.candidate_account_recovery_constants import PURPOSE_MFA_ENROLL
+    from app.services.candidate_mfa_crypto import MfaKeyringUnavailable
+    from app.services.step_up_request import (
+        session_binding_from_request,
+        step_up_token_from_request,
+    )
+
+    sid, epoch = session_binding_from_request(request)
+    try:
+        step_up.require_step_up_or_raise(
+            db,
+            user=user,
+            purpose=PURPOSE_MFA_ENROLL,
+            step_up_token=step_up_token_from_request(request),
+            session_key=sid,
+            session_epoch=epoch,
+        )
+        return mfa.enroll_start(db, user=user)
+    except MfaKeyringUnavailable as exc:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/mfa/enroll/verify")
+@limiter.limit("20/minute")
+def auth_mfa_enroll_verify(
+    request: Request,
+    body: MfaEnrollVerifyIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    from app.services import candidate_mfa as mfa
+    from app.services.candidate_mfa_crypto import MfaKeyringUnavailable
+
+    try:
+        return mfa.enroll_verify(db, user=user, code=body.code)
+    except MfaKeyringUnavailable as exc:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/mfa/enroll/recovery-codes")
+@limiter.limit("10/minute")
+def auth_mfa_enroll_recovery_codes(
+    request: Request,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    from app.services import candidate_mfa as mfa
+
+    try:
+        return mfa.enroll_present_recovery_codes(db, user=user)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/mfa/disable")
+@limiter.limit("10/minute")
+def auth_mfa_disable(
+    request: Request,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    from app.services import candidate_mfa as mfa
+    from app.services.candidate_account_recovery_constants import PURPOSE_MFA_DISABLE
+    from app.services.step_up_request import (
+        session_binding_from_request,
+        step_up_token_from_request,
+    )
+
+    sid, epoch = session_binding_from_request(request)
+    try:
+        step_up.require_step_up_or_raise(
+            db,
+            user=user,
+            purpose=PURPOSE_MFA_DISABLE,
+            step_up_token=step_up_token_from_request(request),
+            session_key=sid,
+            session_epoch=epoch,
+        )
+        return mfa.disable_mfa(db, user=user)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
+
+
+@router.post("/mfa/challenge/complete", response_model=Token)
+@limiter.limit("20/minute")
+def auth_mfa_challenge_complete(
+    request: Request,
+    body: MfaChallengeCompleteIn,
+    db: Session = Depends(get_db),
+) -> Token:
+    from app.services import candidate_mfa as mfa
+    from app.services.candidate_mfa_crypto import MfaKeyringUnavailable
+
+    try:
+        issued = mfa.complete_login_challenge(
+            db,
+            challenge_token=body.mfa_challenge_token,
+            totp_code=body.totp_code,
+            recovery_code=body.recovery_code,
+        )
+    except MfaKeyringUnavailable as exc:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+    return Token(
+        access_token=issued["access_token"],
+        refresh_token=issued.get("refresh_token"),
+        session_key=issued.get("session_key"),
+        managed=bool(issued.get("managed")),
+        mfa_required=False,
+        assurance_level=issued.get("assurance_level"),
+    )
+
+
+@router.post("/step-up/issue")
+@limiter.limit("10/minute")
+def auth_step_up_issue(
+    request: Request,
+    body: StepUpIssueIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    sid, epoch = session_binding_from_request(request)
+    try:
+        return step_up.issue_step_up(
+            db,
+            user=user,
+            purpose=body.purpose,
+            password=body.password,
+            session_key=sid,
+            session_epoch=epoch,
+        )
+    except ValueError as exc:
+        code = str(exc)
+        status_code = (
+            status.HTTP_401_UNAUTHORIZED
+            if code == "invalid_password"
+            else status.HTTP_400_BAD_REQUEST
+        )
+        raise HTTPException(status_code, detail=code) from exc
+
+
+@router.post("/refresh", response_model=Token)
+@limiter.limit("30/minute")
+def refresh_token(request: Request, body: RefreshIn, db: Session = Depends(get_db)) -> Token:
+    try:
+        issued = cas.rotate_refresh(db, refresh_token=body.refresh_token.strip())
+    except LookupError:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="invalid_refresh") from None
+    except ValueError as exc:
+        detail = str(exc)
+        code = (
+            status.HTTP_401_UNAUTHORIZED
+            if detail in {"family_reuse_suspected", "family_revoked", "session_revoked", "refresh_expired"}
+            else status.HTTP_400_BAD_REQUEST
+        )
+        raise HTTPException(code, detail=detail) from None
+    return Token(
+        access_token=issued["access_token"],
+        refresh_token=issued.get("refresh_token"),
+        session_key=issued.get("session_key"),
+        managed=bool(issued.get("managed")),
+    )
+
+
+@router.post("/logout")
+def logout(
+    body: LogoutIn,
+    request: Request,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    sid = getattr(request.state, "session_key", None)
+    if body.everywhere:
+        try:
+            step_up.require_step_up_or_raise(
+                db,
+                user=user,
+                purpose=PURPOSE_SIGN_OUT_EVERYWHERE,
+                step_up_token=step_up_token_from_request(request),
+                session_key=sid,
+                session_epoch=getattr(request.state, "session_epoch", None),
+            )
+        except ValueError as exc:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
+        return cas.revoke_everywhere(db, user_id=user.id)
+    if sid:
+        return cas.revoke_session(db, user_id=user.id, session_key=sid, reason="logout")
+    return {"revoked": False, "legacy_local_only": True}
+
+
+@router.post("/sessions/revoke-others")
+def revoke_other_sessions(
+    request: Request,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    sid = getattr(request.state, "session_key", None)
+    if not sid:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="managed_session_required")
+    return cas.revoke_all_other(db, user_id=user.id, keep_session_key=sid)
 
 
 @router.post("/forgot-password")
@@ -381,8 +710,45 @@ def _authenticate(email: str, password: str, db: Session) -> Token:
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Privacy and consent setup incomplete — finish the consent flow in the app.",
         )
-    token = create_access_token(user.email)
-    return Token(access_token=token)
+    try:
+        from app.services.metrics_exclusion import apply_metrics_exclusion_to_user
+
+        if apply_metrics_exclusion_to_user(user, db=db, commit=True):
+            pass
+    except Exception:
+        pass
+
+    # Epic 2.24 — opt-in MFA gate (pre-auth challenge; no access token yet)
+    try:
+        from app.services import candidate_mfa as mfa
+
+        if mfa.user_mfa_enabled(db, user_id=user.id):
+            ch = mfa.issue_login_challenge(db, user=user)
+            return Token(
+                access_token=None,
+                refresh_token=None,
+                session_key=None,
+                managed=False,
+                mfa_required=True,
+                mfa_challenge_token=ch["mfa_challenge_token"],
+                mfa_methods=list(ch.get("methods") or []),
+                pre_auth_only=True,
+            )
+    except Exception:
+        pass
+
+    issued = cas.issue_session(
+        db,
+        user=user,
+        kpi_excluded=bool(getattr(user, "exclude_from_product_metrics", False)),
+    )
+    return Token(
+        access_token=issued["access_token"],
+        refresh_token=issued.get("refresh_token"),
+        session_key=issued.get("session_key"),
+        managed=bool(issued.get("managed")),
+        assurance_level=issued.get("assurance_level"),
+    )
 
 
 @router.get("/me", response_model=UserOut)
@@ -487,12 +853,25 @@ def change_password(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> dict[str, str]:
+    sid, epoch = session_binding_from_request(request)
+    try:
+        step_up.require_step_up_or_raise(
+            db,
+            user=user,
+            purpose=PURPOSE_CHANGE_PASSWORD,
+            step_up_token=step_up_token_from_request(request),
+            session_key=sid,
+            session_epoch=epoch,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
     try:
         change_user_password(
             db,
             user,
             current_password=body.current_password,
             new_password=body.new_password,
+            keep_session_key=sid,
         )
     except PasswordChangeError as exc:
         detail = {
@@ -534,12 +913,79 @@ def complete_onboarding(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> UserOut:
-    if user.onboarding_completed_at is None:
+    first_completion = user.onboarding_completed_at is None
+    if first_completion:
         user.onboarding_completed_at = datetime.now(timezone.utc)
+        user.onboarding_step = "complete"
         db.add(user)
         db.commit()
         db.refresh(user)
+        try:
+            from app.services.product_funnel import emit_funnel_event
+
+            emit_funnel_event(
+                db,
+                event_name="onboarding_completed",
+                user_id=user.id,
+                properties={"source": "api"},
+                commit=True,
+            )
+        except Exception:
+            pass
+        try:
+            from app.services.activation_matching import maybe_dispatch_after_onboarding
+
+            maybe_dispatch_after_onboarding(db, user, trigger="onboarding_complete")
+        except Exception:
+            # Activation must never break onboarding completion
+            pass
     return UserOut.from_user(user)
+
+
+@router.put("/onboarding/progress", response_model=UserOut)
+@limiter.limit("60/minute")
+def save_onboarding_progress(
+    request: Request,
+    body: OnboardingProgressIn,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> UserOut:
+    """Persist onboarding step server-side so progress survives device/browser loss."""
+    import json
+
+    user.onboarding_step = body.step.strip()[:64]
+    if body.progress is not None:
+        user.onboarding_progress_json = json.dumps(body.progress)[:4000]
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return UserOut.from_user(user)
+
+
+@router.get("/onboarding/progress")
+@limiter.limit("60/minute")
+def get_onboarding_progress(
+    request: Request,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    import json
+
+    _ = db
+    progress = None
+    raw = getattr(user, "onboarding_progress_json", None)
+    if raw:
+        try:
+            progress = json.loads(raw)
+        except json.JSONDecodeError:
+            progress = None
+    return {
+        "step": getattr(user, "onboarding_step", None),
+        "progress": progress,
+        "onboarding_completed_at": (
+            user.onboarding_completed_at.isoformat() if user.onboarding_completed_at else None
+        ),
+    }
 
 
 @router.get("/linkedin/login")
@@ -578,8 +1024,14 @@ def linkedin_callback(
     if not user.is_active:
         return RedirectResponse(_frontend_callback_url(error="inactive"))
 
-    token = create_access_token(user.email)
-    params: dict[str, str] = {"token": token}
+    issued = cas.issue_session(
+        db,
+        user=user,
+        kpi_excluded=bool(getattr(user, "exclude_from_product_metrics", False)),
+    )
+    params: dict[str, str] = {"token": issued["access_token"]}
+    if issued.get("refresh_token"):
+        params["rt"] = str(issued["refresh_token"])
     if profile_created:
         params["next"] = "/profile"
         params["linkedin"] = "1"
@@ -625,8 +1077,14 @@ async def web_oauth_callback(
     if not user.is_active:
         return RedirectResponse(_frontend_callback_url(error="inactive"), status_code=302)
 
-    token = create_access_token(user.email)
-    params: dict[str, str] = {"token": token}
+    issued = cas.issue_session(
+        db,
+        user=user,
+        kpi_excluded=bool(getattr(user, "exclude_from_product_metrics", False)),
+    )
+    params: dict[str, str] = {"token": issued["access_token"]}
+    if issued.get("refresh_token"):
+        params["rt"] = str(issued["refresh_token"])
     if profile_created:
         params["next"] = "/profile"
         params["oauth"] = "1"

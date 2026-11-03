@@ -236,8 +236,13 @@ export async function apiFetch<T>(
   ensureLocaleHeader(headers, localeOverride);
   ensureTraceHeaders(headers);
   const method = (fetchOptions.method ?? "GET").toUpperCase();
-  if (method !== "GET" && method !== "HEAD") {
+  const isFormData =
+    typeof FormData !== "undefined" && fetchOptions.body instanceof FormData;
+  if (method !== "GET" && method !== "HEAD" && !isFormData && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
+  }
+  if (isFormData) {
+    headers.delete("Content-Type");
   }
   const hasAuth = applyAuthHeaders(headers, path, token);
 

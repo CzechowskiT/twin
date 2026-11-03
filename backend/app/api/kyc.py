@@ -30,11 +30,21 @@ router = APIRouter()
 
 
 def _verify_callback_token(settings: Settings, request: Request) -> None:
-    expected = settings.authologic_callback_token.strip()
+    """Require callback token in production/staging; constant-time compare when set."""
+    import hmac
+
+    expected = (settings.authologic_callback_token or "").strip()
+    env = (settings.environment or "").strip().lower()
     if not expected:
+        if env in ("production", "staging"):
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Authologic callback token not configured",
+            )
+        # Non-prod only: allow open callback for local KYC wiring.
         return
     got = request.query_params.get("t") or ""
-    if got != expected:
+    if not hmac.compare_digest(got, expected):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid callback token")
 
 

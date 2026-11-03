@@ -1,0 +1,104 @@
+1|Executive Summary
+Epic 2.11 jest COMPLETE (Verdict A). Ponowne wklejenie promptu 2.11 NIE jest kolejnym krokiem. Nie czekano na manifesto; nie re-implementowano epica. Smoke 2026-08-06: FE=API=worker ALIGNED df142106; E2E 44/44 (stance 13 + product 31); CI SUCCESS; demo contamination 0; pilot INACTIVE; Launch NO-GO. Founder musi wybrać: (1) enable public preview OR (2) one-candidate canary po secure manifesto OR (3) jawnie zdefiniowany next candidate-first scope — bez auto-aktywacji.
+2|Canonical Baseline
+Prompt ~73755bf2 / Alembic 126 = PRE-2.11 stale. Current truth: product close 88c229bb → tip ALIGNED df142106; Alembic 127.
+3|Canonical Final State
+tip df1421066593b44b15506d656c18a3e151a5dc6b FE=API=worker ALIGNED; Alembic 127; PILOT_ACCESS=OPERATIONALLY_READY_INACTIVE; caps 0; public preview READY_INACTIVE not enabled.
+4|Verdict
+GUIDED FIRST VALUE AND CAPABILITY DISCOVERABILITY CUSTOMER-USABLE — ISOLATED DEMO WORKSPACE, ACTIONABLE EMPTY STATES AND ACCESSIBLE PRODUCT TOUR PRODUCTION-READY
+5|Product Value Delivered
+Guided entry (demo / moje dane / wznów), 4 starter paths bez CV/MS, izolowane DEMO SIMULATED, tour 7 IA, empty 7/7 (Home włączone), inventory 31/31, Help recovery — bez aktywacji pilota/preview.
+6|Scope Compliance
+Brak re-implementacji 2.11; brak Epic 3.0 / Phase 3 Agent; brak manifesto wait; brak 8. nav.
+7|Architecture
+Kanoniczne guided_first_value / isolated_demo / capability_discoverability / migration 127 / FE entry+empty+tour / contracts v1.
+8|Route Inventory
+Primary empty 7/7; disposition 31/31.
+9|Guided First Value Entry
+EXPLORE_SAFE_DEMO / START_WITH_MY_DATA / RESUME_EXISTING_SETUP — skippable/pausable/resumable. Smoke PASS.
+10|Guided States
+NOT_STARTED…DELETED. pause/resume PASS.
+11|Starter Paths
+direction / first_evidence / opportunity_review / organize_current_actions — no CV/MS. PASS.
+12|First Value Integrity
+pilot_first_value_v1 only; demo_first_value_seen ≠ real_first_value_reached. PASS.
+13|Isolated Demo Workspace
+demo_scenario_v1; mode=DEMO; kpi_excluded; SIMULATED. PASS.
+14|Demo Contamination
+writes=0; external=0; copy=0; KPI=0; promote=false. PASS.
+15|Demo Exit
+exit clean. PASS.
+16|Product Tour
+7 areas; skippable; tour ≠ first value. PASS.
+17|Public Preview
+READY_INACTIVE; enabled_in_production=false. PASS.
+18|Actionable Empty States
+7/7; loading≠empty; error≠empty. PASS.
+19|Capability Discoverability
+primary_count=7; no 8th nav; no silent scores. PASS.
+20|Home Integration
+GuidedFirstValueEntry + IaActionableEmpty(home) + Daily OS + Help. PASS.
+21|Help Feedback Recovery
+Help 200; recovery journeys. PASS.
+22|Measurement Contracts
+starter_path_v1, actionable_empty_state_v1, isolated_demo_v1, mechanical_discoverability_v1, pilot_first_value_v1. PASS.
+23|Terminal Posture
+PUBLIC_LAUNCH=NO-GO; PUBLIC_SIGNUP=OFF; PUBLIC_ENROLLMENT=OFF; PRIVATE_PILOT=INACTIVE; EFFECTIVE_REAL_PILOT_CAP=0; REAL_INVITE_GENERATION=OFF; REAL_INVITE_SEND=OFF; REAL_INVITE_REDEMPTION=OFF; ACTIVE_REAL_INVITES=0; REAL_PILOT_USERS=0; PHASE_3B=BLOCKED; PHASE_3_AGENT=NOT_STARTED; MICROSOFT_CALENDAR_WRITE=OFF; APPLICATION_SUBMISSION=OFF; EMPLOYER_CONTACT=OFF; EXTERNAL_PURCHASE_OR_ENROLLMENT=OFF; PUBLIC_PREVIEW=READY_INACTIVE_NOT_ENABLED.
+24|Privacy Export Deletion Pause
+Hooks present; smoke posture intact.
+25|Security
+Unknown telemetry rejected 400. PASS.
+26|EN PL A11y
+guidedFv EN/PL; tour a11y. PASS.
+27|This Run Actions
+Realign tip (docs drift → ALIGNED df142106); E2E smoke 44/44; no feature rewrite.
+28|Product Tests
+B 8/8 + C 9/9 + D 9/9 + E 3/3 + F 2/2 = product 31/31.
+29|Stance Tests
+A_stance 13/13.
+30|Synthetic E2E Total
+44/44 PASS.
+31|Backend Unit
+4/4 (prior; unchanged scope).
+32|Frontend Guard
+PASS (prior).
+33|CI
+Product close SUCCESS 31101772863 (88c229bb); tip SUCCESS 31103428095 (df142106).
+34|FE API Worker
+ALIGNED df1421066593b44b15506d656c18a3e151a5dc6b.
+35|Production DB
+127 head; guided/demo live. db_ok implied by E2E.
+
+Final Answers
+- verdict: GUIDED FIRST VALUE AND CAPABILITY DISCOVERABILITY CUSTOMER-USABLE — ISOLATED DEMO WORKSPACE, ACTIONABLE EMPTY STATES AND ACCESSIBLE PRODUCT TOUR PRODUCTION-READY
+- epic_211_status: COMPLETE
+- next_step: NOT_REPASTE_EPIC_211 — Founder chooses (1) public preview OR (2) one-candidate canary after secure manifesto OR (3) next candidate-first scope; do NOT auto-activate
+- product_close_SHA: 88c229bb5fe70a26b88214942661d45a2232e566
+- tip_SHA: df1421066593b44b15506d656c18a3e151a5dc6b
+- FE/API/worker: ALIGNED df142106 / df142106 / df142106
+- alembic: 127_guided_first_value_demo
+- E2E_total: 44/44
+- E2E_stance: 13/13
+- E2E_product: 31/31
+- CI_close: SUCCESS 31101772863
+- CI_tip: SUCCESS 31103428095
+- demo_canonical_writes: 0
+- demo_external_calls: 0
+- demo_kpi_contamination: 0
+- empty_states: 7/7
+- route_disposition: 31/31
+- primary_ia: 7
+- public_preview: READY_INACTIVE (not enabled)
+- pilot_access: OPERATIONALLY_READY_INACTIVE
+- effective_caps: 0/0
+- real_invites: 0
+- real_pilot_users: 0
+- Launch: NO-GO
+- Phase_3B: BLOCKED
+- Phase_3_Agent: NOT_STARTED
+- MS_write: OFF
+- HUMAN_DISCOVERABILITY: NOT_EVALUATED
+- REAL_CANDIDATE_VALUE: NOT_EVALUATED
+- RETENTION: NOT_EVALUATED
+- PRODUCT_MARKET_FIT: NOT_EVALUATED
+- Founder_choice: (1) enable public preview OR (2) one-candidate canary after secure manifesto OR (3) explicitly defined next candidate-first scope — do NOT auto-activate

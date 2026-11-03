@@ -58,6 +58,26 @@ class Settings(BaseSettings):
         return value
     secret_key: str = _DEV_SECRET_KEY
     access_token_expire_minutes: int = 60 * 24 * 7
+    # Epic 2.22 — managed session flags (dual-verify; legacy accepted until original exp)
+    auth_managed_session_mint: bool = True
+    auth_managed_session_verify: bool = True
+    auth_managed_session_enforce: bool = True
+    auth_refresh_rotation: bool = True
+    auth_refresh_reuse_detection: bool = True
+    auth_legacy_token_acceptance: bool = True
+    # Epic 2.23 — recovery v2 + step-up
+    auth_recovery_v2_enabled: bool = True
+    auth_recovery_v2_session_revoke: bool = True
+    auth_recovery_v2_hash_links: bool = True
+    auth_step_up_enforce: bool = True
+    auth_legacy_reset_token_acceptance: bool = True
+    # Epic 2.24 — opt-in TOTP MFA (default OFF for users; never mandatory)
+    auth_mfa_totp_enabled: bool = True
+    auth_mfa_default_off: bool = True
+    auth_mfa_enrollment_opt_in_only: bool = True
+    auth_mfa_mandatory: bool = False
+    # Dedicated Fernet key / high-entropy secret — NOT secret_key / JWT signing key
+    mfa_aead_key: str = ""
     # 0 = disabled (local only). Production should keep a positive cap to slow credential stuffing.
     auth_login_rate_limit_per_minute: int = 30
     # Separate bucket for POST /auth/forgot-password (abuse / enumeration). 0 = disabled.
@@ -121,6 +141,8 @@ class Settings(BaseSettings):
     anthropic_model: str = "claude-sonnet-4-6"
     cv_upload_dir: str = "data/cvs"
     cv_max_bytes: int = 5 * 1024 * 1024
+    # Kill switch for AI Candidate Intelligence pipeline (async extract + brief).
+    candidate_intelligence_enabled: bool = True
 
     # Comma-separated board ids matching scraper registry (empty = all). Controls scrape-all + /jobs/boards list.
     scrape_enabled_board_ids: str = ""
@@ -166,6 +188,9 @@ class Settings(BaseSettings):
     # Hourly sweep: email users ~24h before scheduled interviews (when mail + prefs allow).
     interview_reminder_beat_enabled: bool = True
     interview_reminder_hours_before: int = 24
+    # Daily Career OS reminders (in-product + optional email with opt-in).
+    career_reminder_beat_enabled: bool = True
+    career_reminder_beat_minute: int = 35
     # Max jobs considered per find_top_matches scan (newest validated first).
     match_jobs_scan_limit: int = 15000
     # When true, use ``job_matching_v2`` (salary overlap bonus on top of v1 rules).
@@ -410,6 +435,20 @@ class Settings(BaseSettings):
     nightly_auto_apply_default_daily_limit: int = 10
     nightly_auto_apply_cooldown_seconds: int = 30
     nightly_auto_apply_supported_boards: str = "pracuj,pracuj.pl"
+    # Founder RELEASE_WITH_CONTROLS: default prepares packages for human review;
+    # never CAPTCHA bypass. AUTO_SUBMIT is ops-only and still respects kill switch.
+    nightly_auto_apply_submit_mode: str = "REVIEW_BEFORE_SUBMIT"
+    # Candidate Stripe honesty — sandbox checkout allowed; not public launch.
+    stripe_sandbox_checkout_enabled: bool = True
+    stripe_not_public_launch: bool = True
+    # Optional B2B company pilot Price id (test mode). Empty → honest sandbox_stub.
+    stripe_price_id_company_pilot: str = Field(
+        default="",
+        validation_alias=AliasChoices(
+            "STRIPE_PRICE_ID_COMPANY_PILOT",
+            "STRIPE_PRICE_COMPANY_PILOT",
+        ),
+    )
 
     # Outbound webhook after auto-apply (HMAC optional; empty URL disables).
     employer_webhook_url: str = ""
@@ -434,6 +473,23 @@ class Settings(BaseSettings):
     recruiter_inbox_token: str = ""
     # Recruiter session JWT TTL after pilot-token exchange (default 8h).
     recruiter_jwt_expire_minutes: int = 60 * 8
+
+    # Controlled pilot registration — invite-only when enabled (default off in unit tests).
+    # Production Railway: set PILOT_REGISTRATION_INVITE_ONLY=true + PILOT_EMAIL_ALLOWLIST.
+    external_pilot_enrollment_enabled: bool = False
+    # PP1 independent kill switch — does not flip launch/enrollment/signup/pilot/invite.
+    # Exact enable value: READ_ONLY_SYNTHETIC
+    public_preview: str = ""
+    pilot_registration_invite_only: bool = False
+    pilot_email_allowlist: str = ""
+    # Role placeholders only — never invent human names in code.
+    pilot_on_call_primary: str = "PILOT_ON_CALL_PRIMARY_UNASSIGNED"
+    pilot_on_call_secondary: str = "PILOT_ON_CALL_SECONDARY_UNASSIGNED"
+    pilot_escalation_owner: str = "PILOT_ESCALATION_OWNER_UNASSIGNED"
+    pilot_rollback_authority: str = "PILOT_ROLLBACK_AUTHORITY_UNASSIGNED"
+    # BLOCKED_BY_FOUNDER | READY_FOR_CONTROLLED_PILOT (env PILOT_STANCE)
+    pilot_stance: str = "BLOCKED_BY_FOUNDER"
+    temporary_pilot_canonical_url: str = "https://twin-sooty.vercel.app"
 
     # --- TWIN Agent Dispatcher (Cursor Cloud Agents) ---
     # Production secret name for Cursor service-account API key (never commit the value):
@@ -484,8 +540,22 @@ class Settings(BaseSettings):
     founder_command_csrf_secret: str = ""
     founder_command_default_autonomy_level: int = 3
     founder_command_poll_interval_seconds: int = 20
-    # Optional independent pin; blank trusts the hosting platform's deployed repo SHA.
+    # Optional expected four-way deploy SHA; blank uses the reviewed code fallback.
     founder_command_repo_head_hint: str = ""
+
+    # Product funnel instrumentation (server-side events → /admin/funnel + /admin/retention).
+    # Set PRODUCT_FUNNEL_EVENTS_ENABLED=false for instant rollback without migration reverse.
+    product_funnel_events_enabled: bool = True
+
+    # Activation TTV — independent kill switches (rollback without data loss / destructive migration).
+    activation_auto_matching_enabled: bool = True
+    activation_ttv_metrics_enabled: bool = True
+    activation_ttv_alerts_enabled: bool = True
+    activation_first_match_min_rate: float = 0.80
+    activation_first_match_p90_max_seconds: int = 3600
+    activation_matching_failure_rate_max: float = 0.10
+    activation_stuck_max_age_seconds: int = 7200
+    activation_alerts_min_sample_size: int = 10
 
     # Custom GPT Actions — TWIN Product Operator (Railway-only secret; never frontend/Vercel)
     chatgpt_twin_actions_api_key: str = ""

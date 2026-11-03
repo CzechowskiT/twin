@@ -1,0 +1,12 @@
+{
+  "canary_mutation_diff": 0,
+  "false_real_first_value": 0,
+  "fv_contract_sole": "pilot_first_value_v1",
+  "ms_write_off": "PASS",
+  "no_external_submission": "PASS",
+  "ownership_scoping": "PASS",
+  "primary_ia": 7,
+  "schema_id": "twin.candidate_rc_cross_feature_invariants/v1",
+  "secret_leakage": 0,
+  "synthetic_kpi_exclusion": "ENFORCED"
+}

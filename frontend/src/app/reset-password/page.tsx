@@ -1,19 +1,46 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { FormEvent, Suspense, useState } from "react";
+import { FormEvent, Suspense, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "@/components/language-provider";
 import { Button, Card, Input, Label, Shell } from "@/components/ui";
 import { apiFetch } from "@/lib/api";
 
+function readRecoveryToken(): { token: string; fromHash: boolean } {
+  if (typeof window === "undefined") return { token: "", fromHash: false };
+  const hash = window.location.hash.replace(/^#/, "");
+  if (hash.startsWith("token=")) {
+    return { token: decodeURIComponent(hash.slice("token=".length)).trim(), fromHash: true };
+  }
+  const params = new URLSearchParams(hash);
+  const fromHashParam = params.get("token")?.trim();
+  if (fromHashParam) return { token: fromHashParam, fromHash: true };
+  const q = new URLSearchParams(window.location.search).get("token")?.trim();
+  return { token: q ?? "", fromHash: false };
+}
+
 function ResetPasswordContent() {
-  const searchParams = useSearchParams();
   const { t } = useTranslation();
-  const token = searchParams.get("token")?.trim() ?? "";
+  const [token, setToken] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const hasToken = useMemo(() => Boolean(token), [token]);
+
+  useEffect(() => {
+    const { token: raw, fromHash } = readRecoveryToken();
+    setToken(raw);
+    // Strip secrets from address bar after capture (hash replaceState; query → path-only).
+    if (raw && typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.hash = "";
+      url.searchParams.delete("token");
+      window.history.replaceState({}, "", url.pathname + (url.search || ""));
+      if (fromHash) {
+        /* already cleared hash */
+      }
+    }
+  }, []);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -36,6 +63,7 @@ function ResetPasswordContent() {
         body: JSON.stringify({ token, password }),
       });
       setDone(true);
+      setToken("");
     } catch (err) {
       setError(err instanceof Error ? err.message : t("resetPassword.failed"));
     } finally {
@@ -43,7 +71,7 @@ function ResetPasswordContent() {
     }
   }
 
-  if (!token && !done) {
+  if (!hasToken && !done) {
     return (
       <Shell rail>
         <Card>
@@ -64,6 +92,7 @@ function ResetPasswordContent() {
         {done ? (
           <div className="space-y-4">
             <p className="twin-text-success text-sm">{t("resetPassword.success")}</p>
+            <p className="twin-muted text-sm">{t("resetPassword.freshLogin")}</p>
             <Link href="/login" className="twin-link inline-block text-sm">
               {t("resetPassword.backToLogin")}
             </Link>

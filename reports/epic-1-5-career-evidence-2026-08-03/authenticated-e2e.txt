@@ -1,0 +1,135 @@
+PASS public_health 200
+PASS launch_nogo NO-GO
+PASS enrollment_off 
+PASS phase_3b_blocked 
+PASS ms_write_off_ph 
+PASS four_way_recorded fe=fc1eb1fead67 api=fc1eb1fead67 wrk=fc1eb1fead67
+PASS four_way_aligned fe=fc1eb1fead67 api=fc1eb1fead67 wrk=fc1eb1fead67
+PASS repo_origin_present 
+PASS mint_synthetic 200
+PASS kpi_excluded 
+PASS synthetic_ne_real 
+PASS aggregate_200 200
+PASS alembic_111 111_career_evidence_portfolio
+PASS schema_v1 
+PASS no_public_portfolio 
+PASS no_external_profile_write 
+PASS no_autonomous_publishing 
+PASS no_reference_outreach 
+PASS no_auto_apply 
+PASS ms_write_off_agg 
+PASS no_fabricated_flag 
+PASS phase3_not_started 
+PASS analytics_kpi_excluded 
+PASS obs_no_source_text 
+PASS privacy_no_hidden_reuse 
+PASS portfolio_200 200
+PASS portfolio_private 
+PASS portfolio_no_public_url 
+PASS portfolio_schema 
+PASS fe_portfolio_route 200
+PASS fe_dashboard_route 200
+PASS source_register 201
+PASS source_hash 
+PASS source_kpi_excluded 
+PASS source_synthetic 
+PASS duplicate_source_handled 201
+PASS source_versioning v1=4 v2=4
+PASS extract_200 200
+PASS extract_no_invented 
+PASS extract_fields 12
+PASS unknown_for_missing 
+PASS field_confirm 200
+PASS field_claim_upgraded 
+PASS field_reject 200
+PASS field_dispute 200
+PASS field_edit 200
+PASS field_history history_persisted_server_side
+PASS manual_evidence 201
+PASS evidence_lineage_sources eid=45 src=1
+PASS quality_present 
+PASS fabricated_metric_rejected 400
+PASS skill_link 201
+PASS no_mastery_claim 
+PASS achievement_draft 201
+PASS achievement_metric_unknown 
+PASS source_backed_metric 201
+PASS confidentiality_set 201
+PASS external_reuse_blocked_default PRIVATE/NDA not PUBLIC_SAFE
+PASS redact_variant 201
+PASS redact_preserves_original 
+PASS redact_claim 
+PASS redact_lineage 
+PASS project_builder 201
+PASS project_private 
+PASS case_study_builder 201
+PASS unsupported_sentence_omitted_or_labeled 
+PASS cv_audit 201
+PASS cv_audit_unsupported 
+PASS cv_bullet_from_evidence 201
+PASS star_story 201
+PASS story_not_fabricated 
+PASS application_pack 201
+PASS no_auto_submit_pack 
+PASS fit_kind_present partially_supported_fit
+PASS claimed_vs_evidence_fit partially_supported_fit
+PASS conflict_seed_a 201
+PASS conflict_seed_b 201
+PASS conflict_scan 200
+PASS conflict_explicit_resolve 200
+PASS readiness_200 200
+PASS no_collapsed_score 
+PASS dim_knowledge_readiness 
+PASS dim_experience_readiness 
+PASS dim_evidence_readiness 
+PASS dim_interview_readiness 
+PASS dim_application_readiness 
+PASS dim_portfolio_readiness 
+PASS dim_data_confidence 
+PASS acceptance_calendar_reachable 200
+PASS acal_ms_write_off 
+PASS evidence_task_in_acal n=5
+PASS evidence_task_unscheduled_view covered_by_agenda
+PASS daily_os_reachable 200
+PASS daily_os_inbox 200
+PASS daily_os_evidence_inbox n=5
+PASS daily_os_integration career_copilot_daily+inbox
+PASS field_confidential 200
+PASS privacy_patch 200
+PASS export_200 200
+PASS export_no_hidden_reasoning 
+PASS export_prompts_excluded 
+PASS export_secrets_excluded 
+PASS export_kpi_excluded 
+PASS export_omits_confidential_default []
+PASS cross_candidate_denial 404
+PASS unauth_denied 401
+PASS recruiter_no_evidence_route 404
+PASS company_no_evidence_route 404
+PASS parser_deterministic_fallback extract_pipeline_deterministic
+PASS ai_outage_manual_fallback manual_evidence_path
+PASS duplicate_task_idempotent 201
+PASS retryable_recovery re_register_ok
+PASS i18n_pl_header 
+PASS i18n_en_path default_locale_en
+PASS mobile_keyboard_ux fe_responsive_portfolio_page
+PASS delete_all 200
+PASS stale_reappear_guard 
+PASS no_stale_evidence 200
+PASS no_stale_projects 
+PASS skill_links_cleared 
+PASS signed_url_no_public_portfolio public_url_null
+PASS object_storage_no_public private_default
+PASS launch_nogo_final 
+PASS enrollment_off_final 
+PASS phase_3b_blocked_final 
+PASS ms_write_off_final 
+PASS phase3_agent_not_started_final NOT_STARTED
+PASS invites_unchanged no_invite_send
+PASS alten_untouched no_alten
+PASS no_autonomous_publishing_final OFF
+PASS no_external_profile_final OFF
+PASS no_reference_outreach_final OFF
+PASS no_auto_apply_final OFF
+PASS adaptive_memory_no_sensitive_dup privacy_memory_reuse_opt_in
+SUMMARY 134/134

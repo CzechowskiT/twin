@@ -45,7 +45,12 @@ from app.services.recruiter_trust_review_persistence import (
     list_trust_review_queue,
     record_trust_review_decision,
 )
-from app.schemas.recruiter_c2 import TalentPoolAddIn, TrustReviewDecisionIn
+from app.schemas.recruiter_c2 import TalentPoolAddIn, TalentPoolAssignIn, TrustReviewDecisionIn
+from app.services.recruiter_pool_to_pipeline import (
+    assign_pool_record_to_role,
+    commit_import_and_assign,
+    create_manual_candidate_for_role,
+)
 from app.schemas.recruiter_notification_prefs import (
     RecruiterNotificationPrefsOut,
     RecruiterNotificationPrefsPatchIn,
@@ -80,8 +85,14 @@ from app.services.recruiter_inbox import (
 from app.services.recruiter_pipeline import build_recruiter_pipeline, transition_recruiter_pipeline
 from app.services.recruiter_scorecards import get_recruiter_scorecard, upsert_recruiter_scorecard
 from app.services.recruiter_scheduling import save_recruiter_manual_schedule
-from app.services.recruiter_jobs import create_company_job, list_company_jobs
+from app.services.recruiter_jobs import (
+    archive_company_job,
+    create_company_job,
+    list_company_jobs,
+    update_company_job,
+)
 from app.services.request_locale import locale_from_request
+from app.services import recruiter_wave2 as wave2
 
 router = APIRouter()
 
@@ -168,6 +179,36 @@ class RecruiterJobCreateIn(BaseModel):
     url: str | None = Field(None, max_length=500)
     salary_min: int | None = Field(None, ge=0)
     salary_max: int | None = Field(None, ge=0)
+
+
+class RecruiterJobUpdateIn(BaseModel):
+    title: str | None = Field(None, min_length=2, max_length=300)
+    location: str | None = Field(None, max_length=200)
+    description: str | None = Field(None, max_length=20_000)
+    salary_min: int | None = Field(None, ge=0)
+    salary_max: int | None = Field(None, ge=0)
+    role_status: str | None = Field(None, description="draft | published | archived | closed")
+
+
+class RecruiterDecisionMemoryIn(BaseModel):
+    subject_type: str = Field("candidate", min_length=2, max_length=32)
+    subject_id: str = Field(..., min_length=1, max_length=64)
+    decision_code: str = Field(..., min_length=2, max_length=64)
+    summary: str = Field(..., min_length=2, max_length=500)
+    rationale_code: str | None = Field(None, max_length=64)
+    application_id: int | None = None
+
+
+class RecruiterTeamInviteDryRunIn(BaseModel):
+    invitee_email: str = Field(..., min_length=5, max_length=254)
+    role_key: str = Field("recruiter", min_length=2, max_length=64)
+
+
+class RecruiterCommsDraftIn(BaseModel):
+    template_key: str = Field("recruiter.candidate_note", min_length=2, max_length=128)
+    subject_id: str = Field(..., min_length=1, max_length=64)
+    body_preview: str = Field(..., min_length=1, max_length=500)
+    send: bool = Field(False, description="Must stay false — real outbound forbidden in Wave 2 smoke")
 
 
 @router.get("/activation", response_model=RecruiterActivationOut)
@@ -650,6 +691,103 @@ def recruiter_inbox_schedule(
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
 
+@router.get("/calendar/interviews")
+def recruiter_calendar_interviews(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    """Live recruiter calendar list — manual schedules + holds (provider write gated)."""
+    from app.database.models import Application
+
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
+    apps = (
+        db.query(Application)
+        .filter(Application.recruiter_scheduling_status.isnot(None))
+        .order_by(Application.id.desc())
+        .limit(50)
+        .all()
+    )
+    interviews = []
+    for app in apps:
+        if getattr(app, "company_slug", None) and app.company_slug != slug:
+            continue
+        interviews.append(
+            {
+                "id": app.id,
+                "title": f"Application #{app.id}",
+                "status": app.recruiter_scheduling_status,
+                "starts_at": app.recruiter_manual_slot_at.isoformat() + "Z" if app.recruiter_manual_slot_at else None,
+                "source": "manual_schedule",
+            }
+        )
+    return {
+        "company_slug": slug,
+        "interviews": interviews,
+        "holds": [],
+        "microsoft_write_enabled": bool(settings.microsoft_calendar_write_enabled),
+        "live": True,
+    }
+
+
+@router.post("/calendar/holds", status_code=status.HTTP_201_CREATED)
+def recruiter_calendar_holds(
+    body: dict,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    """Create a local interview hold draft for the company tenant."""
+    from datetime import datetime
+
+    from app.services.platform_foundations import record_domain_event
+
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
+    title = str(body.get("title") or "Interview hold")[:200]
+    starts_at = body.get("starts_at")
+    ends_at = body.get("ends_at")
+    if not starts_at or not ends_at:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="starts_at_and_ends_at_required")
+    record_domain_event(
+        db,
+        event_name="recruiter.calendar_hold_draft",
+        aggregate_type="organization_tenant",
+        aggregate_id=slug,
+        payload={
+            "title": title,
+            "starts_at": starts_at,
+            "ends_at": ends_at,
+            "provider_write": False,
+            "microsoft_write_enabled": bool(settings.microsoft_calendar_write_enabled),
+        },
+    )
+    return {
+        "company_slug": slug,
+        "title": title,
+        "starts_at": starts_at,
+        "ends_at": ends_at,
+        "status": "draft",
+        "provider_write": False,
+        "created_at": datetime.utcnow().isoformat() + "Z",
+    }
+
+
 @router.get("/analytics")
 def recruiter_analytics(
     db: Session = Depends(get_db),
@@ -668,6 +806,128 @@ def recruiter_analytics(
     )
     try:
         return build_recruiter_analytics(db, company_slug=slug, days=days)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.get("/sla")
+def recruiter_sla_summary(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    from app.services.recruiter_sla import build_sla_summary
+
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
+    try:
+        return build_sla_summary(db, company_slug=slug)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+class RecruiterSlaTargetsIn(BaseModel):
+    targets: list[dict] = Field(default_factory=list)
+
+
+@router.put("/sla/targets")
+def recruiter_sla_targets_put(
+    body: RecruiterSlaTargetsIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    from app.services.recruiter_sla import upsert_sla_targets
+
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
+    try:
+        items = upsert_sla_targets(db, company_slug=slug, targets=body.targets)
+        return {"company_slug": slug, "targets": items}
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+class RecruiterCollaborationNoteIn(BaseModel):
+    subject_type: str = Field("candidate", max_length=32)
+    subject_id: str = Field(..., min_length=1, max_length=64)
+    body: str = Field(..., min_length=1, max_length=4000)
+    author_label: str | None = Field(None, max_length=128)
+
+
+@router.get("/collaboration/notes")
+def recruiter_collaboration_notes_list(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    company_slug: str | None = Query(None, max_length=80),
+    subject_type: str = Query("candidate", max_length=32),
+    subject_id: str = Query(..., max_length=64),
+    limit: int = Query(50, ge=1, le=100),
+) -> dict:
+    from app.services.recruiter_collaboration import list_collaboration_notes
+
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
+    try:
+        return list_collaboration_notes(
+            db,
+            company_slug=slug,
+            subject_type=subject_type,
+            subject_id=subject_id,
+            limit=limit,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/collaboration/notes", status_code=status.HTTP_201_CREATED)
+def recruiter_collaboration_notes_create(
+    body: RecruiterCollaborationNoteIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    from app.services.recruiter_collaboration import create_collaboration_note
+
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
+    try:
+        return create_collaboration_note(
+            db,
+            company_slug=slug,
+            subject_type=body.subject_type,
+            subject_id=body.subject_id,
+            body=body.body,
+            author_label=body.author_label,
+        )
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
@@ -787,6 +1047,180 @@ def recruiter_jobs_create(
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
 
+@router.patch("/jobs/{job_id}")
+def recruiter_jobs_update(
+    job_id: int,
+    body: RecruiterJobUpdateIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
+    try:
+        return update_company_job(
+            db,
+            company_slug=slug,
+            job_id=job_id,
+            title=body.title,
+            location=body.location,
+            description=body.description,
+            salary_min=body.salary_min,
+            salary_max=body.salary_max,
+            role_status=body.role_status,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/jobs/{job_id}/archive")
+def recruiter_jobs_archive(
+    job_id: int,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
+    try:
+        return archive_company_job(db, company_slug=slug, job_id=job_id)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.get("/decision-memory")
+def recruiter_decision_memory_list(
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    company_slug: str | None = Query(None, max_length=80),
+    subject_type: str | None = Query(None, max_length=32),
+    subject_id: str | None = Query(None, max_length=64),
+    limit: int = Query(50, ge=1, le=100),
+) -> dict:
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
+    try:
+        return wave2.list_decision_memory(
+            db,
+            company_slug=slug,
+            subject_type=subject_type,
+            subject_id=subject_id,
+            limit=limit,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/decision-memory", status_code=status.HTTP_201_CREATED)
+def recruiter_decision_memory_create(
+    body: RecruiterDecisionMemoryIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
+    try:
+        return wave2.create_decision_memory(
+            db,
+            company_slug=slug,
+            subject_type=body.subject_type,
+            subject_id=body.subject_id,
+            decision_code=body.decision_code,
+            summary=body.summary,
+            rationale_code=body.rationale_code,
+            application_id=body.application_id,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/team/invites/dry-run", status_code=status.HTTP_201_CREATED)
+def recruiter_team_invite_dry_run(
+    body: RecruiterTeamInviteDryRunIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    """Invite smoke without real email — outbox draft only; enrollment stays OFF."""
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
+    try:
+        return wave2.dry_run_team_invite(
+            db,
+            company_slug=slug,
+            invitee_email=body.invitee_email,
+            role_key=body.role_key,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/communications/draft", status_code=status.HTTP_201_CREATED)
+def recruiter_communications_draft(
+    body: RecruiterCommsDraftIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    """Explicit-send communications path — draft only; send=true rejected."""
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
+    try:
+        return wave2.draft_candidate_communication(
+            db,
+            company_slug=slug,
+            template_key=body.template_key,
+            subject_id=body.subject_id,
+            body_preview=body.body_preview,
+            send=body.send,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
 class RecruiterTalentPoolImportPreviewIn(BaseModel):
     csv_text: str = Field(..., min_length=1, max_length=512_000)
     import_source: str = Field("csv_paste", max_length=64)
@@ -794,6 +1228,11 @@ class RecruiterTalentPoolImportPreviewIn(BaseModel):
 
 class RecruiterTalentPoolImportCommitIn(BaseModel):
     import_id: int = Field(..., ge=1)
+    job_id: int | None = Field(
+        None,
+        ge=1,
+        description="When set, create inbox Applications for each imported record on this role",
+    )
 
 
 @router.get("/talent-pool")
@@ -867,6 +1306,18 @@ def recruiter_talent_pool_add_candidate(
         company_slug_query=company_slug,
     )
     try:
+        if body.job_id is not None:
+            return create_manual_candidate_for_role(
+                db,
+                company_slug=slug,
+                job_id=body.job_id,
+                display_name=body.display_name,
+                job_title=body.job_title,
+                location=body.location,
+                seniority=body.seniority,
+                skills=body.skills,
+                external_ats_id=body.external_ats_id,
+            )
         return add_talent_pool_record(
             db,
             company_slug=slug,
@@ -879,6 +1330,34 @@ def recruiter_talent_pool_add_candidate(
             candidate_id=body.candidate_id,
             pipeline_status=body.pipeline_status,
             idempotency_key=body.idempotency_key,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/talent-pool/{record_id}/assign-to-role")
+@limiter.limit("30/minute", key_func=recruiter_token_key)
+def recruiter_talent_pool_assign_to_role(
+    request: Request,
+    record_id: int,
+    body: TalentPoolAssignIn,
+    db: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+    x_twin_recruiter_token: Annotated[str | None, Header(alias="X-Twin-Recruiter-Token")] = None,
+    company_slug: str | None = Query(None, max_length=80),
+) -> dict:
+    """Promote a talent-pool record into an inbox Application for a company role."""
+    slug = _resolved_company_slug(
+        db,
+        settings,
+        authorization=authorization,
+        x_twin_recruiter_token=x_twin_recruiter_token,
+        company_slug_query=company_slug,
+    )
+    try:
+        return assign_pool_record_to_role(
+            db, company_slug=slug, record_id=record_id, job_id=body.job_id
         )
     except ValueError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
@@ -1091,6 +1570,13 @@ def recruiter_talent_pool_import_commit(
         company_slug_query=company_slug,
     )
     try:
+        if body.job_id is not None:
+            return commit_import_and_assign(
+                db,
+                company_slug=slug,
+                import_id=body.import_id,
+                job_id=body.job_id,
+            )
         return commit_talent_pool_import(
             db,
             company_slug=slug,

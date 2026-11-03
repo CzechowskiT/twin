@@ -4,11 +4,12 @@
  */
 import {
   activationStatusToBadgeStatus,
-  getWorkspaceModuleActivationStatus,
-  isWorkspaceModuleVisible,
+  getWorkspaceModuleActivationStatusForPersona,
+  isWorkspaceModuleVisibleForPersona,
   splitByActivationHubSection,
   type ActivationHubSlice,
 } from "@/lib/all-workspace-modules-activation";
+import { isModuleHiddenFromPilot } from "@/lib/customer-usable-readiness";
 import type { MarketingPersona } from "@/lib/marketing-persona";
 import type { SystemOfRecordRouteEntry } from "@/lib/system-of-record-routes";
 import type { WorkspaceModuleDef, WorkspaceModuleStatus } from "@/lib/workspace-module-status";
@@ -46,14 +47,22 @@ export const CONTROLLED_PILOT_PRIMARY_LIMITS: Readonly<Record<MarketingPersona, 
   investor: 99,
 };
 
+/** Full product surface — no green-only primary cap (WORKSPACE_GREEN_ONLY_MODE=false). */
+export const FULL_SURFACE_PRIMARY_LIMITS: Readonly<Record<MarketingPersona, number>> = {
+  candidate: 99,
+  recruiter: 99,
+  company: 99,
+  investor: 99,
+};
+
 function hrefIsBoardOrAdmin(href: string): boolean {
   return BOARD_OR_ADMIN_PREFIXES.some((prefix) => href.startsWith(prefix));
 }
 
 function isInternalModule(persona: MarketingPersona, moduleId: string, href?: string): boolean {
-  if (!isWorkspaceModuleVisible(moduleId)) return true;
+  if (!isWorkspaceModuleVisibleForPersona(persona, moduleId)) return true;
   if (href && hrefIsBoardOrAdmin(href) && persona !== "investor") return true;
-  return getWorkspaceModuleActivationStatus(moduleId) === "INTERNAL";
+  return getWorkspaceModuleActivationStatusForPersona(persona, moduleId) === "INTERNAL";
 }
 
 export function classifyProductSurfaceTier(
@@ -62,11 +71,17 @@ export function classifyProductSurfaceTier(
   _status?: WorkspaceModuleStatus,
 ): ProductSurfaceTier {
   if (isInternalModule(persona, moduleId)) return "INTERNAL";
-  return getWorkspaceModuleActivationStatus(moduleId);
+  return getWorkspaceModuleActivationStatusForPersona(persona, moduleId);
 }
 
 export function shouldHideFromDefaultHub(persona: MarketingPersona, moduleId: string): boolean {
-  return isInternalModule(persona, moduleId);
+  if (isInternalModule(persona, moduleId)) return true;
+  if (isModuleHiddenFromPilot(moduleId)) return true;
+  if (moduleId === "team" || moduleId === "company_team") return isModuleHiddenFromPilot("company_team");
+  if (moduleId === "auto_apply" || moduleId.includes("auto-apply") || moduleId.includes("auto_apply")) {
+    return isModuleHiddenFromPilot("auto_apply");
+  }
+  return false;
 }
 
 export function shouldShowAsRoadmap(persona: MarketingPersona, moduleId: string): boolean {
@@ -168,7 +183,7 @@ export function tierFromWorkspaceStatus(status: WorkspaceModuleStatus): ProductS
             : "INTERNAL";
 }
 
-/** @deprecated No primary limits — full product surface visible. */
+/** Full product surface — green-only mode is off. */
 export function getWorkspacePrimaryLimits(): Readonly<Record<MarketingPersona, number>> {
-  return CONTROLLED_PILOT_PRIMARY_LIMITS;
+  return FULL_SURFACE_PRIMARY_LIMITS;
 }

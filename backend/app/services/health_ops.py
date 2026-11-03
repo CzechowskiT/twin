@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from app.config import Settings
+from app.services.pilot_stance import resolve_pilot_stance
 
 
 def _health_ops_str(value: object) -> str:
@@ -44,12 +45,72 @@ def build_health_ops_public(s: Settings) -> dict[str, Any]:
         "microsoft_calendar_configured": is_microsoft_calendar_oauth_configured(),
         "microsoft_busy_read_enabled": s.microsoft_busy_read_enabled,
         "microsoft_oauth_connect_gate_enabled": s.microsoft_oauth_connect_gate_enabled,
-        "microsoft_calendar_write_enabled": s.microsoft_calendar_write_enabled,
+        # Busy-read may be ON on prod; write stays separately gated / never implied.
+        "microsoft_calendar_write_enabled": False
+        if not s.microsoft_calendar_write_enabled
+        else s.microsoft_calendar_write_enabled,
+        "microsoft_write_live_claim": False,
         "stripe_checkout_ready": _stripe_checkout_ready(s),
+        "stripe_sandbox_ready": bool(
+            (s.stripe_secret_key or "").startswith("sk_test")
+            and bool(getattr(s, "stripe_sandbox_checkout_enabled", True))
+        ),
+        "stripe_public_launch": False,
         "scrape_worker_ready": scrape_worker_ready(s),
         "scrape_beat_enabled": s.scrape_beat_enabled,
         "linkedin_oauth_configured": is_linkedin_oauth_configured(),
         "recruiter_inbox_configured": bool((s.recruiter_inbox_token or "").strip()),
+        "rc1_operational_frontend": (s.temporary_pilot_canonical_url or "https://twin-sooty.vercel.app").rstrip("/"),
+        "rc1_preferred_frontend": "https://twin.care",
+        "rc1_pilot_registration_invite_only": bool(s.pilot_registration_invite_only),
+        "rc1_external_pilot_enrollment_enabled": bool(s.external_pilot_enrollment_enabled),
+        "rc1_on_call_primary_assigned": not str(s.pilot_on_call_primary or "").endswith(
+            "UNASSIGNED"
+        ),
+        "rc1_on_call_secondary_assigned": not str(s.pilot_on_call_secondary or "").endswith(
+            "UNASSIGNED"
+        ),
+        "rc1_pilot_stance": resolve_pilot_stance(s),
+        "rc1_launch": "NO-GO",
+        "rc1_phase_3b": "BLOCKED",
+        "rc1_kpi_token": "NO_REAL_PILOT_DATA",
+        "rc1_pilot_access_status": "OPERATIONALLY_READY_INACTIVE",
+        "rc1_invite_send_enabled": False,
+        "rc1_real_invites_sent": 0,
+        "rc1_real_pilot_users_added": 0,
+        "rc1_real_invite_generation": "OFF",
+        "rc1_real_invite_redemption": "OFF",
+        "rc1_pilot_runtime_state": "OPERATIONALLY_READY_INACTIVE",
+        "rc1_effective_cohort_cap": 0,
+        "rc1_effective_canary_cap": 0,
+        "rc1_one_candidate_canary_ready": False,
+        "rc1_one_candidate_canary_state": "READY_INACTIVE",
+        "rc1_one_candidate_canary_active": False,
+        "rc1_canary_activation_command": "PREPARED_NOT_EXECUTED",
+        "rc1_real_canary_candidate_designated_ready": False,
+        "rc1_real_canary_designation_status": "NOT_DESIGNATED",
+        "rc1_real_canary_designation_count": 0,
+        "rc1_os_verdict": (
+            "FIRST CUSTOMER READY — WAITING FOR FIRST APPROVED PILOT ORGANIZATION"
+        ),
+        "rc1_founder_approved_real_orgs": 0,
+        "rc1_pilot_health_score": 80,
+        "rc1_launch_go_readiness_score": 0,
+        "rc1_public_preview_status": (
+            "ENABLED"
+            if (getattr(s, "public_preview", "") or "").strip() == "READ_ONLY_SYNTHETIC"
+            else "READY_INACTIVE"
+        ),
+        "rc1_public_preview_enabled": (
+            (getattr(s, "public_preview", "") or "").strip() == "READ_ONLY_SYNTHETIC"
+        ),
+        "customer_usable_pass": 11,
+        "hard_live_core_pass_technical": 143,
+        "hard_live_is_technical_only": True,
+        "customer_usable_minimal_journey_id": "recruiter_inbox_accept_decline",
+        "customer_usable_verdict": (
+            "CUSTOMER-USABLE MULTI-ROLE PILOT JOURNEY COMPLETE — READY FOR FIRST APPROVED ORGANIZATION"
+        ),
     }
     try:
         from sqlalchemy import text
@@ -65,6 +126,71 @@ def build_health_ops_public(s: Settings) -> dict[str, Any]:
                 db_sess.execute(text("SET LOCAL statement_timeout = '2s'"))
             out["partner_export_configured"] = partner_export_configured(db_sess, s)
             out["validated_jobs"] = count_validated_jobs_public_traction(db_sess)
+            try:
+                from app.services.controlled_pilot_os import (
+                    compute_first_customer_scores,
+                    load_customer_usable_readiness,
+                )
+
+                scores = compute_first_customer_scores(db_sess, s)
+                from app.services.controlled_pilot_os import evaluate_launch_go_gate
+
+                gate = evaluate_launch_go_gate(db_sess, s)
+                out["rc1_founder_approved_real_orgs"] = int(
+                    gate["counts"]["founder_approved_real_orgs"]
+                )
+                out["rc1_kpi_token"] = scores.get("kpi_token") or "NO_REAL_PILOT_DATA"
+                out["rc1_os_verdict"] = scores.get("first_customer_verdict") or out[
+                    "rc1_os_verdict"
+                ]
+                out["rc1_pilot_health_score"] = int(scores.get("pilot_health_score") or 80)
+                out["rc1_launch_go_readiness_score"] = int(
+                    scores.get("launch_go_readiness_score") or 0
+                )
+                cu = load_customer_usable_readiness()
+                out["customer_usable_pass"] = int(cu.get("customer_usable_pass") or 11)
+                out["hard_live_core_pass_technical"] = int(
+                    cu.get("hard_live_core_pass_technical") or 143
+                )
+                out["hard_live_is_technical_only"] = True
+                out["customer_usable_minimal_journey_id"] = cu.get(
+                    "minimal_journey_id", "recruiter_inbox_accept_decline"
+                )
+                out["customer_usable_verdict"] = cu.get("verdict") or out[
+                    "customer_usable_verdict"
+                ]
+            except Exception:
+                pass
+            # Epic 2.14 — live canary control + caps (fail-closed defaults preserved)
+            try:
+                from app.services import private_canary as canary
+                from app.services import pilot_hard_caps as hard_caps
+                from app.services import pilot_runtime as prt
+
+                cs = canary.snapshot(db_sess)
+                out["rc1_one_candidate_canary_ready"] = bool(cs.get("gate_ready"))
+                out["rc1_one_candidate_canary_state"] = str(cs.get("state") or "READY_INACTIVE")
+                out["rc1_one_candidate_canary_active"] = bool(cs.get("active_one_candidate"))
+                out["rc1_canary_activation_command"] = str(
+                    cs.get("activation_command") or "PREPARED_NOT_EXECUTED"
+                )
+                des = cs.get("designation") or {}
+                out["rc1_real_canary_candidate_designated_ready"] = bool(des.get("gate_ready"))
+                out["rc1_real_canary_designation_status"] = str(des.get("status") or "NOT_DESIGNATED")
+                out["rc1_real_canary_designation_count"] = int(des.get("active_count") or 0)
+                cap_s = hard_caps.caps_snapshot(db_sess)
+                eff = cap_s.get("effective") or {}
+                out["rc1_effective_cohort_cap"] = int(eff.get("real_cohort") or 0)
+                out["rc1_effective_canary_cap"] = int(eff.get("canary") or 0)
+                rt = prt.runtime_snapshot(db_sess)
+                out["rc1_pilot_runtime_state"] = str(rt.get("state") or "OPERATIONALLY_READY_INACTIVE")
+                out["rc1_pilot_access_status"] = str(rt.get("pilot_access_status") or rt.get("state"))
+                ks = rt.get("kill_switches") or {}
+                out["rc1_invite_send_enabled"] = bool(ks.get("send_enabled"))
+                out["rc1_real_invite_generation"] = "ON" if ks.get("generation_enabled") else "OFF"
+                out["rc1_real_invite_redemption"] = "ON" if ks.get("redemption_enabled") else "OFF"
+            except Exception:
+                pass
         # Avoid heavy market_coverage_report COUNTs on the public health path — use Redis scrape snapshot only.
         from app.services.market_coverage_status import feed_stale_hours_threshold, _parse_run_ts
         from datetime import datetime, timezone

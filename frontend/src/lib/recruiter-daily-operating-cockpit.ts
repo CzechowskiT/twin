@@ -1,10 +1,7 @@
-/** Recruiter daily operating cockpit — deterministic demo queues and module links. */
+/** Recruiter daily operating cockpit — live workspace links (no demo fixture CTAs). */
 
 import { atsImportReadinessHref } from "@/lib/ats-import-readiness";
-import { candidateCollaborationHref } from "@/lib/candidate-collaboration";
 import { candidateProfile360Href } from "@/lib/candidate-profile-360";
-import { candidateTrustHref } from "@/lib/candidate-trust";
-import { decisionMemoryHref } from "@/lib/decision-memory";
 import { jobPipelineHref } from "@/lib/job-pipeline";
 import { LAUNCH_STANCE } from "@/lib/investor-metrics-reality";
 import type { TranslationKey } from "@/lib/i18n";
@@ -15,8 +12,6 @@ import {
   RECRUITER_DAILY_COCKPIT_DEMO_ROLE_ID,
   type RecruiterDailyCockpitRecord,
 } from "@/lib/recruiter-daily-operating-cockpit-demo-data";
-import { candidateCommunicationHref } from "@/lib/safe-communication";
-import { candidateTeamHref } from "@/lib/team-collaboration";
 
 export {
   RECRUITER_DAILY_COCKPIT_DEMO_ATS_ID,
@@ -68,33 +63,33 @@ export const RECRUITER_DAILY_COCKPIT_MODULE_LINKS = [
     labelKey: "recruiterDailyCockpit.linkSorHub" as TranslationKey,
   },
   {
-    id: "profile360",
-    href: candidateProfile360Href(RECRUITER_DAILY_COCKPIT_DEMO_CANDIDATE_ID, "recruiter"),
+    id: "inbox",
+    href: "/recruiter/inbox",
     labelKey: "recruiterDailyCockpit.linkProfile360" as TranslationKey,
   },
   {
     id: "pipeline",
-    href: jobPipelineHref(RECRUITER_DAILY_COCKPIT_DEMO_ROLE_ID, "recruiter"),
+    href: "/recruiter/pipeline",
     labelKey: "recruiterDailyCockpit.linkPipeline" as TranslationKey,
   },
   {
     id: "notes",
-    href: candidateCollaborationHref(RECRUITER_DAILY_COCKPIT_DEMO_CANDIDATE_ID, "recruiter"),
+    href: "/recruiter/inbox",
     labelKey: "recruiterDailyCockpit.linkNotes" as TranslationKey,
   },
   {
     id: "trust",
-    href: candidateTrustHref(RECRUITER_DAILY_COCKPIT_DEMO_CANDIDATE_ID, "recruiter"),
+    href: "/recruiter/trust-review-queue",
     labelKey: "recruiterDailyCockpit.linkTrust" as TranslationKey,
   },
   {
     id: "team",
-    href: candidateTeamHref(RECRUITER_DAILY_COCKPIT_DEMO_CANDIDATE_ID, "recruiter"),
+    href: "/recruiter/inbox",
     labelKey: "recruiterDailyCockpit.linkTeam" as TranslationKey,
   },
   {
     id: "communication",
-    href: candidateCommunicationHref(RECRUITER_DAILY_COCKPIT_DEMO_CANDIDATE_ID, "recruiter"),
+    href: "/recruiter/inbox",
     labelKey: "recruiterDailyCockpit.linkCommunication" as TranslationKey,
   },
   {
@@ -109,7 +104,7 @@ export const RECRUITER_DAILY_COCKPIT_MODULE_LINKS = [
   },
   {
     id: "decision_memory",
-    href: decisionMemoryHref(RECRUITER_DAILY_COCKPIT_DEMO_CANDIDATE_ID, "recruiter"),
+    href: "/recruiter/inbox",
     labelKey: "recruiterDailyCockpit.linkDecisionMemory" as TranslationKey,
   },
   {

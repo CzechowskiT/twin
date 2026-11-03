@@ -1,4 +1,4 @@
-/** Candidate export preview bundle — read-only demo JSON download (no backend writes). */
+/** Candidate export preview — live lifecycle when authenticated; demo fallback on demo surfaces. */
 
 import {
   CANDIDATE_EXPORT_PREVIEW_DEMO_ID,

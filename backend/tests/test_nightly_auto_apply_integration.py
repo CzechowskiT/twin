@@ -94,6 +94,7 @@ def test_process_user_success_mocked(nightly_db, monkeypatch) -> None:
     db, user, consent, job = nightly_db
     candidate = db.query(Candidate).filter(Candidate.user_id == user.id).first()
     monkeypatch.setenv("NIGHTLY_AUTO_APPLY_COOLDOWN_SECONDS", "0")
+    get_settings.cache_clear()
 
     app_row = Application(
         candidate_id=candidate.id,
@@ -103,6 +104,7 @@ def test_process_user_success_mocked(nightly_db, monkeypatch) -> None:
     )
 
     with (
+        patch("app.services.nightly_auto_apply.autonomous_apply_allowed", return_value=True),
         patch("app.services.nightly_auto_apply.find_top_matches"),
         patch(
             "app.services.nightly_auto_apply.auto_apply_for_user",
@@ -121,6 +123,7 @@ def test_process_user_success_mocked(nightly_db, monkeypatch) -> None:
 def test_process_user_rate_limit(nightly_db, monkeypatch) -> None:
     db, user, consent, job = nightly_db
     monkeypatch.setenv("NIGHTLY_AUTO_APPLY_COOLDOWN_SECONDS", "0")
+    get_settings.cache_clear()
     from app.database.models import AutoApplyEvent
 
     db.add(
@@ -135,6 +138,7 @@ def test_process_user_rate_limit(nightly_db, monkeypatch) -> None:
     db.commit()
 
     with (
+        patch("app.services.nightly_auto_apply.autonomous_apply_allowed", return_value=True),
         patch("app.services.nightly_auto_apply.find_top_matches"),
         patch("app.services.nightly_auto_apply.auto_apply_for_user") as mock_apply,
     ):
@@ -194,6 +198,7 @@ def test_sweep_persists_auto_apply_run(nightly_db) -> None:
 
     with (
         patch("app.database.session.SessionLocal", FakeSession),
+        patch("app.services.nightly_auto_apply.autonomous_apply_allowed", return_value=True),
         patch("app.services.nightly_auto_apply.find_top_matches"),
         patch(
             "app.services.nightly_auto_apply.auto_apply_for_user",
@@ -216,6 +221,7 @@ def test_guard_skip_counts_as_skipped_not_failed(nightly_db, monkeypatch) -> Non
     get_settings.cache_clear()
     try:
         with (
+            patch("app.services.nightly_auto_apply.autonomous_apply_allowed", return_value=True),
             patch("app.services.nightly_auto_apply.find_top_matches"),
             patch("app.services.nightly_auto_apply.auto_apply_for_user") as mock_apply,
         ):

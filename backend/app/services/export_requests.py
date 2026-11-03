@@ -11,9 +11,17 @@ from app.database.models import ExportRequest
 from app.services.audit_events import create_audit_event
 
 ALLOWED_TYPES = frozenset(
-    {"candidate_export_preview", "trust_audit_preview", "consent_receipt_preview"}
+    {
+        "candidate_export_preview",
+        "trust_audit_preview",
+        "consent_receipt_preview",
+        "candidate_export_intake",
+    }
 )
-ALLOWED_STATUSES = frozenset({"draft", "preview_created", "awaiting_human_review"})
+# Intake / preview only — never claim legal DSR fulfillment via this table.
+ALLOWED_STATUSES = frozenset(
+    {"draft", "preview_created", "awaiting_human_review", "queued_for_ops_intake"}
+)
 FORBIDDEN_STATUSES = frozenset({"fulfilled", "sent", "completed", "legally_processed"})
 
 
@@ -75,9 +83,15 @@ def create_export_request(
     return _serialize(row)
 
 
-def list_export_requests(db: Session, *, candidate_id: str | None = None, limit: int = 50) -> dict[str, Any]:
+def list_export_requests(
+    db: Session,
+    *,
+    user_id: int,
+    candidate_id: str | None = None,
+    limit: int = 50,
+) -> dict[str, Any]:
     cap = max(1, min(limit, 100))
-    query = db.query(ExportRequest)
+    query = db.query(ExportRequest).filter(ExportRequest.created_by_user_id == user_id)
     if candidate_id:
         query = query.filter(ExportRequest.candidate_id == candidate_id.strip()[:64])
     rows = query.order_by(ExportRequest.created_at.desc()).limit(cap).all()

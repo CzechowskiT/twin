@@ -1,0 +1,48 @@
+PASS  A service
+PASS  A constants
+PASS  A api
+PASS  A alembic 133
+PASS  A fe page
+PASS  A fe workspace
+PASS  B opportunity pack
+PASS  B portfolio pack
+PASS  B pack types tuple len 2
+PASS  C contact_email sensitive
+PASS  C default_disclosure
+PASS  C internal blocked
+PASS  D build_preview
+PASS  D confirm_and_generate
+PASS  D immutable
+PASS  E fpdf
+PASS  E zipfile
+PASS  E no http in renderer
+PASS  F download route
+PASS  F no send route
+PASS  F Cache-Control no-store
+PASS  F EXTERNAL_DELIVERY false
+PASS  G revoke
+PASS  G delete
+PASS  G privacy_pause
+PASS  H not first value
+PASS  H first_value false in ser
+PASS  I primary still 7
+PASS  I no career-pack primary
+PASS  I secondary career-pack
+PASS  I privacy link
+PASS  I studio link
+PASS  J revises 132
+PASS  J no canary ddl
+PASS  J no invite ddl
+PASS  J schema id
+PASS  J unit tests
+PASS  J fe guard
+PASS  J EMAIL_SEND false
+PASS  J LLM_REWRITE false
+PASS  stance launch NO-GO
+PASS  stance enrollment OFF
+PASS  stance canary inactive
+PASS  stance activation prepared
+PASS  stance designation 0
+PASS  stance canary cap 0
+
+46 passed, 0 failed

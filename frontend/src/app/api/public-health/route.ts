@@ -115,15 +115,31 @@ export async function GET(request: Request) {
   const frontendCommit = resolveDeployCommitFromEnv();
   const resolvedApi = apiCommit ?? (typeof health.git_commit === "string" ? health.git_commit : "unknown");
   const resolvedFrontend = frontendCommit ?? "unknown";
+  const celeryObj = celery && typeof celery === "object" ? celery : {};
+  const rawWorker =
+    typeof (celeryObj as JsonRecord).worker_git_commit === "string"
+      ? String((celeryObj as JsonRecord).worker_git_commit)
+      : "unknown";
+  const resolvedWorker = rawWorker && rawWorker !== "unknown" ? rawWorker : "unknown";
   const shortFe = resolvedFrontend.slice(0, 7);
   const shortApi = resolvedApi.slice(0, 7);
+  const shortWorker = resolvedWorker.slice(0, 7);
   let commitInterpretation =
-    "Compare scaffold HEAD, Vercel frontend_commit, and Railway api_commit/git_commit separately.";
+    "Compare scaffold HEAD, Vercel frontend_commit, Railway api_commit, and worker_git_commit separately.";
   if (resolvedFrontend !== "unknown" && resolvedApi !== "unknown") {
-    commitInterpretation =
-      shortFe === shortApi
-        ? "Frontend (Vercel) and API (Railway) commits match on short SHA — aligned deploy for this slice."
-        : "Frontend (Vercel) and API (Railway) commits differ — common after frontend-only or backend-only PRs; verify Alembic head separately.";
+    const feApiMatch = shortFe === shortApi;
+    const workerMatch =
+      resolvedWorker === "unknown" ? false : shortWorker === shortApi && shortWorker === shortFe;
+    if (feApiMatch && workerMatch) {
+      commitInterpretation =
+        "Frontend (Vercel), API (Railway), and worker commits match on short SHA — strict Gate F alignment.";
+    } else if (feApiMatch) {
+      commitInterpretation =
+        "Frontend and API match; worker_commit missing or divergent — not strict Gate F aligned.";
+    } else {
+      commitInterpretation =
+        "Frontend (Vercel) and API (Railway) commits differ — common after frontend-only or backend-only PRs; verify Alembic head separately.";
+    }
   } else if (resolvedFrontend === "unknown" || resolvedApi === "unknown") {
     commitInterpretation =
       "One or both deploy SHAs unknown — check Vercel/Railway deploy logs; migration verification is independent of frontend deploy.";
@@ -132,12 +148,13 @@ export async function GET(request: Request) {
     ...health,
     celery,
     ...(celeryWarning ? { celery_warning: celeryWarning } : {}),
-    // Explicit deploy traceability: Vercel FE vs Railway API (git_commit stays API for compat).
+    // Explicit deploy traceability: Vercel FE vs Railway API vs Celery worker.
     frontend_commit: resolvedFrontend,
     api_commit: resolvedApi,
     backend_git_commit: resolvedApi,
+    worker_commit: resolvedWorker,
     deployment_note:
-      "git_commit and api_commit reflect Railway API; frontend_commit reflects Vercel. Scaffold HEAD may differ during partial deploys.",
+      "git_commit/api_commit=Railway API; frontend_commit=Vercel; worker_commit=Celery worker identity task.",
     commit_interpretation: commitInterpretation,
   });
 }

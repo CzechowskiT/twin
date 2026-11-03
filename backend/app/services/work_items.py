@@ -112,12 +112,13 @@ def create_work_item(
 def list_work_items(
     db: Session,
     *,
+    user_id: int,
     persona_scope: str | None = None,
     company_slug: str | None = None,
     limit: int = 50,
 ) -> dict[str, Any]:
     cap = max(1, min(limit, 100))
-    query = db.query(WorkItem)
+    query = db.query(WorkItem).filter(WorkItem.created_by_user_id == user_id)
     if persona_scope:
         query = query.filter(WorkItem.persona_scope == persona_scope.strip().lower())
     if company_slug:

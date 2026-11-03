@@ -1,4 +1,4 @@
-"""Investor data room uploads — metadata validation + optional S3 presign or local dev store."""
+"""Investor data room uploads — metadata + persistent Postgres blob or optional S3."""
 
 from __future__ import annotations
 
@@ -6,11 +6,12 @@ import hashlib
 import re
 import uuid
 from pathlib import Path
+from typing import Any
 
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
-from app.database.models import DataRoomDocumentMetadata
+from app.database.models import DataRoomDocumentBlob, DataRoomDocumentMetadata
 from app.services.s3_storage import get_s3_blob_store
 
 _ALLOWED_CATEGORIES = frozenset({"cap_table", "financials", "legal", "other"})
@@ -25,6 +26,7 @@ _ALLOWED_TYPES = frozenset(
 _MAX_BYTES = 25 * 1024 * 1024
 _FILENAME_RE = re.compile(r"^[\w.\- ]{1,200}$", re.UNICODE)
 _PRESIGN_TTL_SEC = 3600
+_STORED_STATUSES = frozenset({"stored", "validated", "stored_local", "stored_persistent"})
 
 
 def validate_upload_metadata(
@@ -75,6 +77,18 @@ def build_storage_key(*, user_id: int | None, filename: str) -> str:
 def local_upload_root() -> Path:
     raw = (get_settings().data_room_local_upload_dir or "data/data_room_uploads").strip()
     return Path(raw)
+
+
+def storage_backend_status() -> dict[str, Any]:
+    """Honest CORE secure-download backend — Postgres primary, S3 optional."""
+    s3 = object_storage_configured()
+    return {
+        "persistent_backend": "postgres_blob",
+        "persistent": True,
+        "s3_optional": s3,
+        "ephemeral_local_mirror_only": True,
+        "core_download_path": "GET /api/v1/investor/data-room/documents/{id}/download",
+    }
 
 
 def record_upload_metadata(
@@ -153,7 +167,63 @@ def prepare_upload_slot(
         storage_key=key,
         status="validated",
     )
-    return row, None, "metadata_only"
+    return row, None, "persistent_upload_slot"
+
+
+def _validate_bytes(
+    data: bytes,
+    *,
+    expected_size: int,
+    expected_checksum: str | None = None,
+) -> str:
+    if len(data) < 1 or len(data) > _MAX_BYTES:
+        raise ValueError("invalid_size")
+    if len(data) != expected_size:
+        raise ValueError("size_mismatch")
+    digest = hashlib.sha256(data).hexdigest()
+    if expected_checksum and digest != expected_checksum.strip().lower():
+        raise ValueError("checksum_mismatch")
+    return digest
+
+
+def save_persistent_upload_bytes(
+    db: Session,
+    *,
+    document_id: int,
+    data: bytes,
+    expected_size: int,
+    expected_checksum: str | None = None,
+) -> str:
+    """Store bytes in Postgres (persistent, multi-replica safe). Returns sha256."""
+    digest = _validate_bytes(data, expected_size=expected_size, expected_checksum=expected_checksum)
+    existing = db.query(DataRoomDocumentBlob).filter(DataRoomDocumentBlob.document_id == document_id).one_or_none()
+    if existing:
+        existing.content = data
+        existing.checksum_sha256 = digest
+        existing.size_bytes = len(data)
+    else:
+        db.add(
+            DataRoomDocumentBlob(
+                document_id=document_id,
+                content=data,
+                checksum_sha256=digest,
+                size_bytes=len(data),
+            )
+        )
+    db.flush()
+    # Best-effort local mirror (not the durable source of truth).
+    try:
+        meta = db.query(DataRoomDocumentMetadata).filter(DataRoomDocumentMetadata.id == document_id).one_or_none()
+        if meta and meta.storage_key:
+            save_local_upload_bytes(
+                storage_key=meta.storage_key,
+                data=data,
+                expected_size=expected_size,
+                expected_checksum=digest,
+            )
+    except OSError:
+        pass
+    return digest
 
 
 def save_local_upload_bytes(
@@ -163,15 +233,59 @@ def save_local_upload_bytes(
     expected_size: int,
     expected_checksum: str | None = None,
 ) -> None:
-    if len(data) < 1 or len(data) > _MAX_BYTES:
-        raise ValueError("invalid_size")
-    if len(data) != expected_size:
-        raise ValueError("size_mismatch")
-    if expected_checksum:
-        digest = hashlib.sha256(data).hexdigest()
-        if digest != expected_checksum.strip().lower():
-            raise ValueError("checksum_mismatch")
+    _validate_bytes(data, expected_size=expected_size, expected_checksum=expected_checksum)
     root = local_upload_root()
     dest = root / storage_key
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_bytes(data)
+
+
+def has_persistent_blob(db: Session, *, document_id: int) -> bool:
+    return (
+        db.query(DataRoomDocumentBlob.document_id)
+        .filter(DataRoomDocumentBlob.document_id == document_id)
+        .first()
+        is not None
+    )
+
+
+def read_download_payload(
+    db: Session,
+    *,
+    row: DataRoomDocumentMetadata,
+) -> tuple[bytes | None, str | None, str]:
+    """Return (bytes, redirect_url, mode) for authenticated download.
+
+    Modes: postgres_blob | s3_presigned_get | missing
+    """
+    blob = (
+        db.query(DataRoomDocumentBlob)
+        .filter(DataRoomDocumentBlob.document_id == row.id)
+        .one_or_none()
+    )
+    if blob and blob.content:
+        return bytes(blob.content), None, "postgres_blob"
+    if row.storage_key and object_storage_enabled():
+        url = get_s3_blob_store().presigned_get_url(key=row.storage_key, expires_in=_PRESIGN_TTL_SEC)
+        if url:
+            return None, url, "s3_presigned_get"
+    if row.storage_key:
+        path = local_upload_root() / row.storage_key
+        if path.is_file():
+            return path.read_bytes(), None, "local_mirror_fallback"
+    return None, None, "missing"
+
+
+def document_download_available(db: Session, *, row: DataRoomDocumentMetadata) -> bool:
+    if row.status not in _STORED_STATUSES and row.status != "pending_upload":
+        # pending_upload only downloadable after S3 put + confirm — treat as unavailable until stored
+        pass
+    if has_persistent_blob(db, document_id=row.id):
+        return True
+    if row.status in {"stored", "validated", "stored_local", "stored_persistent"} and row.storage_key:
+        if object_storage_configured():
+            return True
+        path = local_upload_root() / row.storage_key
+        if path.is_file():
+            return True
+    return has_persistent_blob(db, document_id=row.id)

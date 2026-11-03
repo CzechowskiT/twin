@@ -56,7 +56,6 @@ export const SITE_MESSAGES_EN = {
     "We prioritize partners who share standards on listing quality, rate limits, and candidate consent. If you represent a board or HR platform, reach out via Contact with “Partnership” in the subject and your API or data-sharing posture.",
   partnersNote:
     "Logos shown on the home marquee are illustrative of the global hiring landscape and are not partnership endorsements unless separately announced.",
-  marqueeLogoDisclaimer: "Representative market context.",
   partnersReferencesTitle: "Written references",
   partnersReferencesLead:
     "Letters of recommendation, security or procurement attestations, and signed integration summaries from partners who agree to publish them.",
@@ -246,7 +245,6 @@ export const SITE_MESSAGES_PL: { [K in keyof typeof SITE_MESSAGES_EN]: string } 
     "Priorytet mają partnerzy z podobnymi standardami jakości ogłoszeń, limitów zapytań i zgody kandydata. Jeśli reprezentujesz portal lub platformę HR, napisz z Kontaktu z tematem „Partnership” i informacją o API lub udostępnianiu danych.",
   partnersNote:
     "Logotypy na stronie głównej ilustrują globalny krajobraz rekrutacji i nie oznaczają partnerstwa, dopóki nie ogłosimy tego osobno.",
-  marqueeLogoDisclaimer: "Reprezentatywny kontekst rynkowy.",
   partnersReferencesTitle: "Referencje pisemne",
   partnersReferencesLead:
     "Listy referencyjne, poświadczenia bezpieczeństwa lub zakupów oraz podsumowania integracji od partnerów, którzy wyrażą zgodę na publikację.",

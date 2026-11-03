@@ -1,0 +1,26 @@
+{
+  "buckets": {
+    "auth_security": {
+      "fail": 0,
+      "pass": 7
+    },
+    "infra": {
+      "fail": 0,
+      "pass": 8
+    },
+    "privacy": {
+      "fail": 0,
+      "pass": 3
+    },
+    "product": {
+      "fail": 0,
+      "pass": 9
+    },
+    "stance": {
+      "fail": 0,
+      "pass": 13
+    }
+  },
+  "finished_at": "2026-08-10T06:17:27.878633+00:00",
+  "golden_pass": 6
+}

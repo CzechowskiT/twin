@@ -1,0 +1,26 @@
+PASS  gate exact value
+PASS  fixture 7 areas
+PASS  markers present
+PASS  page gated
+PASS  page no private API
+PASS  surface no storage APIs
+PASS  surface no fetch
+PASS  middleware X-Robots-Tag
+PASS  middleware kill switch 404
+PASS  middleware private cache for cookies
+PASS  robots disallow /preview
+PASS  sitemap excludes /preview
+PASS  providers skip analytics on preview
+PASS  chrome immersive preview
+PASS  backend independent switch
+PASS  health ops preview fields
+PASS  config public_preview field
+PASS  launch stays NO-GO in gates
+PASS  enrollment gate untouched in preview gate
+PASS  no signup/waitlist form controls
+PASS  simulated flash copy
+PASS  epic211 guided entry exists
+PASS  epic211 isolated demo service exists
+
+PP1 E2E code checks: 23 pass / 0 fail
+LOCAL_FLAG=(unset) status=READY_INACTIVE

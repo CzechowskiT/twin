@@ -1,0 +1,113 @@
+{
+  "public_health": {
+    "frontend_commit": "e2d97bf61c93896c4f02ddad3da9b97862d90fd2",
+    "api_commit": "e2d97bf61c93896c4f02ddad3da9b97862d90fd2",
+    "worker_commit": "e2d97bf61c93896c4f02ddad3da9b97862d90fd2",
+    "microsoft_calendar_write_enabled": false,
+    "rc1_launch": "NO-GO",
+    "rc1_phase_3b": "BLOCKED",
+    "rc1_external_pilot_enrollment_enabled": false
+  },
+  "aggregate_safe": {
+    "schema": "twin.read_only_calendar_sync/v1",
+    "alembic": "122_read_only_calendar_sync",
+    "routes": {
+      "consent_center": "/dashboard/consent-center",
+      "calendar_sync": "/dashboard/calendar-sync",
+      "connection": "/dashboard/calendar-sync?view=connection",
+      "deltas": "/dashboard/calendar-sync?view=deltas",
+      "history": "/dashboard/calendar-sync?view=history",
+      "feed": "/dashboard/calendar-sync?view=feed",
+      "privacy": "/dashboard/consent-center",
+      "execution_calendar": "/dashboard/execution-calendar",
+      "acceptance_calendar": "/dashboard/acceptance",
+      "daily_os_canonical": "/api/v1/candidates/me/career-copilot/daily",
+      "daily_os_fe": "/dashboard/career",
+      "api": "/api/v1/candidates/me/calendar-sync"
+    },
+    "oauth": {
+      "authorize_available": true,
+      "reuse_canonical": "/api/v1/calendar/microsoft/authorize",
+      "pkce": false,
+      "state_validated": true,
+      "code_replay_blocked": true,
+      "scopes": "offline_access User.Read Calendars.Read"
+    },
+    "microsoft": {
+      "scopes": [
+        "offline_access",
+        "User.Read",
+        "Calendars.Read"
+      ],
+      "exact_scope_set": [
+        "offline_access",
+        "User.Read",
+        "Calendars.Read"
+      ],
+      "write_scopes_present": false,
+      "calendars_read_write": false,
+      "mail_send": false,
+      "contacts": false,
+      "online_meetings_write": false,
+      "microsoft_calendar_write_enabled": false,
+      "write_methods_reachable": false,
+      "forbidden_write_methods": [
+        "event_create",
+        "event_update",
+        "event_delete",
+        "invite",
+        "mail_send"
+      ],
+      "graph_event_post_blocked": true,
+      "graph_patch_blocked": true,
+      "graph_delete_blocked": true,
+      "graph_getschedule_read_only": true,
+      "event_subject_storage": false,
+      "event_body_storage": false,
+      "attendee_storage": false,
+      "organizer_storage": false
+    },
+    "safety": {
+      "graph_write_scopes": false,
+      "microsoft_calendar_write": false,
+      "write_methods_reachable": false,
+      "token_exposure": false,
+      "unnecessary_event_content_persisted": false,
+      "bundled_consent": false,
+      "consent_default_off": true,
+      "revoke_stops_reads": true,
+      "revoke_purges_busy": true,
+      "internal_only_requires_ms": false,
+      "synthetic_bypasses_normalization": false,
+      "silent_approved_plan_rewrite": false,
+      "recalc_without_approval": false,
+      "reject_recalc_mutates_acal": false,
+      "postpone_recalc_mutates_acal": false,
+      "daily_os_404": false,
+      "public_non_revocable_feed": false,
+      "feed_as_external_booking": false,
+      "ats_write": false,
+      "auto_apply": false,
+      "phase_3_career_agent": "NOT_STARTED"
+    },
+    "consent": {
+      "ms_busy_read_opt_in": false,
+      "store_availability_blocks": true,
+      "ics_export_opt_in": true,
+      "internal_calendar_enabled": true,
+      "version": 12,
+      "default_off": true,
+      "bundled": false,
+      "explicit": true
+    },
+    "connection": {
+      "provider": "microsoft",
+      "status": "disconnected",
+      "health": {
+        "internal_only_usable": true
+      },
+      "ms_busy_read_opt_in": false,
+      "token_health": "unknown"
+    }
+  }
+}

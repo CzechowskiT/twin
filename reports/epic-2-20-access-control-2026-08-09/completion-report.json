@@ -1,0 +1,31 @@
+{
+  "epic": "2.20",
+  "title": "Candidate Access and Sharing Control Center",
+  "status": "COMPLETE",
+  "verdict_letter": "A",
+  "exact_verdict": "CANDIDATE ACCESS AND SHARING CONTROL CENTER CUSTOMER-USABLE — CANONICAL ACTIVE-GRANT INVENTORY, SOURCE-OWNED EXPLICIT REVOCATION AND PRIVACY-PRESERVING ACCESS TRANSPARENCY PRODUCTION-READY; NO PARALLEL TOKEN STORE, BEHAVIORAL TRACKING OR CANARY MUTATION",
+  "product_SHA": "5c5498552d247f33a6ad7199282f65b8f88794c4",
+  "alignment_status_at_product": "ALIGNED",
+  "alembic": "135_candidate_career_pack_share",
+  "schema_id": "twin.candidate_access_inventory/v1",
+  "revocation_schema_id": "twin.candidate_access_revocation/v1",
+  "new_access_grant_store": "NONE",
+  "CI": "https://github.com/CzechowskiT/twin/actions/runs/31314496471",
+  "CI_conclusion": "success",
+  "unit_tests": "3/3",
+  "fe_guard": "ok",
+  "code_stance_E2E": "48/48",
+  "auth_E2E": {
+    "product": "14/14",
+    "stance": "7/7",
+    "security": "4/4",
+    "invariant": "4/4",
+    "total": "29/29"
+  },
+  "canary_invariant_diff": 0,
+  "ux_route": "/dashboard/settings/access",
+  "eighth_primary_nav": false,
+  "launch": "NO-GO",
+  "canary_run_1": "BLOCKED_EXTERNALLY_NOT_EXECUTED",
+  "evidence_dir": "reports/epic-2-20-access-control-2026-08-09/"
+}

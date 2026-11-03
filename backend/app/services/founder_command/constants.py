@@ -18,7 +18,9 @@ DEFAULT_MAX_OPEN_PRS = 3
 DEFAULT_MAX_ACTIVE_RUNS = 1
 
 GATE_F_STATUS = "PASS"
-LAUNCH_STANCE = "GO"
+LAUNCH_STANCE = "NO-GO"
+# Update on each four-way aligned deploy (first-customer activation tip).
+KNOWN_PROD_SHA_HINT = "5e744d3eba9441e86e789b3e5233c99fa881e51f"
 
 
 class AutonomyLevel(int, Enum):

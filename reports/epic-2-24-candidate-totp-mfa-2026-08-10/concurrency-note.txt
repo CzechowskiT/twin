@@ -1,0 +1,1 @@
+with_for_update on factor last_accepted_counter; exactly one session per counter

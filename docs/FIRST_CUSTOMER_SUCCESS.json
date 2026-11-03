@@ -1,0 +1,79 @@
+{
+  "schema": "twin.first_customer_success/v1",
+  "updated_at": "2026-07-24T18:15:00Z",
+  "branch": "cursor/phase1-monorepo-scaffold",
+  "phase": 1,
+  "phase_2_handoff": "docs/PHASE2_PRODUCTION_HARDENING_HANDOFF.md",
+  "phase_3_untouched": true,
+  "verdict_without_approved_org": "FIRST REAL CUSTOMER SUCCESS SYSTEM READY — AWAITING FOUNDER-APPROVED PILOT ORGANIZATION",
+  "verdicts": {
+    "awaiting": "FIRST REAL CUSTOMER SUCCESS SYSTEM READY — AWAITING FOUNDER-APPROVED PILOT ORGANIZATION",
+    "pack_unsent": "FIRST REAL PILOT ORGANIZATION APPROVED — CUSTOMER SUCCESS PACK READY AND UNSENT",
+    "invites_sent": "FIRST REAL PILOT INVITATIONS SENT — AWAITING CUSTOMER ACTIVATION",
+    "activated": "FIRST REAL CUSTOMER ACTIVATED — PILOT JOURNEY IN PROGRESS",
+    "milestone": "FIRST REAL CUSTOMER VALUE MILESTONE COMPLETED — CONTROLLED PILOT ACTIVE",
+    "validated": "FIRST REAL CUSTOMER SUCCESS VALIDATED — PILOT CONTINUATION DECISION READY",
+    "blocked": "FIRST REAL CUSTOMER JOURNEY BLOCKED — EXACT PRODUCTION REGRESSION"
+  },
+  "stance": {
+    "pilot": "READY_FOR_CONTROLLED_PILOT",
+    "gate_f": "PASS",
+    "launch": "NO-GO",
+    "enrollment": "OFF",
+    "phase_3b": "BLOCKED",
+    "kpi_default": "NO_REAL_PILOT_DATA",
+    "public_registration": "INVITE_ONLY",
+    "stripe_public": "NOT_LIVE",
+    "ats_live_sync": "BLOCKED",
+    "microsoft_calendar_write": "BLOCKED"
+  },
+  "surfaces": {
+    "control_plane_api": "GET /api/v1/admin/pilot-os/first-customer-success",
+    "evidence_api": "GET /api/v1/admin/pilot-os/first-customer-success/evidence",
+    "provisioning_dry_run": "GET /api/v1/admin/pilot-os/first-customer-success/provisioning-dry-run",
+    "status_embedded": "first_customer_success on GET /api/v1/admin/pilot-os/status",
+    "pilot_os_ui": "/admin/pilot-os",
+    "service": "backend/app/services/first_customer_success.py",
+    "checklists": "docs/FIRST_CUSTOMER_SUCCESS_CHECKLISTS.md",
+    "invitation_pack": "docs/FIRST_CUSTOMER_INVITATION_PACK.md",
+    "troubleshooting": "docs/FIRST_CUSTOMER_TROUBLESHOOTING.md"
+  },
+  "journey_stages": [
+    "founder_approval",
+    "provision",
+    "pack_ready_unsent",
+    "send_auth",
+    "invite",
+    "login",
+    "disclosure",
+    "onboarding",
+    "role",
+    "candidate",
+    "ai_intel",
+    "review",
+    "evidence",
+    "correction",
+    "human_decision",
+    "company_visibility",
+    "feedback",
+    "support",
+    "weekly_review",
+    "continuation"
+  ],
+  "hard_bans": [
+    "no_invented_org_or_approval",
+    "no_send_without_org_approval_and_separate_send_ref",
+    "no_launch_go_flip",
+    "no_enrollment_on",
+    "no_phase_3b_execution",
+    "no_false_ai_claims",
+    "no_protected_attributes",
+    "no_unmasked_pii_in_evidence",
+    "synthetic_neq_real"
+  ],
+  "counts_at_ship": {
+    "approved_real_orgs": 0,
+    "invites_sent": 0,
+    "activated_recruiters": 0
+  }
+}

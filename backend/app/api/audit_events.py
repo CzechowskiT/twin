@@ -31,8 +31,13 @@ def get_audit_events(
     target_id: Annotated[str | None, Query()] = None,
     limit: Annotated[int, Query(ge=1, le=100)] = 50,
 ) -> dict:
-    _ = user
-    return list_audit_events(db, target_type=target_type, target_id=target_id, limit=limit)
+    return list_audit_events(
+        db,
+        actor_id=str(user.id),
+        target_type=target_type,
+        target_id=target_id,
+        limit=limit,
+    )
 
 
 @router.post("", status_code=201)

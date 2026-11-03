@@ -1,0 +1,214 @@
+1|Executive Summary
+Epic 2.9 konsoliduje IA/UX i gotowość prywatnego pilota (INACTIVE). Verdict A: PRODUCT CONSOLIDATION AND PRIVATE PILOT READINESS PRODUCTION-READY — FRESH-ACCOUNT JOURNEY, PRIVACY-SAFE TELEMETRY AND INACTIVE INVITE-ONLY ACCESS PROVEN. Product 30ce54b50dbbd6424528921aff2c73f80698aac0; Alembic 124; E2E 41/41 (produkt 32/32); CI success; FE/API/worker ALIGNED; enrollment OFF; invite send OFF; real invites 0; Launch NO-GO.
+2|Canonical Baseline
+Przed 2.9: product 8e858840 / tip 94a44c6b / Alembic 124 / E2E 56/56 / CI 30989591173. Po 2.9: product 30ce54b5; Alembic 124; E2E 41/41; CI 30994745155.
+3|Canonical Final State
+product HEAD 30ce54b50dbbd6424528921aff2c73f80698aac0; tip may docs_only_drift after proof; FE=API=worker=30ce54b50dbbd6424528921aff2c73f80698aac0; Alembic 124 is_at_head=true; schema twin.pilot_consolidation/v1; pilot_access PRODUCTION_READY_INACTIVE.
+4|Verdict
+PRODUCT CONSOLIDATION AND PRIVATE PILOT READINESS PRODUCTION-READY — FRESH-ACCOUNT JOURNEY, PRIVACY-SAFE TELEMETRY AND INACTIVE INVITE-ONLY ACCESS PROVEN
+5|Scope Freeze Honored
+Brak nowego intelligence module / ranking engine / calendar store / Phase 3 Agent / marketplace / enrollment activation.
+6|Regression Audit
+Baseline 2.8 green; Vercel TS fix; Railway SHA align; smoke green after tip.
+7|IA Inventory
+61 dashboard routes; subnav → 7 primary + More.
+8|Canonical IA
+Home, Direction, Opportunities, Evidence, Plan, Decisions, Settings — EN/PL.
+9|Route Disposition
+candidate-ia.ts primary/secondary/hidden_chrome.
+10|Home / Next-Action
+PilotHomeNextAction + Daily OS; calm empty; SUGGESTION.
+11|Primary Journey
+access → sign-in → privacy → minimal setup → first insight → approvals → Daily OS.
+12|Onboarding
+welcome/privacy/profile/skills/preferences; skippable; finish → /dashboard.
+13|First-Value Contract
+pilot_first_value_v1 PROVEN_SYNTHETICALLY.
+14|UX/Copy
+Spokojny EN/PL; bez jargon w primary nav.
+15|Telemetry
+Allowlisted pilot_*; PII strip; kpi_excluded; no replay/ads.
+16|Invite Controls
+PRODUCTION_READY_INACTIVE; send OFF; real invites 0; users added 0.
+17|Enrollment Gate
+OFF; Launch NO-GO unchanged.
+18|Fresh-Account E2E
+PASS 41/41 scripts/pilot-consolidation-authenticated-e2e.py
+19|Reliability
+Daily OS 200; unauth 401; DB head 124.
+20|Performance
+Lżejsza nawigacja; lekki aggregate.
+21|Security/Privacy
+Candidate-scoped; reject unknown telemetry events.
+22|A11y/i18n
+aria-expanded More; EN/PL pilotConsolidation.*
+23|Tests
+test_pilot_consolidation.py PASS; FE build PASS.
+24|CI
+success https://github.com/CzechowskiT/twin/actions/runs/30994745155
+25|FE Deployment
+frontend_commit=30ce54b50dbbd6424528921aff2c73f80698aac0
+26|API Deployment
+api_commit=30ce54b50dbbd6424528921aff2c73f80698aac0
+27|Worker Deployment
+worker_commit=30ce54b50dbbd6424528921aff2c73f80698aac0
+28|Production DB
+124_evidence_investment_intelligence is_at_head=true
+29|Four-Way Alignment
+ALIGNED fe=api=worker=30ce54b50dbbd6424528921aff2c73f80698aac0
+30|Hard Bans
+Launch NO-GO; Enrollment OFF; Phase 3B BLOCKED; Phase 3 Agent NOT_STARTED; MS write OFF; App submission OFF; External purchase/enrollment OFF.
+31|Founder Action
+ŻADNA teraz. Osobna decyzja aktywacji pilota — nie feature epic; nie auto-activate.
+32|Next Step
+Founder-governed pilot activation decision only — do not start Epic 3.0.
+33|Closed P0
+TTV TS build; four-way SHA after Railway stuck build.
+34|Remaining Blockers
+Brak blockerów Verdict A.
+35|External Limitations
+Shared synth mint possible; no real invites by design.
+36|Tech Debt
+PKCE residual; Approvals copy polish; utcnow warnings.
+37|Product Debt
+Dalsze grupowanie More; spokojniejszy dashboard chrome.
+38|Documentation
+reports/epic-2-9-pilot-consolidation-2026-08-05/
+39|Git History
+c52b203a feat · 439b1eeb fix · 02b282df nudge · cdf9b05d docs · 30ce54b5 tip
+40|Per-Module Disposition
+IA/Onboarding/Home/Telemetry/InviteInactive/E2E SHIPPED.
+41|Canonical Routes
+FE /dashboard*; API /me/pilot-consolidation*; Daily OS canonical.
+42|Truth Labels
+FACT/SUGGESTION/INSUFFICIENT_DATA retained.
+43|Safety Flags
+enrollment=false; invite_send=false; new_intelligence_module=false; ms_write=false.
+44|Synthetic KPI
+ENFORCED.
+45|Terminal Posture
+Consolidation/UX/Onboarding SHIPPED; First-Value PROVEN_SYNTHETICALLY; Telemetry SHIPPED; Synthetic KPI ENFORCED; Invite PRODUCTION_READY_INACTIVE; Enrollment OFF; Real invites 0; Real pilot users 0; Fresh-account PASS; CI SUCCESS; FE/API/worker ALIGNED; DB AT_EXPECTED_HEAD; Launch NO-GO; Phase 3B BLOCKED; Phase 3 Agent NOT_STARTED; MS write OFF; App submission OFF; External purchase/enrollment OFF.
+46|E2E Journey Access Count
+2/2
+47|E2E First Value Count
+4/4
+48|E2E IA Home Count
+9/9
+49|E2E Telemetry Count
+4/4
+50|E2E Invite Inactive Count
+8/8
+51|E2E Deletion Security Count
+3/3
+52|E2E Persistence Count
+2/2
+53|E2E Stance Count
+9/9
+54|Backend API
+SHIPPED
+55|Scheduler
+No new Celery required
+56|Alembic
+No 125 — reuse funnel+invites
+57|Health Ops
+rc1_pilot_access_status + invite flags
+58|FE Gates
+INACTIVE constants
+59|Canonical Routes Map
+Updated
+60|Subnav Marker
+data-ia=epic-2-9
+61|Daily OS Reuse
+No new planning engine
+62|Settings
+privacy-center primary
+63|Evidence
+portfolio primary
+64|Plan
+execution-calendar primary
+65|Decisions
+approvals primary
+66|No Silent Ranking
+Confirmed
+67|Residual 2.8
+Evidence Investment intact; Alembic 124
+68|Candidate-First
+PRIMARY
+69|No Phase 3 Agent
+NOT_STARTED
+70|Final Evidence Table
+SHA 30ce54b50dbbd6424528921aff2c73f80698aac0 · CI https://github.com/CzechowskiT/twin/actions/runs/30994745155 · E2E 41/41 · Alembic 124 · four-way ALIGNED
+71|Final Verdict
+PRODUCT CONSOLIDATION AND PRIVATE PILOT READINESS PRODUCTION-READY — FRESH-ACCOUNT JOURNEY, PRIVACY-SAFE TELEMETRY AND INACTIVE INVITE-ONLY ACCESS PROVEN
+
+Final Answers
+FA1|PRODUCT CONSOLIDATION AND PRIVATE PILOT READINESS PRODUCTION-READY — FRESH-ACCOUNT JOURNEY, PRIVACY-SAFE TELEMETRY AND INACTIVE INVITE-ONLY ACCESS PROVEN
+FA2|30ce54b50dbbd6424528921aff2c73f80698aac0
+FA3|30ce54b50dbbd6424528921aff2c73f80698aac0
+FA4|30ce54b50dbbd6424528921aff2c73f80698aac0
+FA5|30ce54b50dbbd6424528921aff2c73f80698aac0
+FA6|30ce54b50dbbd6424528921aff2c73f80698aac0
+FA7|30ce54b50dbbd6424528921aff2c73f80698aac0
+FA8|ALIGNED fe=api=worker=product; DB 124
+FA9|124_evidence_investment_intelligence
+FA10|124 is_at_head=true
+FA11|success https://github.com/CzechowskiT/twin/actions/runs/30994745155
+FA12|PASS 41/41
+FA13|41/41
+FA14|2/2
+FA15|4/4
+FA16|9/9
+FA17|4/4
+FA18|8/8
+FA19|3/3
+FA20|2/2
+FA21|9/9
+FA22|/dashboard
+FA23|/dashboard/career
+FA24|/dashboard/matches
+FA25|/dashboard/portfolio
+FA26|/dashboard/execution-calendar
+FA27|/dashboard/approvals
+FA28|/dashboard/privacy-center
+FA29|SHIPPED 7-primary IA + More
+FA30|SHIPPED calm Home/Today
+FA31|SHIPPED progressive onboarding
+FA32|First-value PROVEN_SYNTHETICALLY
+FA33|Telemetry SHIPPED
+FA34|Synthetic KPI ENFORCED
+FA35|Invite PRODUCTION_READY_INACTIVE
+FA36|Enrollment OFF
+FA37|Invite send OFF
+FA38|Real invites 0
+FA39|Real pilot users added 0
+FA40|Fresh-account PASS
+FA41|Launch NO-GO
+FA42|Phase 3B BLOCKED
+FA43|Phase 3 Agent NOT_STARTED
+FA44|MS write OFF
+FA45|App submission OFF
+FA46|External purchase/enrollment OFF
+FA47|No new intelligence module
+FA48|Daily OS 200
+FA49|Founder action: NONE
+FA50|Next: Founder-governed pilot activation only
+FA51|CI success https://github.com/CzechowskiT/twin/actions/runs/30994745155
+FA52|four-way ALIGNED
+FA53|DB at head
+FA54|E2E not stance-padded
+FA55|Privacy-safe telemetry
+FA56|No CV/JD/transcript telemetry
+FA57|No session replay
+FA58|No third-party ads
+FA59|Onboarding skippable
+FA60|Required vs optional clear
+FA61|localStorage resume safe
+FA62|No dark patterns
+FA63|MS optional OFF default
+FA64|EN/PL i18n
+FA65|a11y More
+FA66|Route disposition map
+FA67|Health fields
+FA68|Unit tests PASS
+FA69|FE build PASS
+FA70|FROZEN: Launch NO-GO; Enrollment OFF; invites not sent; no Epic 3.0

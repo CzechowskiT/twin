@@ -1,0 +1,18 @@
+{
+  "epic": "2.18",
+  "verdict": "A",
+  "product_sha": "30c21f654e29621ba28025fbfa950b207af90f42",
+  "alembic": "134_candidate_journey_continuity",
+  "schema": "twin.candidate_journey_session/v1",
+  "parallel_checkpoint_store": "NONE",
+  "unit": "10/10",
+  "code_stance": "51/51",
+  "auth_product": "20/20",
+  "auth_stance": "7/7",
+  "auth_invariant": "4/4",
+  "adapter_matrix": "48/48",
+  "regression": "19/19",
+  "ci": "31306483529",
+  "canary_invariant_diff": 0,
+  "alignment": "ALIGNED"
+}

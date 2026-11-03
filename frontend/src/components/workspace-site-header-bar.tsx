@@ -9,7 +9,7 @@ import { useTranslation } from "@/components/language-provider";
 import { PersonaBadge } from "@/components/persona-badge";
 import { useMarketingPersona } from "@/components/persona-provider";
 import { apiFetch } from "@/lib/api";
-import { clearToken, getToken, hasActiveSession } from "@/lib/auth";
+import { clearToken, getToken, hasActiveSession, logoutSession } from "@/lib/auth";
 import { isDemoUserEmail } from "@/lib/demo-user";
 import { scrollToDashboardHash } from "@/lib/dashboard-anchor";
 import {
@@ -90,9 +90,10 @@ export function WorkspaceSiteHeaderBar() {
 
   const logout = () => {
     const loginPath = logoutRedirectPath(persona);
-    clearToken();
-    closeMobileMenu();
-    router.push(loginPath);
+    void logoutSession().then(() => {
+      closeMobileMenu();
+      router.push(loginPath);
+    });
   };
 
   return (

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useTranslation } from "@/components/language-provider";
 import { Card, Shell } from "@/components/ui";
 import { INVESTOR_TRUST_PROOF_LINKS, INVESTOR_TRUST_PROOF_MARKERS, INVESTOR_TRUST_PROOF_PAGE_MARKER, LAUNCH_STANCE, resolveInvestorTrustProof } from "@/lib/investor-trust-proof";
+import { InvestorTrustProofReadonlyPanel } from "@/components/investor/investor-trust-proof-readonly-panel";
 import type { TranslationKey } from "@/lib/i18n";
 import { TRUST_PROOF_PREVIEW_BOUNDARY } from "@/lib/seven-day-d5-investor";
 import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
@@ -34,6 +35,7 @@ export function InvestorTrustProofWorkspace() {
             <p className="text-sm leading-relaxed text-[var(--twin-muted-strong)]">{t("sevenDayD5.trustProofPreviewBoundaryBody")}</p>
           </Card>
         ) : null}
+        <InvestorTrustProofReadonlyPanel />
         {section(INVESTOR_TRUST_PROOF_MARKERS.architecture, t("investorTrustProof.architectureTitle"), t("investorTrustProof.architectureLead"))}
         {section(INVESTOR_TRUST_PROOF_MARKERS.matrix, t("investorTrustProof.matrixTitle"), t("investorTrustProof.matrixLead"))}
         {section(INVESTOR_TRUST_PROOF_MARKERS.recruiter, t("investorTrustProof.recruiterTitle"), t("investorTrustProof.recruiterLead"))}

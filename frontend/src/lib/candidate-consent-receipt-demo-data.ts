@@ -55,10 +55,10 @@ export type ConsentReceiptLinkedModule = {
 
 export type CandidateConsentReceiptMetadata = {
   consent_receipt_preview: true;
-  backend_write: false;
-  demo_only: true;
+  backend_write: boolean;
+  demo_only: boolean;
   legal_claim: false;
-  generated_locally: true;
+  generated_locally: boolean;
   candidate_id: string;
   role_id: string;
   generated_at: string;
@@ -91,10 +91,10 @@ export type CandidateConsentReceiptBundle = {
   audit_events: ConsentReceiptAuditEvent[];
   evidence_references: ConsentReceiptEvidenceRef[];
   safety_boundaries: {
-    no_live_export: true;
-    no_ticket: true;
-    no_email: true;
-    human_decision_required: true;
+    no_live_export: boolean;
+    no_ticket: boolean;
+    no_email: boolean;
+    human_decision_required: boolean;
     notes: string[];
   };
 };

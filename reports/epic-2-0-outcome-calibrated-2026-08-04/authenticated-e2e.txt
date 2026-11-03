@@ -1,0 +1,73 @@
+PASS [stance] public_health 200
+PASS [stance] launch_nogo NO-GO
+PASS [stance] enrollment_off 
+PASS [stance] phase_3b_blocked 
+PASS [stance] ms_write_off 
+PASS [persistence] four_way_aligned fe=bade46039004 api=bade46039004 wrk=bade46039004
+PASS [security] mint_synthetic 200
+PASS [security] kpi_excluded 
+PASS [security] synthetic_ne_real 
+PASS [ranking_strategy] aggregate_200 200
+PASS [persistence] alembic_116 116_outcome_calibrated_execution
+PASS [ranking_strategy] schema_v1 
+PASS [security] safety_external_execution_off False
+PASS [security] safety_silent_calibration_off False
+PASS [security] safety_calibration_disconnected_off False
+PASS [security] safety_deletion_preview_only_default_off False
+PASS [security] safety_privacy_revoke_flag_only_off False
+PASS [security] safety_invalidated_in_recs_off False
+PASS [security] safety_non_idempotent_plans_off False
+PASS [security] safety_daily_os_separate_ranking_off False
+PASS [security] safety_acal_unapproved_commitments_off False
+PASS [security] safety_bundled_approvals_off False
+PASS [security] safety_workplace_monitoring_off False
+PASS [security] safety_ats_write_off False
+PASS [security] safety_auto_apply_off False
+PASS [security] safety_microsoft_calendar_write_off False
+PASS [security] safety_covert_assistance_off False
+PASS [security] safety_public_strategy_off False
+PASS [security] phase_3_agent_not_started NOT_STARTED
+PASS [ranking_strategy] canonical_ranking 
+PASS [ranking_strategy] explainability 
+PASS [ranking_strategy] counterfactuals 
+PASS [ranking_strategy] outcome_attribution 
+PASS [ranking_strategy] ranking_refresh 201
+PASS [ranking_strategy] daily_os_canonical 
+PASS [ranking_strategy] daily_os_not_separate 
+PASS [ranking_strategy] feedback_no_silent_weights 200
+PASS [ranking_strategy] calibration_propose 201
+PASS [ranking_strategy] calibration_not_silent 
+PASS [ranking_strategy] calibration_not_bundled 
+PASS [ranking_strategy] calibration_reject 200
+PASS [ranking_strategy] calibration_approve 200
+PASS [ranking_strategy] calibration_revert 200
+PASS [ranking_strategy] strategy_simulation 200
+PASS [ranking_strategy] lifecycle_nba_not_separate {'title': 'Isolation workspace', 'phase': 'DECIDE', 'deep_link': '/dashboard/application-studio?id=2', 'deep_link_preser
+PASS [execution_recovery] plan_create 201
+PASS [execution_recovery] plan_internal_only 
+PASS [execution_recovery] steps_internal 
+PASS [execution_recovery] plan_idempotent 201
+PASS [execution_recovery] plan_run 200
+PASS [execution_recovery] plan_completed_or_running completed
+PASS [execution_recovery] plan_pause 200
+PASS [execution_recovery] paused_blocks_run 400
+PASS [execution_recovery] plan_resume 200
+PASS [execution_recovery] plan_cancel 200
+PASS [execution_recovery] acal_approved_only 200
+PASS [deletion_privacy] deletion_preview 200
+PASS [deletion_privacy] invalidate_stale 200
+PASS [deletion_privacy] deletion_executes 200
+PASS [deletion_privacy] privacy_revoke_executed 200
+PASS [security] unauth_denied 401
+PASS [persistence] db_at_head_116 {'current_revision': '116_outcome_calibrated_execution', 'head_revision': '116_outcome_calibrated_execution', 'head_revi
+PASS [persistence] strategy_route /dashboard/strategy
+PASS [persistence] approvals_route /dashboard/approvals
+PASS [persistence] recovery_route /dashboard/recovery
+---
+ranking_strategy: 18/18
+execution_recovery: 11/11
+deletion_privacy: 4/4
+security: 21/21
+persistence: 6/6
+stance: 5/5
+TOTAL: 65/65

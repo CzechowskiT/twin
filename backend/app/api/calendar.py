@@ -318,6 +318,18 @@ def google_calendar_callback(
         db.add(new_row)
         db.commit()
         store_google_tokens_from_exchange(db, new_row, access_token=exchanged.access_token, expires_in=exchanged.expires_in, refresh_token=None)
+    try:
+        from app.services.product_funnel import emit_funnel_event
+
+        emit_funnel_event(
+            db,
+            event_name="calendar_connected",
+            user_id=user_id,
+            properties={"provider": "google"},
+            commit=True,
+        )
+    except Exception:
+        pass
     return RedirectResponse(_frontend_calendar_redirect(calendar_connected="1"), status_code=302)
 
 
@@ -800,6 +812,19 @@ def google_calendar_schedule_interview(
     db.add(row)
     db.commit()
     db.refresh(row)
+    try:
+        from app.services.product_funnel import emit_funnel_event
+
+        emit_funnel_event(
+            db,
+            event_name="interview_scheduled",
+            user_id=current_user.id,
+            properties={"provider": "google", "application_id": body.application_id},
+            once=False,
+            commit=True,
+        )
+    except Exception:
+        pass
     return row
 
 
@@ -878,5 +903,82 @@ def download_webcal_feed(
             "Cache-Control": "private, max-age=300",
         },
     )
+
+
+class IcsImportIn(BaseModel):
+    ics_text: str = Field(..., min_length=20, max_length=512_000)
+
+
+@router.post("/me/ics/import")
+def import_ics_calendar(
+    body: IcsImportIn,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> dict:
+    """Import VEVENT holds from uploaded ICS — local busy blocks only; no Google/MS write."""
+    from app.services.ics_import import import_ics_for_user
+
+    try:
+        return import_ics_for_user(db, user_id=current_user.id, ics_text=body.ics_text)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.get("/me/ics/imports")
+def list_ics_imports(
+    limit: int = Query(50, ge=1, le=200),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> dict:
+    from app.services.ics_import import list_imported_holds
+
+    return list_imported_holds(db, user_id=current_user.id, limit=limit)
+
+
+@router.get("/google/push/status")
+def google_push_status_endpoint(
+    current_user: User = Depends(get_current_user),
+) -> dict:
+    from app.services.google_calendar_push import google_push_status
+
+    return google_push_status()
+
+
+@router.post("/google/push/watch")
+def google_push_watch_start(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> dict:
+    """Start Google Calendar events.watch when OAuth + public webhook URL are configured."""
+    from app.services.google_calendar_push import start_calendar_watch
+
+    token = _calendar_access_token(db, current_user.id)
+    return start_calendar_watch(db, user_id=current_user.id, access_token=token)
+
+
+@router.post("/google/push/webhook")
+async def google_push_webhook(
+    request: Request,
+    db: Session = Depends(get_db),
+) -> dict:
+    """Public Google Calendar push receiver — ack only; no secrets logged."""
+    from app.services.google_calendar_push import handle_push_notification
+    from fastapi.responses import JSONResponse
+
+    channel_id = request.headers.get("X-Goog-Channel-ID")
+    resource_state = request.headers.get("X-Goog-Resource-State")
+    channel_token = request.headers.get("X-Goog-Channel-Token")
+    resource_id = request.headers.get("X-Goog-Resource-ID")
+    result = handle_push_notification(
+        db,
+        channel_id=channel_id,
+        resource_state=resource_state,
+        channel_token=channel_token,
+        resource_id=resource_id,
+    )
+    code = int(result.get("http_status") or 200)
+    if code != 200:
+        return JSONResponse(result, status_code=code)
+    return result
 
 

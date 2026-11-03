@@ -35,7 +35,7 @@ function AuthCallbackContent() {
     const error = searchParams.get("error");
 
     if (token) {
-      setToken(token);
+      setToken(token, searchParams.get("rt"));
       const next = searchParams.get("next");
       const path = next?.startsWith("/") ? next : "/dashboard";
       const persona = marketingPersonaFromPathExtended(path) ?? "candidate";

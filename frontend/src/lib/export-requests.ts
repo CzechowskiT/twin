@@ -15,6 +15,7 @@ export const EXPORT_REQUESTS_DEMO_CANDIDATE_ID = "demo-candidate-001";
 
 export const EXPORT_REQUEST_TYPES = {
   candidateExportPreview: "candidate_export_preview",
+  candidateExportIntake: "candidate_export_intake",
   trustAuditPreview: "trust_audit_preview",
   consentReceiptPreview: "consent_receipt_preview",
 } as const;

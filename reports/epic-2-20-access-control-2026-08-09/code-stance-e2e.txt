@@ -1,0 +1,60 @@
+PASS  A constants
+PASS  A service
+PASS  A api
+PASS  A page
+PASS  A audit
+PASS  B NEW store NONE
+PASS  B parallel token NONE
+PASS  B parallel share NONE
+PASS  B no alembic 136
+PASS  C kind AUTH_SESSION
+PASS  C kind OAUTH_CONNECTION
+PASS  C kind CALENDAR_READ_CONSENT
+PASS  C kind PRIVATE_CALENDAR_FEED
+PASS  C kind CAREER_PACK_SHARE
+PASS  C kind TEMPORARY_CAREER_PACK_ARTIFACT
+PASS  C kind TEMPORARY_PRIVACY_EXPORT
+PASS  D exclude journey_continuity
+PASS  D exclude path_readiness
+PASS  D exclude data_trust
+PASS  D exclude daily_os
+PASS  D exclude drafts
+PASS  E inventory schema
+PASS  E revocation schema
+PASS  F build_inventory
+PASS  F derived_only
+PASS  G post_condition
+PASS  G no success_on_accept
+PASS  G revision_mismatch
+PASS  H secret_present false
+PASS  H no share_url
+PASS  H no refresh_token field
+PASS  I recipient tracking false
+PASS  I access analytics false
+PASS  I not first value
+PASS  J inventory route
+PASS  J revoke route
+PASS  K primary 7
+PASS  K settings access secondary
+PASS  K privacy link
+PASS  L audit NONE store
+PASS  M unit —  represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return datetime.utcnow()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+3 passed, 127 warnings in 6.04s
+
+PASS  M fe guard — 
+> frontend@0.1.0 test:epic-220-access-control-guard
+> npx --yes tsx scripts/epic-220-access-control-guard.test.ts
+
+epic-220-access-control-guard: ok
+
+PASS  stance launch NO-GO
+PASS  stance enrollment OFF
+PASS  stance canary inactive
+PASS  stance activation prepared
+PASS  stance designation 0
+PASS  stance canary cap 0
+
+48 passed, 0 failed

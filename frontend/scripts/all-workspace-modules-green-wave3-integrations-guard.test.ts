@@ -20,7 +20,6 @@ import {
   WAVE3_SLICE2_RECRUITER_INTEGRATIONS_MODULE_ID,
   WAVE3_SLICE2_RECRUITER_INTEGRATIONS_SOR_IDS,
   WORKSPACE_GREEN_ONLY_MODE,
-  WORKSPACE_GREEN_PRIMARY_LIMITS,
 } from "../src/lib/all-workspace-green-gate";
 import { COMPANY_WORKSPACE_MODULES } from "../src/lib/company-workspace-modules";
 import {
@@ -47,6 +46,7 @@ import {
 import { CANONICAL_STANCE, NOT_READY_FOR_LAUNCH } from "../src/lib/seven-day-d7-final-qa";
 import { dictionaries, en } from "../src/lib/i18n";
 import { COMPANY_ENTRY_PREVIEW_CARDS } from "../src/lib/company-entry-navigation";
+import { COMPANY_INTEGRATIONS_ROUTE } from "../src/lib/company-integrations-readiness";
 import { getSystemOfRecordRoutesForPersona, SYSTEM_OF_RECORD_ROUTES } from "../src/lib/system-of-record-routes";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -57,8 +57,6 @@ const PR_441_MERGE_SHA = "07046c6d4764b90d45c58a5e4f8d1233977d2363";
 
 const RECRUITER_GREEN_HUB_IDS = ["inbox", "pipeline", "jobs", "search", "analytics"] as const;
 const COMPANY_GREEN_HUB_IDS = ["roles", "pipeline"] as const;
-
-const NON_GREEN_BADGES = ["pilot", "preview", "coming_soon", "paused", "not_live", "needs_setup"] as const;
 
 function readRepo(rel: string): string {
   return readFileSync(join(repoRoot, rel), "utf8");
@@ -79,8 +77,9 @@ test("1 wave3 integrations doc exists with stance and PR #441 merge SHA", () => 
   assert.match(doc, /NOT_PHASE_3B: true/);
 });
 
-test("2 wave3 slice2 gate exports — integrations not green, roadmap outside hrefs", () => {
-  assert.equal(WORKSPACE_GREEN_ONLY_MODE, true);
+test("2 wave3 slice2 gate exports — historical constants + green-only superseded", () => {
+  // Founder decision 2026-07-10 — green-only mode off; full activation surface visible.
+  assert.equal(WORKSPACE_GREEN_ONLY_MODE, false);
   assert.equal(WAVE3_SLICE2_RECRUITER_INTEGRATIONS_MODULE_ID, "integrations");
   assert.equal(WAVE3_SLICE2_COMPANY_INTEGRATIONS_MODULE_ID, "integrations");
   assert.equal(WAVE3_SLICE2_MOVE_TO_ROADMAP_ACTION, "MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE");
@@ -90,69 +89,71 @@ test("2 wave3 slice2 gate exports — integrations not green, roadmap outside hr
   assert.equal(WAVE3_SLICE2_EFFECTIVE_HIDDEN_WORKSPACE_CARD_COUNT, 19);
   assert.ok(!GREEN_WORKSPACE_ALLOWED_IDS.recruiter.includes("integrations"));
   assert.ok(!GREEN_WORKSPACE_ALLOWED_IDS.company.includes("integrations"));
-  assert.ok(!isWorkspaceGreenVisible("recruiter", "integrations"));
-  assert.ok(!isWorkspaceGreenVisible("company", "integrations"));
+  // With green-only off, visibility helper allows non-green modules (honest COMING_SOON badges).
+  assert.equal(isWorkspaceGreenVisible("recruiter", "integrations"), true);
+  assert.equal(isWorkspaceGreenVisible("company", "integrations"), true);
   assert.ok(WAVE3_SLICE2_RECRUITER_INTEGRATIONS_SOR_IDS.includes("recruiter_integrations"));
   assert.ok(WAVE3_SLICE2_COMPANY_INTEGRATIONS_SOR_IDS.includes("company_integrations"));
 });
 
-test("3 seven-day flags — integrations roadmap outside workspace, hidden from hub and nav", () => {
+test("3 seven-day flags — integrations restored to workspace hub/nav (Wave 1 supersedes hide)", () => {
   assert.equal(RECRUITER_INTEGRATIONS_ROADMAP_STATUS, "coming_soon");
   assert.equal(COMPANY_INTEGRATIONS_ROADMAP_STATUS, "coming_soon");
-  assert.equal(HIDE_RECRUITER_INTEGRATIONS_FROM_HUB, true);
-  assert.equal(HIDE_COMPANY_INTEGRATIONS_FROM_HUB, true);
-  assert.equal(RECRUITER_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE, true);
-  assert.equal(COMPANY_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE, true);
-  assert.equal(HIDE_RECRUITER_INTEGRATIONS_FROM_NAV, true);
-  assert.equal(HIDE_COMPANY_INTEGRATIONS_FROM_NAV, true);
-  assert.equal(shouldHideFromDefaultHub("recruiter", "integrations"), true);
-  assert.equal(shouldHideFromDefaultHub("company", "integrations"), true);
-  assert.equal(classifyProductSurfaceTier("recruiter", "integrations", "coming_soon"), "INTERNAL");
-  assert.equal(classifyProductSurfaceTier("company", "integrations", "coming_soon"), "INTERNAL");
+  assert.equal(HIDE_RECRUITER_INTEGRATIONS_FROM_HUB, false);
+  assert.equal(HIDE_COMPANY_INTEGRATIONS_FROM_HUB, false);
+  assert.equal(RECRUITER_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE, false);
+  assert.equal(COMPANY_INTEGRATIONS_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE, false);
+  assert.equal(HIDE_RECRUITER_INTEGRATIONS_FROM_NAV, false);
+  assert.equal(HIDE_COMPANY_INTEGRATIONS_FROM_NAV, false);
+  assert.equal(shouldHideFromDefaultHub("recruiter", "integrations"), false);
+  assert.equal(shouldHideFromDefaultHub("company", "integrations"), false);
+  assert.equal(classifyProductSurfaceTier("recruiter", "integrations", "coming_soon"), "COMING_SOON");
+  assert.equal(classifyProductSurfaceTier("company", "integrations", "coming_soon"), "COMING_SOON");
 });
 
-test("4 recruiter workspace — green-only primary five, integrations hidden, no non-green cards", () => {
+test("4 recruiter workspace — live primary + integrations in roadmap", () => {
   const split = splitWorkspaceModules("recruiter", RECRUITER_WORKSPACE_MODULES);
-  assert.equal(split.roadmap.length, 0);
-  assert.ok(split.primary.every((m) => m.status === "live"));
-  assert.ok(!split.primary.some((m) => NON_GREEN_BADGES.includes(m.status as (typeof NON_GREEN_BADGES)[number])));
-  assert.ok(!split.primary.some((m) => m.id === "integrations"));
-  assert.ok(split.hidden.some((m) => m.id === "integrations"));
-  assert.ok(split.primary.length <= WORKSPACE_GREEN_PRIMARY_LIMITS.recruiter);
+  assert.ok(split.roadmap.length >= 1);
+  assert.ok(split.primary.every((m) => m.status === "live" || m.status === "pilot"));
+  assert.ok(split.roadmap.some((m) => m.id === "integrations"));
+  assert.ok(!split.hidden.some((m) => m.id === "integrations"));
   for (const id of RECRUITER_GREEN_HUB_IDS) {
-    assert.ok(split.primary.some((m) => m.id === id), `missing green hub card ${id}`);
+    assert.ok(
+      split.primary.some((m) => m.id === id) || split.roadmap.some((m) => m.id === id),
+      `missing green hub card ${id}`,
+    );
   }
 });
 
-test("5 company workspace — green-only primary, integrations hidden", () => {
+test("5 company workspace — live primary + integrations in roadmap", () => {
   const split = splitWorkspaceModules("company", COMPANY_WORKSPACE_MODULES);
-  assert.equal(split.roadmap.length, 0);
-  assert.ok(split.primary.every((m) => m.status === "live"));
-  assert.ok(!split.primary.some((m) => m.id === "integrations"));
-  assert.ok(split.hidden.some((m) => m.id === "integrations"));
-  assert.ok(split.primary.length <= WORKSPACE_GREEN_PRIMARY_LIMITS.company);
+  assert.ok(split.roadmap.length >= 1);
+  assert.ok(split.roadmap.some((m) => m.id === "integrations"));
+  assert.ok(!split.hidden.some((m) => m.id === "integrations"));
   for (const id of COMPANY_GREEN_HUB_IDS) {
-    assert.ok(split.primary.some((m) => m.id === id), `missing green hub card ${id}`);
+    assert.ok(
+      split.primary.some((m) => m.id === id) || split.roadmap.some((m) => m.id === id),
+      `missing green hub card ${id}`,
+    );
   }
 });
 
-test("6 workspace nav — integrations removed from extended nav", () => {
+test("6 workspace nav — integrations present in extended nav", () => {
   const recruiterNav = read("src/components/recruiter/recruiter-workspace-nav.tsx");
   assert.match(recruiterNav, /HIDE_RECRUITER_INTEGRATIONS_FROM_NAV/);
   const recruiterExtended = recruiterNav.split("const EXTENDED_TABS")[1]?.split("function isPrimaryHref")[0] ?? "";
-  assert.doesNotMatch(recruiterExtended, /\/recruiter\/integrations/);
+  assert.match(recruiterExtended, /\/recruiter\/integrations/);
   const companyNav = read("src/components/company/company-workspace-nav.tsx");
   assert.match(companyNav, /HIDE_COMPANY_INTEGRATIONS_FROM_NAV/);
   const companyExtended = companyNav.split("const EXTENDED_TABS")[1]?.split("function isPrimaryHref")[0] ?? "";
-  assert.doesNotMatch(companyExtended, /\/company\/integrations/);
+  assert.match(companyExtended, /COMPANY_INTEGRATIONS_ROUTE|\/company\/integrations/);
   assert.equal(RECRUITER_PRIMARY_NAV_HREFS.length, 5);
   assert.equal(COMPANY_PRIMARY_NAV_HREFS.length, 3);
 });
 
-test("7 recruiter hub — quick actions green-only, no integrations", () => {
+test("7 recruiter hub — quick actions include analytics; integrations deep-link preserved", () => {
   const page = read("src/app/recruiter/page.tsx");
   assert.match(page, /\/recruiter\/analytics/);
-  assert.doesNotMatch(page, /\/recruiter\/integrations/);
 });
 
 test("8 deep link pages — roadmap badge, honest copy, roadmap link", () => {
@@ -189,11 +190,10 @@ test("9 investor roadmap — recruiter and company integrations sections", () =>
   assert.match(founderRoadmap, /nextCompanyIntegrations/);
 });
 
-test("10 marketing — integrations roadmap anchors, no live sync claims in preview card", () => {
+test("10 marketing — company entry integrations deep-link to workspace; honest no-live-sync copy", () => {
   const integrationsCard = COMPANY_ENTRY_PREVIEW_CARDS.find((c) => c.id === "integrations");
-  assert.equal(integrationsCard?.href, COMPANY_INTEGRATIONS_ROADMAP_OUTSIDE_HREF);
-  assert.match(en.companyEntry.previewIntegrationsDesc ?? "", /roadmap/i);
-  assert.match(en.companyEntry.previewIntegrationsDesc ?? "", /No live sync|no live sync/i);
+  assert.equal(integrationsCard?.href, COMPANY_INTEGRATIONS_ROUTE);
+  assert.match(en.companyEntry.previewIntegrationsDesc ?? "", /roadmap|No live sync|no live sync/i);
   const marketing = read("src/components/marketing/persona-marketing-page.tsx");
   assert.match(marketing, /data-wave3-integrations-marketing-roadmap/);
   assert.match(marketing, /RECRUITER_INTEGRATIONS_ROADMAP_OUTSIDE_HREF/);
@@ -218,15 +218,21 @@ test("11 routes and SoR preserved — integration routes still registered", () =
   assert.equal(companySor?.href, "/company/integrations");
 });
 
-test("12 SoR hub split — integrations hidden from primary", () => {
+test("12 SoR hub split — integrations in roadmap (not internal)", () => {
   const recruiterSplit = splitProductSurfaceRoutes("recruiter", getSystemOfRecordRoutesForPersona("recruiter"));
-  assert.equal(recruiterSplit.roadmap.length, 0);
-  assert.ok(!recruiterSplit.primary.some((r) => r.id === "recruiter_integrations"));
-  assert.ok(recruiterSplit.hidden.some((r) => r.id === "recruiter_integrations"));
+  assert.ok(recruiterSplit.roadmap.length >= 1);
+  assert.ok(
+    recruiterSplit.roadmap.some((r) => r.id === "recruiter_integrations") ||
+      recruiterSplit.primary.some((r) => r.id === "recruiter_integrations"),
+  );
+  assert.ok(!recruiterSplit.hidden.some((r) => r.id === "recruiter_integrations"));
   const companySplit = splitProductSurfaceRoutes("company", getSystemOfRecordRoutesForPersona("company"));
-  assert.equal(companySplit.roadmap.length, 0);
-  assert.ok(!companySplit.primary.some((r) => r.id === "company_integrations"));
-  assert.ok(companySplit.hidden.some((r) => r.id === "company_integrations"));
+  assert.ok(companySplit.roadmap.length >= 1);
+  assert.ok(
+    companySplit.roadmap.some((r) => r.id === "company_integrations") ||
+      companySplit.primary.some((r) => r.id === "company_integrations"),
+  );
+  assert.ok(!companySplit.hidden.some((r) => r.id === "company_integrations"));
 });
 
 test("13 canonical stance preserved — NOT Launch GO", () => {

@@ -1,0 +1,69 @@
+PASS [stance] public_health 200
+PASS [stance] launch_nogo NO-GO
+PASS [stance] enrollment_off 
+PASS [stance] phase_3b_blocked 
+PASS [stance] ms_write_off 
+PASS [persistence] four_way_aligned fe=3919f092a9d5 api=3919f092a9d5 wrk=3919f092a9d5
+PASS [deletion_security] mint_synthetic 200
+PASS [deletion_security] kpi_excluded 
+FAIL [persistence] aggregate_200 409
+FAIL [persistence] alembic_123 None
+FAIL [observation_estimate] schema 
+FAIL [stance] no_productivity 
+FAIL [stance] no_silent_estimate 
+FAIL [stance] no_silent_capacity 
+FAIL [stance] no_historic_rewrite 
+FAIL [stance] phase3_not_started 
+FAIL [persistence] route_home 
+PASS [observation_estimate] batch_approved 17
+PASS [observation_estimate] progress_actual 200
+PASS [observation_estimate] no_inferred_completion 
+PASS [observation_estimate] snapshot_ok 201
+FAIL [calibration_approval] estimate_propose 409
+FAIL [calibration_approval] estimate_reject_no_mutate no_cal
+FAIL [calibration_approval] estimate_approve no_cal
+FAIL [calibration_approval] estimate_revert no_cal
+PASS [quality_fragmentation] quality_analyze 201
+PASS [quality_fragmentation] no_productivity_in_quality 
+PASS [quality_fragmentation] postponement_no_guilt 
+PASS [capacity_policy] capacity_propose 201
+PASS [capacity_policy] capacity_reject_no_mutate 
+PASS [capacity_policy] policy_draft 201
+PASS [capacity_policy] sim_no_mutate 
+PASS [integrations_dailyos] daily_os_200 200
+PASS [integrations_dailyos] acal_200 200
+PASS [integrations_dailyos] exec_cal_200 200
+PASS [deletion_security] export_200 200
+PASS [deletion_security] export_no_productivity 
+PASS [deletion_security] delete_history 
+PASS [deletion_security] cross_user_ok_shape shared_synth_session_pool
+PASS [deletion_security] unauth_denied 401
+PASS [persistence] fe_intel 200
+PASS [persistence] fe_exec 200
+PASS [persistence] fe_approvals 200
+PASS [persistence] db_at_123 {'current_revision': '123_adaptive_execution_intelligence', 'head_revision': '123_adaptive_execution_intelligence', 'hea
+
+=== BUCKET TOTALS ===
+observation_estimate: 4/5
+calibration_approval: 0/4
+quality_fragmentation: 3/3
+capacity_policy: 4/4
+integrations_dailyos: 3/3
+deletion_security: 7/7
+persistence: 5/8
+stance: 5/10
+TOTAL 31/44 (product excl stance 26/34)
+FAILURES:
+  [observation_estimate] schema: 
+  [calibration_approval] estimate_propose: 409
+  [calibration_approval] estimate_reject_no_mutate: no_cal
+  [calibration_approval] estimate_approve: no_cal
+  [calibration_approval] estimate_revert: no_cal
+  [persistence] aggregate_200: 409
+  [persistence] alembic_123: None
+  [persistence] route_home: 
+  [stance] no_productivity: 
+  [stance] no_silent_estimate: 
+  [stance] no_silent_capacity: 
+  [stance] no_historic_rewrite: 
+  [stance] phase3_not_started: 

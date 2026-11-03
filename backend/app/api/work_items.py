@@ -42,8 +42,13 @@ def get_work_items(
     company_slug: Annotated[str | None, Query()] = None,
     limit: Annotated[int, Query(ge=1, le=100)] = 50,
 ) -> dict:
-    _ = user
-    return list_work_items(db, persona_scope=persona_scope, company_slug=company_slug, limit=limit)
+    return list_work_items(
+        db,
+        user_id=user.id,
+        persona_scope=persona_scope,
+        company_slug=company_slug,
+        limit=limit,
+    )
 
 
 @router.post("", status_code=201)

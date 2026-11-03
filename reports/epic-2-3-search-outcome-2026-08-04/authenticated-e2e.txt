@@ -1,0 +1,106 @@
+PASS [stance] public_health 200
+PASS [stance] launch_nogo NO-GO
+PASS [stance] enrollment_off 
+PASS [stance] phase_3b_blocked 
+PASS [stance] ms_write_off 
+PASS [persistence] four_way_aligned fe=42b6cab1bda5 api=42b6cab1bda5 wrk=42b6cab1bda5
+PASS [security] mint_synthetic 200
+PASS [security] kpi_excluded 
+PASS [security] synthetic_ne_real 
+PASS [dailyos_acal_lifecycle] lifecycle_unpaused 200
+PASS [dailyos_acal_lifecycle] canonical_daily_os_not_404 /api/v1/candidates/me/career-copilot/daily -> 200
+PASS [dailyos_acal_lifecycle] canonical_daily_os_path /api/v1/candidates/me/career-copilot/daily
+PASS [dailyos_acal_lifecycle] daily_os_brief_live 200
+PASS [linkage_normalization] aggregate_200 200
+PASS [persistence] alembic_119 119_search_outcome_intelligence
+PASS [linkage_normalization] schema_v1 
+PASS [security] safety_fabricated_benchmarks_off False
+PASS [security] safety_hidden_denominators_off False
+PASS [security] safety_silent_stage_upgrade_off False
+PASS [security] safety_silent_weight_change_off False
+PASS [security] safety_silent_experiment_weights_off False
+PASS [security] safety_feedback_as_offer_off False
+PASS [security] safety_package_approval_as_submission_off False
+PASS [security] safety_rejection_from_delay_off False
+PASS [security] safety_causality_claims_off False
+PASS [security] safety_hiring_probability_off False
+PASS [security] safety_protected_attr_inference_off False
+PASS [security] safety_skill_mastery_inference_off False
+PASS [security] safety_automatic_activity_monitoring_off False
+PASS [security] safety_archived_cycles_spawn_tasks_off False
+PASS [security] safety_stale_thesis_after_evidence_delete_off False
+PASS [security] safety_daily_os_404_off False
+PASS [security] safety_search_leaks_off False
+PASS [security] safety_external_apply_off False
+PASS [security] safety_ats_write_off False
+PASS [security] safety_auto_apply_off False
+PASS [security] safety_microsoft_calendar_write_off False
+PASS [security] safety_workplace_monitoring_off False
+PASS [security] safety_public_outcome_analytics_off False
+PASS [security] phase_3_agent_not_started NOT_STARTED
+PASS [dailyos_acal_lifecycle] aggregate_canonical_daily_os /api/v1/candidates/me/career-copilot/daily
+PASS [linkage_normalization] taxonomy_no_silent_upgrade 200
+PASS [linkage_normalization] no_rejection_from_delay 
+PASS [linkage_normalization] linkage_create 201
+PASS [linkage_normalization] candidate_declared_provenance 
+PASS [linkage_normalization] feedback_not_offer 400
+PASS [linkage_normalization] package_not_submission 400
+PASS [linkage_normalization] external_confirmed_requires_source 400
+PASS [linkage_normalization] normalize_no_silent_upgrade 201
+PASS [funnel_ratios] funnel_refresh 200
+PASS [funnel_ratios] candidate_specific_wording 
+PASS [funnel_ratios] no_fabricated_benchmark 
+PASS [funnel_ratios] denominators_disclosed 
+PASS [funnel_ratios] unknowns_visible 
+PASS [funnel_ratios] no_rejection_from_delay_in_time 
+PASS [thesis_search_watch_source] components_200 200
+PASS [thesis_search_watch_source] no_causality 
+PASS [thesis_search_watch_source] no_skill_mastery_inference 
+PASS [thesis_search_watch_source] saved_search_quality_not_static_only_flag 
+PASS [thesis_search_watch_source] watchlist_quality_not_static_only_flag 
+PASS [thesis_search_watch_source] sources_field 
+PASS [thesis_search_watch_source] clusters_field 
+PASS [experiment_cycle] experiments_no_silent_weights 
+PASS [experiment_cycle] archived_cycles_no_spawn archived=0
+PASS [experiment_cycle] archive_cycle_live 200
+PASS [experiment_cycle] experiment_complete_no_weights 200
+PASS [experiment_cycle] inconclusive_allowed completed_without_weights
+PASS [evidence_effort_attribution] evidence_gaps 200
+PASS [evidence_effort_attribution] no_activity_monitoring 200
+PASS [evidence_effort_attribution] attribution_no_causality 200
+PASS [evidence_effort_attribution] conflicts_no_silent 200
+PASS [evidence_effort_attribution] feedback_not_offer_flag 201
+PASS [evidence_effort_attribution] unknowns_not_fabricated 200
+PASS [calibration_ranking] weekly_review 201
+PASS [calibration_ranking] monthly_review 201
+PASS [calibration_ranking] propose_calibration 201
+PASS [calibration_ranking] calibration_not_silent 
+PASS [calibration_ranking] preview_not_applied 200
+PASS [calibration_ranking] reject_no_ranking_change 200
+PASS [calibration_ranking] approve_ranking_change 200
+PASS [calibration_ranking] ranking_refresh 201
+PASS [calibration_ranking] no_calibration_bypass 
+PASS [calibration_ranking] revert_ok 200
+PASS [dailyos_acal_lifecycle] search_lab_daily_os_canonical /api/v1/candidates/me/career-copilot/daily
+PASS [deletion_privacy_recovery] evidence_invalidation 200
+PASS [deletion_privacy_recovery] export_safe 200
+PASS [deletion_privacy_recovery] delete_propagated 200
+PASS [security] unauth_denied 401
+PASS [persistence] db_at_head_119 {'current_revision': '119_search_outcome_intelligence', 'head_revision': '119_search_outcome_intelligence', 'head_revisi
+PASS [persistence] search_outcomes_route /dashboard/search-outcomes
+PASS [persistence] funnel_route /dashboard/search-outcomes?view=funnel
+PASS [persistence] history_route /dashboard/search-outcomes?view=history
+PASS [persistence] search_lab_route /dashboard/search-strategy
+---
+linkage_normalization: 10/10
+funnel_ratios: 6/6
+thesis_search_watch_source: 7/7
+experiment_cycle: 5/5
+evidence_effort_attribution: 6/6
+calibration_ranking: 10/10
+dailyos_acal_lifecycle: 6/6
+deletion_privacy_recovery: 3/3
+security: 28/28
+persistence: 7/7
+stance: 5/5
+TOTAL: 93/93

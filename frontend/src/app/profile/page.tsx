@@ -434,6 +434,7 @@ export default function ProfilePage() {
     const token = getToken();
     if (!token) return;
     const form = new FormData(e.currentTarget);
+    const currentPassword = String(form.get("current_password") || "");
     const newPassword = String(form.get("new_password") || "");
     const confirm = String(form.get("new_password_confirm") || "");
     if (newPassword !== confirm) {
@@ -442,12 +443,15 @@ export default function ProfilePage() {
     }
     setPasswordBusy(true);
     try {
+      const { issueStepUpToken, stepUpHeaders } = await import("@/lib/step-up");
+      const stepTok = await issueStepUpToken("CHANGE_PASSWORD", currentPassword);
       await apiFetch(
         "/api/v1/auth/me/password",
         {
           method: "PATCH",
+          headers: stepUpHeaders(stepTok),
           body: JSON.stringify({
-            current_password: String(form.get("current_password") || ""),
+            current_password: currentPassword,
             new_password: newPassword,
           }),
         },

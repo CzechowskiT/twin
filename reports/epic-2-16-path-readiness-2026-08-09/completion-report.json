@@ -1,0 +1,22 @@
+{
+  "epic": "2.16",
+  "schema_id": "twin.candidate_path_readiness/v1",
+  "contract_id": "candidate_path_readiness_v1",
+  "verdict_letter": "A",
+  "exact_verdict": "CANDIDATE-SELECTED PATH READINESS AND GUIDED RESOLUTION ROUTING CUSTOMER-USABLE — DETERMINISTIC REQUIRED-VERSUS-OPTIONAL PRODUCT BLOCKERS, SOURCE-LINKED EXPLANATIONS AND NON-MUTATING ROUTES TO CANONICAL EDITORS PRODUCTION-READY; CANARY CONTROL PLANE UNCHANGED",
+  "product_sha": "1f94f2dd451abb47d927132675fa2e2c7150b046",
+  "alignment_status": "ALIGNED",
+  "alembic": "132_candidate_path_readiness",
+  "ci_tip": "31302628681",
+  "canary_run_1": "BLOCKED_EXTERNALLY_NOT_EXECUTED",
+  "canary_invariant_diff": 0,
+  "recommends_best_path": false,
+  "person_employability_scores": false,
+  "eighth_primary_nav": false,
+  "first_value_satisfied_by_path_readiness": false,
+  "REAL_CANDIDATE_COMPREHENSION": "NOT_EVALUATED",
+  "REAL_CANDIDATE_USABILITY": "NOT_EVALUATED",
+  "REAL_CANDIDATE_VALUE": "NOT_EVALUATED",
+  "REAL_CANDIDATE_ADOPTION": "NOT_EVALUATED",
+  "REAL_CANDIDATE_RETENTION": "NOT_EVALUATED"
+}

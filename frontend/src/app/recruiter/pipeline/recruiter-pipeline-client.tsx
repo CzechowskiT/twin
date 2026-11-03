@@ -5,6 +5,7 @@ import { useCallback, useMemo, useState } from "react";
 
 import { useTranslation } from "@/components/language-provider";
 import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
+import { IntelligenceCompactCard } from "@/components/recruiter/intelligence-compact-card";
 import { RecruiterWorkspaceNav } from "@/components/recruiter/recruiter-workspace-nav";
 import type { TranslationKey } from "@/lib/i18n";
 import { Card, Shell } from "@/components/ui";
@@ -161,6 +162,10 @@ export function RecruiterPipelineClient() {
                               {t("recruiterPipeline.scheduledSlot")}: {scheduled}
                             </p>
                           ) : null}
+                          <IntelligenceCompactCard
+                            intelligence={row.intelligence}
+                            candidateId={row.candidate_id}
+                          />
                         </div>
                         <Link
                           href={`/recruiter/inbox?review=${row.application_id}`}

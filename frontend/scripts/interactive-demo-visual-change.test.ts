@@ -28,7 +28,7 @@ test("1 interactive flow config validates with no issues", () => {
   assert.deepEqual(validateInteractiveFlowConfig(), []);
 });
 
-test("2 motion beats target 1500ms within 1300–1700ms window", () => {
+test("2 motion beats target 1000ms within 900–1100ms window", () => {
   for (const [role, steps] of Object.entries(INTERACTIVE_FLOW_STEPS)) {
     const motionSteps = steps.filter((s) => s.durationMs > 0);
     assert.ok(motionSteps.length >= 5, `${role}: need >= 5 timed beats`);
@@ -50,7 +50,7 @@ test("2 motion beats target 1500ms within 1300–1700ms window", () => {
       `${role}: average beat ${avg}ms outside window`,
     );
   }
-  assert.equal(INTERACTIVE_FLOW_TARGET_BEAT_MS, 1_500);
+  assert.equal(INTERACTIVE_FLOW_TARGET_BEAT_MS, 1_000);
   assert.equal(INTERACTIVE_FLOW_MAX_STEP_MS, INTERACTIVE_FLOW_ABSOLUTE_MAX_MS);
 });
 

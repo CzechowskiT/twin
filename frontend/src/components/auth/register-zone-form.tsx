@@ -18,7 +18,10 @@ import { useOAuthProviderStatus } from "@/lib/use-oauth-provider-status";
 import type { LoginZone } from "@/lib/persona-auth";
 import { LOGIN_PATH, postRegisterPath } from "@/lib/persona-auth";
 
-type RegisterSuccessResponse = { access_token: string };
+type RegisterSuccessResponse = {
+  access_token: string;
+  refresh_token?: string | null;
+};
 
 type SessionPhase = "boot" | "anon" | "gone";
 
@@ -181,16 +184,30 @@ export function RegisterZoneForm({ zone }: { zone: LoginZone }) {
           marketing_emails_opt_in: form.get("marketing_emails_opt_in") === "on",
           ...attributionFromUrl,
           ...(referredRaw ? { referred_by_note: referredRaw.slice(0, 500) } : {}),
+          ...(searchParams.get("invite")
+            ? { invite_token: String(searchParams.get("invite")).slice(0, 128) }
+            : {}),
         }),
         },
         null,
       );
-      setToken(registered.access_token);
+      setToken(registered.access_token, registered.refresh_token || null);
       setSessionPersona(zone);
       setPersona(zone);
       router.push(safeNext);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("register.failed"));
+      const raw = err instanceof Error ? err.message : "";
+      if (raw.includes("registration_invite_only")) {
+        setError(t("register.inviteOnly"));
+      } else if (
+        raw.includes("invite_token_invalid") ||
+        raw.includes("invite_token_expired") ||
+        raw.includes("invite_token_revoked")
+      ) {
+        setError(t("register.inviteTokenInvalid"));
+      } else {
+        setError(raw || t("register.failed"));
+      }
     } finally {
       setLoading(false);
     }

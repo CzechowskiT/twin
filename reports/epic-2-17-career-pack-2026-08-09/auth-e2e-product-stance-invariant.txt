@@ -1,0 +1,38 @@
+PASS  stance/public_health
+PASS  stance/launch_nogo
+PASS  stance/enrollment_off
+PASS  stance/canary_inactive
+PASS  stance/activation_prepared
+PASS  stance/designation_0
+PASS  stance/caps_zero
+PASS  product/mint_synthetic — 200
+PASS  product/unauth_blocked — 401
+PASS  product/catalog_200 — 200
+PASS  product/schema
+PASS  product/two_types
+PASS  product/no_external
+PASS  product/no_llm
+PASS  product/not_first_value
+PASS  product/no_eighth_nav
+PASS  product/recipient_not_performed
+PASS  product/sensitive_email_off
+PASS  product/internal_not_selectable
+PASS  product/artifacts_200 — 200
+PASS  product/artifacts_not_fv
+PASS  product/create_draft — 200
+PASS  product/create_not_fv
+PASS  product/selection_ok — 200
+PASS  product/preview_awaiting — 200
+PASS  product/confirm_ready — 200
+PASS  product/download_zip — status=200 bytes=1719
+PASS  product/download_unauth_blocked — 401
+PASS  product/revoke_ok — 200
+PASS  product/download_after_revoke_blocked — 409
+PASS  product/delete_ok — 200
+PASS  product/send_absent — 404
+PASS  invariant/business_state_diff_0 — {}
+PASS  invariant/canary_ready_inactive
+PASS  invariant/designation_still_0
+PASS  invariant/activation_still_prepared
+
+product 25/25 stance 7/7 invariant 4/4

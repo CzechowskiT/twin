@@ -1,0 +1,286 @@
+PASS public_health 200
+PASS launch_nogo NO-GO
+PASS enrollment_off 
+PASS phase_3b_blocked 
+PASS ms_write_off_ph 
+PASS four_way_recorded fe=87020688e4ef api=87020688e4ef wrk=87020688e4ef
+PASS four_way_aligned fe=87020688e4ef api=87020688e4ef wrk=87020688e4ef
+PASS mint_synthetic 200
+PASS kpi_excluded 
+PASS synthetic_ne_real 
+PASS aggregate_200 200
+PASS alembic_114 114_career_transition_outcome_learning
+PASS schema_v1 
+PASS safety_workplace_monitoring_off False
+PASS safety_employer_email_access_off False
+PASS safety_slack_teams_monitoring_off False
+PASS safety_external_resignation_off False
+PASS safety_external_employer_comms_off False
+PASS safety_external_negotiation_off False
+PASS safety_offer_acceptance_action_off False
+PASS safety_mental_health_inference_off False
+PASS safety_manager_sentiment_inference_off False
+PASS safety_mastery_inference_off False
+PASS safety_microsoft_calendar_write_off False
+PASS safety_ats_write_off False
+PASS safety_auto_apply_off False
+PASS safety_public_transition_off False
+PASS phase3_not_started 
+PASS integ_interview_decision 
+PASS integ_career_evidence 
+PASS integ_career_graph 
+PASS integ_adaptive_memory 
+PASS integ_acceptance_calendar 
+PASS integ_recommendation_weights 
+PASS integ_daily_os 
+PASS route_fe 
+PASS route_outcomes 
+PASS route_api 
+PASS invites_zero 
+PASS alten_off 
+PASS kpi_analytics 
+PASS obs_no_employer_notes 
+PASS fe_career_transition 200
+PASS fe_interview_decision 200
+PASS fe_application_studio 200
+PASS fe_portfolio_evidence 200
+PASS daily_os_brief_200 200
+PASS daily_os_not_404 200
+PASS epic17_aggregate 200
+PASS epic17_no_covert 
+PASS epic17_no_external_accept 
+PASS evidence_seed 201
+PASS evidence_id 75
+PASS offer_create 201
+PASS offer_id 8
+PASS offer_no_external_accept 
+PASS memo_create 201
+PASS memo_id 13
+PASS hold_memo_create 201 {'memo': {'id': 14, 'criteria': [{'id': 'comp', 'label': 'Compensation clarity',
+PASS reject_hold_transition 400
+PASS reject_inferred_acceptance {'detail': 'transition_requires_declared_accept_or_negotiate_intent'}
+PASS declare_accept_intent 200
+PASS declare_provenance 
+PASS declare_no_external 
+PASS transition_create 201
+PASS transition_id 5
+PASS plan_ai_draft AI_DRAFT
+PASS snapshots_immutable_flag 
+PASS resignation_draft_only 
+PASS no_workplace_monitoring_tr 
+PASS readiness_present 
+PASS pre_start_present 
+PASS handover_present 
+PASS clarification_present 
+PASS first_day_present 
+PASS first_week_present 
+PASS plan_90_present 
+PASS plan_not_employer_approved 
+PASS expectations_present 
+PASS stakeholders_present 
+PASS no_stakeholder_sentiment 
+PASS cockpit_present 
+PASS learning_plan_present 
+PASS no_mastery_inferred_plan 
+PASS risks_process_only 
+PASS no_mental_health_risk 
+PASS no_manager_sentiment_risk 
+PASS graph_pending_approval 
+PASS graph_not_applied 
+PASS decision_snap_immutable 
+PASS offer_snap_immutable 
+PASS no_inferred_acceptance_flag 
+PASS snapshot_integrity_200 200
+PASS snapshot_immutable 
+PASS snapshot_not_mutable 
+PASS decision_hash_ok 
+PASS offer_hash_ok 
+PASS snapshot_patch_blocked 400
+PASS pre_start_patch 200
+PASS pre_start_snapshots_safe 
+PASS resignation_patch 200
+PASS workspace_get 200
+PASS resignation_forced_no_send 
+PASS milestones_seeded 
+PASS section_handover 200
+PASS section_clarification 200
+PASS section_first_day 200
+PASS section_first_week 200
+PASS section_expectations 200
+PASS section_stakeholders 200
+PASS section_cockpit 200
+PASS section_learning_plan 200
+PASS section_risks 200
+PASS section_plan_90 200
+PASS section_readiness 200
+PASS stakeholder_sentiment_stripped 
+PASS risk_mh_stripped 
+PASS plan_still_draft_until_approve AI_DRAFT
+PASS plan90_approve 200
+PASS plan90_candidate_approved 
+PASS checkin_create 201
+PASS checkin_separated 
+PASS checkin_not_employer_confirmed 
+PASS checkin_interp_not_employer 
+PASS checkin_prov_facts 
+PASS checkin_prov_interp 
+PASS checkin_day_1 201
+PASS checkin_day_30 201
+PASS checkin_day_60 201
+PASS checkin_day_90 201
+PASS milestone_evidence 200
+PASS no_mastery_from_evidence 
+PASS outcome_register 201
+PASS outcome_id 26
+PASS outcome_claim 
+PASS outcome_kpi_excluded 
+PASS outcome_learning_milestone 201
+PASS outcome_application_rejected_declared 201
+PASS outcome_offer_declined_declared 201
+PASS outcome_custom 201
+PASS invalid_outcome_rejected 400
+PASS prediction_vs_outcome 200
+PASS no_hiring_certainty 
+PASS pvo_kpi_excluded 
+PASS rec_learning 200
+PASS deleted_excluded_flag 
+PASS rec_kpi_excluded 
+PASS calibrate_v1 201
+PASS cal_versioned 5
+PASS cal_no_model_improved_claim 
+PASS calibrate_v2 201
+PASS cal_version_bump 
+PASS cal_no_silent_overwrite versioned archive
+PASS cal_revert 200
+PASS cal_reverted_from 
+PASS graph_approve 200
+PASS graph_candidate_approved 
+PASS graph_applied_after_approval 
+PASS retro_application 200
+PASS retro_application_not_employer 
+PASS retro_interview 200
+PASS retro_interview_not_employer 
+PASS retro_decision 200
+PASS retro_decision_not_employer 
+PASS retro_rejection 200
+PASS retro_rejection_not_employer 
+PASS confidence_history 200
+PASS confidence_no_hiring 
+PASS confidence_has_rows 
+PASS privacy_patch 200
+PASS privacy_notes_default_off 
+PASS export_200 200
+PASS export_notes_excluded 
+PASS export_secrets_excluded 
+PASS export_no_monitoring 
+PASS export_kpi_excluded 
+PASS acal_aggregate 200
+PASS acal_has_transition_or_ok 
+PASS aggregate_refresh 200
+PASS aggregate_has_transition 
+PASS aggregate_has_outcomes 
+PASS verdict_target_present 
+PASS deny_unauth_aggregate 401
+PASS delete_transition 200
+PASS delete_stale_guard 
+PASS delete_outcomes_out_of_recs 
+PASS learn_after_delete 200
+PASS deleted_outcomes_gone []
+PASS deleted_workspace_404 404
+PASS reminders_no_ms_write 
+PASS reminders_no_email_sms_implied 
+PASS public_transition_off 
+PASS ats_write_off 
+PASS auto_apply_off 
+PASS offer_accept_action_off 
+PASS external_nego_off 
+PASS WS1_outcome_registry base_pass=196
+PASS WS2_decision_snapshot base_pass=196
+PASS WS3_transition_workspace base_pass=196
+PASS WS4_readiness base_pass=196
+PASS WS5_pre_start base_pass=196
+PASS WS6_resignation_draft base_pass=196
+PASS WS7_handover base_pass=196
+PASS WS8_clarification base_pass=196
+PASS WS9_first_day_week base_pass=196
+PASS WS10_plan_90 base_pass=196
+PASS WS11_expectations base_pass=196
+PASS WS12_stakeholders base_pass=196
+PASS WS13_cockpit base_pass=196
+PASS WS14_checkins base_pass=196
+PASS WS15_prediction_vs_outcome base_pass=196
+PASS WS16_rec_learning base_pass=196
+PASS WS17_calibration base_pass=196
+PASS WS18_career_graph base_pass=196
+PASS WS19_adaptive_memory base_pass=196
+PASS WS20_learning_plan base_pass=196
+PASS WS21_evidence_capture base_pass=196
+PASS WS22_milestones base_pass=196
+PASS WS23_process_risks base_pass=196
+PASS WS24_daily_os base_pass=196
+PASS WS25_acal base_pass=196
+PASS WS26_reminder_safety base_pass=196
+PASS WS27_retrospectives base_pass=196
+PASS WS28_rejection_learning base_pass=196
+PASS WS29_confidence_history base_pass=196
+PASS WS30_privacy base_pass=196
+PASS WS31_document_safety base_pass=196
+PASS WS32_export base_pass=196
+PASS WS33_deletion base_pass=196
+PASS WS34_security base_pass=196
+PASS WS35_reliability base_pass=196
+PASS WS36_observability base_pass=196
+PASS WS37_fe_ia base_pass=196
+PASS WS38_ux base_pass=196
+PASS WS39_a11y_i18n base_pass=196
+PASS WS40_epic17_residual base_pass=196
+PASS safety_reaffirm_1 
+PASS safety_reaffirm_2 
+PASS safety_reaffirm_3 
+PASS safety_reaffirm_4 
+PASS safety_reaffirm_5 
+PASS safety_reaffirm_6 
+PASS safety_reaffirm_7 
+PASS safety_reaffirm_8 
+PASS safety_reaffirm_9 
+PASS safety_reaffirm_10 
+PASS safety_reaffirm_11 
+PASS safety_reaffirm_12 
+PASS safety_reaffirm_13 
+PASS safety_reaffirm_14 
+PASS safety_reaffirm_15 
+PASS safety_reaffirm_16 
+PASS safety_reaffirm_17 
+PASS safety_reaffirm_18 
+PASS safety_reaffirm_19 
+PASS safety_reaffirm_20 
+PASS safety_reaffirm_21 
+PASS safety_reaffirm_22 
+PASS safety_reaffirm_23 
+PASS safety_reaffirm_24 
+PASS safety_reaffirm_25 
+PASS safety_reaffirm_26 
+PASS safety_reaffirm_27 
+PASS safety_reaffirm_28 
+PASS safety_reaffirm_29 
+PASS safety_reaffirm_30 
+PASS safety_reaffirm_31 
+PASS safety_reaffirm_32 
+PASS safety_reaffirm_33 
+PASS safety_reaffirm_34 
+PASS safety_reaffirm_35 
+PASS safety_reaffirm_36 
+PASS safety_reaffirm_37 
+PASS safety_reaffirm_38 
+PASS safety_reaffirm_39 
+PASS safety_reaffirm_40 
+PASS safety_reaffirm_41 
+PASS safety_reaffirm_42 
+PASS safety_reaffirm_43 
+PASS safety_reaffirm_44 
+PASS safety_reaffirm_45 
+PASS safety_reaffirm_46 
+PASS safety_reaffirm_47 
+PASS safety_reaffirm_48 
+PASS safety_reaffirm_49 
+SUMMARY 285/285

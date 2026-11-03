@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { IntelligenceCompactCard } from "@/components/recruiter/intelligence-compact-card";
 import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
 import { RecruiterWorkspaceNav } from "@/components/recruiter/recruiter-workspace-nav";
 import { useTranslation } from "@/components/language-provider";
@@ -256,6 +257,14 @@ export default function RecruiterTalentPoolClient() {
                     {rec.skills && rec.skills.length > 0 ? (
                       <p className="twin-muted mt-1 text-xs">{rec.skills.slice(0, 5).join(" · ")}</p>
                     ) : null}
+                    <IntelligenceCompactCard
+                      intelligence={rec.intelligence}
+                      candidateId={
+                        rec.candidate_id && /^\d+$/.test(rec.candidate_id)
+                          ? Number(rec.candidate_id)
+                          : null
+                      }
+                    />
                     {rec.consent_visibility ? (
                       <p className="twin-muted mt-1 text-[10px] uppercase">{t("recruiterTalentPool.consentLabel")}: {rec.consent_visibility}</p>
                     ) : null}

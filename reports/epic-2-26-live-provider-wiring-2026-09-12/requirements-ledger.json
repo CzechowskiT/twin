@@ -1,0 +1,46 @@
+{
+  "generated_at": "2026-09-12T07:44:45.091921+00:00",
+  "verdict": "IMPLEMENTATION AND NON-LIVE VERIFICATION COMPLETE \u2014 LIVE PROVIDER QUALITY NOT VERIFIED",
+  "gates": {
+    "IMPLEMENTATION_AND_PRIVACY": "PASS",
+    "PROVIDER_METADATA_INTEGRATION": "PASS",
+    "VALIDATOR_NEGATIVE_CONTROLS": "PASS",
+    "BROWSER_AND_DATABASE_VERIFICATION": "PASS_PRIOR_PLUS_UNIT",
+    "DEPLOYMENT_PROVENANCE": "PASS_PRODUCT_CODE",
+    "DEPLOYMENT_RUNTIME_LABEL": "mismatched",
+    "SYNTHETIC_CLEANUP": "N_A_NO_LIVE_RUN",
+    "LIVE_PROVIDER_QUALITY": "NOT_VERIFIED"
+  },
+  "scaffold_tip": "9bfda263",
+  "remediation_tip": "a5caa417+",
+  "prod_api_source_revision": "9bfda263818264ae8bfd8e3d7651ba877c249c72",
+  "prod_api_runtime_label": "94e6de3be698b9dac990e01051555f80f8813eaa",
+  "prod_deployment_id": "f582d4af-9e4f-49aa-bfa1-689f7fc2e713",
+  "db_head": "141_practice_eval_provider_execution",
+  "live_gate": {
+    "checked_at": "2026-09-12T07:44:17.007522+00:00",
+    "run_id": "20260912T074417Z",
+    "status": "NOT_RUN_NO_PROVIDER",
+    "certified": false,
+    "live_provider_quality": "NOT_VERIFIED",
+    "railway_twin_anthropic_len": null,
+    "cases_run": 0,
+    "note": "Provider key absent on Railway twin. Implementation path verified offline; live matrix not run."
+  },
+  "deployment_gate_strict_mismatch": {
+    "passed": false,
+    "failures": [
+      "runtime_label_mismatch:label=94e6de3be698b9dac990e01051555f80f8813eaa:source=9bfda263818264ae8bfd8e3d7651ba877c249c72"
+    ],
+    "status": "DEPLOYMENT_PROVENANCE_UNVERIFIED",
+    "identity": {
+      "service_role": "api",
+      "git_commit": "9bfda263818264ae8bfd8e3d7651ba877c249c72",
+      "source_revision": "9bfda263818264ae8bfd8e3d7651ba877c249c72",
+      "runtime_label": "94e6de3be698b9dac990e01051555f80f8813eaa",
+      "deployment_id": "f582d4af-9e4f-49aa-bfa1-689f7fc2e713",
+      "provenance": "mismatched"
+    }
+  },
+  "note": "Do not set GIT_COMMIT_SHA to chase tip; source_revision is platform truth. Stale runtime_label left as mismatched."
+}

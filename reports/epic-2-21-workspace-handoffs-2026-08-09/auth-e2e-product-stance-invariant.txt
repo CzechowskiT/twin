@@ -1,0 +1,36 @@
+PASS  stance/public_health
+PASS  stance/launch_nogo
+PASS  stance/enrollment_off
+PASS  stance/canary_inactive
+PASS  stance/activation_prepared
+PASS  stance/designation_0
+PASS  stance/caps_zero
+PASS  product/mint_synthetic — 200
+PASS  product/catalog — 200
+PASS  product/schema
+PASS  product/parallel_none
+PASS  product/no_mutations_layer
+PASS  product/not_fv
+PASS  product/continuity_sole
+PASS  product/journey_a_batch — 200
+PASS  product/journey_a_create — 200
+PASS  security/handle_opaque
+PASS  product/journey_a_resolve — 200
+PASS  product/journey_a_path_create — 200
+PASS  product/journey_a_path_resolve — 200
+PASS  product/journey_b_workspace — 201
+PASS  product/journey_b_studio_pack — 200
+PASS  product/journey_b_resolve_pack — 200
+PASS  product/journey_b_pack — 200
+PASS  product/journey_b_pack_access — 200
+PASS  product/journey_b_resolve_access — 200
+PASS  security/not_allowlisted — 400
+PASS  security/auth_required — 401
+PASS  security/dest_mismatch — 400
+PASS  product/synthetic_cleanup
+PASS  invariant/business_state_diff_0 — {}
+PASS  invariant/canary_ready_inactive
+PASS  invariant/designation_still_0
+PASS  invariant/activation_still_prepared
+
+product 19/19 stance 7/7 security 4/4 invariant 4/4

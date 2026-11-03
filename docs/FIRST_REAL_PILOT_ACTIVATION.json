@@ -1,0 +1,82 @@
+{
+  "schema": "twin.first_real_pilot_activation/v1",
+  "updated_at": "2026-07-24T09:30:00Z",
+  "branch": "cursor/phase1-monorepo-scaffold",
+  "program": "First Approved Real Pilot Organization Activation",
+  "verdict_without_complete_approval": "FIRST REAL PILOT ORGANIZATION APPROVAL REQUIRED — ACTIVATION SYSTEM READY",
+  "allowed_outcomes": [
+    "FIRST REAL PILOT ORGANIZATION APPROVAL REQUIRED — ACTIVATION SYSTEM READY",
+    "FIRST REAL PILOT ORGANIZATION APPROVED — ACTIVATION PACK READY AND UNSENT",
+    "FIRST REAL PILOT ORGANIZATION INVITATIONS SENT — AWAITING USER ACTIVATION",
+    "FIRST REAL PILOT ORGANIZATION ACTIVATED — CONTROLLED PILOT ACTIVE",
+    "FIRST REAL PILOT ORGANIZATION ACTIVATION BLOCKED — CUSTOMER-USABLE JOURNEY REGRESSION"
+  ],
+  "approval_search": {
+    "db_approved_real_orgs": 0,
+    "signed_file": null,
+    "approved_config": null,
+    "structured_founder_input": null,
+    "result": "NO_COMPLETE_APPROVAL"
+  },
+  "intake_required_fields": [
+    "slug",
+    "display_name",
+    "legal_name",
+    "sponsor_label",
+    "approved_by_label",
+    "founder_org_approval_ref",
+    "recipient_emails"
+  ],
+  "send_requires": [
+    "FOUNDER_APPROVED_non_synthetic",
+    "invitation_pack_READY_UNSENT",
+    "send_safety_gate_PASS",
+    "founder_send_approval_ref_min_8"
+  ],
+  "missing_inputs_exact": [
+    "founder_approved_real_organization",
+    "legal_name",
+    "sponsor_label",
+    "founder_org_approval_ref",
+    "named_recipient_emails",
+    "approved_by_label",
+    "organization_candidate_record"
+  ],
+  "frozen": {
+    "launch": "NO-GO",
+    "enrollment": "OFF",
+    "phase_3b": "BLOCKED",
+    "public_registration": "INVITE_ONLY",
+    "stripe_public": "NOT_LIVE",
+    "ats_write": "OFF",
+    "ms_write": "OFF",
+    "mass_outreach": "FORBIDDEN"
+  },
+  "kpi": {
+    "token": "NO_REAL_PILOT_DATA",
+    "real_pilot_data_started": false,
+    "real_customer_validated": false,
+    "synthetic_excluded_from_real_kpi": true
+  },
+  "journey": {
+    "id": "company_recruiter_candidate_pipeline",
+    "customer_usable": true,
+    "synthetic_smoke": "19/19",
+    "real_validation_score": 0
+  },
+  "surfaces": {
+    "pilot_os_ui": "/admin/pilot-os",
+    "status_api": "GET /api/v1/admin/pilot-os/status",
+    "send_safety_api": "GET /api/v1/admin/pilot-os/invitation-packs/{id}/send-safety",
+    "alembic": "102_first_real_pilot_intake"
+  },
+  "hard_bans": [
+    "no_invented_org_sponsor_recipient_approval",
+    "no_send_without_founder_send_approval_ref",
+    "no_real_invites_as_tests",
+    "no_synthetic_as_real_evidence",
+    "no_launch_go",
+    "no_public_enrollment"
+  ],
+  "next_founder_action": "Provide complete structured intake via /admin/pilot-os (legal_name, sponsor_label, founder_org_approval_ref ≥8, approved_by_label, named recipient emails, org slug/display_name). Do not authorize send until pack is READY_UNSENT and send-safety PASS."
+}

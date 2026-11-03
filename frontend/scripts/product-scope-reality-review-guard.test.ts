@@ -65,8 +65,8 @@ test("4 logo disclaimer three options with recommendation", () => {
   assert.match(content, /LOGO_DISCLAIMER_RECOMMENDATION: Option_1_keep/);
   const marquee = readFrontend("src/components/site-top-marquee.tsx");
   const siteMessages = readFrontend("src/lib/site-messages.ts");
-  assert.match(marquee, /site\.marqueeLogoDisclaimer/);
-  assert.match(siteMessages, /marqueeLogoDisclaimer/);
+  assert.doesNotMatch(marquee, /site\.marqueeLogoDisclaimer/);
+  assert.doesNotMatch(siteMessages, /marqueeLogoDisclaimer/);
 });
 
 test("5 public launch and controlled pilot recommendations present", () => {

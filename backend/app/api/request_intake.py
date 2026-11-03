@@ -33,8 +33,7 @@ def get_intake(
     user: User = Depends(get_current_user),
     limit: Annotated[int, Query(ge=1, le=100)] = 50,
 ) -> dict:
-    _ = user
-    return list_request_intake(db, limit=limit)
+    return list_request_intake(db, user_id=user.id, limit=limit)
 
 
 @router.post("", status_code=201)

@@ -73,8 +73,15 @@ def user_plan_tier(user: User) -> PlanTier:
     return effective_plan_tier(user)
 
 
+def sandbox_profile_edit_allowed(user: User) -> bool:
+    """Internal/smoke accounts may edit profile+CV without public Stripe Standard+."""
+    return bool(getattr(user, "exclude_from_product_metrics", False))
+
+
 def feature_allowed(user: User, feature: Feature) -> bool:
     """True when user's effective tier meets feature minimum."""
+    if feature == Feature.PROFILE_EDIT and sandbox_profile_edit_allowed(user):
+        return True
     required = _FEATURE_MIN_TIER.get(feature, PlanTier.FREE)
     return _tier_rank(user_plan_tier(user)) >= _tier_rank(required)
 

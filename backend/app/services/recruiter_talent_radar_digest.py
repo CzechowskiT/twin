@@ -518,29 +518,32 @@ def build_recruiter_talent_radar_digest(
                 }
             )
 
+    # list_company_jobs returns serialized dicts (id/title), not ORM rows.
     jobs = list_company_jobs(db, company_slug=slug, limit=50)
     low_coverage_roles: list[dict] = []
     role_counts: dict[int, list[dict]] = {}
     for s in suggestions:
         jid = None
         for j in jobs:
-            if j.title == s.get("job_title"):
-                jid = j.id
+            if j.get("title") == s.get("job_title"):
+                jid = int(j["id"])
                 break
         key = jid or 0
         role_counts.setdefault(key, []).append(s)
 
     for job in jobs:
-        if job_id and job.id != job_id:
+        j_id = int(job["id"])
+        j_title = str(job.get("title") or "")
+        if job_id and j_id != job_id:
             continue
-        rows_for_job = role_counts.get(job.id, [])
+        rows_for_job = role_counts.get(j_id, [])
         low_conf = sum(1 for r in rows_for_job if r.get("data_confidence") == "low")
         missing_heavy = sum(1 for r in rows_for_job if len(r.get("missing_data") or []) >= 2)
         dismissed_for_role = sum(
             1
             for d in period_decisions
             if d.get("action_type") == "dismissed"
-            and (d.get("meta") or {}).get("job_id") == str(job.id)
+            and (d.get("meta") or {}).get("job_id") == str(j_id)
         )
         if len(rows_for_job) >= 3 and low_conf < len(rows_for_job) // 2 and missing_heavy < 2:
             continue
@@ -557,8 +560,8 @@ def build_recruiter_talent_radar_digest(
             )
         low_coverage_roles.append(
             {
-                "jobId": str(job.id),
-                "roleTitle": job.title,
+                "jobId": str(j_id),
+                "roleTitle": j_title,
                 "candidateCount": len(rows_for_job),
                 "coverageWarning": warning,
                 "recommendedNextAction": "refine_role_criteria",

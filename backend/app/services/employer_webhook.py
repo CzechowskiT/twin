@@ -26,6 +26,13 @@ def dispatch_auto_apply_webhook(
     url = (settings.employer_webhook_url or "").strip()
     if not url:
         return
+    try:
+        from app.services.url_safety import assert_public_https_url
+
+        assert_public_https_url(url)
+    except ValueError:
+        logger.warning("employer webhook URL blocked by SSRF guard")
+        return
     secret = (settings.employer_webhook_secret or "").strip()
     payload: dict[str, Any] = {
         "event": "twin.auto_apply.finished",

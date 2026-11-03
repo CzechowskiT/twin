@@ -1,0 +1,53 @@
+PASS  A service
+PASS  A constants
+PASS  A api
+PASS  A alembic 134
+PASS  A fe panel
+PASS  B PARALLEL none
+PASS  B revises 133
+PASS  B additive only
+PASS  B no parallel table
+PASS  C flow CANDIDATE_PATH_READINESS
+PASS  C flow CANDIDATE_IMPORT_REVIEW
+PASS  C flow DATA_TRUST_REVIEW
+PASS  C flow CAREER_PACK_DRAFT
+PASS  C flow APPLICATION_STUDIO_DRAFT
+PASS  C flow LIFECYCLE_APPROVAL_REVIEW
+PASS  D journey schema
+PASS  D adapter contract
+PASS  D safe resume
+PASS  E route keys
+PASS  E no arbitrary url resume
+PASS  F stale_client_revision
+PASS  F source_revision_changed
+PASS  F SAFE_REVIEW
+PASS  F EXACT_CHECKPOINT
+PASS  G pin
+PASS  G pause
+PASS  G clear
+PASS  G invalidate
+PASS  H not first value
+PASS  H no reminders
+PASS  H no surveillance
+PASS  H no 8th nav
+PASS  H explicit checkpoint
+PASS  I primary 7
+PASS  I home panel
+PASS  I preview without panel
+PASS  J path readiness owns semantics
+PASS  J mutates_on_resume false
+PASS  J data trust cannot resolve
+PASS  K adapter_matrix
+PASS  K unit tests
+PASS  K fe guard
+PASS  K no canary ddl
+PASS  K no invite ddl
+PASS  K no dual-write table
+PASS  stance launch NO-GO
+PASS  stance enrollment OFF
+PASS  stance canary inactive
+PASS  stance activation prepared
+PASS  stance designation 0
+PASS  stance canary cap 0
+
+51 passed, 0 failed

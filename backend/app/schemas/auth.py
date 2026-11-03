@@ -34,6 +34,11 @@ class UserRegister(BaseModel):
         max_length=128,
         description="Optional share token (same as referrer's referral_public_token); also sendable as ?ref= on /register.",
     )
+    invite_token: str | None = Field(
+        default=None,
+        max_length=128,
+        description="Candidate-first pilot invite token (Founder-authorized send).",
+    )
 
 
 class UserLogin(BaseModel):
@@ -55,13 +60,45 @@ class ChangePasswordRequest(BaseModel):
     new_password: str = Field(min_length=8, max_length=128)
 
 
+class StepUpIssueIn(BaseModel):
+    purpose: str = Field(min_length=3, max_length=64)
+    password: str = Field(min_length=1, max_length=128)
+
+
 class VerifyEmailRequest(BaseModel):
     token: str = Field(min_length=1, max_length=512)
 
 
 class Token(BaseModel):
-    access_token: str
+    access_token: str | None = None
     token_type: str = "bearer"
+    refresh_token: str | None = None
+    session_key: str | None = None
+    managed: bool = False
+    # Epic 2.24 — MFA challenge path (pre-auth; no candidate API access)
+    mfa_required: bool = False
+    mfa_challenge_token: str | None = None
+    mfa_methods: list[str] = Field(default_factory=list)
+    assurance_level: str | None = None
+    pre_auth_only: bool = False
+
+
+class MfaChallengeCompleteIn(BaseModel):
+    mfa_challenge_token: str = Field(min_length=16, max_length=512)
+    totp_code: str | None = Field(default=None, max_length=16)
+    recovery_code: str | None = Field(default=None, max_length=64)
+
+
+class MfaEnrollVerifyIn(BaseModel):
+    code: str = Field(min_length=6, max_length=16)
+
+
+class RefreshIn(BaseModel):
+    refresh_token: str = Field(min_length=16, max_length=512)
+
+
+class LogoutIn(BaseModel):
+    everywhere: bool = False
 
 
 class GdprConsentIn(BaseModel):
@@ -126,6 +163,7 @@ class UserOut(BaseModel):
     google_calendar_oauth_configured: bool = False
     microsoft_calendar_oauth_configured: bool = False
     onboarding_completed_at: datetime | None = None
+    onboarding_step: str | None = None
     email_verified_at: datetime | None = None
     email_verified: bool = False
     has_password_login: bool = False
@@ -160,14 +198,23 @@ class UserOut(BaseModel):
                 user, "profile_documents_processing_consent_at", None
             ),
             onboarding_completed_at=getattr(user, "onboarding_completed_at", None),
+            onboarding_step=getattr(user, "onboarding_step", None),
             email_verified_at=getattr(user, "email_verified_at", None),
             email_verified=getattr(user, "email_verified_at", None) is not None,
             has_password_login=bool(getattr(user, "hashed_password", None)),
         )
 
 
+class OnboardingProgressIn(BaseModel):
+    step: str = Field(..., min_length=1, max_length=64)
+    progress: dict | None = None
+
+
 class UserRegisteredOut(UserOut):
     """Password registration response: profile plus bearer token (avoids a second login request)."""
 
     access_token: str
+    refresh_token: str | None = None
+    session_key: str | None = None
+    managed: bool = False
     token_type: str = "bearer"

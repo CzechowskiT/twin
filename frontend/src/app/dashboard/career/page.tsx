@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
+import { IaActionableEmpty } from "@/components/dashboard/ia-actionable-empty";
 import { CandidateReadinessFlowBanner } from "@/components/candidate/candidate-readiness-flow-banner";
 import { WorkspaceStatusBadge } from "@/components/workspace/workspace-status-badge";
 import { useTranslation } from "@/components/language-provider";
@@ -21,6 +22,8 @@ import {
   formsEqual,
   validateForm,
 } from "@/lib/candidate-career-compass";
+import { CareerCopilotPanel } from "@/components/career/career-copilot-panel";
+import { DailyCareerOsPanel } from "@/components/career/daily-career-os-panel";
 import { CAREER_COMPASS_SHIP_STATUS } from "@/lib/seven-day-d2-candidate";
 import type { TranslationKey } from "@/lib/i18n";
 
@@ -195,6 +198,8 @@ export default function CareerCompassPage() {
 
       <CandidateReadinessFlowBanner context="career_brief" />
 
+      <IaActionableEmpty areaId="direction" show />
+
       <Card variant="soft" className="mb-6" data-career-compass-completion>
         <p className="text-sm leading-relaxed text-[var(--twin-muted-strong)]">{t("dashboard.careerCompassPageLead")}</p>
         <div className="mt-4">
@@ -214,6 +219,9 @@ export default function CareerCompassPage() {
           </div>
         </div>
       </Card>
+
+      <DailyCareerOsPanel />
+      <CareerCopilotPanel />
 
       {error ? (
         <Card variant="soft" className="mb-4 border-red-200 bg-red-50/50">

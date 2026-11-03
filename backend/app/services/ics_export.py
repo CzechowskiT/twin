@@ -19,17 +19,29 @@ def _utc_stamp(dt: datetime) -> str:
     return dt.strftime("%Y%m%dT%H%M%SZ")
 
 
-def scheduled_interview_to_ics(row: ScheduledInterview) -> str:
-    """Build a minimal PUBLISH calendar with one VEVENT (stable UID per interview id)."""
+def scheduled_interview_to_ics(
+    row: ScheduledInterview,
+    *,
+    cancelled: bool | None = None,
+    sequence: int = 0,
+) -> str:
+    """Build a minimal calendar with one VEVENT (stable UID per interview id).
+
+    When cancelled (explicit or row.status == cancelled), emit METHOD:CANCEL + STATUS:CANCELLED
+    so Apple/Outlook/Google can drop the hold without a separate provider write.
+    """
     uid = f"twin-interview-{row.id}@twin"
     summary = _ics_escape(f"{row.company_name} — {row.job_title}")
     tz_label = (getattr(row, "timezone", None) or "").strip() or "UTC"
     type_label = (getattr(row, "interview_type", None) or "").strip() or "video"
+    is_cancelled = bool(cancelled) or (getattr(row, "status", None) or "").lower() == "cancelled"
     parts_desc = [
         f"Interview: {row.job_title} at {row.company_name}",
         f"Timezone: {tz_label}",
         f"Interview type: {type_label}",
     ]
+    if is_cancelled:
+        parts_desc.append("Status: CANCELLED")
     if row.meeting_link and row.meeting_link.strip():
         parts_desc.append(f"Link: {row.meeting_link.strip()}")
     elif row.meeting_location and row.meeting_location.strip():
@@ -44,18 +56,23 @@ def scheduled_interview_to_ics(row: ScheduledInterview) -> str:
     dtstamp = _utc_stamp(datetime.now(timezone.utc))
     dtstart = _utc_stamp(row.interview_start)
     dtend = _utc_stamp(row.interview_end)
+    method = "CANCEL" if is_cancelled else "PUBLISH"
+    event_status = "CANCELLED" if is_cancelled else "CONFIRMED"
+    seq = max(0, int(sequence))
 
     lines = [
         "BEGIN:VCALENDAR",
         "VERSION:2.0",
         "PRODID:-//TWIN//Interview//EN",
         "CALSCALE:GREGORIAN",
-        "METHOD:PUBLISH",
+        f"METHOD:{method}",
         "BEGIN:VEVENT",
         f"UID:{uid}",
         f"DTSTAMP:{dtstamp}",
         f"DTSTART:{dtstart}",
         f"DTEND:{dtend}",
+        f"SEQUENCE:{seq}",
+        f"STATUS:{event_status}",
         f"SUMMARY:{summary}",
         f"DESCRIPTION:{description}",
     ]

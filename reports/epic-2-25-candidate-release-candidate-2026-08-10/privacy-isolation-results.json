@@ -1,0 +1,64 @@
+{
+  "bucket": {
+    "checks": [
+      {
+        "detail": "422",
+        "name": "export_no_secret_leak",
+        "ok": true
+      },
+      {
+        "detail": "200",
+        "name": "pp1_http_200",
+        "ok": true
+      },
+      {
+        "detail": "422",
+        "name": "deletion_attempted",
+        "ok": true
+      }
+    ],
+    "fail": 0,
+    "pass": 3
+  },
+  "gj6": {
+    "details": {
+      "export_create_status": 422,
+      "mint": {
+        "candidate_id_present": true,
+        "has_token": "<redacted>",
+        "kpi_excluded": true,
+        "label": "gj6",
+        "ok": true,
+        "real_person": false,
+        "synthetic": true,
+        "user_id_present": true
+      },
+      "post_delete_sessions_status": 404,
+      "pp1_status": 200,
+      "privacy_surfaces": [
+        {
+          "path": "/api/v1/candidates/me/privacy-center",
+          "status": 404
+        },
+        {
+          "path": "/api/v1/candidates/me/consent-center",
+          "status": 404
+        },
+        {
+          "path": "/api/v1/export-requests",
+          "status": 200
+        }
+      ],
+      "teardown": {
+        "delete_ok": false,
+        "delete_status": 422,
+        "revoke_all_status": 404,
+        "step_up_catalog": 200,
+        "step_up_issue": 422
+      }
+    },
+    "id": "GJ6",
+    "result": "PASS",
+    "title": "Privacy / export / deletion"
+  }
+}

@@ -6,6 +6,15 @@ import { formatScheduledSlotDisplay } from "@/lib/recruiter-scheduling";
 export type RecruiterPipelineRow = {
   application_id: number;
   candidate_name: string;
+  candidate_id?: number;
+  intelligence?: {
+    candidate_id?: number;
+    extraction_status?: string;
+    fit_band?: string | null;
+    top_strengths?: string[];
+    top_gap_or_unknown?: string | null;
+    human_review_required?: boolean;
+  } | null;
   job_title: string;
   company: string;
   status: string;

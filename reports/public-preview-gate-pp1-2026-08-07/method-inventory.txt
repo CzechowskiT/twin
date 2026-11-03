@@ -1,0 +1,14 @@
+METHOD INVENTORY /preview
+GET 200
+HEAD 200
+OPTIONS 200
+POST 405
+PUT 405
+PATCH 405
+DELETE 405
+
+scenario ok=200
+scenario bad=404
+dashboard=200 cache=cache-control: private, no-store, max-age=0, must-revalidate
+me=404
+api_me=404

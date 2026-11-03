@@ -1,0 +1,28 @@
+PASS  health_200 — 200
+PASS  launch_nogo
+PASS  enrollment_off
+PASS  canary_inactive
+PASS  caps_zero
+PASS  des_get_200 — 200
+PASS  start_count_zero_or_known — 0
+PASS  unauth_blocked — 401
+PASS  reject_fixture — 400
+PASS  designate_200 — 200
+PASS  designated_ready — DESIGNATED_READY
+PASS  gate_designation_true
+PASS  masked_only
+PASS  no_plaintext_in_response
+PASS  control_embeds_des — 200
+PASS  still_not_active
+PASS  activation_not_executed
+PASS  invites_still_zero
+PASS  preflight_200 — 200
+PASS  preflight_no_activate
+PASS  preflight_has_des_id
+PASS  revoke_200 — 200
+PASS  teardown_count_zero — 0
+PASS  teardown_not_designated
+PASS  final_count_zero
+PASS  pp1_preview_200 — 200
+
+Canary designation E2E: 26 pass / 0 fail

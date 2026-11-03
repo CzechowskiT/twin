@@ -75,7 +75,29 @@ def execute_candidate_account_deletion(
     if not user.is_active:
         raise ValueError("Account already deleted or inactive")
 
+    held = (
+        db.query(CandidatePrivacyRequest)
+        .filter(
+            CandidatePrivacyRequest.candidate_id == candidate.id,
+            CandidatePrivacyRequest.legal_hold.is_(True),
+        )
+        .first()
+    )
+    if held is not None:
+        raise ValueError("legal_hold_blocks_self_service_deletion")
+
     deleted_at = _utcnow()
+    try:
+        from app.services import pilot_support_ops as support_ops
+
+        support_ops.soft_delete_all_for_candidate(db, candidate_id=candidate.id)
+        from app.services import guided_first_value as gfv
+        from app.services import isolated_demo as demo
+
+        gfv.soft_delete_for_candidate(db, candidate_id=candidate.id)
+        demo.soft_delete_for_candidate(db, candidate_id=candidate.id)
+    except Exception:
+        pass
     _anonymize_candidate(candidate)
     _anonymize_user(user)
 

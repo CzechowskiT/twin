@@ -29,18 +29,19 @@ export function RecruiterInboxScene() {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const enter = spring({ frame, fps, config: { damping: 16, stiffness: 90 } });
-  const score = Math.round(interpolate(frame, [10, 55], [61, 94], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }));
-  const showTags = frame > 40;
-  const showMetrics = frame > 55;
-  const invited = frame >= 140;
+  // ~1s cadence (30fps): queue → tags → metrics → invite
+  const score = Math.round(interpolate(frame, [5, 35], [61, 94], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }));
+  const showTags = frame > 30;
+  const showMetrics = frame > 45;
+  const invited = frame >= 90;
   const neonPulse = interpolate(frame % 40, [0, 20, 40], [0.35, 0.7, 0.35]);
 
   const cursor = useCursorPath([
-    { frame: 25, x: 280, y: 280 },
-    { frame: 70, x: 920, y: 360 },
-    { frame: 110, x: 780, y: 720 },
-    { frame: 140, x: 780, y: 720, click: true },
-    { frame: 190, x: 1400, y: 420 },
+    { frame: 15, x: 280, y: 280 },
+    { frame: 40, x: 920, y: 360 },
+    { frame: 70, x: 780, y: 720 },
+    { frame: 90, x: 780, y: 720, click: true },
+    { frame: 120, x: 1400, y: 420 },
   ]);
 
   return (
@@ -79,7 +80,7 @@ export function RecruiterInboxScene() {
                 ...rowStyle,
                 borderColor: item.active ? FILM.cyan : "rgba(148,163,184,0.18)",
                 boxShadow: item.active ? `0 0 14px ${FILM.cyan}33` : "none",
-                opacity: interpolate(frame, [i * 8, i * 8 + 18], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
+                opacity: interpolate(frame, [i * 12, i * 12 + 14], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
               }}
             >
               <Avatar initials={item.name.slice(0, 2).toUpperCase()} />
@@ -115,7 +116,7 @@ export function RecruiterInboxScene() {
               style={{
                 fontSize: 13,
                 marginTop: 4,
-                opacity: frame > 35 + i * 8 ? 1 : 0.15,
+                opacity: frame > 22 + i * 6 ? 1 : 0.15,
               }}
             >
               <span style={{ color: FILM.neon, fontWeight: 700, marginRight: 6 }}>✓</span>
@@ -164,14 +165,14 @@ export function RecruiterInboxScene() {
               style={{
                 ...btnNeon,
                 boxShadow: invited ? `0 0 18px ${FILM.neon}88` : `0 0 ${18 + neonPulse * 14}px ${FILM.neon}99`,
-                transform: frame >= 135 && frame < 150 ? "scale(0.96)" : "scale(1)",
+                transform: frame >= 85 && frame < 100 ? "scale(0.96)" : "scale(1)",
               }}
             >
               {invited ? "Invite sent ✓" : "Invite to interview"}
             </button>
             <button type="button" style={{ ...btnGhost, pointerEvents: "none" }}>Decline</button>
           </div>
-          <SuccessFlash startFrame={140} />
+          <SuccessFlash startFrame={90} />
         </main>
 
         {/* Score */}
@@ -189,7 +190,7 @@ export function RecruiterInboxScene() {
                   <div style={{ height: 6, borderRadius: 99, background: "#1e293b", marginTop: 4, overflow: "hidden" }}>
                     <div
                       style={{
-                        width: `${interpolate(frame, [55, 90], [0, m.value], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })}%`,
+                        width: `${interpolate(frame, [45, 70], [0, m.value], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })}%`,
                         height: "100%",
                         borderRadius: 99,
                         background: `linear-gradient(90deg, ${FILM.blue}, ${FILM.cyan})`,
@@ -244,9 +245,9 @@ export function RecruiterInboxScene() {
       >
         {[
           { label: "Inbox", done: true },
-          { label: "Review", done: frame > 40 },
+          { label: "Review", done: frame > 25 },
           { label: "Score", done: showMetrics },
-          { label: "Decision", active: !invited && frame > 100, done: invited },
+          { label: "Decision", active: !invited && frame > 65, done: invited },
           { label: "Interview", active: invited },
         ].map((s) => (
           <div

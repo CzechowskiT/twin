@@ -1,0 +1,41 @@
+PASS  service
+PASS  constants
+PASS  api
+PASS  alembic 131
+PASS  fe workspace
+PASS  fe page
+PASS  schema id
+PASS  no auto repair
+PASS  no fuzzy llm
+PASS  no trust scores
+PASS  not first value
+PASS  post commit spawn
+PASS  impact preview
+PASS  conflict-safe undo
+PASS  stale dependents
+PASS  approval kind
+PASS  revises 130
+PASS  no canary table touch
+PASS  no invite table touch
+PASS  catalog route
+PASS  cache no-store
+PASS  import hooks post-commit
+PASS  no 8th primary data-trust
+PASS  secondary data-trust
+PASS  primary still 7
+PASS  preview has no data trust workspace
+PASS  settings link to data-trust
+PASS  unit tests
+PASS  fe guard
+PASS  svc no canary ddl
+PASS  svc no designation
+PASS  svc no invite mint
+PASS  prod launch NO-GO
+PASS  enrollment OFF
+PASS  preview enabled
+PASS  canary not active
+PASS  activation prepared
+PASS  designation count 0
+PASS  canary cap 0
+
+39 passed, 0 failed

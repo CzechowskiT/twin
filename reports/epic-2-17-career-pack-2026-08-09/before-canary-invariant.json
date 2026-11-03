@@ -1,0 +1,21 @@
+{
+  "_meta": {
+    "api_commit": "1f94f2dd451abb47d927132675fa2e2c7150b046",
+    "frontend_commit": "92c6b1a315dde7fbefef3e54d8dce6a44c66b797",
+    "worker_commit": "1f94f2dd451abb47d927132675fa2e2c7150b046"
+  },
+  "rc1_canary_activation_command": "PREPARED_NOT_EXECUTED",
+  "rc1_effective_canary_cap": 0,
+  "rc1_effective_cohort_cap": 0,
+  "rc1_external_pilot_enrollment_enabled": false,
+  "rc1_invite_send_enabled": false,
+  "rc1_launch": "NO-GO",
+  "rc1_one_candidate_canary_active": false,
+  "rc1_one_candidate_canary_ready": true,
+  "rc1_one_candidate_canary_state": "READY_INACTIVE",
+  "rc1_pilot_runtime_state": "OPERATIONALLY_READY_INACTIVE",
+  "rc1_public_preview_enabled": true,
+  "rc1_real_canary_candidate_designated_ready": false,
+  "rc1_real_canary_designation_count": 0,
+  "rc1_real_canary_designation_status": "NOT_DESIGNATED"
+}

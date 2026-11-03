@@ -229,4 +229,23 @@ def build_user_owned_export_payload(
         "oauth_accounts": oauth_out,
         "google_calendar": gcal_out,
         "profile_documents": profile_docs_out,
+        "pilot_support_and_feedback": (
+            __import__(
+                "app.services.pilot_support_ops", fromlist=["export_for_candidate"]
+            ).export_for_candidate(db, candidate_id=candidate.id)
+            if candidate
+            else {"support_cases": [], "pilot_feedback": []}
+        ),
+        "guided_first_value_and_demo": (
+            {
+                **__import__(
+                    "app.services.guided_first_value", fromlist=["export_for_candidate"]
+                ).export_for_candidate(db, candidate_id=candidate.id),
+                **__import__(
+                    "app.services.isolated_demo", fromlist=["export_for_candidate"]
+                ).export_for_candidate(db, candidate_id=candidate.id),
+            }
+            if candidate
+            else {"guided_first_value": None, "isolated_demo_sessions": []}
+        ),
     }

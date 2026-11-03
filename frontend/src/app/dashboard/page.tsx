@@ -8,6 +8,15 @@ import { useDashboardVerifiedReadiness } from "@/hooks/dashboard/use-dashboard-v
 import { CandidateModuleNav } from "@/components/dashboard/candidate-module-nav";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { DashboardCommandCenter } from "@/components/dashboard-command-center";
+import { DailyCareerOsPanel } from "@/components/career/daily-career-os-panel";
+import { PilotHomeNextAction } from "@/components/dashboard/pilot-home-next-action";
+import { GuidedFirstValueEntry } from "@/components/dashboard/guided-first-value-entry";
+import { CanaryFirstValuePanel } from "@/components/dashboard/canary-first-value-panel";
+import { PathReadinessPanel } from "@/components/dashboard/path-readiness-panel";
+import { JourneyContinuityPanel } from "@/components/dashboard/journey-continuity-panel";
+import { WorkspaceHandoffBanner } from "@/components/candidate/workspace-handoff-banner";
+import { IaActionableEmpty } from "@/components/dashboard/ia-actionable-empty";
+import { LifecycleCommandPanel } from "@/components/lifecycle/lifecycle-command-panel";
 import { ProfileCompletenessHint } from "@/components/ux/profile-completeness-hint";
 import { WorkspaceFlowSteps } from "@/components/ux/workspace-flow-steps";
 import { EmailVerificationBanner } from "@/components/email-verification-banner";
@@ -15,7 +24,7 @@ import { useTranslation } from "@/components/language-provider";
 import { Shell } from "@/components/ui";
 import { WorkspaceQuickActions } from "@/components/workspace/workspace-quick-actions";
 import { isCalendarConnected } from "@/lib/dashboard-next-best-action";
-import { SHOW_DASHBOARD_EXTENDED_HOME_MODULES } from "@/lib/product-polish-p0";
+import { SHOW_DASHBOARD_EXTENDED_HOME_MODULES, SHOW_DASHBOARD_AUTO_APPLY_STRIP } from "@/lib/product-polish-p0";
 import { SHOW_CAREER_COMPASS_ON_DASHBOARD_HOME } from "@/lib/product-polish-p4";
 import { SHOW_SCRAPE_UI } from "@/lib/features";
 
@@ -27,6 +36,7 @@ import { JobsSection } from "@/components/dashboard/jobs-section";
 import { MatchesSection } from "@/components/dashboard/matches-section";
 import { DashboardVerifiedReadinessCard } from "@/components/dashboard/dashboard-verified-readiness-card";
 import { ProfileScrapePanel } from "@/components/dashboard/profile-scrape-panel";
+import { NightlyAutoApplyStrip } from "@/components/nightly-auto-apply-strip";
 import { useDashboardApplicationActions } from "@/hooks/dashboard/use-dashboard-application-actions";
 import { useDashboardCalendarActions } from "@/hooks/dashboard/use-dashboard-calendar-actions";
 import { useDashboardData } from "@/hooks/dashboard/use-dashboard-data";
@@ -336,6 +346,7 @@ export default function DashboardPage() {
       ) : null}
 
       {user ? <EmailVerificationBanner /> : null}
+      {user && SHOW_DASHBOARD_AUTO_APPLY_STRIP ? <NightlyAutoApplyStrip /> : null}
 
       {user ? (
         SHOW_DASHBOARD_EXTENDED_HOME_MODULES ? (
@@ -348,6 +359,15 @@ export default function DashboardPage() {
                 showScrapeUi={showScrapePanel}
                 todayContext={todayContext}
               />
+              <GuidedFirstValueEntry />
+              <CanaryFirstValuePanel />
+              <JourneyContinuityPanel />
+              <WorkspaceHandoffBanner expectedDestRouteKey="path_home" />
+              <PathReadinessPanel />
+              <IaActionableEmpty areaId="home" show />
+              <PilotHomeNextAction />
+              <DailyCareerOsPanel compact />
+              <LifecycleCommandPanel />
             </div>
             <div className="dashboard-hero-grid__insights">
               <ProgressDashboard />
@@ -362,6 +382,17 @@ export default function DashboardPage() {
               showScrapeUi={showScrapePanel}
               todayContext={todayContext}
             />
+            <GuidedFirstValueEntry />
+            <CanaryFirstValuePanel />
+            <JourneyContinuityPanel />
+            <WorkspaceHandoffBanner expectedDestRouteKey="path_home" />
+            <PathReadinessPanel />
+            <IaActionableEmpty areaId="home" show />
+            <PilotHomeNextAction />
+            <DailyCareerOsPanel compact />
+            <div className="mb-4 sm:mb-6">
+              <LifecycleCommandPanel />
+            </div>
             <div className="mb-4 sm:mb-6" aria-label={t("dashboard.coreLinksAria")}>
               <WorkspaceQuickActions actions={DASHBOARD_CORE_QUICK_ACTIONS} />
             </div>

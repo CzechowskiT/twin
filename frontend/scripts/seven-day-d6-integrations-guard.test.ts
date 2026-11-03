@@ -26,6 +26,7 @@ import {
   NO_FAKE_CHECKOUT_OR_CONNECTED_SYNC_UI,
   RECRUITER_CALENDAR_ROADMAP_ONLY,
   STRIPE_NOT_PUBLIC_LAUNCH,
+  STRIPE_SANDBOX_CHECKOUT_ENABLED,
 } from "../src/lib/seven-day-d6-integrations";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -69,18 +70,18 @@ test("1 D6 execution doc exists with stance footer and matrices", () => {
 
 test("2 seven-day-d6 flags — calendar tiers, billing preview, integrations honesty", () => {
   assert.equal(CANDIDATE_CALENDAR_HONEST_TIERS, true);
-  assert.equal(RECRUITER_CALENDAR_ROADMAP_ONLY, true);
-  assert.equal(COMPANY_SCHEDULING_ROADMAP_ONLY, true);
+  assert.equal(RECRUITER_CALENDAR_ROADMAP_ONLY, false);
+  assert.equal(COMPANY_SCHEDULING_ROADMAP_ONLY, false);
   assert.equal(NORMALIZE_INTEGRATION_NOT_LIVE_AS_COMING_SOON, true);
   assert.equal(ATS_COMING_SOON_NO_LIVE_SYNC, true);
   assert.equal(BILLING_PREMIUM_PREVIEW_ONLY, true);
   assert.equal(STRIPE_NOT_PUBLIC_LAUNCH, true);
-  assert.equal(AUTO_APPLY_PAUSED_HIDDEN, true);
+  assert.equal(AUTO_APPLY_PAUSED_HIDDEN, false);
   assert.equal(NO_FAKE_CHECKOUT_OR_CONNECTED_SYNC_UI, true);
-  assert.equal(HIDE_RECRUITER_CALENDAR_FROM_NAV, true);
+  assert.equal(HIDE_RECRUITER_CALENDAR_FROM_NAV, false);
   assert.equal(HIDE_CANDIDATE_BILLING_FROM_HUB, true);
   assert.equal(HIDE_COMPANY_BILLING_FROM_NAV, true);
-  assert.equal(FORCE_MICROSOFT_CALENDAR_COMING_SOON, true);
+  assert.equal(FORCE_MICROSOFT_CALENDAR_COMING_SOON, false);
 });
 
 test("3 calendar tiers — Google live, Microsoft coming soon, ICS preview", () => {
@@ -98,16 +99,16 @@ test("3 calendar tiers — Google live, Microsoft coming soon, ICS preview", () 
   assert.match(en.sevenDayD6.calendarBoundaryLead ?? "", /Microsoft 365 is coming soon/i);
 });
 
-test("4 recruiter calendar — coming soon roadmap, not primary live", () => {
+test("4 recruiter calendar — live holds surface (provider write still gated)", () => {
   const page = read("src/app/recruiter/calendar/page.tsx");
-  assert.match(page, /RECRUITER_CALENDAR_ROADMAP_ONLY/);
-  assert.match(page, /data-seven-day-d6-recruiter-calendar-boundary/);
-  assert.match(page, /WorkspaceStatusBadge status="coming_soon"/);
-  assert.match(en.sevenDayD6.recruiterCalendarComingSoonTitle ?? "", /Coming soon/i);
+  assert.equal(RECRUITER_CALENDAR_ROADMAP_ONLY, false);
+  assert.match(page, /data-recruiter-calendar-live/);
+  assert.doesNotMatch(page, /data-seven-day-d6-recruiter-calendar-boundary/);
+  assert.match(page, /WorkspaceStatusBadge status="live"/);
   assert.doesNotMatch(page, /Microsoft.*live/i);
 });
 
-test("5 billing — premium preview, stripe checkout disabled, waitlist CTA", () => {
+test("5 billing — premium preview, stripe public launch blocked, sandbox CTA allowed", () => {
   const candidate = read("src/app/dashboard/billing/page.tsx");
   assert.match(candidate, /STRIPE_NOT_PUBLIC_LAUNCH/);
   assert.match(candidate, /data-seven-day-d6-billing-stripe-boundary/);
@@ -116,11 +117,17 @@ test("5 billing — premium preview, stripe checkout disabled, waitlist CTA", ()
   const company = read("src/app/company/billing/company-billing-client.tsx");
   assert.match(company, /data-seven-day-d6-company-billing/);
   assert.match(company, /PremiumPreviewSurface/);
-  assert.doesNotMatch(company, /checkout-session/i);
+  assert.match(company, /STRIPE_NOT_PUBLIC_LAUNCH/);
+  assert.match(company, /STRIPE_SANDBOX_CHECKOUT_ENABLED/);
+  assert.match(company, /checkout-session/);
+  assert.match(company, /data-seven-day-d6-billing-sandbox-cta/);
+  assert.doesNotMatch(company, /public launch enabled|Stripe is live/i);
   const preview = read("src/components/workspace/premium-preview-surface.tsx");
   assert.match(preview, /premiumPreviewWaitlistCta/);
   assert.match(en.sevenDayD6.billingStripePreviewBoundary ?? "", /not part of the public launch/i);
   assert.match(en.productPolish.premiumPreviewLead ?? "", /no fake upgrade/i);
+  assert.equal(STRIPE_SANDBOX_CHECKOUT_ENABLED, true);
+  assert.equal(STRIPE_NOT_PUBLIC_LAUNCH, true);
 });
 
 test("6 integrations — coming soon rows, no fake connected sync", () => {
@@ -144,17 +151,18 @@ test("7 integration badge — not_live normalized to coming_soon for users", () 
   assert.match(badge, /mapped = "coming_soon"/);
 });
 
-test("8 auto-apply — strip hidden, settings paused boundary", () => {
-  assert.equal(SHOW_DASHBOARD_AUTO_APPLY_STRIP, false);
-  assert.equal(AUTO_APPLY_PAUSED_HIDDEN, true);
+test("8 auto-apply — strip visible when SHOW=true; review-before-submit honesty", () => {
+  assert.equal(SHOW_DASHBOARD_AUTO_APPLY_STRIP, true);
+  assert.equal(AUTO_APPLY_PAUSED_HIDDEN, false);
   const dashboard = read("src/app/dashboard/page.tsx");
-  assert.doesNotMatch(dashboard, /<NightlyAutoApplyStrip/);
+  assert.match(dashboard, /SHOW_DASHBOARD_AUTO_APPLY_STRIP/);
+  assert.match(dashboard, /<NightlyAutoApplyStrip/);
   const settings = read("src/app/dashboard/settings/auto-apply/page.tsx");
   assert.match(settings, /AUTO_APPLY_PAUSED_HIDDEN/);
-  assert.match(settings, /data-seven-day-d6-auto-apply-boundary/);
-  assert.match(settings, /WorkspaceStatusBadge status="paused"/);
-  assert.match(en.sevenDayD6.autoApplyPausedBoundary ?? "", /paused on production/i);
-  assert.match(dictionaries.pl.sevenDayD6.autoApplyPausedBoundary ?? "", /wstrzymane na produkcji/i);
+  assert.match(settings, /data-seven-day-d6-auto-apply-review-mode/);
+  assert.match(settings, /autoApplyReviewBeforeSubmitBoundary/);
+  assert.match(en.sevenDayD6.autoApplyReviewBeforeSubmitBoundary ?? "", /review-before-submit/i);
+  assert.match(dictionaries.pl.sevenDayD6.autoApplyReviewBeforeSubmitBoundary ?? "", /review-before-submit/i);
 });
 
 test("9 no fake checkout or connected sync in D6 UI blob", () => {

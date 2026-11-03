@@ -96,6 +96,7 @@ from app.services.candidate_privacy_request_service import (
 from app.services.candidate_account_deletion import execute_candidate_account_deletion
 from app.services.candidate_trust_audit_service import list_trust_audit_events
 from app.services.candidate_trust_center_service import build_trust_center
+from app.services import candidate_wave1 as wave1
 from app.schemas.acceptance_queue import AcceptanceQueueOut, AcceptanceRespondIn
 from app.schemas.job_match_feedback import (
     JobMatchFeedbackIn,
@@ -664,6 +665,42 @@ def get_my_matches(
     return JobMatchListOut(items=items, total=len(items))
 
 
+@router.get("/me/activation-status")
+def get_my_activation_status(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict[str, Any]:
+    """Non-PII activation matching UX state for post-onboarding matches page."""
+    from app.services.activation_matching import get_activation_status
+
+    return get_activation_status(db, user)
+
+
+@router.post("/me/activation-matching/retry")
+@limiter.limit("10/minute", key_func=user_or_ip_key)
+def retry_my_activation_matching(
+    request: Request,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict[str, Any]:
+    from app.services.activation_matching import retry_activation_matching
+
+    return retry_activation_matching(db, user)
+
+
+@router.post("/me/activation-ttv-view")
+@limiter.limit("30/minute", key_func=user_or_ip_key)
+def record_my_activation_ttv_view(
+    request: Request,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict[str, Any]:
+    """Server-side activation_ttv_matches_view (once per user; refresh-safe)."""
+    from app.services.activation_matching import record_activation_ttv_view
+
+    return record_activation_ttv_view(db, user, surface="matches_activated")
+
+
 @router.get("/me/match-feedback", response_model=JobMatchFeedbackListOut)
 def list_my_match_feedback(
     db: Session = Depends(get_db),
@@ -786,10 +823,31 @@ def export_my_matches_xlsx(
 
 @router.get("/me/export.json")
 def export_my_data_json(
+    request: Request,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> JSONResponse:
     """Machine-readable export of account and profile data owned by the signed-in user (GDPR-style portability)."""
+    from app.services import candidate_step_up as step_up
+    from app.services.candidate_account_recovery_constants import PURPOSE_FULL_PRIVACY_EXPORT
+    from app.services.step_up_request import (
+        session_binding_from_request,
+        step_up_token_from_request,
+    )
+
+    sid, epoch = session_binding_from_request(request)
+    try:
+        step_up.require_step_up_or_raise(
+            db,
+            user=user,
+            purpose=PURPOSE_FULL_PRIVACY_EXPORT,
+            step_up_token=step_up_token_from_request(request),
+            session_key=sid,
+            session_epoch=epoch,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
+
     settings = get_settings()
     dashboard_url = f"{settings.frontend_url.rstrip('/')}/dashboard"
     row = db.query(User).filter(User.id == user.id).first()
@@ -1000,6 +1058,26 @@ def delete_my_account(
     user: User = Depends(get_current_user),
 ) -> AccountDeleteOut:
     """Self-service account deletion — anonymizes PII and deactivates sign-in (R-019)."""
+    from app.services import candidate_step_up as step_up
+    from app.services.candidate_account_recovery_constants import PURPOSE_ACCOUNT_DELETION
+    from app.services.step_up_request import (
+        session_binding_from_request,
+        step_up_token_from_request,
+    )
+
+    sid, epoch = session_binding_from_request(request)
+    try:
+        step_up.require_step_up_or_raise(
+            db,
+            user=user,
+            purpose=PURPOSE_ACCOUNT_DELETION,
+            step_up_token=step_up_token_from_request(request),
+            session_key=sid,
+            session_epoch=epoch,
+        )
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
+
     candidate = _get_candidate_or_404(db, user.id)
     try:
         data = execute_candidate_account_deletion(
@@ -1011,7 +1089,12 @@ def delete_my_account(
         )
     except ValueError as exc:
         detail = str(exc)
-        code = status.HTTP_409_CONFLICT if "already deleted" in detail.lower() else status.HTTP_422_UNPROCESSABLE_ENTITY
+        if "legal_hold" in detail.lower():
+            code = status.HTTP_403_FORBIDDEN
+        elif "already deleted" in detail.lower():
+            code = status.HTTP_409_CONFLICT
+        else:
+            code = status.HTTP_422_UNPROCESSABLE_ENTITY
         raise HTTPException(status_code=code, detail=detail) from exc
     return AccountDeleteOut.model_validate(data)
 
@@ -1027,6 +1110,30 @@ def get_trust_audit_events(
     return TrustAuditEventListOut.model_validate(
         list_trust_audit_events(db, candidate_id=candidate.id, limit=limit, offset=offset)
     )
+
+
+@router.get("/me/trust/activity-timeline")
+def get_trust_activity_timeline(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+    limit: int = Query(default=50, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+) -> dict:
+    """Honest alias — same persistence as audit-events (Wave 1 path fix)."""
+    candidate = _get_candidate_or_404(db, user.id)
+    return wave1.build_activity_timeline(db, candidate_id=candidate.id, limit=limit, offset=offset)
+
+
+@router.get("/me/trust/live-bundle")
+def get_trust_live_bundle(
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    """Wave 1 aggregated live trust payload — no demo fixtures."""
+    candidate = _get_candidate_or_404(db, user.id)
+    row = db.query(User).filter(User.id == user.id).first()
+    assert row is not None
+    return wave1.build_live_trust_bundle(db, candidate=candidate, user=row)
 
 
 @router.get("/referrals/resolve", response_model=CandidateReferralResolveOut)

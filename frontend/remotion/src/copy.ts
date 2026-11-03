@@ -9,6 +9,8 @@ export type FilmSegment = {
 
 export const FILM_DURATION_SEC = 45;
 export const FILM_FPS = 30;
+/** Meaningful UI reveal cadence inside scenes (~1s between successive elements). */
+export const FILM_BEAT_FRAMES = FILM_FPS;
 
 const EN_SEGMENTS: FilmSegment[] = [
   { id: "inbox", startSec: 0, endSec: 7, caption: "Inbox chaos — thousands of pings, zero clarity" },

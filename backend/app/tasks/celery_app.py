@@ -25,6 +25,19 @@ celery_app.conf.update(
         "app.tasks.nightly_auto_apply",
         "app.tasks.agent_dispatch_tasks",
         "app.tasks.founder_command_tasks",
+        "app.tasks.activation_matching_tasks",
+        "app.tasks.candidate_intelligence_tasks",
+        "app.tasks.career_strategy_tasks",
+        "app.tasks.opportunity_intelligence_tasks",
+        "app.tasks.search_strategy_tasks",
+        "app.tasks.search_outcome_tasks",
+        "app.tasks.strategy_review_tasks",
+        "app.tasks.decision_calendar_tasks",  # Epic 2.5 decision calendar capacity tasks
+        "app.tasks.read_only_calendar_sync_tasks",  # Epic 2.6 read-only calendar sync
+        "app.tasks.adaptive_execution_tasks",  # Epic 2.7 adaptive execution intelligence
+        "app.tasks.evidence_investment_tasks",  # Epic 2.8 evidence investment intelligence
+        "app.tasks.worker_identity",
+        "app.tasks.company_invite_tasks",
     ),
 )
 
@@ -33,8 +46,12 @@ def apply_celery_runtime_config() -> None:
     """Re-read Settings (e.g. after get_settings.cache_clear) and sync broker + eager mode."""
     s = get_settings()
     celery_app.conf.broker_url = s.celery_broker_url
-    celery_app.conf.result_backend = s.celery_result_backend
     celery_app.conf.task_always_eager = s.celery_task_always_eager
+    # Eager mode: drop Redis result backend so local/tests never hang on reconnect.
+    if s.celery_task_always_eager:
+        celery_app.conf.result_backend = None
+    else:
+        celery_app.conf.result_backend = s.celery_result_backend
 
 
 # In-process tasks (no Redis): set CELERY_TASK_ALWAYS_EAGER=true on the API when no worker service exists.
@@ -96,6 +113,13 @@ def _configure_beat_schedule() -> None:
             "task": "app.tasks.reminder_tasks.interview_reminders_sweep",
             "schedule": crontab(minute=20),
         }
+    if s.career_reminder_beat_enabled:
+        cm = min(59, max(0, int(s.career_reminder_beat_minute)))
+        schedule["career-reminders-hourly"] = {
+            "task": "app.tasks.reminder_tasks.career_reminders_sweep",
+            "schedule": crontab(minute=cm),
+            "options": {"expires": 3300},
+        }
     if s.weekly_digest_beat_enabled:
         wd = min(6, max(0, int(s.weekly_digest_beat_weekday)))
         wh = min(23, max(0, int(s.weekly_digest_beat_hour_utc)))
@@ -125,7 +149,17 @@ def _configure_beat_schedule() -> None:
             "schedule": float(fc_interval),
             "options": {"expires": fc_interval},
         }
+    # Safe no-op while enrollment OFF; delivers queued invites when Founder flips enrollment ON.
+    schedule["company-invite-outbox"] = {
+        "task": "app.tasks.company_invite_tasks.process_company_invite_outbox",
+        "schedule": crontab(minute="*/5"),
+        "options": {"expires": 240},
+    }
     celery_app.conf.beat_schedule = schedule
 
 
 _configure_beat_schedule()
+
+# epic-1.3 career reminder delivery + four-way align nudge 20260729T1400Z
+
+# epic-2.3 search outcome deploy nudge 20260804T2105Z

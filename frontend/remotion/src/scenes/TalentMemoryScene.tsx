@@ -12,7 +12,7 @@ export function TalentMemoryScene() {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const mergeProgress = spring({ frame: frame - 15, fps, config: { damping: 16, stiffness: 80 } });
+  const mergeProgress = spring({ frame: frame - 5, fps, config: { damping: 16, stiffness: 80 } });
   const cardCount = Math.max(1, Math.round(interpolate(mergeProgress, [0, 1], [6, 1])));
 
   return (
@@ -60,7 +60,7 @@ export function TalentMemoryScene() {
               );
             })}
           </div>
-          <FlyInItem delay={40} fromX={0} fromY={20}>
+          <FlyInItem delay={25} fromX={0} fromY={20}>
             <div
               style={{
                 background: FILM.bgPanelDark,
@@ -112,7 +112,7 @@ export function TalentMemoryScene() {
             Talent Memory forming
           </div>
           {SKILLS.map((s, i) => {
-            const fill = interpolate(frame, [50 + i * 8, 70 + i * 8], [0, 100], {
+            const fill = interpolate(frame, [30 + i * 6, 48 + i * 6], [0, 100], {
               extrapolateLeft: "clamp",
               extrapolateRight: "clamp",
             });
@@ -129,7 +129,7 @@ export function TalentMemoryScene() {
           <div style={{ marginTop: 14, fontSize: 12, fontWeight: 600, color: FILM.textLight }}>Preferences</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
             {PREFS.map((p, i) => {
-              const show = frame > 80 + i * 6;
+              const show = frame > 55 + i * 5;
               return show ? (
                 <span
                   key={p}
@@ -141,7 +141,7 @@ export function TalentMemoryScene() {
                     color: FILM.purple,
                     fontSize: 11,
                     fontWeight: 600,
-                    transform: `scale(${spring({ frame: frame - 80 - i * 6, fps, config: { damping: 12 } })})`,
+                    transform: `scale(${spring({ frame: frame - 55 - i * 5, fps, config: { damping: 12 } })})`,
                   }}
                 >
                   {p}
@@ -152,7 +152,7 @@ export function TalentMemoryScene() {
           <div style={{ marginTop: 14 }}>
             <div style={{ fontSize: 12, fontWeight: 600, color: FILM.textLight, marginBottom: 4 }}>Availability</div>
             <ProgressBar
-              progress={interpolate(frame, [100, 130], [0, 100], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })}
+              progress={interpolate(frame, [70, 95], [0, 100], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })}
               color={FILM.neon}
             />
           </div>

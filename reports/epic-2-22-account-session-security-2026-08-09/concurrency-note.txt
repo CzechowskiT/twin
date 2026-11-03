@@ -1,0 +1,4 @@
+rotate_refresh uses SQLAlchemy with_for_update() on refresh family + session rows.
+scripts/epic-2-22-refresh-concurrency-proof.py exercises Postgres contention (exactly one success of two concurrent rotates).
+Unit tests cover one-time rotation + family REUSE_SUSPECTED containment.
+REVOCATION_PROPAGATION_SLO measured in auth E2E (~221–904ms observed on prod).

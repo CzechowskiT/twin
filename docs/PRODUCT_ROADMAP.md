@@ -1,4 +1,6 @@
-# TWIN product roadmap (living doc)
+# TWIN product roadmap (historical context)
+
+> **Not the prioritized execution roadmap.** Canonical prioritized roadmap: [`UNICORN_ROADMAP.md`](./UNICORN_ROADMAP.md). Canonical status map: [`CANONICAL_PRODUCT_CAPABILITY_MAP.md`](./CANONICAL_PRODUCT_CAPABILITY_MAP.md). Stance: Gate F **PENDING** · Launch **NO-GO** · P0 **CLOSED** · Phase 3B not flipped.
 
 North star: **short calendar of acceptance-ready moments** — not inbox noise.
 

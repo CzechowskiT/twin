@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { RecruiterAccessFields } from "@/components/recruiter/recruiter-access-fields";
+import { IntelligenceCompactCard } from "@/components/recruiter/intelligence-compact-card";
 import { RecruiterAuditTrailPanel, postRecruiterAuditEvent } from "@/components/recruiter/recruiter-audit-trail-panel";
 import { RecruiterDecisionRail } from "@/components/recruiter/recruiter-decision-rail";
 import { RecruiterScorecardPanel } from "@/components/recruiter/recruiter-scorecard-panel";
@@ -92,6 +93,15 @@ type BatchRow = {
   job_title: string;
   company: string;
   candidate_name: string;
+  candidate_id?: number;
+  intelligence?: {
+    candidate_id?: number;
+    extraction_status?: string;
+    fit_band?: string | null;
+    top_strengths?: string[];
+    top_gap_or_unknown?: string | null;
+    human_review_required?: boolean;
+  } | null;
   status: string;
   applied_at: string | null;
   updated_at: string | null;
@@ -926,6 +936,10 @@ export default function RecruiterInboxClient() {
                                   {matchScoreLabelKey(r.match_score_label)}
                                 </p>
                               ) : null}
+                              <IntelligenceCompactCard
+                                intelligence={r.intelligence}
+                                candidateId={r.candidate_id}
+                              />
                             </div>
                             <RecruiterSignalList
                               items={evidencePreview.visible}

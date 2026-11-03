@@ -41,11 +41,6 @@ import {
   type TalentRadarFilters,
   type TalentRadarPayload,
 } from "@/lib/recruiter-talent-radar";
-import {
-  candidateProfile360Href,
-  CANDIDATE_PROFILE_360_DEMO_ID,
-} from "@/lib/candidate-profile-360";
-import { jobPipelineHref, JOB_PIPELINE_DEMO_ID } from "@/lib/job-pipeline";
 import { RECRUITER_TALENT_RADAR_DIGEST_ROUTE } from "@/lib/recruiter-talent-radar-digest";
 import {
   matchesDecisionFilter,
@@ -387,7 +382,7 @@ export default function RecruiterTalentRadarClient() {
                 </Link>
                 <span className="twin-muted mx-2">·</span>
                 <Link
-                  href={candidateProfile360Href(CANDIDATE_PROFILE_360_DEMO_ID)}
+                  href="/recruiter/talent-pool"
                   className="font-medium text-[var(--twin-accent)] underline"
                   data-testid="recruiter-talent-radar-profile-360-link"
                 >
@@ -395,7 +390,7 @@ export default function RecruiterTalentRadarClient() {
                 </Link>
                 <span className="twin-muted mx-2">·</span>
                 <Link
-                  href={jobPipelineHref(JOB_PIPELINE_DEMO_ID)}
+                  href="/recruiter/pipeline"
                   className="font-medium text-[var(--twin-accent)] underline"
                   data-testid="recruiter-talent-radar-job-pipeline-link"
                 >

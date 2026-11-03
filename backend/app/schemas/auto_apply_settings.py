@@ -22,6 +22,19 @@ class AutoApplySettingsOut(BaseModel):
         default=False,
         description="True when verified-readiness gate passes (career brief, evidence, consents).",
     )
+    # Founder RELEASE_WITH_CONTROLS — default review-before-submit; no CAPTCHA bypass.
+    submit_mode: str = Field(
+        default="REVIEW_BEFORE_SUBMIT",
+        description="REVIEW_BEFORE_SUBMIT prepares packages; AUTO_SUBMIT is ops-gated.",
+    )
+    kill_switch_active: bool = Field(
+        default=False,
+        description="True when user paused (is_active=false) or platform beat disabled.",
+    )
+    captcha_bypass: bool = Field(
+        default=False,
+        description="Always false — CAPTCHA bypass is forbidden.",
+    )
 
 
 class AutoApplyConsentIn(BaseModel):

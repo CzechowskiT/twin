@@ -74,9 +74,15 @@ def create_company_feedback(
     return _serialize(row)
 
 
-def list_company_feedback(db: Session, *, limit: int = 50) -> dict[str, Any]:
+def list_company_feedback(db: Session, *, user_id: int, limit: int = 50) -> dict[str, Any]:
     cap = max(1, min(limit, 100))
-    rows = db.query(CompanyFeedbackItem).order_by(CompanyFeedbackItem.updated_at.desc()).limit(cap).all()
+    rows = (
+        db.query(CompanyFeedbackItem)
+        .filter(CompanyFeedbackItem.created_by_user_id == user_id)
+        .order_by(CompanyFeedbackItem.updated_at.desc())
+        .limit(cap)
+        .all()
+    )
     return {"items": [_serialize(r) for r in rows], "count": len(rows)}
 
 

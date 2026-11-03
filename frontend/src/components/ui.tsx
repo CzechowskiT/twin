@@ -81,12 +81,13 @@ export function Card({
   className = "",
   variant = "default",
   id,
+  ...rest
 }: {
   children: ReactNode;
   className?: string;
   variant?: "default" | "soft" | "accent";
   id?: string;
-}) {
+} & Omit<HTMLAttributes<HTMLDivElement>, "children" | "className" | "id">) {
   const variantClass =
     variant === "accent"
       ? "twin-card-panel--accent"
@@ -97,6 +98,7 @@ export function Card({
     <div
       id={id}
       className={`twin-card-panel mb-4 scroll-mt-24 p-4 text-[var(--foreground)] sm:mb-6 sm:p-6 ${variantClass} ${className}`}
+      {...rest}
     >
       {children}
     </div>

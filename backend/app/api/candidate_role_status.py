@@ -38,8 +38,13 @@ def get_statuses(
     role_ref: Annotated[str | None, Query()] = None,
     limit: Annotated[int, Query(ge=1, le=100)] = 50,
 ) -> dict:
-    _ = user
-    return list_candidate_role_statuses(db, candidate_ref=candidate_ref, role_ref=role_ref, limit=limit)
+    return list_candidate_role_statuses(
+        db,
+        user_id=user.id,
+        candidate_ref=candidate_ref,
+        role_ref=role_ref,
+        limit=limit,
+    )
 
 
 @router.post("", status_code=201)

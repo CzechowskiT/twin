@@ -1,0 +1,9 @@
+revision: 131_candidate_data_trust
+down_revision: 130_real_canary_candidate_designation
+tables:
+  - candidate_data_trust_reviews
+  - candidate_data_trust_questions
+  - candidate_data_trust_change_sets
+  - candidate_data_trust_audits
+canary_invite_designation_tables_touched: false
+prod_proof: authenticated E2E spawn/preview/propose/approve/undo succeeded on live API (implies head applied)

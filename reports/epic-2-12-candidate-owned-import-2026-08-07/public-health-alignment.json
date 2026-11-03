@@ -1,0 +1,10 @@
+{
+  "frontend_commit": "ff2ba434aea112bd82aa5e131374081f79becc45",
+  "api_commit": "ff2ba434aea112bd82aa5e131374081f79becc45",
+  "worker_commit": "ff2ba434aea112bd82aa5e131374081f79becc45",
+  "rc1_launch": "NO-GO",
+  "rc1_public_preview_enabled": true,
+  "rc1_external_pilot_enrollment_enabled": false,
+  "rc1_phase_3b": "BLOCKED",
+  "microsoft_calendar_write_enabled": false
+}

@@ -1,0 +1,42 @@
+PASS [stance] public_health 200
+PASS [stance] launch_nogo NO-GO
+PASS [stance] enrollment_off 
+PASS [stance] phase_3b_blocked 
+PASS [stance] ms_write_off 
+PASS [invite_inactive] pilot_access_inactive PRODUCTION_READY_INACTIVE
+PASS [invite_inactive] invite_send_off False
+PASS [invite_inactive] real_invites_zero 0
+PASS [invite_inactive] real_pilots_zero 0
+PASS [persistence] four_way_aligned fe=02b282dfef56 api=02b282dfef56 wrk=02b282dfef56
+PASS [deletion_security] mint_fresh 200
+PASS [deletion_security] kpi_excluded 
+PASS [journey_access] privacy_orient 200
+PASS [journey_access] consolidation_200 200
+PASS [invite_inactive] access_status {'schema': 'twin.pilot_consolidation/v1', 'pilot_access_status': 'PRODUCTION_READY_INACTIVE', 'enrollment_enabled': Fals
+PASS [invite_inactive] enrollment_false 
+PASS [invite_inactive] invite_send_false 
+PASS [invite_inactive] real_invites_0 
+PASS [ia_home] seven_primary 
+PASS [ia_home] no_jargon_primary 
+PASS [first_value] contract_id 
+PASS [first_value] not_sign_in_alone 
+PASS [first_value] daily_os_200 200
+PASS [first_value] daily_os_canonical 
+PASS [ia_home] fe_home 200
+PASS [ia_home] fe_direction 200
+PASS [ia_home] fe_opportunities 200
+PASS [ia_home] fe_evidence 200
+PASS [ia_home] fe_decisions 200
+PASS [ia_home] fe_settings 200
+PASS [ia_home] fe_onboarding 200
+PASS [telemetry_privacy] first_value_event 200
+PASS [telemetry_privacy] kpi_excluded_flag 
+PASS [telemetry_privacy] reject_unknown 400
+PASS [telemetry_privacy] daily_os_event 200
+PASS [stance] no_new_intel 
+PASS [stance] phase3_not_started 
+PASS [stance] no_app_submit 
+PASS [stance] no_purchase 
+PASS [deletion_security] unauth_blocked 401
+PASS [persistence] db_at_expected_head {'current_revision': '124_evidence_investment_intelligence', 'head_revision': '124_evidence_investment_intelligence', 'h
+SUMMARY product=32/32 stance=9/9 all=41/41

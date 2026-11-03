@@ -1,0 +1,24 @@
+{
+  "checked_at": "2026-09-08T13:48:31.137779+00:00",
+  "railway_twin_anthropic_len": 0,
+  "railway_worker_anthropic": "missing_key",
+  "live_ai_quality": "NOT_RUN_EXTERNAL_PREREQUISITE",
+  "section_29_cases": [
+    "concise_relevant",
+    "long_irrelevant",
+    "plausible_incorrect",
+    "valid_alternative",
+    "clarification",
+    "i_do_not_know",
+    "unsupported_claim",
+    "prompt_injection",
+    "en",
+    "pl"
+  ],
+  "section_29_executed_live": false,
+  "verdict_impact": "REMAIN_PROVIDER_BLOCKED",
+  "note": "Production ANTHROPIC_API_KEY empty/unset on API; worker has no usable key. Deterministic labeled path remains certified; adaptive live Claude not certified.",
+  "model_version": null,
+  "prompt_version": "ai_interview_coach._EVAL_PROMPT",
+  "rubric_version": "twin.interview_practice_criteria/v1"
+}

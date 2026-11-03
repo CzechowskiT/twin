@@ -40,31 +40,44 @@ function resolveLocale(): Locale {
   return readStoredLocale() ?? detectBrowserLocale();
 }
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
+type LanguageProviderProps = {
+  children: ReactNode;
+  /** When false (PP1 public preview), never read/write locale storage or API locale cookie. */
+  persist?: boolean;
+};
+
+export function LanguageProvider({ children, persist = true }: LanguageProviderProps) {
   // First paint must match the server (always "en") to avoid React #418 hydration mismatches
   // when localStorage / navigator prefers another locale. We sync the real choice after mount.
   const [locale, setLocaleState] = useState<Locale>("en");
 
   useEffect(() => {
+    if (!persist) return;
     const resolved = resolveLocale();
     queueMicrotask(() => {
       setLocaleState((current) => (current === resolved ? current : resolved));
     });
-  }, []);
+  }, [persist]);
 
   useEffect(() => {
     document.documentElement.lang = LOCALE_HTML_LANG[locale];
     document.documentElement.dir = localeIsRtl(locale) ? "rtl" : "ltr";
+    if (!persist) return;
     safeStorage.setItem(LOCALE_STORAGE_KEY, locale);
     setClientApiLocale(locale);
-  }, [locale]);
+  }, [locale, persist]);
 
-  const setLocale = useCallback((next: Locale) => {
-    setLocaleState(next);
-    document.documentElement.lang = LOCALE_HTML_LANG[next];
-    document.documentElement.dir = localeIsRtl(next) ? "rtl" : "ltr";
-    safeStorage.setItem(LOCALE_STORAGE_KEY, next);
-  }, []);
+  const setLocale = useCallback(
+    (next: Locale) => {
+      setLocaleState(next);
+      document.documentElement.lang = LOCALE_HTML_LANG[next];
+      document.documentElement.dir = localeIsRtl(next) ? "rtl" : "ltr";
+      if (persist) {
+        safeStorage.setItem(LOCALE_STORAGE_KEY, next);
+      }
+    },
+    [persist],
+  );
 
   const t = useCallback((key: TranslationKey) => translate(locale, key), [locale]);
 

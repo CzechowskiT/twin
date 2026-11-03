@@ -1,0 +1,28 @@
+PASS  service exists
+PASS  security exists
+PASS  parsers exist
+PASS  api exists
+PASS  alembic 128
+PASS  fe import page
+PASS  fe workspace
+PASS  zero mutations until commit gate
+PASS  encrypt raw uploads
+PASS  no malware-free claim
+PASS  stale preview stop
+PASS  rollback conflict-safe
+PASS  magic bytes
+PASS  zip banned
+PASS  UNTRUSTED marker
+PASS  twin deny secrets
+PASS  import in secondary not primary
+PASS  still 7 primaries
+PASS  no 8th primary href import
+PASS  preview has no import center
+PASS  pp1 gate file
+PASS  pp1 kill switch intact
+PASS  unit tests
+PASS  prod launch NO-GO
+PASS  enrollment OFF
+PASS  preview enabled flag
+
+Epic 2.12 E2E code/stance: 26 pass / 0 fail

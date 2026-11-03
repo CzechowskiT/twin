@@ -64,41 +64,40 @@ test("2 seven-day-d2 flags — ship modules, hide auto-apply and billing, collap
   assert.equal(TRUST_CENTER_ROADMAP_STATUS, "pilot");
   assert.equal(REFERRALS_LIMITED_PILOT, true);
   assert.equal(HIDE_CANDIDATE_BILLING_FROM_HUB, true);
-  assert.equal(SHOW_DASHBOARD_AUTO_APPLY_STRIP, false);
+  assert.equal(SHOW_DASHBOARD_AUTO_APPLY_STRIP, true);
   assert.equal(SHOW_DASHBOARD_EXTENDED_HOME_MODULES, false);
   assert.equal(CANDIDATE_MODULE_NAV_COLLAPSED_DEFAULT, true);
   assert.equal(TRUST_CENTER_OVERVIEW_MODE, true);
 });
 
-test("3 workspace modules — career and interview prep live; auto-apply paused; trust pilot roadmap", () => {
+test("3 workspace modules — career/interview/evidence/trust/referrals live; auto-apply paused", () => {
   assert.equal(moduleStatus("career_compass"), "live");
   assert.equal(moduleStatus("interview_prep"), "live");
   assert.equal(moduleStatus("evidence"), "live");
-  assert.equal(moduleStatus("trust_center"), "pilot");
-  assert.equal(moduleStatus("referrals"), "pilot");
+  assert.equal(moduleStatus("trust_center"), "live");
+  assert.equal(moduleStatus("referrals"), "live");
   assert.equal(moduleStatus("auto_apply"), "paused");
 });
 
-test("4 product surface — green-only: ship modules primary; referrals/trust hidden", () => {
+test("4 product surface — ship modules primary; billing/auto-apply hub-hidden; trust/referrals visible", () => {
   assert.equal(classifyProductSurfaceTier("candidate", "career_compass"), "LIVE");
   assert.equal(classifyProductSurfaceTier("candidate", "interview_prep"), "LIVE");
   assert.equal(classifyProductSurfaceTier("candidate", "evidence"), "LIVE");
   assert.equal(shouldHideFromDefaultHub("candidate", "auto_apply"), true);
   assert.equal(shouldHideFromDefaultHub("candidate", "plan_payments"), true);
-  assert.equal(shouldHideFromDefaultHub("candidate", "referrals"), true);
-  assert.equal(shouldHideFromDefaultHub("candidate", "trust_center"), true);
-  assert.equal(classifyProductSurfaceTier("candidate", "referrals"), "INTERNAL");
-  assert.equal(classifyProductSurfaceTier("candidate", "trust_center"), "INTERNAL");
+  assert.equal(shouldHideFromDefaultHub("candidate", "referrals"), false);
+  assert.equal(shouldHideFromDefaultHub("candidate", "trust_center"), false);
+  assert.equal(classifyProductSurfaceTier("candidate", "referrals"), "LIVE");
+  assert.equal(classifyProductSurfaceTier("candidate", "trust_center"), "LIVE");
   assert.equal(moduleStatus("career_compass"), "live");
   assert.equal(moduleStatus("interview_prep"), "live");
   assert.equal(moduleStatus("evidence"), "live");
 });
 
-test("5 career compass — static framework, no DemoJourneyPilotStatus", () => {
+test("5 career compass — live persistence form, no DemoJourneyPilotStatus", () => {
   const page = read("src/app/dashboard/career/page.tsx");
-  assert.match(page, /seven-day-d2-candidate/);
-  assert.match(page, /data-seven-day-career-static-framework/);
-  assert.match(page, /careerCompassStaticSkillsGapTitle/);
+  assert.match(page, /CAREER_COMPASS_SHIP_STATUS/);
+  assert.match(page, /data-career-compass-form/);
   assert.doesNotMatch(page, /DemoJourneyPilotStatus/);
 });
 
@@ -167,12 +166,9 @@ test("12 npm script test:seven-day-d2-candidate-guard registered", () => {
   assert.match(pkg, /seven-day-d2-candidate-guard\.test\.ts/);
 });
 
-test("13 wave3 — trust center moved to roadmap outside workspace", () => {
-  assert.equal(TRUST_CENTER_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE, true);
+test("13 wave3 — trust center restored to workspace hub (roadmap href remains for footer)", () => {
+  assert.equal(TRUST_CENTER_MOVE_TO_ROADMAP_OUTSIDE_WORKSPACE, false);
   assert.equal(TRUST_CENTER_ROADMAP_OUTSIDE_HREF, "/investor/roadmap#candidate-trust-center");
-  const subnav = read("src/components/candidate-workspace-subnav.tsx");
-  assert.match(subnav, /data-candidate-workspace-subnav-green-only/);
-  assert.doesNotMatch(subnav, /href="\/dashboard\/trust"/);
   const profile = read("src/app/profile/page.tsx");
   assert.match(profile, /data-profile-privacy-controls/);
 });

@@ -1,0 +1,28 @@
+PASS [stance] public_health 200
+PASS [stance] launch_nogo NO-GO
+PASS [stance] enrollment_off 
+PASS [stance] preview_on 
+PASS [stance] fe_api_worker_aligned fe=4d7833f091fa api=4d7833f091fa wrk=4d7833f091fa
+PASS [product] mint_synthetic 200
+PASS [product] kpi_excluded 
+PASS [product] unauth_catalog_blocked 401
+PASS [product] catalog_200 200
+PASS [product] no_elasticsearch 
+PASS [product] no_8th_nav 
+PASS [product] inventory_complete {'total': 72, 'complete': '72/72', 'by_disposition': {'CAPABILITY_ONLY': 42, 'SEARCHABLE_CANONICAL_RECORD': 4, 'EXCLUDED
+PASS [product] catalog_no_store private, no-store
+PASS [product] inventory_200 200
+PASS [product] inventory_n_of_n 72
+PASS [product] capability_search 200
+PASS [product] capability_hits {'capability': 1, 'record': 0, 'total': 1}
+PASS [product] mutations_0 
+PASS [product] not_first_value 
+PASS [product] search_no_store 
+PASS [product] query_not_echoed 
+PASS [product] mixed_search 200
+PASS [product] deep_links_internal 
+PASS [product] candidate_scoped 
+PASS [product] post_preferred_contract POST /me/workspace-search
+PASS [stance] pp1_preview_200 200
+
+Epic 2.13 auth E2E product: 20/20  stance: 6/6

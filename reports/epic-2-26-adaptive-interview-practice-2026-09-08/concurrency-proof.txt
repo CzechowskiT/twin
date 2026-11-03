@@ -1,0 +1,1 @@
+submit_turn uses with_for_update + commit-before-model + duplicate guard: True

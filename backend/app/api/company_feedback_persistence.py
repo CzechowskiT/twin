@@ -36,8 +36,7 @@ class CompanyFeedbackPatchIn(BaseModel):
 
 @router.get("")
 def get_feedback(db: Session = Depends(get_db), user: User = Depends(get_current_user), limit: Annotated[int, Query(ge=1, le=100)] = 50) -> dict:
-    _ = user
-    return list_company_feedback(db, limit=limit)
+    return list_company_feedback(db, user_id=user.id, limit=limit)
 
 
 @router.post("", status_code=201)

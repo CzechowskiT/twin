@@ -1,4 +1,4 @@
-"""Celery tasks for interview reminders (email when mail is configured)."""
+"""Celery tasks for interview + Daily Career OS reminders (consent-safe)."""
 
 from __future__ import annotations
 
@@ -6,6 +6,8 @@ import logging
 from datetime import datetime, timedelta, timezone
 
 from sqlalchemy.orm import Session
+
+from celery.exceptions import MaxRetriesExceededError
 
 from app.config import get_settings
 from app.database.models import ScheduledInterview, User
@@ -104,3 +106,83 @@ def interview_reminders_sweep() -> str:
             sent += 1
     logger.info("interview_reminders_sweep queued=%s window_hours=%s", len(ids), hours)
     return f"queued={len(ids)}"
+
+
+@celery_app.task(
+    bind=True,
+    name="app.tasks.reminder_tasks.deliver_career_reminder",
+    max_retries=3,
+    default_retry_delay=90,
+    acks_late=True,
+)
+def deliver_career_reminder_task(self, reminder_id: int, dry_run: bool = False) -> dict:
+    """Deliver one Daily OS reminder; retries on hard failure; never silent."""
+    from app.services import career_daily_os as daily_os
+
+    db: Session = SessionLocal()
+    try:
+        out = daily_os.deliver_career_reminder(
+            db, reminder_id=int(reminder_id), dry_run=bool(dry_run)
+        )
+        if not out.get("ok") and out.get("result") in {"failed_email", "failed_in_product"}:
+            raise RuntimeError(str(out.get("result")))
+        return out
+    except Exception as exc:
+        logger.exception("deliver_career_reminder_task failed id=%s", reminder_id)
+        try:
+            raise self.retry(exc=exc)
+        except MaxRetriesExceededError:
+            return {
+                "ok": False,
+                "result": "max_retries_exceeded",
+                "reminder_id": reminder_id,
+                "visible_failure": True,
+                "error": type(exc).__name__,
+            }
+    finally:
+        db.close()
+
+
+@celery_app.task(name="app.tasks.reminder_tasks.career_reminders_sweep")
+def career_reminders_sweep(dry_run: bool = False, limit: int = 100) -> dict:
+    """Enqueue due CandidateCareerReminder deliveries on the worker (consent-safe)."""
+    from app.database.models import CandidateCareerReminder
+    from app.services import career_daily_os as daily_os
+
+    if dry_run:
+        db: Session = SessionLocal()
+        try:
+            return daily_os.sweep_due_career_reminders(db, dry_run=True, limit=int(limit))
+        finally:
+            db.close()
+
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    db = SessionLocal()
+    try:
+        ids = [
+            r.id
+            for r in db.query(CandidateCareerReminder)
+            .filter(
+                CandidateCareerReminder.status == "scheduled",
+                CandidateCareerReminder.due_at <= now,
+            )
+            .order_by(CandidateCareerReminder.due_at.asc())
+            .limit(max(1, min(500, int(limit))))
+            .all()
+        ]
+    finally:
+        db.close()
+
+    queued = 0
+    for rid in ids:
+        deliver_career_reminder_task.delay(int(rid), False)
+        queued += 1
+    logger.info("career_reminders_sweep queued=%s", queued)
+    return {
+        "ok": True,
+        "dry_run": False,
+        "queued": queued,
+        "reminder_ids": ids[:50],
+        "kpi_excluded": True,
+        "mass_email": False,
+    }

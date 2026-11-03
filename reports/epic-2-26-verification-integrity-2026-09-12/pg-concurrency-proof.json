@@ -1,0 +1,33 @@
+{
+  "dialect_check": {
+    "ok": true,
+    "dialect": "postgresql",
+    "version_prefix": "PostgreSQL 18.6 (Debian 18.6-1.pgdg13+2)",
+    "practice_tables": 3
+  },
+  "static_for_update": {
+    "with_for_update": true,
+    "commit_before_model": true,
+    "duplicate_guard": true
+  },
+  "concurrent_submit": {
+    "session_id": 40,
+    "turn_id": 44,
+    "outcomes": [
+      {
+        "tag": "B",
+        "status": 400,
+        "detail": "turn_already_submitted"
+      },
+      {
+        "tag": "A",
+        "status": 200,
+        "detail": null
+      }
+    ],
+    "success_count": 1,
+    "conflict_count": 1,
+    "ok": true
+  },
+  "verdict": "PASS"
+}

@@ -138,13 +138,22 @@ export async function loadCandidateVisibilityPreferences(): Promise<{
   record: VisibilityPreferenceRecord;
 }> {
   const demo = demoRecord();
-  const query = `?candidate_id=${encodeURIComponent(CANDIDATE_VISIBILITY_PREFERENCES_DEMO_CANDIDATE_ID)}`;
+  // Live path: list owned prefs without forcing demo-candidate-001 as sole truth.
   const result = await fetchSafePersistenceList<ApiVisibilityResponse>(
-    `${CANDIDATE_VISIBILITY_PREFERENCES_API_PATH}${query}`,
+    CANDIDATE_VISIBILITY_PREFERENCES_API_PATH,
     { items: [] },
   );
   if (result.source === "live" && result.data.items.length > 0) {
     return { source: "live", record: mapApiItem(result.data.items[0]) };
+  }
+  if (result.source === "live") {
+    return {
+      source: "live",
+      record: {
+        ...demo,
+        candidate_id: "authenticated",
+      },
+    };
   }
   return { source: result.source, record: demo };
 }
@@ -152,8 +161,14 @@ export async function loadCandidateVisibilityPreferences(): Promise<{
 export async function saveCandidateVisibilityPreferences(
   record: VisibilityPreferenceRecord,
 ): Promise<SafePersistenceWriteResult<ApiVisibilityItem>> {
+  const candidateId =
+    !record.candidate_id ||
+    record.candidate_id === CANDIDATE_VISIBILITY_PREFERENCES_DEMO_CANDIDATE_ID ||
+    record.candidate_id === "authenticated"
+      ? `cand-user`
+      : record.candidate_id;
   const body = {
-    candidate_id: record.candidate_id,
+    candidate_id: candidateId,
     profile_visibility: record.profile_visibility,
     cv_visibility: record.cv_visibility,
     match_visibility: record.match_visibility,

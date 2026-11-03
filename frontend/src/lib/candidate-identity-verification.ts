@@ -1,4 +1,4 @@
-/** Candidate identity verification pilot — read-only demo preview (no backend writes). */
+/** Candidate identity verification — manual review status live path; Authologic start remains policy-held. */
 
 import {
   CANDIDATE_IDENTITY_VERIFICATION_DEMO_ID,

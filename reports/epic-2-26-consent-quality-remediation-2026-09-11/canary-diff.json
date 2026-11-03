@@ -1,0 +1,39 @@
+{
+  "product_feature_sha": "924bc7d684880c25a045ba69b7ed7441f1e79c7f",
+  "aligned_tip_sha": "d36e15ee943082b25ddcd1d039a1bd2a5c305410",
+  "frontend_commit": "d36e15ee943082b25ddcd1d039a1bd2a5c305410",
+  "api_commit": "d36e15ee943082b25ddcd1d039a1bd2a5c305410",
+  "worker_commit": "d36e15ee943082b25ddcd1d039a1bd2a5c305410",
+  "aligned": true,
+  "canary_diff": {},
+  "before": {
+    "rc1_launch": "NO-GO",
+    "rc1_external_pilot_enrollment_enabled": false,
+    "rc1_one_candidate_canary_ready": true,
+    "rc1_one_candidate_canary_state": "READY_INACTIVE",
+    "rc1_one_candidate_canary_active": false,
+    "rc1_canary_activation_command": "PREPARED_NOT_EXECUTED",
+    "rc1_effective_canary_cap": 0,
+    "rc1_effective_cohort_cap": 0,
+    "rc1_real_canary_designation_count": 0,
+    "rc1_real_canary_designation_status": "NOT_DESIGNATED",
+    "rc1_real_canary_candidate_designated_ready": false,
+    "rc1_pilot_runtime_state": "OPERATIONALLY_READY_INACTIVE",
+    "rc1_invite_send_enabled": false
+  },
+  "after": {
+    "rc1_launch": "NO-GO",
+    "rc1_external_pilot_enrollment_enabled": false,
+    "rc1_one_candidate_canary_ready": true,
+    "rc1_one_candidate_canary_state": "READY_INACTIVE",
+    "rc1_one_candidate_canary_active": false,
+    "rc1_canary_activation_command": "PREPARED_NOT_EXECUTED",
+    "rc1_effective_canary_cap": 0,
+    "rc1_effective_cohort_cap": 0,
+    "rc1_real_canary_designation_count": 0,
+    "rc1_real_canary_designation_status": "NOT_DESIGNATED",
+    "rc1_real_canary_candidate_designated_ready": false,
+    "rc1_pilot_runtime_state": "OPERATIONALLY_READY_INACTIVE",
+    "rc1_invite_send_enabled": false
+  }
+}

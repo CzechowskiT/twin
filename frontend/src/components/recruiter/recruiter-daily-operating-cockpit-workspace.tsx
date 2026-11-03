@@ -11,15 +11,11 @@ import { CompactAuditTrailWidget } from "@/components/shared/compact-audit-trail
 import { OperationalCrossLinksPanel } from "@/components/shared/operational-cross-links-panel";
 import { Card, Shell } from "@/components/ui";
 import { loadRecruiterOperatingState, type OperatingStateSummary } from "@/lib/live-operating-state";
-import type { CockpitQueueItem } from "@/lib/recruiter-daily-operating-cockpit-demo-data";
 import {
-  candidatePipelineHref,
-  candidateProfileHref,
   LAUNCH_STANCE,
   RECRUITER_DAILY_COCKPIT_MARKERS,
   RECRUITER_DAILY_COCKPIT_MODULE_LINKS,
   RECRUITER_DAILY_COCKPIT_PAGE_MARKER,
-  resolveRecruiterDailyCockpit,
 } from "@/lib/recruiter-daily-operating-cockpit";
 import {
   resolveRecruiterSchedulingProof,
@@ -45,43 +41,8 @@ function sectionCard(marker: string, title: string, children: ReactNode, classNa
   );
 }
 
-function priorityBadge(priority: CockpitQueueItem["priority"]): string {
-  if (priority === "high") return "border-rose-500/30 bg-rose-500/10 text-rose-200";
-  if (priority === "medium") return "border-amber-500/30 bg-amber-500/10 text-amber-200";
-  return "border-[var(--twin-border)] text-[var(--twin-muted-strong)]";
-}
-
-function queueList(items: CockpitQueueItem[], profileLabel: string): ReactNode {
-  return (
-    <ul className="space-y-2">
-      {items.map((item) => (
-        <li key={item.id} className="rounded-lg border border-[var(--twin-border)]/60 bg-[var(--twin-surface)]/40 px-3 py-2">
-          <div className="flex flex-wrap items-center gap-2">
-            <Link href={candidateProfileHref(item.candidate_id)} className="twin-link font-medium">
-              {item.candidate_display}
-            </Link>
-            <span className={`rounded-full border px-2 py-0.5 text-[10px] uppercase ${priorityBadge(item.priority)}`}>
-              {item.priority}
-            </span>
-          </div>
-          <p className="twin-muted mt-1 text-xs">{item.summary}</p>
-          <div className="mt-2 flex flex-wrap gap-3 text-xs">
-            <Link href={candidateProfileHref(item.candidate_id)} className="twin-link">
-              {profileLabel}
-            </Link>
-            <Link href={candidatePipelineHref(item.role_id)} className="twin-link">
-              {item.role_id}
-            </Link>
-          </div>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
 export function RecruiterDailyOperatingCockpitWorkspace() {
   const { t } = useTranslation();
-  const record = useMemo(() => resolveRecruiterDailyCockpit(), []);
   const schedulingProof = useMemo(() => resolveRecruiterSchedulingProof(), []);
   const microsoftReadiness = useMemo(() => resolveMicrosoftCalendarReadiness(), []);
   const { record: busyReadRecord } = useMicrosoftBusyReadLive();
@@ -97,6 +58,8 @@ export function RecruiterDailyOperatingCockpitWorkspace() {
       active = false;
     };
   }, []);
+
+  const liveChannels = operatingState?.channels ?? [];
 
   return (
     <Shell wide rail>
@@ -139,12 +102,6 @@ export function RecruiterDailyOperatingCockpitWorkspace() {
               </span>
             </div>
           </div>
-          <p className="text-xs text-[var(--twin-muted-strong)]">
-            {t("recruiterDailyCockpit.sampleContextLead")}{" "}
-            <span className="font-mono">{record.candidate_id}</span> ·{" "}
-            <span className="font-mono">{record.role_id}</span> ·{" "}
-            <span className="font-mono">{record.ats_connector_id}</span>
-          </p>
           <nav
             className="flex flex-wrap gap-2"
             data-testid={RECRUITER_DAILY_COCKPIT_MARKERS.moduleLinks}
@@ -164,21 +121,42 @@ export function RecruiterDailyOperatingCockpitWorkspace() {
         </header>
 
         <div className="grid gap-6 lg:grid-cols-2">
-        <LiveOperatingStatePanel
-          titleKey="recruiterDailyCockpit.operatingStateTitle"
-          leadKey="recruiterDailyCockpit.operatingStateLead"
-          summary={operatingState}
-          testId={RECRUITER_DAILY_COCKPIT_MARKERS.operatingState}
-        />
+          <LiveOperatingStatePanel
+            titleKey="recruiterDailyCockpit.operatingStateTitle"
+            leadKey="recruiterDailyCockpit.operatingStateLead"
+            summary={operatingState}
+            testId={RECRUITER_DAILY_COCKPIT_MARKERS.operatingState}
+          />
 
-        <CompactAuditTrailWidget />
+          <CompactAuditTrailWidget />
 
-        {sectionCard(
-          RECRUITER_DAILY_COCKPIT_MARKERS.priorityWorklist,
-          t("recruiterDailyCockpit.priorityWorklistTitle"),
+          {sectionCard(
+            RECRUITER_DAILY_COCKPIT_MARKERS.priorityWorklist,
+            t("recruiterDailyCockpit.priorityWorklistTitle"),
             <>
               <p className="twin-muted text-xs">{t("recruiterDailyCockpit.priorityWorklistLead")}</p>
-              {queueList(record.priority_worklist, t("recruiterDailyCockpit.openProfile"))}
+              <ul className="space-y-2" data-testid="recruiter-daily-cockpit-live-queues">
+                {liveChannels.length === 0 ? (
+                  <li className="twin-muted text-xs">{t("liveOperatingState.loading")}</li>
+                ) : (
+                  liveChannels.map((ch) => (
+                    <li
+                      key={ch.id}
+                      className="rounded-lg border border-[var(--twin-border)]/60 bg-[var(--twin-surface)]/40 px-3 py-2"
+                      data-queue-source={ch.source}
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <Link href={ch.href} className="twin-link font-medium">
+                          {t(ch.labelKey)}
+                        </Link>
+                        <span className="rounded-full border border-[var(--twin-border)] px-2 py-0.5 text-[10px] uppercase tabular-nums">
+                          {ch.count} · {ch.source}
+                        </span>
+                      </div>
+                    </li>
+                  ))
+                )}
+              </ul>
             </>,
           )}
 
@@ -187,7 +165,9 @@ export function RecruiterDailyOperatingCockpitWorkspace() {
             t("recruiterDailyCockpit.decisionQueueTitle"),
             <>
               <p className="twin-muted text-xs">{t("recruiterDailyCockpit.decisionQueueLead")}</p>
-              {queueList(record.open_decisions, t("recruiterDailyCockpit.openProfile"))}
+              <Link href="/recruiter/inbox" className="twin-link text-sm">
+                {t("recruiterDailyCockpit.linkPipeline")} →
+              </Link>
             </>,
           )}
 
@@ -196,7 +176,9 @@ export function RecruiterDailyOperatingCockpitWorkspace() {
             t("recruiterDailyCockpit.trustConsentTitle"),
             <>
               <p className="twin-muted text-xs">{t("recruiterDailyCockpit.trustConsentLead")}</p>
-              {queueList(record.consent_review, t("recruiterDailyCockpit.openTrust"))}
+              <Link href="/recruiter/trust-review-queue" className="twin-link text-sm">
+                {t("recruiterDailyCockpit.linkTrust")} →
+              </Link>
             </>,
           )}
 
@@ -205,14 +187,9 @@ export function RecruiterDailyOperatingCockpitWorkspace() {
             t("recruiterDailyCockpit.feedbackScorecardTitle"),
             <>
               <p className="twin-muted text-xs">{t("recruiterDailyCockpit.feedbackScorecardLead")}</p>
-              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--twin-muted-strong)]">
-                {t("recruiterDailyCockpit.feedbackMissingLabel")}
-              </p>
-              {queueList(record.feedback_missing, t("recruiterDailyCockpit.openNotes"))}
-              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--twin-muted-strong)]">
-                {t("recruiterDailyCockpit.scorecardsPendingLabel")}
-              </p>
-              {queueList(record.scorecards_pending, t("recruiterDailyCockpit.openNotes"))}
+              <Link href="/recruiter/work-items" className="twin-link text-sm">
+                {t("recruiterDailyCockpit.openNotes")} →
+              </Link>
             </>,
           )}
 
@@ -221,7 +198,9 @@ export function RecruiterDailyOperatingCockpitWorkspace() {
             t("recruiterDailyCockpit.commDraftsTitle"),
             <>
               <p className="twin-muted text-xs">{t("recruiterDailyCockpit.commDraftsLead")}</p>
-              {queueList(record.comm_drafts_review, t("recruiterDailyCockpit.openCommunication"))}
+              <Link href="/recruiter/inbox" className="twin-link text-sm">
+                {t("recruiterDailyCockpit.openCommunication")} →
+              </Link>
             </>,
           )}
 
@@ -230,25 +209,9 @@ export function RecruiterDailyOperatingCockpitWorkspace() {
             t("recruiterDailyCockpit.atsImportTitle"),
             <>
               <p className="twin-muted text-xs">{t("recruiterDailyCockpit.atsImportLead")}</p>
-              <ul className="space-y-2">
-                {record.ats_import_queue.map((item) => (
-                  <li
-                    key={item.id}
-                    className="rounded-lg border border-[var(--twin-border)]/60 bg-[var(--twin-surface)]/40 px-3 py-2"
-                  >
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-medium">{item.connector}</span>
-                      <span className="rounded-full border border-sky-500/30 px-2 py-0.5 text-[10px] uppercase">
-                        {item.status}
-                      </span>
-                    </div>
-                    <p className="twin-muted mt-1 text-xs">{item.issue}</p>
-                    <p className="mt-1 text-xs">
-                      {item.candidate_id} · {item.role_id}
-                    </p>
-                  </li>
-                ))}
-              </ul>
+              <Link href="/recruiter/ats-import-readiness" className="twin-link text-sm">
+                {t("recruiterDailyCockpit.linkAtsReadiness")} →
+              </Link>
             </>,
           )}
 
@@ -257,25 +220,9 @@ export function RecruiterDailyOperatingCockpitWorkspace() {
             t("recruiterDailyCockpit.pipelineChangesTitle"),
             <>
               <p className="twin-muted text-xs">{t("recruiterDailyCockpit.pipelineChangesLead")}</p>
-              <ul className="space-y-2">
-                {record.pipeline_stage_changes.map((change) => (
-                  <li
-                    key={change.id}
-                    className="rounded-lg border border-[var(--twin-border)]/60 bg-[var(--twin-surface)]/40 px-3 py-2"
-                  >
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Link href={candidateProfileHref(change.candidate_id)} className="twin-link font-medium">
-                        {change.candidate_display}
-                      </Link>
-                      <span className="text-xs">
-                        {change.from_stage} → {change.to_stage}
-                      </span>
-                    </div>
-                    <p className="twin-muted mt-1 text-xs">{change.rationale}</p>
-                    <p className="mt-1 text-[10px] text-[var(--twin-muted-strong)]">{change.changed_at}</p>
-                  </li>
-                ))}
-              </ul>
+              <Link href="/recruiter/pipeline" className="twin-link text-sm">
+                {t("recruiterDailyCockpit.linkPipeline")} →
+              </Link>
             </>,
           )}
 
@@ -284,7 +231,9 @@ export function RecruiterDailyOperatingCockpitWorkspace() {
             t("recruiterDailyCockpit.digestTitle"),
             <>
               <p className="twin-muted text-xs">{t("recruiterDailyCockpit.digestLead")}</p>
-              {queueList(record.weekly_digest_candidates, t("recruiterDailyCockpit.openProfile"))}
+              <Link href="/recruiter/talent-radar" className="twin-link text-sm">
+                {t("recruiterDailyCockpit.openProfile")} →
+              </Link>
             </>,
           )}
 
@@ -293,35 +242,11 @@ export function RecruiterDailyOperatingCockpitWorkspace() {
             t("recruiterDailyCockpit.dailyChecklistTitle"),
             <>
               <p className="twin-muted text-xs">{t("recruiterDailyCockpit.dailyChecklistLead")}</p>
-              <ul className="space-y-2">
-                {record.daily_checklist.map((item) => (
-                  <li key={item.id} className="flex items-start gap-2 text-xs">
-                    <input type="checkbox" checked={item.done} disabled readOnly className="mt-0.5" aria-label={item.label} />
-                    <span>
-                      {item.label}
-                      {item.boundary === "no_outreach" ? (
-                        <span className="ml-1 text-amber-700 dark:text-amber-300">
-                          ({t("recruiterDailyCockpit.boundaryNoOutreach")})
-                        </span>
-                      ) : null}
-                      {item.boundary === "no_ats_sync" ? (
-                        <span className="ml-1 text-amber-700 dark:text-amber-300">
-                          ({t("recruiterDailyCockpit.boundaryNoAtsSync")})
-                        </span>
-                      ) : null}
-                      {item.boundary === "launch_no_go" ? (
-                        <span className="ml-1 text-rose-700 dark:text-rose-300">
-                          ({t("recruiterDailyCockpit.boundaryLaunchNoGo")})
-                        </span>
-                      ) : null}
-                      {item.boundary === "phase3b_blocked" ? (
-                        <span className="ml-1 text-rose-700 dark:text-rose-300">
-                          ({t("recruiterDailyCockpit.boundaryPhase3bBlocked")})
-                        </span>
-                      ) : null}
-                    </span>
-                  </li>
-                ))}
+              <ul className="space-y-1 text-xs">
+                <li>· {t("recruiterDailyCockpit.humanPoint1")}</li>
+                <li>· {t("recruiterDailyCockpit.humanPoint2")}</li>
+                <li>· {t("recruiterDailyCockpit.humanPoint3")}</li>
+                <li>· {t("recruiterDailyCockpit.humanPoint4")}</li>
               </ul>
             </>,
           )}
@@ -343,10 +268,7 @@ export function RecruiterDailyOperatingCockpitWorkspace() {
               </ul>
               <p className="text-xs text-[var(--twin-muted)]">{schedulingProof.blocked_note}</p>
               {microsoftReadiness ? (
-                <p
-                  className="text-xs font-medium"
-                  data-testid="microsoft-calendar-readiness-busy-read"
-                >
+                <p className="text-xs font-medium" data-testid="microsoft-calendar-readiness-busy-read">
                   {t("microsoftCalendarReadiness.busyReadTitle")}:{" "}
                   {t(microsoftBusyReadStageKey(microsoftReadiness.busy_read_stage))}
                 </p>

@@ -14,8 +14,20 @@ ConsentPurpose = Literal[
     "profile_documents",
 ]
 ConsentStatus = Literal["active", "withdrawn", "not_granted", "review_required"]
-PrivacyRequestType = Literal["correction", "export", "portability", "withdrawal", "deletion"]
+PrivacyRequestType = Literal[
+    "correction",
+    "export",
+    "portability",
+    "withdrawal",
+    "deletion",
+    "identity_review",
+    "objection",
+    "restriction",
+]
 PrivacyRequestStatus = Literal["open", "processing", "completed", "cancelled"]
+PrivacyFulfillmentStatus = Literal[
+    "queued", "in_progress", "fulfilled", "rejected", "cancelled"
+]
 
 
 class ConsentItemOut(BaseModel):
@@ -70,6 +82,11 @@ class PrivacyRequestOut(BaseModel):
     created_at: datetime
     updated_at: datetime
     completed_at: datetime | None = None
+    fulfillment_status: str | None = None
+    fulfilled_at: datetime | None = None
+    fulfilled_by_user_id: int | None = None
+    delivery_receipt: dict[str, Any] | None = None
+    legal_hold: bool = False
     manual_processing_notice: str
 
 

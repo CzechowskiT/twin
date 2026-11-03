@@ -1,0 +1,34 @@
+{
+  "A": {
+    "status": "PASS",
+    "detail": "consent off default; submit; feedback visible"
+  },
+  "B": {
+    "status": "PASS",
+    "detail": "browser Anthropic hits=0 (server-side egress verified separately in unit matrix)"
+  },
+  "C": {
+    "status": "PASS",
+    "detail": "exact draft restored: DRAFT_SENTINEL_3dc37d6a"
+  },
+  "D": {
+    "status": "PASS",
+    "detail": "objective correct≠wrong; catalog visible"
+  },
+  "E": {
+    "status": "PASS",
+    "detail": "explicit promote completed"
+  },
+  "F": {
+    "status": "PASS",
+    "detail": "sentinel isolated; delete denied reads; users 86≠87"
+  },
+  "G": {
+    "status": "PASS",
+    "detail": "authed UI; anon=401; isolated candidate 74"
+  },
+  "H": {
+    "status": "PASS",
+    "detail": "mobile viewport + keyboard typing"
+  }
+}

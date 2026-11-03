@@ -24,6 +24,7 @@ Command TWIN’s Founder Command Center through Actions. Eliminate copy-paste of
 11. Speak Polish with the founder unless they write in English. Keep status updates short and actionable.
 12. FCC at `/admin/founder-command` is a **fallback dashboard** only — Actions are the primary path.
 13. Before dispatch, confirm plan contract for mutating work: `execution_mode` mutating/build/deploy, `read_only=false`, and required mutation flags. If the API returns `planner_execution_mode_mismatch`, tell the founder and retry with `action=start` (not analyze).
+14. Under the default Approval Policy, a standard deploy is auto-approved only when its contract still requires commit, PR, deployment, and production-regression evidence. Destructive operations, overrides, and merge-to-base remain explicit founder decisions; never describe auto-approval as bypassing CI or manual-merge policy.
 
 ## Workflow
 1. `getTwinProjectState` — counters, SHAs, Gate F, Launch, open PRs.

@@ -1,0 +1,118 @@
+{
+  "bucket": {
+    "checks": [
+      {
+        "detail": "exit=0",
+        "name": "script_epic-2-22-auth-session-e2e.py",
+        "ok": true
+      },
+      {
+        "detail": "exit=0",
+        "name": "script_epic-2-22-auth-session-authenticated-e2e.py",
+        "ok": true
+      },
+      {
+        "detail": "exit=0",
+        "name": "script_epic-2-23-account-recovery-e2e.py",
+        "ok": true
+      },
+      {
+        "detail": "exit=0",
+        "name": "script_epic-2-23-account-recovery-authenticated-e2e.py",
+        "ok": true
+      },
+      {
+        "detail": "exit=0",
+        "name": "script_epic-2-24-totp-mfa-e2e.py",
+        "ok": true
+      },
+      {
+        "detail": "exit=0",
+        "name": "script_epic-2-24-totp-mfa-authenticated-e2e.py",
+        "ok": true
+      },
+      {
+        "detail": "200",
+        "name": "fresh_mfa_default_off",
+        "ok": true
+      }
+    ],
+    "fail": 0,
+    "pass": 7
+  },
+  "gj5": {
+    "details": {
+      "mfa_status_http": 200,
+      "mint": {
+        "candidate_id_present": true,
+        "has_token": "<redacted>",
+        "kpi_excluded": true,
+        "label": "gj5",
+        "ok": true,
+        "real_person": false,
+        "synthetic": true,
+        "user_id_present": true
+      },
+      "scripts": [
+        {
+          "exit_code": 0,
+          "fail_lines": 0,
+          "log_tail": "PASS  B canonical authority\nPASS  C session schema\nPASS  C refresh schema\nPASS  C security schema\nPASS  D for update\nPASS  D reuse family\nPASS  E legacy accept\nPASS  E no mass logout\nPASS  F validate in deps\nPASS  F refresh route\nPASS  F logout route\nPASS  G digest only\nPASS  G no device tracking fields\nPASS  H not first value\nPASS  H provider gate\nPASS  I primary 7\nPASS  J fe logoutSession\nPASS  J access recovery\nPASS  K previous_digest\nPASS  L unit \u2014  represent datetimes in UTC: datetime.datetime.now(datetime.UTC).\n    return datetime.utcnow()\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n5 passed, 143 warnings in 3.19s\n\nPASS  L fe guard \u2014 \n> frontend@0.1.0 test:epic-222-auth-session-guard\n> npx --yes tsx scripts/epic-222-auth-session-guard.test.ts\n\nepic-222-auth-session-guard: ok\n\nPASS  M no alembic 137\nPASS  stance launch NO-GO\nPASS  stance enrollment OFF\nPASS  stance canary inactive\nPASS  stance activation prepared\nPASS  stance designation 0\nPASS  stance canary cap 0\n\n34 passed, 0 failed",
+          "ok": true,
+          "pass_lines": 34,
+          "script": "epic-2-22-auth-session-e2e.py"
+        },
+        {
+          "exit_code": 0,
+          "fail_lines": 0,
+          "log_tail": "PASS  stance/public_health\nPASS  stance/launch_nogo\nPASS  stance/enrollment_off\nPASS  stance/canary_inactive\nPASS  stance/activation_prepared\nPASS  stance/designation_0\nPASS  stance/caps_zero\nPASS  product/catalog \u2014 200\nPASS  product/canonical\nPASS  product/parallel_none\nPASS  product/mint_synthetic \u2014 200\nPASS  product/managed_mint\nPASS  product/access_with_managed \u2014 200\nPASS  product/second_session \u2014 200\nPASS  product/revoke_others \u2014 200\nPASS  product/revocation_propagated \u2014 401\nPASS  product/revocation_slo_ms \u2014 226\nPASS  product/inventory_sessions \u2014 200\nPASS  security/no_secrets_in_inventory\nPASS  security/no_raw_refresh_in_inventory\nPASS  product/refresh_rotate \u2014 200\nPASS  security/reuse_contained \u2014 401\nPASS  product/remint_after_reuse \u2014 200\nPASS  product/logout_current \u2014 200\nPASS  product/logout_invalidates \u2014 401\nPASS  security/synthetic_only\nPASS  invariant/business_state_diff_0 \u2014 {}\nPASS  invariant/canary_ready_inactive\nPASS  invariant/designation_still_0\nPASS  invariant/activation_still_prepared\n\nproduct 15/15 stance 7/7 security 4/4 invariant 4/4",
+          "ok": true,
+          "pass_lines": 30,
+          "script": "epic-2-22-auth-session-authenticated-e2e.py"
+        },
+        {
+          "exit_code": 0,
+          "fail_lines": 0,
+          "log_tail": "PASS  C step-up schema\nPASS  D for update\nPASS  D revoke everywhere\nPASS  D no auto mint\nPASS  E passkeys deferred\nPASS  E hash fragment links\nPASS  F step-up routes\nPASS  F step-up header\nPASS  G no fingerprint\nPASS  G no ua/ip scoring\nPASS  H not first value recovery\nPASS  H not first value step-up\nPASS  I primary 7\nPASS  J fe replaceState\nPASS  J access step-up\nPASS  K alembic revises 136\nPASS  L unit \u2014  version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).\n    return datetime.utcnow()\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n12 passed, 129 warnings in 4.46s\n\nPASS  L fe guard \u2014 \n> frontend@0.1.0 test:epic-223-account-recovery-guard\n> npx --yes tsx scripts/epic-223-account-recovery-guard.test.ts\n\nepic-223-account-recovery-guard: ok\n\nPASS  stance launch nogo preserved\nPASS  stance passkeys still deferred\nPASS  stance no canary mutation code\nPASS  stance mint synthetic recovery ops\nPASS  stance pending recovery inventory\nPASS  M public health\nPASS  M launch NO-GO\nPASS  M canary inactive\nPASS  M activation prepared\nPASS  M designation 0\n\n37/37",
+          "ok": true,
+          "pass_lines": 37,
+          "script": "epic-2-23-account-recovery-e2e.py"
+        },
+        {
+          "exit_code": 0,
+          "fail_lines": 0,
+          "log_tail": "PASS  stance/public_health\nPASS  stance/launch_nogo\nPASS  stance/enrollment_off\nPASS  stance/canary_inactive\nPASS  stance/activation_prepared\nPASS  stance/designation_0\nPASS  stance/caps_zero\nPASS  product/recovery_catalog \u2014 200\nPASS  product/recovery_schema\nPASS  product/parallel_none\nPASS  product/step_up_catalog \u2014 200\nPASS  product/step_up_ttl\nPASS  product/mint_synthetic \u2014 200\nPASS  product/everywhere_requires_step_up \u2014 403\nPASS  product/step_up_issue \u2014 200\nPASS  product/everywhere_with_step_up \u2014 200\nPASS  product/remint \u2014 200\nPASS  product/mint_recovery \u2014 200\nPASS  security/recovery_sink_no_mail\nPASS  product/inventory_pending_recovery \u2014 200\nPASS  security/no_secrets_in_pending\nPASS  security/no_raw_recovery_token_in_inventory\nPASS  product/recovery_complete \u2014 200\nPASS  product/post_recovery_session_dead \u2014 401\nPASS  product/recovery_single_use \u2014 400\nPASS  product/remint_after_recovery \u2014 200\nPASS  product/step_up_change_pw \u2014 200\nPASS  product/restore_synth_password \u2014 200\nPASS  security/synthetic_only\nPASS  invariant/business_state_diff_0 \u2014 {}\nPASS  invariant/canary_ready_inactive\nPASS  invariant/designation_still_0\nPASS  invariant/activation_still_prepared\n\nproduct 18/18 stance 7/7 security 4/4 invariant 4/4",
+          "ok": true,
+          "pass_lines": 33,
+          "script": "epic-2-23-account-recovery-authenticated-e2e.py"
+        },
+        {
+          "exit_code": 0,
+          "fail_lines": 0,
+          "log_tail": "PASS  C challenge schema\nPASS  C recovery codes schema\nPASS  C assurance schema\nPASS  D pyotp\nPASS  D dedicated keyring\nPASS  E no webauthn impl\nPASS  E no sms/email otp\nPASS  F mfa routes\nPASS  G for update replay\nPASS  H not first value\nPASS  H passkeys deferred\nPASS  I primary 7\nPASS  J fe mfa lib\nPASS  J access opt-in\nPASS  K alembic revises 137\nPASS  K assurance column\nPASS  L anti-lockout reset\nPASS  L recovery wires reset\nPASS  M unit \u2014  represent datetimes in UTC: datetime.datetime.now(datetime.UTC).\n    return datetime.utcnow()\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n4 passed, 123 warnings in 3.59s\n\nPASS  M fe guard \u2014 \n> frontend@0.1.0 test:epic-224-totp-mfa-guard\n> npx --yes tsx scripts/epic-224-totp-mfa-guard.test.ts\n\nepic-224-totp-mfa-guard: ok\n\nPASS  N stance launch nogo preserved\nPASS  N no canary mutation\nPASS  N inventory MFA_TOTP\nPASS  O public health\nPASS  O launch NO-GO\nPASS  O canary inactive\nPASS  O activation prepared\nPASS  O designation 0\n\n36/36",
+          "ok": true,
+          "pass_lines": 36,
+          "script": "epic-2-24-totp-mfa-e2e.py"
+        },
+        {
+          "exit_code": 0,
+          "fail_lines": 0,
+          "log_tail": "PASS  stance/public_health\nPASS  stance/launch_nogo\nPASS  stance/enrollment_off\nPASS  stance/canary_inactive\nPASS  stance/activation_prepared\nPASS  stance/designation_0\nPASS  stance/caps_zero\nPASS  product/mfa_catalog \u2014 200\nPASS  product/stance_flags\nPASS  security/keyring_not_secret_key\nPASS  product/keyring_available \u2014 {'keyring_available': True, 'uses_secret_key': False, 'uses_jwt_signing_key': False, 'dedicated_mfa_keyring': True, 'production_fail_closed': True}\nPASS  product/mint_synthetic \u2014 200\nPASS  product/mfa_status \u2014 200\nPASS  product/step_up_enroll \u2014 200\nPASS  product/enroll_start \u2014 200\nPASS  security/secret_not_empty\nPASS  product/enroll_verify \u2014 200\nPASS  product/recovery_codes \u2014 200\nPASS  product/inventory_mfa \u2014 200\nPASS  security/no_secrets_in_inventory\nPASS  security/no_raw_secret_in_inventory\nPASS  product/disable_cleanup \u2014 200\nPASS  security/synthetic_only\nPASS  invariant/business_state_diff_0 \u2014 {}\nPASS  invariant/canary_ready_inactive\nPASS  invariant/designation_still_0\nPASS  invariant/activation_still_prepared\n\nproduct 11/11 stance 7/7 security 5/5 invariant 4/4",
+          "ok": true,
+          "pass_lines": 27,
+          "script": "epic-2-24-totp-mfa-authenticated-e2e.py"
+        }
+      ],
+      "teardown": {
+        "delete_ok": false,
+        "delete_status": 422,
+        "revoke_all_status": 404,
+        "step_up_catalog": 200,
+        "step_up_issue": 422
+      }
+    },
+    "id": "GJ5",
+    "result": "PASS",
+    "title": "Continuity + account security (sessions/MFA/recovery)"
+  }
+}

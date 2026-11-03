@@ -65,6 +65,7 @@ def test_scrape_all_allowed_for_regular_user(mock_delay, scrape_client, monkeypa
     client, regular, ops, _db = scrape_client
     monkeypatch.setenv("SCRAPE_USER_TRIGGER_ENABLED", "true")
     monkeypatch.setenv("SCRAPE_OPS_USER_IDS", str(ops.id))
+    monkeypatch.setenv("CELERY_TASK_ALWAYS_EAGER", "false")
     get_settings.cache_clear()
     mock_delay.return_value = type("R", (), {"id": "task-1"})()
     try:
@@ -138,6 +139,7 @@ def test_scrape_allowed_with_or_without_ops_email(mock_delay, scrape_client, mon
     monkeypatch.setenv("SCRAPE_USER_TRIGGER_ENABLED", "true")
     monkeypatch.setenv("SCRAPE_OPS_USER_IDS", "")
     monkeypatch.setenv("SCRAPE_OPS_EMAILS", ops.email)
+    monkeypatch.setenv("CELERY_TASK_ALWAYS_EAGER", "false")
     get_settings.cache_clear()
     mock_delay.return_value = type("R", (), {"id": "task-3"})()
     try:

@@ -151,6 +151,19 @@ def declare_placement_intent(
     )
     db.commit()
     db.refresh(app)
+    try:
+        from app.services.product_funnel import emit_funnel_event
+
+        emit_funnel_event(
+            db,
+            event_name="placement_declared",
+            user_id=user.id,
+            properties={"application_id": app.id},
+            once=False,
+            commit=True,
+        )
+    except Exception:
+        pass
     return app
 
 
@@ -215,11 +228,20 @@ def start_work_email_verification(
         except Exception:
             logger.exception("Placement verification email failed application_id=%s", application_id)
     else:
-        logger.warning(
-            "Placement verify link (no mail configured): application_id=%s url=%s",
-            application_id,
-            link,
-        )
+        # Never log raw placement verify URLs outside development/debug.
+        env = (settings.environment or "").strip().lower()
+        if settings.debug or env == "development":
+            logger.warning(
+                "Placement verify link (no mail configured): application_id=%s url=%s",
+                application_id,
+                link,
+            )
+        else:
+            logger.warning(
+                "Placement verify mail not configured; application_id=%s token_fp=%s",
+                application_id,
+                hashlib.sha256(raw.encode("utf-8")).hexdigest()[:12],
+            )
 
     record_placement_event(
         db,
@@ -478,4 +500,19 @@ def confirm_placement_token(db: Session, raw_token: str) -> tuple[bool, str]:
         from_magic_link=True,
     )
     db.commit()
+    try:
+        from app.services.product_funnel import emit_funnel_event
+
+        cand = db.query(Candidate).filter(Candidate.id == app.candidate_id).first()
+        if cand:
+            emit_funnel_event(
+                db,
+                event_name="placement_verified",
+                user_id=cand.user_id,
+                properties={"application_id": app.id, "source": "magic_link"},
+                once=False,
+                commit=True,
+            )
+    except Exception:
+        pass
     return True, "Placement verified. Thank you."
