@@ -50,10 +50,9 @@ echo 'Chromium with local HTML only'
 docker run --rm --network twin-verify-net --env-file "$env_file" "$image" python -c \
   'from playwright.sync_api import sync_playwright; p=sync_playwright().start(); b=p.chromium.launch(headless=True,args=["--no-sandbox"]); page=b.new_page(); page.set_content("<title>TWIN offline verification</title>"); assert page.title()=="TWIN offline verification"; b.close(); p.stop(); print("Chromium local HTML: PASS")'
 echo 'Actual Docker CMD and start-api.sh'
-docker run -d --name twin-verify-api --network twin-verify-net --env-file "$env_file" \
-  -p 127.0.0.1:43877:8000 "$image"
+docker run -d --name twin-verify-api --network twin-verify-net --env-file "$env_file" "$image"
 for attempt in $(seq 1 90); do
-  if curl -fsS http://127.0.0.1:43877/api/v1/health > /dev/null; then break; fi
+  if docker exec twin-verify-api curl -fsS --max-time 2 http://127.0.0.1:8000/api/v1/health > /dev/null 2>&1; then break; fi
   if [[ "$attempt" == 90 ]]; then docker logs twin-verify-api; exit 1; fi
   sleep 1
 done
