@@ -24,8 +24,8 @@ if sys.argv[1] == "db":
         current = connection.execute(text("SELECT version_num FROM alembic_version")).scalars().all()
         assert current == heads, (current, heads)
         if "--preserved-row" in sys.argv:
-            count = connection.execute(text("SELECT count(*) FROM users WHERE email='ci-preservation@example.invalid'")).scalar_one()
-            assert count == 1
+            row = connection.execute(text("SELECT hashed_password,email_product_updates,email_interview_reminders FROM users WHERE email='ci-preservation@example.invalid'")).one()
+            assert tuple(row) == ("not-a-real-password", False, False)
     print("PostgreSQL migration verification: PASS", heads[0])
 elif sys.argv[1] == "http":
     import httpx

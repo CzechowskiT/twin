@@ -37,7 +37,7 @@ upgrade_url='postgresql+psycopg://postgres:ci-local-only@twin-verify-db:5432/twi
 docker run --rm --network twin-verify-net --env-file "$env_file" -e DATABASE_URL="$upgrade_url" \
   "$image" alembic upgrade 077_candidate_activity_timeline
 docker exec twin-verify-db psql -v ON_ERROR_STOP=1 -U postgres -d twin_upgrade -c \
-  "INSERT INTO users (email,hashed_password,is_active,created_at) VALUES ('ci-preservation@example.invalid','not-a-real-password',true,NOW());"
+  "INSERT INTO users (email,hashed_password,is_active,created_at,email_product_updates,email_interview_reminders) VALUES ('ci-preservation@example.invalid','not-a-real-password',true,NOW(),false,false);"
 docker run --rm --network twin-verify-net --env-file "$env_file" -e DATABASE_URL="$upgrade_url" \
   "$image" alembic upgrade head
 docker run --rm --network twin-verify-net --env-file "$env_file" -e DATABASE_URL="$upgrade_url" \
