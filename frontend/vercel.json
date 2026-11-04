@@ -1,5 +1,6 @@
 {
   "framework": "nextjs",
+  "git": { "deploymentEnabled": { "codex/verify-cursor-20261104": false } },
   "buildCommand": "npm run build",
   "installCommand": "npm ci",
   "headers": [

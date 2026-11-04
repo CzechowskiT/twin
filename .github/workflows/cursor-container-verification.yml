@@ -1,0 +1,25 @@
+name: cursor-container-verification
+on:
+  push:
+    branches: [codex/verify-cursor-20261104]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: cursor-container-verification-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  container-and-isolated-postgres:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Build backend and verify isolated PostgreSQL migrations and HTTP
+        run: bash backend/scripts/verify-cursor-container.sh
+      - name: Dispose temporary test containers
+        if: always()
+        run: |
+          docker rm -fv twin-verify-api twin-verify-db 2>/dev/null || true
+          docker network rm twin-verify-net 2>/dev/null || true
