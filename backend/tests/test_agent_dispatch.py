@@ -2152,3 +2152,70 @@ def test_polling_delay_rechecks_github_before_success(dispatch_client, monkeypat
     assert response.json()["status"] == "succeeded"
     assert response.json()["verified_artifacts"]["ci_passed"] is True
     assert calls == {"cursor": 2, "github": 2}
+
+
+def test_remote_cancel_stays_pending_until_cursor_confirms(dispatch_client, monkeypatch):
+    """HTTP cancellation accepted by Cursor is not proof of terminal state."""
+    from app.database.models import AgentDispatchRun
+
+    client, db = dispatch_client
+    created = client.post(
+        "/api/internal/agent-dispatch/runs",
+        headers=_auth(),
+        json=_create_payload(prompt="Stop remote safely"),
+    )
+    assert created.status_code == 201, created.text
+    run_id = created.json()["id"]
+    row = db.get(AgentDispatchRun, run_id)
+    row.status = "running"
+    row.cursor_agent_id = "bc-cancel-test"
+    row.cursor_api_version = "v1"
+    db.commit()
+
+    monkeypatch.setattr(
+        "app.services.agent_dispatch.service.CursorCloudAgentsClient.cancel",
+        lambda *_args, **_kwargs: None,
+    )
+    response = client.post(
+        f"/api/internal/agent-dispatch/runs/{run_id}/cancel", headers=_auth()
+    )
+    assert response.status_code == 200, response.text
+    assert response.json()["status"] == "cancelling"
+    db.refresh(row)
+    assert row.finished_at is None
+    assert row.error_code == "cursor_cancel_pending"
+
+
+def test_remote_cancel_api_error_never_claims_success(dispatch_client, monkeypatch):
+    """A failed Cursor cancel request must retain lock and pending status."""
+    from app.database.models import AgentDispatchRun
+
+    client, db = dispatch_client
+    created = client.post(
+        "/api/internal/agent-dispatch/runs",
+        headers=_auth(),
+        json=_create_payload(prompt="Stop remote with error"),
+    )
+    assert created.status_code == 201, created.text
+    run_id = created.json()["id"]
+    row = db.get(AgentDispatchRun, run_id)
+    row.status = "running"
+    row.cursor_agent_id = "bc-error-test"
+    row.cursor_api_version = "v1"
+    db.commit()
+
+    def fail_cancel(*_args, **_kwargs):
+        raise CursorApiError("test remote unreachable", status_code=503)
+
+    monkeypatch.setattr(
+        "app.services.agent_dispatch.service.CursorCloudAgentsClient.cancel",
+        fail_cancel,
+    )
+    response = client.post(
+        f"/api/internal/agent-dispatch/runs/{run_id}/cancel", headers=_auth()
+    )
+    assert response.status_code == 200, response.text
+    assert response.json()["status"] == "cancelling"
+    db.refresh(row)
+    assert row.finished_at is None
+    assert row.error_code == "cursor_cancel_unconfirmed"
