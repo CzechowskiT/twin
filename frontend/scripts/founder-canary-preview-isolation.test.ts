@@ -97,7 +97,7 @@ test("preview without cert fail-closed even for non-prod upstream", () => {
   );
 });
 
-test("preview + cert + non-prod upstream allows mutations", () => {
+test("preview + cert + non-prod upstream remains blocked until isolated staging exists", () => {
   withEnv(
     {
       VERCEL_ENV: "preview",
@@ -107,11 +107,15 @@ test("preview + cert + non-prod upstream allows mutations", () => {
       FOUNDER_CANARY_PREVIEW_ISOLATION_CERT: "1",
     },
     () => {
-      assert.equal(previewCanaryMutationsAllowed(), true);
-      assert.equal(assertPreviewCanaryMutationAllowed().ok, true);
+      assert.equal(previewCanaryMutationsAllowed(), false);
+      const denied = assertPreviewCanaryMutationAllowed();
+      assert.equal(denied.ok, false);
+      if (!denied.ok) assert.equal(denied.status, 403);
       const audit = founderCanaryPreviewIsolationAudit();
-      assert.equal(audit.fail_closed_guard_active, false);
-      assert.equal(audit.preview_mutations_allowed, true);
+      assert.equal(audit.upstream_configured, true);
+      assert.equal(audit.upstream_is_known_production_api, false);
+      assert.equal(audit.fail_closed_guard_active, true);
+      assert.equal(audit.preview_mutations_allowed, false);
     },
   );
 });
