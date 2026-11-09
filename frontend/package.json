@@ -379,6 +379,7 @@
     "test:founder-canary-access-guard": "npx --yes tsx scripts/founder-canary-access-guard.test.ts",
     "test:founder-canary-bff": "npx --yes tsx scripts/founder-canary-bff.test.ts",
     "test:founder-canary-preview-isolation": "npx --yes tsx scripts/founder-canary-preview-isolation-guard.test.ts && npx --yes tsx scripts/founder-canary-preview-isolation.test.ts",
+    "test:preview-prod-api-isolation": "npx --yes tsx scripts/preview-prod-api-isolation.test.ts",
     "test:founder-canary-access-browser": "npx --yes tsx scripts/founder-canary-preview-isolation-guard.test.ts && node -e \"if(process.env.PLAYWRIGHT_ENABLE_BROWSER_TESTS!=='1'){console.error('Set PLAYWRIGHT_ENABLE_BROWSER_TESTS=1 (mocked e2e only; no live designation).');process.exit(1)}\" && npm run test:founder-canary-access-browser:raw",
     "test:founder-canary-access-browser:raw": "playwright test e2e/founder-canary-access-browser.spec.ts --workers=1",
     "test:founder-command-center-prod": "node -e \"if(process.env.PLAYWRIGHT_ALLOW_PROD_SMOKE!=='1'){console.error('Set PLAYWRIGHT_ALLOW_PROD_SMOKE=1 for production FCC e2e.');process.exit(1)}\" && npm run test:founder-command-center-prod:raw",
