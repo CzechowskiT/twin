@@ -35,7 +35,10 @@ jobs:
           python3 -m pytest tests/test_candidate_account_deletion.py \
             tests/test_beta_waitlist_upload_rate_limit.py \
             tests/test_idempotency_key_naming.py \
-            tests/test_founder_canary_auth.py -q
+            tests/test_founder_canary_auth.py \
+            tests/test_agent_dispatch.py::test_remote_cancel_stays_pending_until_cursor_confirms \
+            tests/test_agent_dispatch.py::test_remote_cancel_api_error_never_claims_success \
+            tests/test_founder_command.py::test_founder_stop_stays_paused_while_remote_cursor_cancel_pending -q
       - name: Frontend security guards
         working-directory: frontend
         run: |
