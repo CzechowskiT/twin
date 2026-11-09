@@ -11,6 +11,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
+from app.config import get_settings
 from app.core.deps import get_current_user
 from app.core.security import hash_password
 from app.database.models import (
@@ -28,6 +29,20 @@ from app.services.candidate_account_recovery_constants import PURPOSE_ACCOUNT_DE
 from tests.test_auth_integration import _sqlite_session
 
 PASSWORD = "DeletePass123!"
+
+
+
+@pytest.fixture(autouse=True)
+def _legacy_delete_behavior_without_step_up(monkeypatch):
+    """Exercise legacy deletion behavior without step-up in this test module only.
+
+    Step-up protection stays enabled in production and is explicitly tested
+    in the negative-control test below. Never change backend defaults.
+    """
+    monkeypatch.setenv("AUTH_STEP_UP_ENFORCE", "false")
+    get_settings.cache_clear()
+    yield
+    get_settings.cache_clear()
 
 
 def _seed_user(db: Session, email: str = "delete-me@example.com") -> tuple[User, Candidate]:
@@ -109,6 +124,26 @@ def test_delete_account_requires_confirmation() -> None:
             json={"confirmation": "WRONG"},
         )
         assert r.status_code == 422
+    finally:
+        app.dependency_overrides.clear()
+        db.close()
+
+
+
+def test_delete_account_requires_step_up_when_enforced(monkeypatch) -> None:
+    """Unauthenticated elevated action must fail closed when enforcement is on."""
+    monkeypatch.setenv("AUTH_STEP_UP_ENFORCE", "true")
+    get_settings.cache_clear()
+    db = _sqlite_session()
+    try:
+        user, _ = _seed_user(db, "step-up@example.com")
+        client = _client_for(db, user)
+        response = client.post(
+            "/api/v1/candidates/me/delete-account",
+            json={"confirmation": "DELETE"},
+        )
+        assert response.status_code == 403
+        assert response.json()["detail"] == "step_up_required"
     finally:
         app.dependency_overrides.clear()
         db.close()
