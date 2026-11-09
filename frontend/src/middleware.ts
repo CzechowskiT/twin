@@ -64,6 +64,15 @@ export function middleware(request: NextRequest) {
   }
 
   const { pathname } = request.nextUrl;
+  // Fail-closed preview: no API route may forward to production or mutate data.
+  // A dedicated isolated staging backend is required before this can be relaxed.
+  if (process.env.VERCEL_ENV === "preview" && (pathname === "/api" || pathname.startsWith("/api/"))) {
+    return NextResponse.json(
+      { detail: "Preview API disabled until dedicated isolated staging is configured" },
+      { status: 503, headers: { "Cache-Control": "private, no-store" } },
+    );
+  }
+
   if (pathname === "/auth/signup" || pathname === "/auth/signup/") {
     const url = request.nextUrl.clone();
     url.pathname = "/register";
@@ -136,6 +145,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/api/:path*",
     "/((?!api/|_next/|favicon.ico|robots.txt|.*\\.(?:ico|png|jpg|jpeg|gif|webp|svg|txt|woff2?|webmanifest)$).*)",
   ],
 };

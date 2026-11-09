@@ -11,7 +11,7 @@ from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.config import Settings
+from app.config import Settings, get_settings
 from app.database.models import (
     FounderCommand,
     FounderCommandTimelineEvent,
@@ -407,22 +407,84 @@ def cancel_command(
     *,
     reason: str | None = None,
 ) -> FounderCommand:
+    """Durable Founder stop: stop planning first, then request remote cancellation.
+
+    Parent cancellation MUST NOT claim a remote Cursor run is stopped until its
+    terminal state is observed. A pending/failed remote stop remains PAUSED,
+    preventing further automatic stages while allowing a retry.
+    """
     command = db.get(FounderCommand, command_id)
     if not command:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="command_not_found")
-    command.status = CommandStatus.CANCELLED.value
-    command.finished_at = datetime.utcnow()
-    summary = "Cancelled by founder"
-    if reason:
-        summary = f"Cancelled by founder: {reason.strip()[:400]}"
-    command.live_summary = summary
+    if command.status == CommandStatus.CANCELLED.value:
+        return command
+    if command.status in COMMAND_TERMINAL:
+        raise HTTPException(status.HTTP_409_CONFLICT, detail="command_terminal")
+
+    command.status = CommandStatus.PAUSED.value
+    command.live_summary = "Stop requested; checking active downstream execution"
     write_founder_audit(
         db,
         command_id=command.id,
-        event_type="cancelled",
+        event_type="stop_requested",
         actor_fingerprint=principal.fingerprint,
         detail={"reason": (reason or "")[:500]},
     )
+    db.commit()  # Halt parent ticks before any remote network request.
+
+    remote_confirmed = True
+    child_status = None
+    if command.dispatch_run_id:
+        try:
+            from app.services.agent_dispatch.auth import AgentDispatchPrincipal
+            from app.services.agent_dispatch.constants import AGENT_DISPATCH_SCOPE_CANCEL
+            from app.services.agent_dispatch.service import cancel_run
+
+            dispatch_principal = AgentDispatchPrincipal(
+                token_fingerprint=principal.fingerprint,
+                scopes=frozenset({AGENT_DISPATCH_SCOPE_CANCEL}),
+            )
+            child = cancel_run(db, get_settings(), dispatch_principal, command.dispatch_run_id)
+            child_status = child.status
+            remote_confirmed = child.status in {
+                "cancelled", "failed", "timed_out", "succeeded", "needs_attention",
+            }
+        except Exception as exc:
+            remote_confirmed = False
+            child_status = "unverified_error"
+            write_founder_audit(
+                db,
+                command_id=command.id,
+                event_type="stop_child_error",
+                actor_fingerprint=principal.fingerprint,
+                detail={"error_class": type(exc).__name__},
+            )
+
+    if remote_confirmed:
+        command.status = CommandStatus.CANCELLED.value
+        command.finished_at = datetime.utcnow()
+        command.error_code = None
+        command.live_summary = "Stopped by founder; no pending Cursor run"
+        write_founder_audit(
+            db,
+            command_id=command.id,
+            event_type="cancelled",
+            actor_fingerprint=principal.fingerprint,
+            detail={"child_status": child_status},
+        )
+    else:
+        # Parent is paused; child may still be working. Never claim completion.
+        command.status = CommandStatus.PAUSED.value
+        command.finished_at = None
+        command.error_code = "remote_stop_unconfirmed"
+        command.live_summary = "Parent paused; remote Cursor cancellation not yet confirmed"
+        write_founder_audit(
+            db,
+            command_id=command.id,
+            event_type="stop_pending_confirmation",
+            actor_fingerprint=principal.fingerprint,
+            detail={"child_status": child_status},
+        )
     db.commit()
     return command
 

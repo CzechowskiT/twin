@@ -7,6 +7,11 @@ on:
       - backend/app/**
       - backend/tests/**
       - frontend/scripts/*guard*
+      - frontend/scripts/preview-prod-api-isolation.test.ts
+      - frontend/src/lib/public-api-base.ts
+      - frontend/src/middleware.ts
+      - frontend/next.config.ts
+      - frontend/package.json
 
 jobs:
   security-regression:
@@ -29,7 +34,11 @@ jobs:
           pip install -r requirements.txt
           python3 -m pytest tests/test_candidate_account_deletion.py \
             tests/test_beta_waitlist_upload_rate_limit.py \
-            tests/test_idempotency_key_naming.py -q
+            tests/test_idempotency_key_naming.py \
+            tests/test_founder_canary_auth.py \
+            tests/test_agent_dispatch.py::test_remote_cancel_stays_pending_until_cursor_confirms \
+            tests/test_agent_dispatch.py::test_remote_cancel_api_error_never_claims_success \
+            tests/test_founder_command.py::test_founder_stop_stays_paused_while_remote_cursor_cancel_pending -q
       - name: Frontend security guards
         working-directory: frontend
         run: |
@@ -37,3 +46,8 @@ jobs:
           npm run test:candidate-account-delete-guard
           npm run test:observability-redaction-guard
           npm run test:referral-abuse-controls-guard
+          npm run test:founder-canary-access-guard
+          npm run test:founder-canary-bff
+          npm run test:founder-canary-preview-isolation
+          npm run test:preview-prod-api-isolation
+          # preview-isolation includes unit fail-closed checks for shared prod API

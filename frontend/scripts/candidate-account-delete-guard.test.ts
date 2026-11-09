@@ -17,6 +17,7 @@ test("1 backend delete-account route exists", () => {
   const api = readRepo("backend/app/api/candidates.py");
   assert.match(api, /\/me\/delete-account/);
   assert.match(api, /execute_candidate_account_deletion/);
+  assert.match(api, /PURPOSE_ACCOUNT_DELETION|require_step_up_or_raise/);
 });
 
 test("2 deletion service anonymizes and audits", () => {
@@ -38,8 +39,9 @@ test("4 audit event type registered", () => {
   assert.match(audit, /account_deleted/);
 });
 
-test("5 backend tests cover deletion", () => {
+test("5 backend tests cover deletion with step-up", () => {
   const tests = readRepo("backend/tests/test_candidate_account_deletion.py");
   assert.match(tests, /delete-account/);
   assert.match(tests, /DELETE/);
+  assert.match(tests, /PURPOSE_ACCOUNT_DELETION|X-Twin-Step-Up|step_up_required/);
 });
