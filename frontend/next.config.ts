@@ -64,12 +64,17 @@ const previewHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Compile the Preview flag into client code as well as server middleware.
+  env: {
+    NEXT_PUBLIC_TWIN_PREVIEW_DEPLOYMENT:
+      process.env.VERCEL_ENV === "preview" ? "true" : "false",
+  },
   output: "standalone",
   reactStrictMode: true,
   poweredByHeader: false,
   async headers() {
     return [
-      { source: "/:path*", headers: securityHeaders },
+      { source: "/:path*", headers: process.env.VERCEL_ENV === "preview" ? previewHeaders : securityHeaders },
       // Preview-specific headers must win over the catch-all (last match for same key).
       { source: "/preview", headers: previewHeaders },
       { source: "/preview/:path*", headers: previewHeaders },
