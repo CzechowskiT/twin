@@ -443,7 +443,7 @@ def reconcile_run(db: Session, settings: Settings, run_id: str) -> AgentDispatch
     # Timeout check
     timeout_min = int(settings.agent_dispatch_run_timeout_minutes or 180)
     started = run.dispatched_at or run.created_at
-    if started and datetime.utcnow() - started > timedelta(minutes=timeout_min):
+    if run.status != DispatchRunStatus.CANCELLING.value and started and datetime.utcnow() - started > timedelta(minutes=timeout_min):
         return _timeout_run(db, settings, run)
 
     client = CursorCloudAgentsClient(settings)
@@ -479,6 +479,31 @@ def reconcile_run(db: Session, settings: Settings, run_id: str) -> AgentDispatch
     heartbeat_lock(db, run_id=run.id, lease_seconds=int(settings.agent_dispatch_lock_lease_seconds or 120))
 
     mapped = _map_cursor_status_to_dispatch(snap.status, run.cursor_api_version or "v1")
+    if run.status == DispatchRunStatus.CANCELLING.value:
+        # Do not claim "cancelled" from a successful HTTP cancel request alone.
+        # Ignore artifacts from a race where Cursor finished before the stop.
+        if mapped in (
+            DispatchRunStatus.CANCELLED.value,
+            DispatchRunStatus.FAILED.value,
+            DispatchRunStatus.TIMED_OUT.value,
+        ):
+            run.status = mapped
+            run.finished_at = datetime.utcnow()
+            release_lock(db, run_id=run.id)
+            write_audit(db, run_id=run.id, event_type="cancel_terminal_verified",
+                        actor_fingerprint=None, detail={"status": mapped})
+        elif mapped == DispatchRunStatus.AWAITING_RESULT.value:
+            run.status = DispatchRunStatus.NEEDS_ATTENTION.value
+            run.error_code = "cancel_race_cursor_finished"
+            run.error_message = "Cursor finished while cancellation was pending; review artifacts manually"
+            run.finished_at = datetime.utcnow()
+            release_lock(db, run_id=run.id)
+            write_audit(db, run_id=run.id, event_type="cancel_race_finished",
+                        actor_fingerprint=None, detail={})
+        # RUNNING / CREATING: retain cancelling state and lock for polling.
+        db.commit()
+        db.refresh(run)
+        return run
     if mapped == DispatchRunStatus.AWAITING_RESULT.value:
         run.status = DispatchRunStatus.AWAITING_RESULT.value
         db.commit()
@@ -835,6 +860,8 @@ def cancel_run(
                 run_id=run.cursor_run_id,
             )
         except CursorApiError as exc:
+            run.error_code = "cursor_cancel_unconfirmed"
+            run.error_message = "Remote cancellation failed; confirmation and manual review required"
             write_audit(
                 db,
                 run_id=run.id,
@@ -842,7 +869,26 @@ def cancel_run(
                 actor_fingerprint=principal.token_fingerprint,
                 detail={"status_code": exc.status_code},
             )
+            db.commit()
+            db.refresh(run)
+            return run
 
+        # Cursor accepted a stop request; it may still be running.
+        # Preserve the active lock until a terminal status is independently observed.
+        run.error_code = "cursor_cancel_pending"
+        run.error_message = "Remote cancellation requested; awaiting Cursor terminal confirmation"
+        write_audit(
+            db,
+            run_id=run.id,
+            event_type="cancel_cursor_requested",
+            actor_fingerprint=principal.token_fingerprint,
+            detail={},
+        )
+        db.commit()
+        db.refresh(run)
+        return run
+
+    # No remote Cursor job was launched, so cancellation is immediately local.
     run.status = DispatchRunStatus.CANCELLED.value
     run.finished_at = datetime.utcnow()
     release_lock(db, run_id=run.id)
@@ -960,6 +1006,26 @@ def ingest_webhook(
         if fields.get("agent_url"):
             run.cursor_agent_url = fields["agent_url"]
         cs = (fields.get("cursor_status") or "").upper()
+        if run.status == DispatchRunStatus.CANCELLING.value:
+            # Webhook is evidence, not authorization to finalize or merge output.
+            if cs in {CURSOR_V1_RUN_CANCELLED, "CANCELLED"}:
+                run.status = DispatchRunStatus.CANCELLED.value
+                run.finished_at = datetime.utcnow()
+                release_lock(db, run_id=run.id)
+            elif cs in {CURSOR_V0_ERROR, CURSOR_V1_RUN_ERROR, CURSOR_V1_RUN_EXPIRED}:
+                run.status = DispatchRunStatus.FAILED.value
+                run.error_code = "cursor_error_during_cancel"
+                run.finished_at = datetime.utcnow()
+                release_lock(db, run_id=run.id)
+            elif cs in {CURSOR_V0_FINISHED, CURSOR_V1_RUN_FINISHED}:
+                run.status = DispatchRunStatus.NEEDS_ATTENTION.value
+                run.error_code = "cancel_race_cursor_finished"
+                run.error_message = "Cursor finished before cancellation confirmed; review manually"
+                run.finished_at = datetime.utcnow()
+                release_lock(db, run_id=run.id)
+            # Otherwise retain CANCELLING: do not schedule artifact finalization.
+            db.commit()
+            return {"status": "processed"}
         if cs == CURSOR_V0_FINISHED:
             run.status = DispatchRunStatus.AWAITING_RESULT.value
             db.commit()
