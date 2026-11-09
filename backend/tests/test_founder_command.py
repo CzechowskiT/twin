@@ -936,3 +936,61 @@ def test_heal_legacy_needs_founder_hard_limit_residual(founder_client):
     msgs = _timeline_messages(db, cmd.id)
     tick_command(db, settings, cmd.id, actor_fingerprint="celery-beat")
     assert _timeline_messages(db, cmd.id) == msgs
+
+
+def test_founder_stop_stays_paused_while_remote_cursor_cancel_pending(founder_client, monkeypatch):
+    """The Founder stop button must not report success before child termination."""
+    from datetime import datetime
+    from types import SimpleNamespace
+    from app.database.models import AgentDispatchRun
+
+    client, db = founder_client
+    monkeypatch.setattr(
+        "app.services.founder_command.service.tick_command",
+        _keep_founder_command_queued,
+    )
+    created = client.post(
+        "/api/v1/founder-command/commands",
+        headers={**_csrf(client), "Idempotency-Key": "stop-unconfirmed-child-1"},
+        json={
+            "direction": "Wykonaj bezpieczny diagnostyczny batch do odczytu.",
+            "action": "analyze",
+            "autonomy_level": 1,
+            "max_batches": 1,
+            "max_runtime_minutes": 20,
+        },
+    )
+    assert created.status_code == 200, created.text
+    command_id = created.json()["id"]
+    command = db.get(FounderCommand, command_id)
+    db.add(
+        AgentDispatchRun(
+            id="stop-pending-child-1",
+            status="running",
+            task_name="stop-test",
+            repository_url="https://github.com/CzechowskiT/twin",
+            base_branch="cursor/phase1-monorepo-scaffold",
+            prompt_envelope_version="v1",
+            prompt_hash="unit-test",
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow(),
+        )
+    )
+    db.commit()
+    command.dispatch_run_id = "stop-pending-child-1"
+    command.status = "running"
+    db.commit()
+
+    monkeypatch.setattr(
+        "app.services.agent_dispatch.service.cancel_run",
+        lambda *_args, **_kwargs: SimpleNamespace(status="cancelling"),
+    )
+    response = client.post(
+        f"/api/v1/founder-command/commands/{command_id}/cancel",
+        headers=_csrf(client),
+    )
+    assert response.status_code == 200, response.text
+    assert response.json()["status"] == "paused"
+    db.refresh(command)
+    assert command.error_code == "remote_stop_unconfirmed"
+    assert command.finished_at is None
