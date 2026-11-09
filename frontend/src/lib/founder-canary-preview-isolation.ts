@@ -8,6 +8,18 @@
 
 import { getUpstreamApiBase } from "@/lib/public-api-base";
 
+/**
+ * Diagnostic-only read of configured upstream. NEVER use this to route requests:
+ * getUpstreamApiBase() intentionally blocks every Preview backend request.
+ */
+function configuredUpstreamForAudit(): string | null {
+  for (const key of ["TWIN_API_BASE_URL", "API_URL", "NEXT_PUBLIC_API_URL"] as const) {
+    const raw = process.env[key]?.trim();
+    if (raw) return raw;
+  }
+  return null;
+}
+
 /** Known production API host fingerprints (public hostnames only — never secrets). */
 const BUILTIN_PRODUCTION_API_HOSTS = ["twin-production-bcd9.up.railway.app"] as const;
 
@@ -55,7 +67,7 @@ export function productionApiHostAllowlist(): Set<string> {
 }
 
 export function upstreamIsKnownProductionApi(apiBase?: string | null): boolean {
-  const host = hostnameFromUrl(apiBase ?? getUpstreamApiBase());
+  const host = hostnameFromUrl(apiBase ?? configuredUpstreamForAudit());
   if (!host) return false;
   return productionApiHostAllowlist().has(host);
 }
@@ -80,7 +92,7 @@ export function previewCanaryMutationsAllowed(): boolean {
 export function founderCanaryPreviewIsolationAudit(): PreviewIsolationAudit {
   const preview = isVercelPreviewRuntime();
   const cert = previewIsolationCertPresent();
-  const base = getUpstreamApiBase();
+  const base = configuredUpstreamForAudit();
   const upstreamConfigured = Boolean(base);
   const upstreamProd = upstreamIsKnownProductionApi(base);
   const allowed = previewCanaryMutationsAllowed();
