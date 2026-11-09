@@ -7,6 +7,11 @@ on:
       - backend/app/**
       - backend/tests/**
       - frontend/scripts/*guard*
+      - frontend/scripts/preview-prod-api-isolation.test.ts
+      - frontend/src/lib/public-api-base.ts
+      - frontend/src/middleware.ts
+      - frontend/next.config.ts
+      - frontend/package.json
 
 jobs:
   security-regression:
@@ -41,4 +46,5 @@ jobs:
           npm run test:founder-canary-access-guard
           npm run test:founder-canary-bff
           npm run test:founder-canary-preview-isolation
+          npm run test:preview-prod-api-isolation
           # preview-isolation includes unit fail-closed checks for shared prod API
