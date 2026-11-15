@@ -11,7 +11,7 @@ import { useMarketingPersona } from "@/components/persona-provider";
 import { SiteHeaderExplorePanel } from "@/components/site-header-explore-panel";
 import { trackEvent } from "@/lib/analytics";
 import { apiFetch } from "@/lib/api";
-import { clearToken, getToken, hasActiveSession, logoutSession } from "@/lib/auth";
+import { getToken, hasActiveSession, logoutSession, subscribeToAuthSession } from "@/lib/auth";
 import { isDemoUserEmail } from "@/lib/demo-user";
 import { scrollToDashboardHash } from "@/lib/dashboard-anchor";
 import {
@@ -72,10 +72,9 @@ export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false
   const highlightDemoNav = isDemoUserEmail(userEmail);
 
   useEffect(() => {
-    const sync = () => setHasSession(hasActiveSession());
+    const sync = () => queueMicrotask(() => setHasSession(hasActiveSession()));
     sync();
-    window.addEventListener("storage", sync);
-    return () => window.removeEventListener("storage", sync);
+    return subscribeToAuthSession(sync);
   }, [pathname]);
 
   useEffect(() => {
@@ -141,10 +140,9 @@ export function SiteHeaderBar({ showMarketingPersonaNav: marketingChrome = false
 
   const logout = () => {
     const loginPath = logoutRedirectPath(persona);
-    void logoutSession().then(() => {
-      closeMobileMenu();
-      router.push(loginPath);
-    });
+    closeMobileMenu();
+    void logoutSession();
+    if (pathname !== loginPath) router.replace(loginPath);
   };
 
   const primaryGrowth = growthLinks[0];

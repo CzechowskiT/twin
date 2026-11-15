@@ -12,7 +12,7 @@ import {
   PersonaWorkspaceGateShell,
 } from "@/components/persona-workspace-gate-shell";
 import { WorkspaceRouteSkeleton } from "@/components/workspace-route-skeleton";
-import { clearToken, hasActiveSession } from "@/lib/auth";
+import { hasActiveSession, logoutSession, subscribeToAuthSession } from "@/lib/auth";
 import type { TranslationKey } from "@/lib/i18n";
 import { buildAuthRedirectNext, lockAuthRedirectDestination, loginPathWithNext } from "@/lib/login-redirect";
 import type { MarketingPersona } from "@/lib/marketing-persona";
@@ -89,12 +89,14 @@ export function PersonaWorkspaceGate({
   }, [loginPath, pathname]);
 
   useEffect(() => {
-    queueMicrotask(() => {
+    const sync = () => queueMicrotask(() => {
       setHasSession(hasActiveSession());
       setHasPilotRecruiter(
         surface === "recruiter" && (hasRecruiterJwtSession() || hasRecruiterPilotInboxSession()),
       );
     });
+    sync();
+    return subscribeToAuthSession(sync);
   }, [pathname, surface]);
 
   useEffect(() => {
@@ -154,7 +156,7 @@ export function PersonaWorkspaceGate({
             type="button"
             className="twin-btn-secondary twin-touch-target"
             onClick={() => {
-              clearToken();
+              void logoutSession();
               router.replace(logoutRedirectPath(effectivePersona));
             }}
           >

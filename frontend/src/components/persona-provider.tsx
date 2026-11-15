@@ -12,7 +12,7 @@ import {
   type ReactNode,
 } from "react";
 
-import { getToken } from "@/lib/auth";
+import { getToken, subscribeToAuthSession } from "@/lib/auth";
 import {
   isMarketingPersona,
   marketingPersonaFromPath,
@@ -75,12 +75,14 @@ export function PersonaProvider({ children }: { children: ReactNode }) {
   const [sessionLocked, setSessionLocked] = useState(false);
 
   useLayoutEffect(() => {
-    const hasSession = Boolean(getToken());
-    queueMicrotask(() => {
+    const sync = () => queueMicrotask(() => {
+      const hasSession = Boolean(getToken());
       setSessionLocked(hasSession);
       const resolved = resolvePersona(pathname, hasSession);
       setPersonaState((current) => (current === resolved ? current : resolved));
     });
+    sync();
+    return subscribeToAuthSession(sync);
   }, [pathname]);
 
   useEffect(() => {

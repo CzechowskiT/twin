@@ -261,7 +261,7 @@ export function useDashboardData(t: Translator) {
       try {
         u = await apiFetch<DashboardUser>("/api/v1/auth/me", {}, token);
       } catch (e) {
-        if (cancelled) return;
+        if (cancelled || getToken() !== token) return;
         const msg = e instanceof Error ? e.message : String(e);
         const lower = msg.toLowerCase();
         const looksLikeAuthFailure =

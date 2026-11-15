@@ -160,11 +160,13 @@ export function shouldClearSessionOnApiError(
 function handleAuthFailure(
   status: number,
   message: string,
+  requestToken: string | null,
   apiPath?: string,
   options?: Pick<ApiFetchOptions, "preserveSessionOnUnauthorized">,
 ): void {
   if (typeof window === "undefined") return;
   if (!shouldClearSessionOnApiError(status, message, apiPath, options)) return;
+  if (requestToken !== getToken()) return;
   clearToken();
   const path = window.location.pathname;
   if (path === "/login" || path.startsWith("/login/")) return;
@@ -173,21 +175,25 @@ function handleAuthFailure(
   window.location.assign(loginUrl);
 }
 
-function applyAuthHeaders(headers: Headers, path: string, token?: string | null): boolean {
+function applyAuthHeaders(headers: Headers, path: string, token?: string | null): string | null {
   const resolvedToken = resolveAuthToken(path, token);
-  const hasAuth = Boolean(resolvedToken);
-  if (hasAuth) {
+  if (resolvedToken) {
     const bearer = `Bearer ${resolvedToken}`;
     headers.set("Authorization", bearer);
     headers.set("X-Twin-Authorization", bearer);
   }
-  return hasAuth;
+  return resolvedToken || null;
 }
 
-async function throwIfNotOk(res: Response, apiPath: string, options?: Pick<ApiFetchOptions, "preserveSessionOnUnauthorized">): Promise<void> {
+async function throwIfNotOk(
+  res: Response,
+  apiPath: string,
+  requestToken: string | null,
+  options?: Pick<ApiFetchOptions, "preserveSessionOnUnauthorized">,
+): Promise<void> {
   if (res.ok) return;
   const errMsg = formatApiErrorMessageWithResponseId(await parseError(res), res);
-  handleAuthFailure(res.status, errMsg, apiPath, options);
+  handleAuthFailure(res.status, errMsg, requestToken, apiPath, options);
   throw new Error(errMsg);
 }
 
@@ -244,7 +250,8 @@ export async function apiFetch<T>(
   if (isFormData) {
     headers.delete("Content-Type");
   }
-  const hasAuth = applyAuthHeaders(headers, path, token);
+  const requestToken = applyAuthHeaders(headers, path, token);
+  const hasAuth = Boolean(requestToken);
 
   const directOrigin = clientApiOriginForRequest(hasAuth);
   let timeoutController: AbortController | undefined;
@@ -279,7 +286,7 @@ export async function apiFetch<T>(
   } finally {
     if (timeoutId != null) clearTimeout(timeoutId);
   }
-  await throwIfNotOk(res, path, options);
+  await throwIfNotOk(res, path, requestToken, options);
   if (res.status === 204) return undefined as T;
   try {
     return (await res.json()) as T;
@@ -303,7 +310,8 @@ export async function apiFetchBlob(
   if (method !== "GET" && method !== "HEAD") {
     headers.set("Content-Type", "application/json");
   }
-  const hasAuth = applyAuthHeaders(headers, path, token);
+  const requestToken = applyAuthHeaders(headers, path, token);
+  const hasAuth = Boolean(requestToken);
 
   const directOrigin = clientApiOriginForRequest(hasAuth);
   const fetchOpts: RequestInit = {
@@ -322,7 +330,7 @@ export async function apiFetchBlob(
       throw err;
     }
   }
-  await throwIfNotOk(res, path, options);
+  await throwIfNotOk(res, path, requestToken, options);
   try {
     return await res.blob();
   } catch (e) {
@@ -350,7 +358,8 @@ export async function apiUpload<T>(
 ): Promise<T> {
   const headers = new Headers();
   ensureTraceHeaders(headers);
-  const hasAuth = applyAuthHeaders(headers, path, token);
+  const requestToken = applyAuthHeaders(headers, path, token);
+  const hasAuth = Boolean(requestToken);
 
   const body = new FormData();
   body.append("file", file);
@@ -378,6 +387,6 @@ export async function apiUpload<T>(
       throw err;
     }
   }
-  await throwIfNotOk(res, path);
+  await throwIfNotOk(res, path, requestToken);
   return res.json() as Promise<T>;
 }
