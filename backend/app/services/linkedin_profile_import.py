@@ -73,7 +73,7 @@ def build_profile_from_candidate(candidate: Any, user: Any | None = None) -> dic
     }
 
 
-def synthesize_profile_deterministic(raw: dict[str, Any]) -> dict[str, Any]:
+def synthesize_profile_deterministic(raw: dict[str, Any], *, allow_external_ai: bool = True) -> dict[str, Any]:
     """Rule-based synthesis when Claude is unavailable."""
     profile = raw.get("profile") or {}
     cv_text = str(raw.get("cv_text") or "")
@@ -87,7 +87,10 @@ def synthesize_profile_deterministic(raw: dict[str, Any]) -> dict[str, Any]:
         elif isinstance(item, dict):
             flat_skills.append(str(item.get("name") or item.get("title") or ""))
     if cv_text:
-        enriched = enrich_from_cv_text(cv_text, {"skills": flat_skills, "experience_years": 0, "location": None, "preferred_job_titles": []})
+        enriched = enrich_from_cv_text(
+            cv_text, {"skills": flat_skills, "experience_years": 0, "location": None, "preferred_job_titles": []},
+            allow_external_ai=allow_external_ai,
+        )
         flat_skills = enriched.get("skills") or flat_skills
     primary = flat_skills[:8]
     secondary = flat_skills[8:16]

@@ -30,7 +30,7 @@ export type ActivationStatus = {
 
 type Props = {
   activated: boolean;
-  matchCount: number;
+  matchCount: number | null;
   onStatusChange?: (status: ActivationStatus | null) => void;
 };
 
@@ -61,12 +61,15 @@ export function ActivationMatchingStatus({ activated, matchCount, onStatusChange
     if (!token) return;
     // Server-side view event (deduped) — fire-and-forget, does not block paint
     void apiFetch("/api/v1/candidates/me/activation-ttv-view", { method: "POST" }, token).catch(() => undefined);
-    void load();
+    let mounted = true;
+    queueMicrotask(() => { if (mounted) void load(); });
+    return () => { mounted = false; };
   }, [activated, load]);
 
+  const pending = status?.ux_state === "matching_in_progress";
   useEffect(() => {
     if (!ACTIVATION_MATCHING_STATUS_ENABLED || !activated) return;
-    if (!status || status.ux_state !== "matching_in_progress") return;
+    if (!pending) return;
     let n = 0;
     const id = window.setInterval(() => {
       n += 1;
@@ -74,7 +77,7 @@ export function ActivationMatchingStatus({ activated, matchCount, onStatusChange
       if (n >= MAX_POLLS) window.clearInterval(id);
     }, POLL_MS);
     return () => window.clearInterval(id);
-  }, [activated, status?.ux_state, load, status]);
+  }, [activated, pending, load]);
 
   const onRetry = async () => {
     const token = getToken();
@@ -97,19 +100,11 @@ export function ActivationMatchingStatus({ activated, matchCount, onStatusChange
 
   if (!ACTIVATION_MATCHING_STATUS_ENABLED || !activated) return null;
 
-  const ux = status?.ux_state ?? (matchCount > 0 ? "matches_ready" : "matching_in_progress");
-  // Never claim matching is in progress when no job exists
-  const effectiveUx =
-    ux === "matching_in_progress" && status?.status === "none" ? "idle" : ux;
-  // Never show success if no matches persisted
-  const displayUx =
-    effectiveUx === "matches_ready" && matchCount <= 0 && (status?.match_count ?? 0) <= 0
-      ? "no_matches"
-      : effectiveUx === "matches_ready" || matchCount > 0
-        ? matchCount > 0 || (status?.match_count ?? 0) > 0
-          ? "matches_ready"
-          : effectiveUx
-        : effectiveUx;
+  let displayUx: ActivationUxState = status?.ux_state ?? "idle";
+  if (matchCount !== null && matchCount > 0) displayUx = "matches_ready";
+  else if (displayUx === "matches_ready" || displayUx === "idle") {
+    displayUx = matchCount === 0 ? "no_matches" : "idle";
+  }
 
   const copy = (() => {
     switch (displayUx) {

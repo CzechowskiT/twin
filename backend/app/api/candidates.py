@@ -97,6 +97,8 @@ from app.services.candidate_account_deletion import execute_candidate_account_de
 from app.services.candidate_trust_audit_service import list_trust_audit_events
 from app.services.candidate_trust_center_service import build_trust_center
 from app.services import candidate_wave1 as wave1
+from app.services.activation_matching import dispatch_first_match_after_profile_save, profile_min_complete
+from app.services.candidate_first_pilot import is_free_candidate_pilot
 from app.schemas.acceptance_queue import AcceptanceQueueOut, AcceptanceRespondIn
 from app.schemas.job_match_feedback import (
     JobMatchFeedbackIn,
@@ -151,6 +153,7 @@ def create_profile(
     db.add(candidate)
     db.commit()
     db.refresh(candidate)
+    dispatch_first_match_after_profile_save(db, user, candidate)
     return _to_out(db, candidate)
 
 
@@ -163,9 +166,18 @@ def get_my_profile(
     return _to_out(db, candidate)
 
 
-def _enforce_profile_edit(user: User) -> None:
+def _enforce_profile_edit(user: User, request: Request, *, free_pilot: bool) -> None:
     if feature_allowed(user, Feature.PROFILE_EDIT):
         return
+    if free_pilot:
+        if user.email_verified_at is not None:
+            return
+        message = (
+            "Potwierdź adres e-mail z zaproszenia, aby uzupełnić profil w pilotażu."
+            if locale_from_request(request) == "pl"
+            else "Confirm the email address on your invitation to edit your pilot profile."
+        )
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=message)
     pw = paywall_for_feature(Feature.PROFILE_EDIT)
     raise HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
@@ -184,7 +196,7 @@ def update_profile(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> CandidateOut:
-    _enforce_profile_edit(user)
+    _enforce_profile_edit(user, request, free_pilot=is_free_candidate_pilot(db, user))
     candidate = db.query(Candidate).filter(Candidate.user_id == user.id).first()
     if not candidate:
         if body.talent_pool_opt_in and not body.talent_pool_processing_consent:
@@ -198,6 +210,7 @@ def update_profile(
         _apply_update(candidate, body)
     db.commit()
     db.refresh(candidate)
+    dispatch_first_match_after_profile_save(db, user, candidate)
     return _to_out(db, candidate)
 
 
@@ -210,7 +223,8 @@ async def upload_cv(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> CvUploadOut:
-    _enforce_profile_edit(user)
+    free_pilot = is_free_candidate_pilot(db, user)
+    _enforce_profile_edit(user, request, free_pilot=free_pilot)
     candidate = db.query(Candidate).filter(Candidate.user_id == user.id).first()
     if not candidate:
         raise HTTPException(
@@ -242,11 +256,12 @@ async def upload_cv(
 
     try:
         candidate = save_cv_for_candidate(
-            db, candidate, content=content, filename=file.filename
+            db, candidate, content=content, filename=file.filename, allow_external_ai=not free_pilot
         )
     except CvParseError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
 
+    dispatch_first_match_after_profile_save(db, user, candidate)
     skills = json.loads(candidate.skills) if candidate.skills else []
     titles_raw = json.loads(candidate.preferred_job_titles) if candidate.preferred_job_titles else []
     titles = [str(t) for t in titles_raw] if isinstance(titles_raw, list) else []
@@ -257,6 +272,7 @@ async def upload_cv(
         cv_filename=candidate.cv_filename,
         skills_updated=skills,
         preferred_job_titles=titles,
+        matching_profile_complete=profile_min_complete(candidate)[0],
         experience_years=candidate.experience_years,
         location=candidate.location,
         cv_insights=cv_insights,
@@ -1355,6 +1371,7 @@ def _to_out(db: Session, candidate: Candidate) -> CandidateOut:
         name=candidate.name,
         skills=skills,
         preferred_job_titles=titles,
+        matching_profile_complete=profile_min_complete(candidate)[0],
         experience_years=candidate.experience_years,
         desired_salary=candidate.desired_salary,
         location=candidate.location,

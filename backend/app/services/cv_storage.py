@@ -29,6 +29,7 @@ def save_cv_for_candidate(
     *,
     content: bytes,
     filename: str,
+    allow_external_ai: bool = True,
 ) -> Candidate:
     settings = get_settings()
     text = extract_cv_text(content, filename)
@@ -47,7 +48,7 @@ def save_cv_for_candidate(
         if candidate.preferred_job_titles
         else [],
     }
-    enriched = enrich_from_cv_text(text, existing)
+    enriched = enrich_from_cv_text(text, existing, allow_external_ai=allow_external_ai)
 
     candidate.resume_path = str(file_path)
     candidate.cv_text = text
@@ -82,6 +83,8 @@ def save_cv_for_candidate(
 
     db.commit()
     db.refresh(candidate)
+    if not allow_external_ai:
+        return candidate
     # Async (or eager) Candidate Intelligence — never blocks upload on LLM failure
     try:
         from app.services.candidate_intelligence import enqueue_intelligence_for_candidate

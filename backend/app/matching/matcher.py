@@ -8,6 +8,11 @@ from app.matching.synonyms import SALES_TITLE_SIGNALS, SKILL_ALIASES, SKILL_SYNO
 
 _SALARY_RE = re.compile(r"(\d[\d\s]{2,})\s*(?:–|-)?\s*(\d[\d\s]{2,})?\s*PLN", re.I)
 
+_TITLE_MODIFIERS = {
+    "senior", "junior", "lead", "head", "manager", "director", "specialist",
+    "starszy", "starsza", "młodszy", "młodsza", "specjalista", "specjalistka", "kierownik", "dyrektor",
+}
+
 
 _PL_STOP = frozenset(
     {
@@ -43,6 +48,16 @@ def calculate_match_score(candidate: dict[str, Any], job: dict[str, Any]) -> flo
     score += _location_score(candidate, job)
     score += _experience_score(candidate, job)
     return round(min(score, 100.0), 2)
+
+
+def has_role_or_skill_overlap(candidate: dict[str, Any], job: dict[str, Any]) -> bool:
+    """Require an occupational signal before salary, location and freshness can rank a job."""
+    if _preferred_title_score(candidate, job) or _sales_role_score(candidate, job) or _skills_score(candidate, job):
+        return True
+    if candidate.get("skills") or candidate.get("preferred_job_titles"):
+        return False
+    cv_words = _tokenize(candidate.get("cv_text") or "")
+    return bool(cv_words & (_tokenize(job.get("title") or "") - _TITLE_MODIFIERS))
 
 
 def _normalize_skills(raw: Any) -> list[str]:
@@ -86,7 +101,11 @@ def _skills_score(candidate: dict[str, Any], job: dict[str, Any]) -> float:
 
 
 def _any_term_in_text(terms: list[str], text: str) -> bool:
-    return any(term in text for term in terms)
+    return any(
+        (re.search(rf"(?<!\w){re.escape(term.strip())}(?!\w)", text) is not None)
+        if len(term.strip()) <= 3 else term in text
+        for term in terms
+    )
 
 
 def _tokenize(text: str) -> set[str]:
@@ -127,7 +146,7 @@ def _preferred_title_score(candidate: dict[str, Any], job: dict[str, Any]) -> fl
     if hits:
         return min(12.0, 4.0 + 4.0 * hits)
 
-    job_words = _tokenize(job_title)
+    job_words = _tokenize(job_title) - _TITLE_MODIFIERS
     if not job_words:
         return 0.0
     overlap_pts = 0.0

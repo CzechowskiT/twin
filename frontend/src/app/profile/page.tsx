@@ -40,6 +40,7 @@ type Profile = {
   name: string;
   skills: string[];
   preferred_job_titles?: string[];
+  matching_profile_complete?: boolean;
   experience_years: number;
   desired_salary: number | null;
   location: string | null;
@@ -73,6 +74,7 @@ type TailorMatchRow = {
 
 type UserPrefs = {
   marketing_emails_opt_in: boolean;
+  onboarding_completed_at?: string | null;
   profile_documents_processing_consent_at?: string | null;
   has_password_login?: boolean;
 };
@@ -112,6 +114,7 @@ export default function ProfilePage() {
   const [initial, setInitial] = useState<Profile | null>(null);
   const [userPrefs, setUserPrefs] = useState<UserPrefs | null>(null);
   const [cvUploadConsent, setCvUploadConsent] = useState(false);
+  const [pendingCv, setPendingCv] = useState<File | null>(null);
   const [introUploadConsent, setIntroUploadConsent] = useState(false);
   const [talentPoolOptIn, setTalentPoolOptIn] = useState(false);
   const [talentPoolProcessingConsent, setTalentPoolProcessingConsent] = useState(false);
@@ -484,6 +487,11 @@ export default function ProfilePage() {
       .map((s) => s.trim())
       .filter(Boolean);
     const salaryRaw = String(form.get("desired_salary") || "").trim();
+    if (pendingCv && !cvUploadConsent) {
+      setError(t("profile.cvConsentRequiredUpload"));
+      setSaving(false);
+      return;
+    }
     if (talentPoolOptIn && !initial?.talent_pool_opt_in_at && !talentPoolProcessingConsent) {
       setError(t("profile.talentPoolProcessingConsentRequired"));
       setSaving(false);
@@ -505,15 +513,29 @@ export default function ProfilePage() {
     }
     const marketing_emails_opt_in = form.get("marketing_emails_opt_in") === "on";
     try {
-      await Promise.all([
-        apiFetch("/api/v1/candidates/me", { method: "PUT", body: JSON.stringify(body) }, token),
+      const [saved] = await Promise.all([
+        apiFetch<Profile>("/api/v1/candidates/me", { method: "PUT", body: JSON.stringify(body) }, token),
         apiFetch(
           "/api/v1/auth/me/marketing",
           { method: "PATCH", body: JSON.stringify({ marketing_emails_opt_in }) },
           token,
         ),
       ]);
-      router.push("/dashboard");
+      let ready = saved.matching_profile_complete;
+      if (pendingCv) {
+        const cv = await apiUpload<{ matching_profile_complete?: boolean }>(
+          "/api/v1/candidates/me/cv", pendingCv, token, { processing_consent: "true" },
+        );
+        ready = cv.matching_profile_complete;
+        setPendingCv(null);
+      }
+      if (ready && !initial?.matching_profile_complete) {
+        router.push(userPrefs?.onboarding_completed_at ? "/dashboard/matches?activated=1" : "/onboarding?profile=saved");
+      } else if (ready === false && !initial?.matching_profile_complete) {
+        await reloadProfile();
+      } else {
+        router.push("/dashboard");
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : t("profile.failed"));
     } finally {
@@ -665,7 +687,7 @@ export default function ProfilePage() {
             {t("profile.cvSection")}
           </h2>
           <p className="twin-muted mb-3 text-xs">{t("profile.cvHint")}</p>
-          {initial && !initial.cv_processing_consent_at && (
+          {!initial?.cv_processing_consent_at && (
             <label className="mb-3 flex cursor-pointer items-start gap-3 rounded-lg border border-[var(--twin-border)] bg-[var(--twin-surface-raised)]/30 p-3 text-sm">
               <input
                 type="checkbox"
@@ -687,7 +709,16 @@ export default function ProfilePage() {
             </p>
           )}
           {!initial ? (
-            <p className="twin-muted text-sm">{t("profile.cvSaveProfileFirst")}</p>
+            <label className="block text-sm">
+              {t("profile.cvWithFirstSave")}
+              <input
+                className="mt-2 block"
+                type="file"
+                accept={CV_ACCEPT}
+                disabled={saving}
+                onChange={(event) => setPendingCv(event.target.files?.[0] ?? null)}
+              />
+            </label>
           ) : (
             <>
           <input
