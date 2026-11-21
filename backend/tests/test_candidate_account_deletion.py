@@ -3,22 +3,27 @@
 import json
 from datetime import datetime, timezone
 
-import pytest
 from fastapi.testclient import TestClient
+from httpx import Response
 from sqlalchemy.orm import Session
 
-from app.core.deps import get_current_user
+from app.core.security import hash_password
 from app.database.models import Candidate, CandidatePrivacyRequest, CandidateTrustAuditEvent, User
 from app.database.session import get_db
 from app.limiter import limiter
 from app.main import app
+from app.services.candidate_account_recovery_constants import PURPOSE_ACCOUNT_DELETION
+from app.services.step_up_request import STEP_UP_HEADER
 from tests.test_auth_integration import _sqlite_session
+
+TEST_PASSWORD = "Test-only candidate password!"
+DELETE_PATH = "/api/v1/candidates/me/delete-account"
 
 
 def _seed_user(db: Session, email: str = "delete-me@example.com") -> tuple[User, Candidate]:
     user = User(
         email=email,
-        hashed_password="x",
+        hashed_password=hash_password(TEST_PASSWORD),
         gdpr_consent_at=datetime.now(timezone.utc),
         is_active=True,
         referral_public_token="abc123",
@@ -40,20 +45,26 @@ def _seed_user(db: Session, email: str = "delete-me@example.com") -> tuple[User,
 
 def _client_for(db: Session, user: User) -> TestClient:
     limiter.reset()
-    def override_db():
-        try:
-            yield db
-        finally:
-            pass
 
-    def _user() -> User:
-        row = db.query(User).filter(User.id == user.id).first()
-        assert row is not None
-        return row
+    def override_db():
+        yield db
 
     app.dependency_overrides[get_db] = override_db
-    app.dependency_overrides[get_current_user] = _user
-    return TestClient(app)
+    client = TestClient(app)
+    login = client.post("/api/v1/auth/login/json", json={"email": user.email, "password": TEST_PASSWORD})
+    assert login.status_code == 200
+    client.headers["Authorization"] = f"Bearer {login.json()['access_token']}"
+    return client
+
+
+def _confirmed_delete(client: TestClient, confirmation: str = "DELETE") -> Response:
+    step = client.post("/api/v1/auth/step-up/issue", json={
+        "purpose": PURPOSE_ACCOUNT_DELETION, "password": TEST_PASSWORD,
+    })
+    assert step.status_code == 200
+    return client.post(DELETE_PATH, json={"confirmation": confirmation}, headers={
+        STEP_UP_HEADER: step.json()["step_up_token_once"],
+    })
 
 
 def test_delete_account_requires_confirmation() -> None:
@@ -61,7 +72,10 @@ def test_delete_account_requires_confirmation() -> None:
     try:
         user, _ = _seed_user(db)
         client = _client_for(db, user)
-        r = client.post("/api/v1/candidates/me/delete-account", json={"confirmation": "WRONG"})
+        unconfirmed = client.post(DELETE_PATH, json={"confirmation": "DELETE"})
+        assert unconfirmed.status_code == 403
+        assert unconfirmed.json()["detail"] == "step_up_required"
+        r = _confirmed_delete(client, "WRONG")
         assert r.status_code == 422
     finally:
         app.dependency_overrides.clear()
@@ -73,7 +87,7 @@ def test_delete_account_anonymizes_and_deactivates() -> None:
     try:
         user, cand = _seed_user(db, "gone@example.com")
         client = _client_for(db, user)
-        r = client.post("/api/v1/candidates/me/delete-account", json={"confirmation": "DELETE"})
+        r = _confirmed_delete(client)
         assert r.status_code == 200
         body = r.json()
         assert body["deleted"] is True
@@ -113,11 +127,10 @@ def test_delete_account_second_attempt_blocked() -> None:
     try:
         user, _ = _seed_user(db, "twice@example.com")
         client = _client_for(db, user)
-        r1 = client.post("/api/v1/candidates/me/delete-account", json={"confirmation": "DELETE"})
+        r1 = _confirmed_delete(client)
         assert r1.status_code == 200
-        # After deletion user.is_active=False — auth dependency rejects further calls.
-        r2 = client.post("/api/v1/candidates/me/delete-account", json={"confirmation": "DELETE"})
-        assert r2.status_code == 409
+        r2 = client.post(DELETE_PATH, json={"confirmation": "DELETE"})
+        assert r2.status_code == 401
     finally:
         app.dependency_overrides.clear()
         db.close()
@@ -128,7 +141,7 @@ def test_delete_account_requires_auth() -> None:
     try:
         limiter.reset()
         client = TestClient(app)
-        r = client.post("/api/v1/candidates/me/delete-account", json={"confirmation": "DELETE"})
+        r = client.post(DELETE_PATH, json={"confirmation": "DELETE"})
         assert r.status_code in {401, 403}
     finally:
         db.close()
@@ -140,7 +153,7 @@ def test_delete_account_creates_completed_privacy_request_lifecycle() -> None:
     try:
         user, cand = _seed_user(db, "lifecycle@example.com")
         client = _client_for(db, user)
-        r = client.post("/api/v1/candidates/me/delete-account", json={"confirmation": "DELETE"})
+        r = _confirmed_delete(client)
         assert r.status_code == 200
         pr_id = r.json()["privacy_request_id"]
 
@@ -181,7 +194,7 @@ def test_delete_account_blocked_by_legal_hold() -> None:
         )
         db.commit()
         client = _client_for(db, user)
-        r = client.post("/api/v1/candidates/me/delete-account", json={"confirmation": "DELETE"})
+        r = _confirmed_delete(client)
         assert r.status_code == 403
         assert "legal_hold" in r.json()["detail"]
         db.refresh(user)
@@ -199,12 +212,10 @@ def test_delete_account_rate_limited() -> None:
         user, _ = _seed_user(db, "ratelimit@example.com")
         client = _client_for(db, user)
         for _ in range(3):
-            # First call succeeds; subsequent calls hit inactive user (409) before rate limit.
-            r = client.post("/api/v1/candidates/me/delete-account", json={"confirmation": "DELETE"})
-            assert r.status_code in {200, 409}
-        # Fourth rapid call should be rate-limited or rejected as already deleted.
-        r4 = client.post("/api/v1/candidates/me/delete-account", json={"confirmation": "DELETE"})
-        assert r4.status_code in {409, 429}
+            assert _confirmed_delete(client, "WRONG").status_code == 422
+        assert _confirmed_delete(client).status_code == 429
+        db.refresh(user)
+        assert user.is_active
     finally:
         app.dependency_overrides.clear()
         db.close()
