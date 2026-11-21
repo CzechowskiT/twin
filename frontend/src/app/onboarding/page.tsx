@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import confetti from "canvas-confetti";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
@@ -26,21 +26,17 @@ function readStoredStep(): number {
   return Number.isFinite(n) && n >= 0 && n < STEPS.length ? n : 0;
 }
 
-/** Epic 2.9 first-value: land on Home/Today (Daily OS), not a forced module tour. */
-function postOnboardingPath(): string {
-  return "/dashboard";
-}
-
-export default function OnboardingPage() {
+function OnboardingFlow() {
   const router = useRouter();
+  const profileSaved = useSearchParams().get("profile") === "saved";
   const { t } = useTranslation();
   const [step, setStep] = useState(0);
   const [finishing, setFinishing] = useState(false);
 
   useEffect(() => {
     if (!getToken()) router.replace("/login/candidate");
-    else queueMicrotask(() => setStep(readStoredStep()));
-  }, [router]);
+    else queueMicrotask(() => setStep(profileSaved ? STEPS.length - 1 : readStoredStep()));
+  }, [router, profileSaved]);
 
   useEffect(() => {
     if (typeof window !== "undefined") window.localStorage.setItem(STORAGE_KEY, String(step));
@@ -58,43 +54,43 @@ export default function OnboardingPage() {
       if (PRODUCT_FUNNEL_CLIENT_ENABLED) {
         trackEvent("onboarding_completed", {
           surface: "onboarding",
-          ttv_matches_redirect: false,
+          ttv_matches_redirect: Boolean(opts?.celebrate && profileSaved),
         });
       }
       if (opts?.celebrate) {
         confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
-        toast.success(t("onboardingFlow.doneToast"));
+        if (!profileSaved) toast.success(t("onboardingFlow.doneToast"));
       }
       return true;
     },
-    [router, t],
+    [router, t, profileSaved],
   );
 
   const finish = useCallback(async () => {
     setFinishing(true);
     try {
-      await completeOnboarding({ celebrate: true });
+      if (!(await completeOnboarding({ celebrate: true }))) return;
       if (PRODUCT_FUNNEL_CLIENT_ENABLED) {
         trackEvent("pilot_consent_oriented", { surface: "onboarding_finish" });
         trackEvent("pilot_first_value_reached", { surface: "onboarding_finish" });
       }
-      router.push(postOnboardingPath());
+      router.push(profileSaved ? "/dashboard/matches?activated=1" : "/dashboard");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t("onboardingFlow.failed"));
     } finally {
       setFinishing(false);
     }
-  }, [completeOnboarding, router, t]);
+  }, [completeOnboarding, router, t, profileSaved]);
 
   const skipToDashboard = useCallback(async () => {
     setFinishing(true);
     try {
-      await completeOnboarding();
+      if (!(await completeOnboarding())) return;
       if (PRODUCT_FUNNEL_CLIENT_ENABLED) {
         trackEvent("pilot_onboarding_skipped", { surface: "onboarding_skip" });
         trackEvent("pilot_first_value_reached", { surface: "onboarding_skip" });
       }
-      router.push(postOnboardingPath());
+      router.push("/dashboard");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t("onboardingFlow.failed"));
     } finally {
@@ -163,7 +159,7 @@ export default function OnboardingPage() {
                   disabled={finishing}
                   onClick={() => void finish()}
                 >
-                  {t("onboardingFlow.finish")}
+                  {t(profileSaved ? "onboardingFlow.finishSeeMatches" : "onboardingFlow.finish")}
                 </button>
               )}
               {step > 0 ? (
@@ -185,4 +181,8 @@ export default function OnboardingPage() {
       </Card>
     </Shell>
   );
+}
+
+export default function OnboardingPage() {
+  return <Suspense fallback={null}><OnboardingFlow /></Suspense>;
 }

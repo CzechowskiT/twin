@@ -107,4 +107,43 @@ test.describe("landing auth-shell browser", () => {
         .toBeNull();
     });
   });
+
+  test("logout updates the homepage while the server request is pending", async ({ browser }) => {
+    await withFreshContext(browser, async (context) => {
+      await seedPlLocale(context);
+      await context.route("**/api/v1/auth/me", (route) => route.fulfill({
+        json: { email: "logout-fixture@example.invalid" },
+      }));
+      let finishLogout = () => {};
+      const logoutPending = new Promise<void>((resolve) => { finishLogout = resolve; });
+      await context.route("**/api/v1/auth/logout", async (route) => {
+        await logoutPending;
+        await route.fulfill({ json: { revoked: true } });
+      });
+
+      const page = await context.newPage();
+      await openLandingHome(page);
+      await page.evaluate(() => {
+        const payload = btoa(JSON.stringify({ exp: Math.floor(Date.now() / 1000) + 600 }));
+        window.localStorage.setItem("twin_access_token", `fixture.${payload}.signature`);
+        window.localStorage.setItem("twin_refresh_token", "fixture-refresh");
+        window.dispatchEvent(new StorageEvent("storage", { key: "twin_access_token" }));
+      });
+
+      const logout = page.getByRole("button", { name: /^Wyloguj$/i });
+      await expect(logout).toBeVisible();
+      const request = page.waitForRequest("**/api/v1/auth/logout");
+      try {
+        await logout.click();
+        expect((await request).method()).toBe("POST");
+        await assertGuestMarketingAuthShell(page);
+        expect(await page.evaluate(() => [
+          window.localStorage.getItem("twin_access_token"),
+          window.localStorage.getItem("twin_refresh_token"),
+        ])).toEqual([null, null]);
+      } finally {
+        finishLogout();
+      }
+    });
+  });
 });

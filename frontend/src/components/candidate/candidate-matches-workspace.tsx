@@ -1,13 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
-import { ActivationMatchingStatus } from "@/components/candidate/activation-matching-status";
+import { ActivationMatchingStatus, type ActivationStatus } from "@/components/candidate/activation-matching-status";
 import { CandidateWorkspaceSubnav } from "@/components/candidate-workspace-subnav";
 import { useTranslation } from "@/components/language-provider";
-import { DemoJourneyPilotStatus } from "@/components/workspace/demo-journey-pilot-status";
 import { JobList } from "@/components/job-list";
 import { Card, Shell } from "@/components/ui";
 import { GuidedEmptyState } from "@/components/ux/guided-empty-state";
@@ -18,11 +17,8 @@ import { getToken } from "@/lib/auth";
 import { CANDIDATE_CANONICAL_ROUTES } from "@/lib/candidate-canonical-routes";
 import { WorkspaceHandoffBanner, startWorkspaceHandoff } from "@/components/candidate/workspace-handoff-banner";
 import { useRouter } from "next/navigation";
-import {
-  CANDIDATE_MATCHES_PAGE_MARKER,
-  CANDIDATE_MATCHES_PILOT_ITEMS,
-  CANDIDATE_MATCHES_PILOT_MISSING,
-} from "@/lib/candidate-offers-matches-demo-data";
+import { CANDIDATE_MATCHES_PAGE_MARKER } from "@/lib/candidate-offers-matches-demo-data";
+import { ACTIVATION_MATCHING_STATUS_ENABLED } from "@/lib/features";
 import { dashboardMatchesQuery } from "@/lib/matching-quality";
 
 export function CandidateMatchesWorkspace() {
@@ -33,9 +29,10 @@ export function CandidateMatchesWorkspace() {
   const [matches, setMatches] = useState<DashboardMatchList | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activationPending, setActivationPending] = useState(false);
+  const requestId = useRef(0);
 
   const loadMatches = useCallback(async () => {
+    const id = ++requestId.current;
     const token = getToken();
     if (!token) {
       setLoading(false);
@@ -43,33 +40,31 @@ export function CandidateMatchesWorkspace() {
     }
     try {
       const data = await apiFetch<DashboardMatchList>(dashboardMatchesQuery(), {}, token);
-      setMatches(data);
+      if (id === requestId.current) {
+        setMatches(data);
+        setError(null);
+      }
     } catch {
-      setError(t("jobBoard.loadError"));
+      if (id === requestId.current) setError(t("jobBoard.loadError"));
     } finally {
-      setLoading(false);
+      if (id === requestId.current) setLoading(false);
     }
   }, [t]);
 
   useEffect(() => {
-    void loadMatches();
+    let mounted = true;
+    queueMicrotask(() => {
+      if (mounted) void loadMatches();
+    });
+    return () => { mounted = false; };
   }, [loadMatches]);
 
-  // Re-fetch matches when activation matching completes
-  useEffect(() => {
-    if (!activated || !activationPending) return;
-    const id = window.setInterval(() => {
-      void loadMatches();
-    }, 3000);
-    return () => window.clearInterval(id);
-  }, [activated, activationPending, loadMatches]);
+  const onStatusChange = useCallback((status: ActivationStatus | null) => {
+    if (status?.status === "completed") void loadMatches();
+  }, [loadMatches]);
 
   const liveItems = matches?.items ?? [];
-  // During activation path, activation banner owns empty/pending UX (no pilot sample cards).
-  const showPilotCards = !loading && liveItems.length === 0 && !activated;
-  const displayItems = showPilotCards ? CANDIDATE_MATCHES_PILOT_ITEMS : liveItems;
-
-  const pageTitle = useMemo(() => t("candidateMatchesPage.pageTitle"), [t]);
+  const pageTitle = t("candidateMatchesPage.pageTitle");
 
   return (
     <Shell wide rail>
@@ -111,38 +106,21 @@ export function CandidateMatchesWorkspace() {
 
         <ActivationMatchingStatus
           activated={activated}
-          matchCount={liveItems.length}
-          onStatusChange={(s) => {
-            setActivationPending(s?.ux_state === "matching_in_progress");
-            if (s && (s.ux_state === "matches_ready" || s.match_count > 0)) {
-              void loadMatches();
-            }
-          }}
+          matchCount={matches && !error ? liveItems.length : null}
+          onStatusChange={onStatusChange}
         />
 
         {error ? <p className="text-sm text-red-500">{error}</p> : null}
         {loading ? <p className="twin-muted text-sm">{t("dashboard.matchesLoading")}</p> : null}
 
-        {showPilotCards ? (
-          <Card variant="soft" className="border border-[var(--twin-border)]/80 p-4 text-sm">
-            <DemoJourneyPilotStatus className="items-start" />
-            <p className="mt-3 text-[var(--twin-muted-strong)]">{t("candidateMatchesPage.pilotLead")}</p>
-            <ul className="mt-3 list-inside list-disc text-[var(--twin-fg)]">
-              {CANDIDATE_MATCHES_PILOT_MISSING.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </Card>
-        ) : null}
-
-        {!loading && displayItems.length > 0 && !showPilotCards ? (
+        {!loading && liveItems.length > 0 ? (
           <Card variant="soft" className="p-5 sm:p-6">
-            <JobList items={displayItems} showScore />
+            <JobList items={liveItems} showScore />
             <p className="twin-muted mt-4 text-xs leading-relaxed">{t("candidateMatchesPage.decisionBoundary")}</p>
           </Card>
         ) : null}
 
-        {!loading && !showPilotCards && displayItems.length === 0 && !activated ? (
+        {!loading && !error && liveItems.length === 0 && !(activated && ACTIVATION_MATCHING_STATUS_ENABLED) ? (
           <GuidedEmptyState
             title={t("candidateMatchesPage.emptyTitle")}
             message={t("candidateMatchesPage.emptyMessage")}

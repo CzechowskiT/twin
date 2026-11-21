@@ -9,6 +9,8 @@ from app.core.deps import get_current_user
 from app.database.models import Candidate, User
 from app.database.session import get_db
 from app.schemas.profile_import import ImportCvTextIn, ImportLinkedInIn, ProfileImportOut
+from app.services.activation_matching import dispatch_first_match_after_profile_save
+from app.services.candidate_first_pilot import is_free_candidate_pilot
 from app.services.career_assistant_common import get_candidate_for_user
 from app.services.gamification import record_activity
 from app.services.linkedin_profile_import import (
@@ -30,11 +32,15 @@ def _next_steps(synthesized: dict) -> list[str]:
 
 
 async def _run_import(raw: dict, candidate: Candidate, user: User, db: Session) -> ProfileImportOut:
-    synthesized = synthesize_profile_with_ai(raw) or synthesize_profile_deterministic(raw)
+    if is_free_candidate_pilot(db, user):
+        synthesized = synthesize_profile_deterministic(raw, allow_external_ai=False)
+    else:
+        synthesized = synthesize_profile_with_ai(raw) or synthesize_profile_deterministic(raw)
     apply_synthesis_to_candidate(candidate, synthesized)
     db.commit()
     db.refresh(candidate)
     record_activity(db, candidate, event="profile_update")
+    dispatch_first_match_after_profile_save(db, user, candidate)
     completeness = int(synthesized.get("profile_completeness") or 0)
     return ProfileImportOut(
         synthesized=synthesized,

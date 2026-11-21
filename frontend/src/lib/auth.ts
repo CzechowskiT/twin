@@ -2,12 +2,15 @@ import { clearSessionPersona } from "@/lib/session-persona";
 
 const TOKEN_KEY = "twin_access_token";
 const REFRESH_KEY = "twin_refresh_token";
+const SESSION_CHANGE_EVENT = "twin-session-change";
+const AUTH_STORAGES = ["localStorage", "sessionStorage"] as const;
 
 /** Browser-agnostic token storage with localStorage → sessionStorage fallback. */
 function getStorage(): Storage | null {
   if (typeof window === "undefined") return null;
-  for (const store of [window.localStorage, window.sessionStorage]) {
+  for (const storage of AUTH_STORAGES) {
     try {
+      const store = window[storage];
       const probe = "__twin_storage_test__";
       store.setItem(probe, "1");
       store.removeItem(probe);
@@ -17,6 +20,19 @@ function getStorage(): Storage | null {
     }
   }
   return null;
+}
+
+/** Keep session-dependent UI in sync within this tab and across tabs. */
+export function subscribeToAuthSession(onChange: () => void): () => void {
+  const onStorage = (event: StorageEvent) => {
+    if (event.key === TOKEN_KEY || event.key === null) onChange();
+  };
+  window.addEventListener(SESSION_CHANGE_EVENT, onChange);
+  window.addEventListener("storage", onStorage);
+  return () => {
+    window.removeEventListener(SESSION_CHANGE_EVENT, onChange);
+    window.removeEventListener("storage", onStorage);
+  };
 }
 
 export function getToken(): string | null {
@@ -45,29 +61,38 @@ export function setToken(token: string, refreshToken?: string | null): void {
   try {
     store.setItem(TOKEN_KEY, token);
     if (refreshToken) store.setItem(REFRESH_KEY, refreshToken);
+    window.dispatchEvent?.(new Event(SESSION_CHANGE_EVENT));
   } catch {
     /* private mode / blocked storage */
   }
 }
 
 export function clearToken(): void {
-  const store = getStorage();
-  if (!store) return;
-  try {
-    store.removeItem(TOKEN_KEY);
-    store.removeItem(REFRESH_KEY);
-  } catch {
-    /* ignore */
+  if (typeof window === "undefined") return;
+  let clearedAccess = false;
+  for (const storage of AUTH_STORAGES) {
+    try {
+      const store = window[storage];
+      const hadAccess = store.getItem(TOKEN_KEY) !== null;
+      store.removeItem(TOKEN_KEY);
+      clearedAccess ||= hadAccess;
+      store.removeItem(REFRESH_KEY);
+    } catch {
+      /* The browser may deny access to one of the storage areas. */
+    }
   }
   clearSessionPersona();
+  if (clearedAccess) window.dispatchEvent?.(new Event(SESSION_CHANGE_EVENT));
 }
 
-/** Server logout (current or everywhere) then clear local tokens. */
+/** Clear this browser's session immediately and ask the API to revoke it. */
 export async function logoutSession(opts?: {
   everywhere?: boolean;
   stepUpToken?: string;
 }): Promise<void> {
   const token = getToken();
+  const everywhere = Boolean(opts?.everywhere);
+  if (!everywhere) clearToken();
   if (token) {
     try {
       const { apiFetch } = await import("@/lib/api");
@@ -78,15 +103,18 @@ export async function logoutSession(opts?: {
         {
           method: "POST",
           headers,
-          body: JSON.stringify({ everywhere: Boolean(opts?.everywhere) }),
+          body: JSON.stringify({ everywhere }),
+          keepalive: !everywhere,
+          preserveSessionOnUnauthorized: !everywhere,
+          timeoutMs: everywhere ? undefined : 12_000,
         },
         token,
       );
     } catch {
-      /* still clear local */
+      /* Local sign-out still applies if the API is unavailable. */
     }
   }
-  clearToken();
+  if (everywhere) clearToken();
 }
 
 export function isStorageAvailable(): boolean {

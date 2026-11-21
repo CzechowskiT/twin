@@ -135,6 +135,20 @@ def _latest_job(db: Session, user_id: int) -> ActivationMatchingJob | None:
     )
 
 
+def dispatch_first_match_after_profile_save(db: Session, user: User, candidate: Candidate) -> None:
+    """Finish activation when the candidate completed onboarding before their profile."""
+    if not get_settings().activation_auto_matching_enabled or user.onboarding_completed_at is None:
+        return
+    if not profile_min_complete(candidate)[0]:
+        return
+    previous = _latest_job(db, user.id)
+    if previous is None or previous.status == STATUS_NOT_ELIGIBLE or (
+        previous.status == STATUS_COMPLETED and previous.match_count == 0
+        and previous.profile_version != profile_version_for(candidate)
+    ):
+        maybe_dispatch_after_onboarding(db, user, trigger="profile_saved")
+
+
 def maybe_dispatch_after_onboarding(
     db: Session,
     user: User,

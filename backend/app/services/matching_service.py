@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.database.models import Candidate, Job, JobMatch
-from app.matching.matcher import calculate_match_score
+from app.matching.matcher import calculate_match_score, has_role_or_skill_overlap
 from app.services.job_matching_v2 import calculate_match_score_v2, calculate_match_score_v2_tfidf
 from app.matching.quality_gate import match_quality_label
 from app.matching.ranking import (
@@ -105,7 +105,10 @@ def find_top_matches(
             continue
         if skip_dedupe_keys and feed_dedupe_key(job) in skip_dedupe_keys:
             continue
-        fit = score_fn(cand, job_to_dict(job))
+        job_data = job_to_dict(job)
+        if job.id not in apply_boost and job.id not in relevant_boost and not has_role_or_skill_overlap(cand, job_data):
+            continue
+        fit = score_fn(cand, job_data)
         final = compute_final_score(
             fit,
             job,
@@ -143,7 +146,7 @@ def find_top_matches(
             }
         )
 
-    if persist:
+    if persist and results:
         db.commit()
         from app.services.product_notifications import maybe_send_first_match_after_match
 

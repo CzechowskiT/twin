@@ -38,14 +38,14 @@ CV:
 """
 
 
-def enrich_from_cv_text(cv_text: str, existing: dict[str, Any]) -> dict[str, Any]:
+def enrich_from_cv_text(cv_text: str, existing: dict[str, Any], *, allow_external_ai: bool = True) -> dict[str, Any]:
     """Merge CV insights into profile fields."""
     merged = dict(existing)
     merged.setdefault("preferred_job_titles", [])
     rule_skills = _skills_from_cv_keywords(cv_text)
     merged["skills"] = _merge_skills(existing.get("skills", []), rule_skills)
 
-    if is_anthropic_configured():
+    if allow_external_ai and is_anthropic_configured():
         ai = _enrich_with_claude(cv_text)
         if ai:
             merged["skills"] = _merge_skills(merged["skills"], ai.get("skills", []))

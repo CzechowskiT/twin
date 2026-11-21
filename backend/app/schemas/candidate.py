@@ -43,6 +43,7 @@ class CandidateOut(BaseModel):
     name: str
     skills: list[str]
     preferred_job_titles: list[str] = Field(default_factory=list)
+    matching_profile_complete: bool = False
     experience_years: int
     desired_salary: int | None
     location: str | None
@@ -74,6 +75,7 @@ class CvUploadOut(BaseModel):
     cv_filename: str | None
     skills_updated: list[str]
     preferred_job_titles: list[str] = Field(default_factory=list)
+    matching_profile_complete: bool = False
     experience_years: int
     location: str | None
     cv_insights: dict[str, Any] | None = None

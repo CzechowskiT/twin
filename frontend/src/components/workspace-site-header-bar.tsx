@@ -9,7 +9,7 @@ import { useTranslation } from "@/components/language-provider";
 import { PersonaBadge } from "@/components/persona-badge";
 import { useMarketingPersona } from "@/components/persona-provider";
 import { apiFetch } from "@/lib/api";
-import { clearToken, getToken, hasActiveSession, logoutSession } from "@/lib/auth";
+import { getToken, hasActiveSession, logoutSession, subscribeToAuthSession } from "@/lib/auth";
 import { isDemoUserEmail } from "@/lib/demo-user";
 import { scrollToDashboardHash } from "@/lib/dashboard-anchor";
 import {
@@ -41,10 +41,9 @@ export function WorkspaceSiteHeaderBar() {
   const highlightDemoNav = isDemoUserEmail(userEmail);
 
   useEffect(() => {
-    const sync = () => setHasSession(hasActiveSession());
+    const sync = () => queueMicrotask(() => setHasSession(hasActiveSession()));
     sync();
-    window.addEventListener("storage", sync);
-    return () => window.removeEventListener("storage", sync);
+    return subscribeToAuthSession(sync);
   }, [pathname]);
 
   useEffect(() => {
@@ -89,11 +88,9 @@ export function WorkspaceSiteHeaderBar() {
     "border-[var(--twin-accent)]/50 bg-[var(--twin-accent-muted)] text-[var(--twin-accent-hover)]";
 
   const logout = () => {
-    const loginPath = logoutRedirectPath(persona);
-    void logoutSession().then(() => {
-      closeMobileMenu();
-      router.push(loginPath);
-    });
+    closeMobileMenu();
+    void logoutSession();
+    router.replace(logoutRedirectPath(persona));
   };
 
   return (

@@ -16,11 +16,13 @@ from typing import Any
 from sqlalchemy.orm import Session
 
 from app.config import Settings, get_settings
+from app.core.plans import PlanTier, effective_plan_tier
 from app.database.models import (
     CandidatePilotAllowlist,
     CandidatePilotCohort,
     CandidatePilotIntakeRow,
     CandidatePilotInvitationPack,
+    User,
 )
 from app.services import candidate_invite_tokens as invite_tokens
 
@@ -145,6 +147,23 @@ JOURNEY_MODULES = {
         "note": "Celery retries + failed extraction_status; no silent stuck running",
     },
 }
+
+
+def is_free_candidate_pilot(db: Session, user: User) -> bool:
+    """Check the current candidate roster so membership changes apply on the next request."""
+    if effective_plan_tier(user) != PlanTier.FREE:
+        return False
+    return (
+        db.query(CandidatePilotAllowlist.id)
+        .join(CandidatePilotCohort, CandidatePilotCohort.id == CandidatePilotAllowlist.cohort_id)
+        .filter(
+            CandidatePilotAllowlist.email_hash == invite_tokens.hash_email(user.email),
+            CandidatePilotAllowlist.active.is_(True),
+            CandidatePilotAllowlist.revoked_at.is_(None),
+            CandidatePilotCohort.status.in_((STATUS_FOUNDER_APPROVED, STATUS_ACTIVE)),
+        )
+        .first() is not None
+    )
 
 
 def _utcnow() -> datetime:
